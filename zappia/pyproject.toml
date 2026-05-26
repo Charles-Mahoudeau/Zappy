@@ -19,8 +19,8 @@ authors = [
     { name = "Ethan Charpentier", email = "ethan.charpentier@epitech.eu" },
     { name = "Thomas Boucard", email = "thomas.boucard@epitech.eu" },
 ]
-description = "Renforcement learning project for the Zappy"
-readme = { file = "README.txt", content-type = "text/markdown" }
+description = "Reinforcement learning project for the Zappy"
+readme = { file = "README.md", content-type = "text/markdown" }
 [build-system]
 requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
