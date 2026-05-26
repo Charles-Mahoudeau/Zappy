@@ -25,7 +25,7 @@ def connectToServer(host, port, name):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.settimeout(5)
     try:
-        s.connect((host, int(port)))
+        s.connect((host, port))
         s.sendall(f"{name}\n".encode())
         return s
     except OSError as exc:
@@ -39,6 +39,12 @@ if __name__ == "__main__":
         sys.exit(-1)
     port = getArg("-p")
     if port is None:
+        print("USAGE: ./zappy_ai -p port -n name -h machine")
+        sys.exit(-1)
+    try:
+        port = int(port)
+    except ValueError:
+        print("Error: port must be a number")
         print("USAGE: ./zappy_ai -p port -n name -h machine")
         sys.exit(-1)
     name = getArg("-n")
