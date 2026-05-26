@@ -4,11 +4,11 @@ on:
   push:
     paths:
       - "zappia/**"
-      - ".github/workflows/python/zappia.yaml"
+      - ".github/workflows/zappia.yaml"
   pull_request:
     paths:
       - "zappia/**"
-      - ".github/workflows/python/zappia.yaml"
+      - ".github/workflows/zappia.yaml"
   workflow_dispatch:
 
 jobs:
