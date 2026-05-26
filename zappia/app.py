@@ -15,7 +15,9 @@ import socket
 def getArg(arg_name):
     for i in range(len(sys.argv)):
         if sys.argv[i] == arg_name:
-            return sys.argv[i + 1]
+            if i + 1 < len(sys.argv) and not sys.argv[i + 1].startswith("-"):
+                return sys.argv[i + 1]
+            return None
     return None
 
 def connectToServer(host, port, name):
