@@ -8,5 +8,10 @@
 !/.clang-format
 !/.clang-tidy
 
+# Project files
+!/ai/
+!/gui/
+!/server/
+
 # Documentation
 /README.md
