@@ -3,8 +3,12 @@ name: CTest
 on:
   pull_request:
     branches: [ "**" ]
+    paths:
+      - 'zappy/**'
   push:
     branches: [ main ]
+    paths:
+      - 'zappy/**'
 
 env:
   BUILD_TYPE: Release
@@ -34,7 +38,7 @@ jobs:
             ccache-${{ github.ref }}-
             ccache-
       - name: Configure CMake
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+        run: cmake -S zappy -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
       - name: Build
         run: cmake --build build --config ${{env.BUILD_TYPE}}
       - name: Run CTest

@@ -1,9 +1,15 @@
 name: Linter
+
 on:
   pull_request:
     branches: [ "**" ]
+    paths:
+      - 'zappy/**'
   push:
     branches: [ main ]
+    paths:
+      - 'zappy/**'
+
 permissions:
   contents: read
   pull-requests: read
@@ -24,7 +30,7 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends build-essential cmake clang-format-20 clang-tidy-20
       - name: Configure CMake
-        run: cmake -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+        run: cmake -S zappy -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
       - name: Run cpp-linter
         uses: cpp-linter/cpp-linter-action@v2
         id: linter
