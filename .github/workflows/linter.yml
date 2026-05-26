@@ -5,10 +5,12 @@ on:
     branches: [ "**" ]
     paths:
       - 'zappy/**'
+      - '.github/workflows/linter.yml'
   push:
     branches: [ main ]
     paths:
       - 'zappy/**'
+      - '.github/workflows/linter.yml'
 
 permissions:
   contents: read

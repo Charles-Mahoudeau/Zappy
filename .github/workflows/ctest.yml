@@ -5,10 +5,12 @@ on:
     branches: [ "**" ]
     paths:
       - 'zappy/**'
+      - '.github/workflows/ctest.yml'
   push:
     branches: [ main ]
     paths:
       - 'zappy/**'
+      - '.github/workflows/ctest.yml'
 
 env:
   BUILD_TYPE: Release
