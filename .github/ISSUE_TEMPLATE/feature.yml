@@ -1,0 +1,68 @@
+name: New feature request
+description: File a new feature request.
+labels: enhancement
+type: feature
+body:
+  - type: 'markdown'
+    attributes:
+      value: |
+        # New feature proposal
+        
+        Ensure the new feature proposal is clear and concise, providing all necessary information for the development team to understand and implement the feature effectively.
+        
+        ## Details:
+
+        * **Description:** A clear and concise description of the new feature, outlining its purpose and benefits.
+        * **Requirements:** A detailed list of requirements that the new feature must meet, including any specific technical constraints or design principles that should be followed.
+        * **Implementation:** A high-level overview of how the new feature should be implemented, including where it fits within the existing project structure and any relevant design patterns or architectural considerations.
+        * **Code examples:** Provide code snippets or examples that illustrate how the new feature should work, demonstrating its intended usage and behavior.
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What is the description of the new feature?
+      placeholder: |
+        Add argc/argv parsing that...
+    validations:
+      required: true
+  - type: textarea
+    id: requirements
+    attributes:
+      label: Requirements
+      description: What are the requirements for the new feature?
+      placeholder: |
+        * You **must** use ``std::string_view`` for string parameters.
+        * You **must** use ``std::optional`` for optional parameters.
+        * ...
+      value: |
+        * The class **must** respect the [Rule of 5](https://www.geeksforgeeks.org/cpp/rule-of-five-in-cpp/).
+        * The class **must** respect [RAII principle](https://www.geeksforgeeks.org/cpp/resource-acquisition-is-initialization/).
+        * The class **must** use custom exceptions for error handling.
+        * The new feature **must** be tested with unit tests.
+    validations:
+      required: true
+  - type: textarea
+    id: implementation
+    attributes:
+      label: Implementation
+      description: How the new feature should be implemented? Where does it fit in the project?
+      placeholder: |
+        * The class **may** be called ``ArgParser``.
+        * The argument parsing **should** be integrated in ``main.cpp`` execution loop.
+        * The class **should** be in ``shared`` source directory.
+    validations:
+      required: true
+  - type: textarea
+    id: code_examples
+    attributes:
+      label: Code examples
+      description: What are some code examples of the new feature?
+      placeholder: |
+        ```cpp
+        int main(int argc, char** argv) {
+          ArgParser parser{argc, argv};
+        
+          auto input_file = parser.get<std::string_view>("input");
+          // ...
+        }
+        ```
