@@ -1,0 +1,72 @@
+name: Bug report
+description: File a bug report to help us fix issues.
+body:
+  - type: 'markdown'
+    attributes:
+      value: |
+        # Bug report
+        
+        Ensure the bug report is clear and concise, providing all necessary information for the development team to reproduce, isolate, and fix the issue effectively.
+        
+        ## Details:
+
+        * **Description:** A clear and concise description of what the bug is and how it impacts the project.
+        * **Steps to reproduce:** A detailed, step-by-step list of instructions to reliably trigger the bug.
+        * **Expected behavior:** A description of what you expected to happen under normal circumstances.
+        * **Actual behavior & Logs:** A description of what actually happened, including any crash logs, stack traces, or relevant code snippets demonstrating the failure.
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What is the description of the bug?
+      placeholder: |
+        When parsing command-line arguments using `ArgParser`, providing a flag without its corresponding value causes a segmentation fault rather than throwing the expected custom exception.
+    validations:
+      required: true
+  - type: textarea
+    id: steps_to_reproduce
+    attributes:
+      label: Steps to reproduce
+      description: How can the development team reproduce this bug?
+      placeholder: |
+        1. Compile the program using `CMake` and `GCC 12`.
+        2. Execute the compiled binary from the terminal: `./my_app --input`
+        3. Do not provide a string argument after the `--input` flag.
+        4. Observe the segmentation fault.
+    validations:
+      required: true
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen?
+      placeholder: |
+        * The `ArgParser` **should** detect the missing value.
+        * The class **must** throw an `InvalidArgumentException` (or similar custom exception).
+        * The application **should** catch the exception, print the usage guide, and exit gracefully.
+    validations:
+      required: true
+  - type: textarea
+    id: actual_behavior_and_logs
+    attributes:
+      label: Actual behavior & Logs
+      description: What actually happened? Please provide any crash logs, stack traces, or code examples.
+      placeholder: |
+        The program crashes immediately. Here is the stack trace:
+        
+        ```text
+        Segmentation fault (core dumped)
+        #0  0x00007ffff7a9b... in std::string_view::length() const
+        #1  0x0000555555555... in ArgParser::get<std::string_view>(...)
+        ```
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: What operating system, compiler, and version are you using?
+      placeholder: |
+        Ubuntu 22.04 LTS, GCC 12.3.0, CMake 3.22.1
+    validations:
+      required: false
