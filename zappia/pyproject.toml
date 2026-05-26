@@ -11,6 +11,8 @@ dependencies = [
     "scikit-learn",
     "seaborn",
     "jupyterlab",
+    "ruff",
+    "flake8",
 ]
 requires-python = ">= 3.8"
 authors = [
