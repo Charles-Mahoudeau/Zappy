@@ -9,8 +9,9 @@
 !/zappy/.clang-tidy
 
 # Project files
-!/zappy
-!/zappia
+!/zappy/
+!/zappia/
+!/Makefile
 
 # Documentation
 !/README.md
