@@ -4,5 +4,9 @@
 !/.gitignore
 !/.github/
 
+# C++ configuration files
+!/.clang-format
+!/.clang-tidy
+
 # Documentation
 /README.md
