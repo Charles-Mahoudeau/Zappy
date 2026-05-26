@@ -5,13 +5,12 @@
 !/.github/
 
 # C++ configuration files
-!/.clang-format
-!/.clang-tidy
+!/zappy/.clang-format
+!/zappy/.clang-tidy
 
 # Project files
-!/ai/
-!/gui/
-!/server/
+!/zappy
+!/zappia
 
 # Documentation
 !/README.md
