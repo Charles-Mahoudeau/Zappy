@@ -7,25 +7,24 @@
 We use the **C++23** standard. All code must reflect modern C++ paradigms.
 Key principles include:
 
-* **RAII:** Resource acquisition is initialization is mandatory. Avoid manual
+* **RAII:** Resource Acquisition Is Initialization (RAII) is mandatory. Avoid manual
   memory management (`new`/`delete`).
 * **Smart Pointers:** Use `std::unique_ptr` and `std::shared_ptr` exclusively.
 * **Type Safety:** Prefer `std::expected`, `std::optional`, and strong typing
   over error codes or `void*`.
-* **STL & Ranges:** Use the `<ranges>` and `<algorithms>` libraries to write
+* **STL & Ranges:** Use the `<ranges>` and `<algorithm>` libraries to write
   expressive, declarative code.
 * **Const-Correctness:** Mark variables and methods as `const` whenever
   possible to ensure immutability.
 * **Structured Bindings:** Use structured bindings for clarity when unpacking
   tuples or pairs.
 * **Modern Features:** Leverage C++23 features to improve code clarity and
-  safety. Use ``std::string_view`` for read-only string parameters, `std::span`
-  for array views, and `std::format` for string formatting, ...
+  safety. Use `std::string_view` for read-only string parameters, `std::span`
+  for array views, and `std::format` for string formatting.
 
 ### Coding Style
 
-We follow the **Google C++ Style Guide** with specific **Epitech-style tweaks
-**:
+We follow the **Google C++ Style Guide** with specific **Epitech-style tweaks**:
 
 * **Naming:** `PascalCase` for classes, `camelCase` for methods/functions, and
   `camelCase` for private members with a leading underscore (e.g.,
@@ -54,8 +53,7 @@ the correct branch.
 
 ## Commit Message Format
 
-We follow
-the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
+We follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
 specification.
 
 **Format:** `<type>(<scope>): <description>`
