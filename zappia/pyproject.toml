@@ -1,0 +1,24 @@
+[project]
+name = "Zappy-IA"
+version = "0.0.1"
+dependencies = [
+    "torch",
+    "pytest",
+    "numpy",
+    "scipy",
+    "matplotlib",
+    "pandas",
+    "scikit-learn",
+    "seaborn",
+    "jupyterlab",
+]
+requires-python = ">= 3.8"
+authors = [
+    { name = "Ethan Charpentier", email = "ethan.charpentier@epitech.eu" },
+    { name = "Thomas Boucard", email = "thomas.boucard@epitech.eu" },
+]
+description = "Renforcement learning project for the Zappy"
+readme = { file = "README.txt", content-type = "text/markdown" }
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
