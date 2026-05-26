@@ -14,7 +14,7 @@ dependencies = [
     "ruff",
     "flake8",
 ]
-requires-python = ">= 3.8"
+requires-python = ">= 3.9"
 authors = [
     { name = "Ethan Charpentier", email = "ethan.charpentier@epitech.eu" },
     { name = "Thomas Boucard", email = "thomas.boucard@epitech.eu" },
