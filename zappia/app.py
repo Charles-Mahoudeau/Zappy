@@ -22,11 +22,15 @@ def getArg(arg_name):
 
 def connectToServer(host, port, name):
     print(f"Connecting to server at {host}:{port} with name {name}")
-
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((host, int(port)))
-    s.sendall(f"{name}\n".encode())
-    return s
+    s.settimeout(5)
+    try:
+        s.connect((host, int(port)))
+        s.sendall(f"{name}\n".encode())
+        return s
+    except OSError as exc:
+        s.close()
+        raise ConnectionError(f"Unable to connect to {host}:{port}") from exc
 
 
 if __name__ == "__main__":
@@ -53,6 +57,6 @@ if __name__ == "__main__":
     PATH = config["PATH"]
 
     s = connectToServer(host, port, name)
-
+    s.close()
     model = DQNAgent()
 
