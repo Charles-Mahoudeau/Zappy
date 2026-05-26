@@ -6,11 +6,11 @@
 ##
 
 import torch
-import agent as DQNAgent
 import yaml
 import os
 import sys
 import socket
+from agent import DQNAgent
 
 def getArg(arg_name):
     for i in range(len(sys.argv)):
