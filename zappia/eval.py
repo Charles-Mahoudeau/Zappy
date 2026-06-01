@@ -6,7 +6,7 @@
 ##
 
 import torch
-import agent as DQNAgent
+import zappia.ppo_agent as DQNAgent
 import yaml
 
 with open("zappia/configs/model.yml", "r") as f:

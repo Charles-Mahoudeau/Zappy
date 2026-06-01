@@ -10,7 +10,7 @@ import yaml
 import os
 import sys
 import socket
-from agent import DQNAgent
+from zappia.ppo_agent import PPOAgent
 
 def getArg(arg_name):
     for i in range(len(sys.argv)):
@@ -32,29 +32,22 @@ def connectToServer(host, port, name):
         s.close()
         raise ConnectionError(f"Unable to connect to {host}:{port}") from exc
 
+def printUsage():
+    print("USAGE: ./zappy_ai -p port -n name -h machine")
+    sys.exit(-1)
 
 if __name__ == "__main__":
     if len(sys.argv) != 7:
-        print("USAGE: ./zappy_ai -p port -n name -h machine")
-        sys.exit(-1)
+        printUsage()
     port = getArg("-p")
     if port is None:
-        print("USAGE: ./zappy_ai -p port -n name -h machine")
-        sys.exit(-1)
-    try:
-        port = int(port)
-    except ValueError:
-        print("Error: port must be a number")
-        print("USAGE: ./zappy_ai -p port -n name -h machine")
-        sys.exit(-1)
+        printUsage()
     name = getArg("-n")
     if name is None:
-        print("USAGE: ./zappy_ai -p port -n name -h machine")
-        sys.exit(-1)
+        printUsage()
     host = getArg("-h")
     if host is None:
-        print("USAGE: ./zappy_ai -p port -n name -h machine")
-        sys.exit(-1)
+        printUsage()
     if not os.path.exists("zappia/configs/model.yml"):
         print("Model config file not found")
         sys.exit(-1)
@@ -64,5 +57,5 @@ if __name__ == "__main__":
 
     s = connectToServer(host, port, name)
     s.close()
-    model = DQNAgent()
+    model = PPOAgent()
 
