@@ -42,9 +42,9 @@ It also contains the entity database, which is used to store and manage all game
 
 * ``zappy::game::IEntity``: An interface for all game entities, including players, resources, and world objects.
 * ``zappy::game::EntityDatabase``: A database of all game entities, including players, resources, and world objects.
-* ``zappy::game::Player``: Represents a player in the game, including their position, inventory, and state.
-* ``zappy::game::Resource``: Represents a resource in the game, including its type and quantity.
-* ``zappy::game::Egg``: Represents an egg in the game, including its position and hatch time.
+* ``zappy::game::entities::Player``: Represents a player in the game, including their position, inventory, and state.
+* ``zappy::game::entities::Resource``: Represents a resource in the game, including its type and quantity.
+* ``zappy::game::entities::Egg``: Represents an egg in the game, including its position and hatch time.
 * ``zappy::game::World``: Represents the game world, including the map, resources, and entities.
 
 ### Why entity database?
