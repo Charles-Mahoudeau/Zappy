@@ -66,3 +66,5 @@ It interacts with the game logic module to update the game state based on client
 * ``zappy::ICommand``: An interface that represents a command received from a client, including the command name and arguments.
 * ``zappy::CommandHandler``: Parses and executes commands received from clients.
 * ``zappy::commands::<Command>``: Represents a specific command, including its name, arguments, and execution logic.
+
+![Alt text](./architecture.png "Schema")
