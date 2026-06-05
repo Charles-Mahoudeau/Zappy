@@ -17,31 +17,47 @@ from torchrl.envs import EnvBase
 
 RESOURCES = ["food", "linemate", "deraumere", "sibur", "mendiane", "phiras", "thystame"]
 COMMANDS = [
-    "Forward", "Right", "Left", "Look", "Inventory",
+    "Forward",
+    "Right",
+    "Left",
+    "Look",
+    "Inventory",
     "Broadcast",
-    "Take food", "Take linemate", "Take deraumere", "Take sibur",
-    "Take mendiane", "Take phiras", "Take thystame",
-    "Set food", "Set linemate", "Set deraumere", "Set sibur",
-    "Set mendiane", "Set phiras", "Set thystame",
-    "Fork", "Incantation", "Eject",
+    "Take food",
+    "Take linemate",
+    "Take deraumere",
+    "Take sibur",
+    "Take mendiane",
+    "Take phiras",
+    "Take thystame",
+    "Set food",
+    "Set linemate",
+    "Set deraumere",
+    "Set sibur",
+    "Set mendiane",
+    "Set phiras",
+    "Set thystame",
+    "Fork",
+    "Incantation",
+    "Eject",
 ]
 
 # FOV: at level L the player sees (L+1)^2 tiles.  Max level = 8 → 81 tiles.
-MAX_LEVEL   = 8
-MAX_TILES   = (MAX_LEVEL + 1) ** 2   # 81
-TILE_FEAT   = len(RESOURCES) + 1     # 8  (7 resources + player count)
-FOV_FEAT    = MAX_TILES * TILE_FEAT  # 648
+MAX_LEVEL = 8
+MAX_TILES = (MAX_LEVEL + 1) ** 2  # 81
+TILE_FEAT = len(RESOURCES) + 1  # 8  (7 resources + player count)
+FOV_FEAT = MAX_TILES * TILE_FEAT  # 648
 
-MAX_BROADCASTS   = 3
+MAX_BROADCASTS = 3
 # per broadcast: 9 (direction 0-8) + 8 (sender level one-hot) = 17
-BROADCAST_FEAT   = MAX_BROADCASTS * (9 + MAX_LEVEL)   # 51
-RECENT_ACT_FEAT  = len(COMMANDS) + 1                  # 24
+BROADCAST_FEAT = MAX_BROADCASTS * (9 + MAX_LEVEL)  # 51
+RECENT_ACT_FEAT = len(COMMANDS) + 1  # 24
 
 OBSERVATION_SIZE = (
-    len(RESOURCES)   # inventory
-    + MAX_LEVEL      # level one-hot
-    + 1              # food time
-    + len(RESOURCES) # resource deficit
+    len(RESOURCES)  # inventory
+    + MAX_LEVEL  # level one-hot
+    + 1  # food time
+    + len(RESOURCES)  # resource deficit
     + FOV_FEAT
     + BROADCAST_FEAT
     + RECENT_ACT_FEAT
@@ -54,8 +70,15 @@ ELEVATION_REQ = {
     4: {"players": 4, "linemate": 1, "deraumere": 1, "sibur": 2, "phiras": 1},
     5: {"players": 4, "linemate": 1, "deraumere": 2, "sibur": 1, "mendiane": 3},
     6: {"players": 6, "linemate": 1, "deraumere": 2, "sibur": 3, "phiras": 1},
-    7: {"players": 6, "linemate": 2, "deraumere": 2, "sibur": 2,
-        "mendiane": 2, "phiras": 2, "thystame": 1},
+    7: {
+        "players": 6,
+        "linemate": 2,
+        "deraumere": 2,
+        "sibur": 2,
+        "mendiane": 2,
+        "phiras": 2,
+        "thystame": 1,
+    },
 }
 
 
@@ -80,12 +103,15 @@ class ZappyEnv(EnvBase):
 
         self.observation_spec = Composite(
             observation=Unbounded(
-                shape=torch.Size([OBSERVATION_SIZE]), dtype=torch.float32, device=self.device
+                shape=torch.Size([OBSERVATION_SIZE]),
+                dtype=torch.float32,
+                device=self.device,
             ),
             action_mask=Unbounded(
                 shape=torch.Size([len(COMMANDS)]), dtype=torch.bool, device=self.device
             ),
-            shape=self.batch_size, device=self.device,
+            shape=self.batch_size,
+            device=self.device,
         )
         self.reward_spec = Unbounded(
             shape=torch.Size([1]), dtype=torch.float32, device=self.device
@@ -93,7 +119,9 @@ class ZappyEnv(EnvBase):
         self.done_spec = Categorical(
             2, shape=torch.Size([1]), dtype=torch.bool, device=self.device
         )
-        self.action_spec = Categorical(len(COMMANDS), shape=torch.Size([1]), device=self.device)
+        self.action_spec = Categorical(
+            len(COMMANDS), shape=torch.Size([1]), device=self.device
+        )
 
     def _send(self, msg: str) -> None:
         if self.sock is None:
@@ -137,7 +165,7 @@ class ZappyEnv(EnvBase):
         if idx == -1:
             return None
         line = self._recv_buf[:idx].strip()
-        self._recv_buf = self._recv_buf[idx + 1:]
+        self._recv_buf = self._recv_buf[idx + 1 :]
         return line
 
     def _recv_response(self, timeout: float = 3.0) -> str:
@@ -172,7 +200,7 @@ class ZappyEnv(EnvBase):
     def _handle_broadcast(self, line: str) -> None:
         """Parse 'message K, INCANT_N' and push (direction, text, sender_level) into buffer."""
         try:
-            rest = line[len("message "):]
+            rest = line[len("message ") :]
             k_str, text = rest.split(",", 1)
             direction = int(k_str.strip())
             text = text.strip()
@@ -193,7 +221,7 @@ class ZappyEnv(EnvBase):
         self._send("Look")
         self._send("Inventory")
         look_raw = self._recv_response()
-        inv_raw  = self._recv_response()
+        inv_raw = self._recv_response()
         if look_raw.startswith("["):
             self.last_look = self._parse_look(look_raw)
         if inv_raw.startswith("["):
@@ -247,7 +275,7 @@ class ZappyEnv(EnvBase):
         req = ELEVATION_REQ.get(self.level, {})
         for r in RESOURCES:
             needed = req.get(r, 0)
-            have   = self.inventory.get(r, 0)
+            have = self.inventory.get(r, 0)
             obs.append(max(0, needed - have) / max(needed, 1))
 
         obs.extend(self._encode_fov())
@@ -271,11 +299,14 @@ class ZappyEnv(EnvBase):
                 while True:
                     try:
                         if not self.sock.recv(4096):
-                            self.sock.close(); self.sock = None; break
+                            self.sock.close()
+                            self.sock = None
+                            break
                     except socket.timeout:
                         break
                     except (OSError, BrokenPipeError):
-                        self.sock = None; break
+                        self.sock = None
+                        break
             except Exception:
                 self.sock = None
             if self.sock:
@@ -298,7 +329,9 @@ class ZappyEnv(EnvBase):
                     self.sock = None
                 time.sleep(1.0)
             else:
-                raise RuntimeError(f"Cannot connect to {self.host}:{self.port} after 30 attempts")
+                raise RuntimeError(
+                    f"Cannot connect to {self.host}:{self.port} after 30 attempts"
+                )
 
         self._fetch_state()
         return self._build_tensordict(self._build_obs(), False, None)
@@ -319,16 +352,43 @@ class ZappyEnv(EnvBase):
 
         cmd_to_send = f"Broadcast INCANT_{self.level}" if action_idx == 5 else cmd
         self._send(cmd_to_send)
-        
+
         needs_look = action_idx in (
-            0, 1, 2,
-            6, 7, 8, 9, 10, 11, 12,
-            13, 14, 15, 16, 17, 18, 19,
-            21, 22,
+            0,
+            1,
+            2,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            21,
+            22,
         )
         needs_inv = action_idx in (
-            6, 7, 8, 9, 10, 11, 12,
-            13, 14, 15, 16, 17, 18, 19,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
             21,
         )
         if self._steps_since_refresh >= 8:
@@ -363,9 +423,9 @@ class ZappyEnv(EnvBase):
             except ValueError:
                 pass
 
-        done    = "dead" in action_resp.lower() or self.sock is None
-        reward  = self._compute_reward(action_idx, action_resp)
-        obs     = self._build_obs() if not done else self._empty_obs()
+        done = "dead" in action_resp.lower() or self.sock is None
+        reward = self._compute_reward(action_idx, action_resp)
+        obs = self._build_obs() if not done else self._empty_obs()
 
         detail = self._describe_command(cmd, prev_inv, self.inventory)
         self.last_command_detail = detail
@@ -397,7 +457,7 @@ class ZappyEnv(EnvBase):
         if not welcome:
             return False
         self._send(self.team)
-        client_num = self._recv_response(timeout=2.0)   # "" if team is full
+        client_num = self._recv_response(timeout=2.0)  # "" if team is full
         if not client_num:
             return False
         xy = self._recv_response(timeout=2.0)
@@ -414,7 +474,7 @@ class ZappyEnv(EnvBase):
     # ── Reward ────────────────────────────────────────────────────────────────
 
     def _compute_reward(self, action_idx: int, response: str) -> float:
-        r    = 0.0
+        r = 0.0
         resp = response.strip()
 
         if "dead" in resp.lower():
@@ -424,38 +484,38 @@ class ZappyEnv(EnvBase):
 
         food = self.inventory.get("food", 0)
         if food < 2:
-            r -= (2 - food) * 1.5               # critical only — was (food<5)*0.5
+            r -= (2 - food) * 1.5  # critical only — was (food<5)*0.5
 
         if "Current level:" in resp:
             r += 200.0 * self.level
             return r
 
-        if action_idx == 21 and resp == "ko":   # Incantation failed
-            r -= 20.0                            # softer: was 200*level
+        if action_idx == 21 and resp == "ko":  # Incantation failed
+            r -= 20.0  # softer: was 200*level
 
-        if action_idx == 6:                     # Take food
+        if action_idx == 6:  # Take food
             r += (10.0 if food < 5 else 2.0) if resp == "ok" else -1.0
 
-        elif 7 <= action_idx <= 12:             # Take resource
+        elif 7 <= action_idx <= 12:  # Take resource
             resource = RESOURCES[action_idx - 6]
-            req      = ELEVATION_REQ.get(self.level, {})
-            needed   = req.get(resource, 0)
-            have     = self.inventory.get(resource, 0)
+            req = ELEVATION_REQ.get(self.level, {})
+            needed = req.get(resource, 0)
+            have = self.inventory.get(resource, 0)
             r += (20.0 if have < needed else 2.0) if resp == "ok" else -1.0
 
-        elif 13 <= action_idx <= 19:            # Set resource
-            resource     = RESOURCES[action_idx - 13]
-            req          = ELEVATION_REQ.get(self.level, {})
-            needed_tile  = req.get(resource, 0)
+        elif 13 <= action_idx <= 19:  # Set resource
+            resource = RESOURCES[action_idx - 13]
+            req = ELEVATION_REQ.get(self.level, {})
+            needed_tile = req.get(resource, 0)
             r += (5.0 if needed_tile > 0 else -1.0) if resp == "ok" else -3.0
 
-        elif action_idx == 22:                  # Eject
+        elif action_idx == 22:  # Eject
             r += -2.0 if resp == "ok" else -3.0
 
-        elif action_idx == 20:                  # Fork
+        elif action_idx == 20:  # Fork
             r -= 0.5
 
-        elif action_idx in (0, 1, 2):           # Move
+        elif action_idx in (0, 1, 2):  # Move
             nav_bonus = 0.0
             if action_idx == 0 and self.broadcast_buffer:
                 for direction, _, sender_level in self.broadcast_buffer:
@@ -464,14 +524,14 @@ class ZappyEnv(EnvBase):
                         break
             r += 0.05 + nav_bonus
 
-        elif action_idx in (3, 4):              # Look / Inventory (standalone)
+        elif action_idx in (3, 4):  # Look / Inventory (standalone)
             r -= 0.05
 
-        elif action_idx == 5:                   # Broadcast
+        elif action_idx == 5:  # Broadcast
             r -= 0.2
 
         if self.last_look:
-            tile0       = self.last_look[0]
+            tile0 = self.last_look[0]
             req_players = ELEVATION_REQ.get(self.level, {}).get("players", 1)
             if tile0.count("player") >= req_players:
                 r += 3.0
@@ -480,30 +540,33 @@ class ZappyEnv(EnvBase):
             r -= 1.0
 
         if len(self.action_history) >= 5 and len(set(self.action_history[-5:])) == 1:
-            r -= 2.0                            # looping penalty
+            r -= 2.0  # looping penalty
 
-        if len(self.action_history) >= 10 and self.action_history.count(action_idx) >= 4:
+        if (
+            len(self.action_history) >= 10
+            and self.action_history.count(action_idx) >= 4
+        ):
             r -= 0.5
 
         return r
 
     def get_action_mask(self) -> List[bool]:
-        mask  = [True] * len(COMMANDS)
+        mask = [True] * len(COMMANDS)
         tile0 = self.last_look[0] if self.last_look else []
 
         for i, r in enumerate(RESOURCES):
             if r not in tile0:
-                mask[6 + i] = False            # can't Take what isn't there
+                mask[6 + i] = False  # can't Take what isn't there
 
         for i, r in enumerate(RESOURCES):
             if self.inventory.get(r, 0) == 0:
-                mask[13 + i] = False           # can't Set what we don't have
+                mask[13 + i] = False  # can't Set what we don't have
 
-        req       = ELEVATION_REQ.get(self.level, {})
-        has_res   = all(self.inventory.get(r, 0) >= req.get(r, 0) for r in RESOURCES)
-        has_plrs  = tile0.count("player") >= req.get("players", 1)
+        req = ELEVATION_REQ.get(self.level, {})
+        has_res = all(self.inventory.get(r, 0) >= req.get(r, 0) for r in RESOURCES)
+        has_plrs = tile0.count("player") >= req.get("players", 1)
         if not (has_res and has_plrs):
-            mask[21] = False                   # Incantation conditions not met
+            mask[21] = False  # Incantation conditions not met
 
         return mask
 
@@ -519,14 +582,14 @@ class ZappyEnv(EnvBase):
         return COMMANDS[idx]
 
     def _build_tensordict(self, observation: np.ndarray, done: bool, reward):
-        obs_t  = torch.as_tensor(observation, dtype=torch.float32)
-        flag   = torch.tensor([done], dtype=torch.bool)
-        mask   = torch.tensor(self.get_action_mask(), dtype=torch.bool)
+        obs_t = torch.as_tensor(observation, dtype=torch.float32)
+        flag = torch.tensor([done], dtype=torch.bool)
+        mask = torch.tensor(self.get_action_mask(), dtype=torch.bool)
         source = {
             "observation": obs_t,
             "action_mask": mask,
-            "done":        flag,
-            "terminated":  flag.clone(),
+            "done": flag,
+            "terminated": flag.clone(),
         }
         if reward is not None:
             source["reward"] = torch.tensor([reward], dtype=torch.float32)

@@ -10,6 +10,7 @@ import os
 import sys
 import socket
 
+
 def get_args(arg_name):
     for i in range(len(sys.argv)):
         if sys.argv[i] == arg_name:
@@ -35,6 +36,7 @@ def connect_to_server(host, port, name):
 def printUsage():
     print("USAGE: ./zappy_ai -p port -n name -h machine")
     sys.exit(-1)
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 7:
