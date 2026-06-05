@@ -1,10 +1,3 @@
-##
-## EPITECH PROJECT, 2026
-## Zappy
-## File description:
-## app
-##
-
 import yaml
 import os
 import sys
@@ -59,4 +52,3 @@ if __name__ == "__main__":
 
     s = connect_to_server(host, port, name)
     s.close()
-    model = PPOAgent()

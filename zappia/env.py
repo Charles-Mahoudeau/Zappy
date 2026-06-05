@@ -1,10 +1,3 @@
-##
-## EPITECH PROJECT, 2026
-## Zappy
-## File description:
-## env
-##
-
 import socket
 import time
 from typing import List, Optional
@@ -165,7 +158,7 @@ class ZappyEnv(EnvBase):
         if idx == -1:
             return None
         line = self._recv_buf[:idx].strip()
-        self._recv_buf = self._recv_buf[idx + 1 :]
+        self._recv_buf = self._recv_buf[idx + 1:]
         return line
 
     def _recv_response(self, timeout: float = 3.0) -> str:
@@ -200,7 +193,7 @@ class ZappyEnv(EnvBase):
     def _handle_broadcast(self, line: str) -> None:
         """Parse 'message K, INCANT_N' and push (direction, text, sender_level) into buffer."""
         try:
-            rest = line[len("message ") :]
+            rest = line[len("message "):]
             k_str, text = rest.split(",", 1)
             direction = int(k_str.strip())
             text = text.strip()
