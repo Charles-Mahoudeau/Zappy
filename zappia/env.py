@@ -158,7 +158,7 @@ class ZappyEnv(EnvBase):
         if idx == -1:
             return None
         line = self._recv_buf[:idx].strip()
-        self._recv_buf = self._recv_buf[idx + 1:]
+        self._recv_buf = self._recv_buf[idx + 1 :]
         return line
 
     def _recv_response(self, timeout: float = 3.0) -> str:
@@ -193,7 +193,7 @@ class ZappyEnv(EnvBase):
     def _handle_broadcast(self, line: str) -> None:
         """Parse 'message K, INCANT_N' and push (direction, text, sender_level) into buffer."""
         try:
-            rest = line[len("message "):]
+            rest = line[len("message ") :]
             k_str, text = rest.split(",", 1)
             direction = int(k_str.strip())
             text = text.strip()
@@ -340,7 +340,7 @@ class ZappyEnv(EnvBase):
         self.last_command_sent = cmd
         self.sent_command_history.append(cmd)
         self.action_history.append(action_idx)
-        if len(self.action_history) > 10:
+        if len(self.action_history) > 20:
             self.action_history.pop(0)
 
         cmd_to_send = f"Broadcast INCANT_{self.level}" if action_idx == 5 else cmd
@@ -401,6 +401,11 @@ class ZappyEnv(EnvBase):
             second = self._recv_response(timeout=incant_timeout)
             action_resp = f"Elevation underway\n{second}"
 
+        if action_idx == 3 and action_resp.startswith("["):
+            self.last_look = self._parse_look(action_resp)
+        if action_idx == 4 and action_resp.startswith("["):
+            self.inventory = self._parse_inventory(action_resp)
+
         if needs_look:
             look_raw = self._recv_response()
             if look_raw.startswith("["):
@@ -450,7 +455,7 @@ class ZappyEnv(EnvBase):
         if not welcome:
             return False
         self._send(self.team)
-        client_num = self._recv_response(timeout=2.0)  # "" if team is full
+        client_num = self._recv_response(timeout=2.0)
         if not client_num:
             return False
         xy = self._recv_response(timeout=2.0)
@@ -463,8 +468,6 @@ class ZappyEnv(EnvBase):
             return int(x), int(y)
         except Exception:
             return (0, 0)
-
-    # ── Reward ────────────────────────────────────────────────────────────────
 
     def _compute_reward(self, action_idx: int, response: str) -> float:
         r = 0.0
@@ -487,7 +490,7 @@ class ZappyEnv(EnvBase):
             r -= 20.0  # softer: was 200*level
 
         if action_idx == 6:  # Take food
-            r += (10.0 if food < 5 else 2.0) if resp == "ok" else -1.0
+            r += (8.0 if food < 15 else 1.0) if resp == "ok" else -0.5
 
         elif 7 <= action_idx <= 12:  # Take resource
             resource = RESOURCES[action_idx - 6]
@@ -523,22 +526,31 @@ class ZappyEnv(EnvBase):
         elif action_idx == 5:  # Broadcast
             r -= 0.2
 
-        if self.last_look:
+        if self.last_look and self.level >= 2:
             tile0 = self.last_look[0]
             req_players = ELEVATION_REQ.get(self.level, {}).get("players", 1)
-            if tile0.count("player") >= req_players:
+            # tile0.count("player") counts OTHER players (server doesn't show self)
+            if tile0.count("player") >= req_players - 1:
                 r += 3.0
+
+        if self.last_look:
+            tile0 = self.last_look[0]
+            req = ELEVATION_REQ.get(self.level, {})
+            for res in RESOURCES[1:]:  # skip food
+                if req.get(res, 0) > self.inventory.get(res, 0) and res in tile0:
+                    r += 0.3
+                    break
 
         if resp.startswith("eject:"):
             r -= 1.0
 
         if len(self.action_history) >= 5 and len(set(self.action_history[-5:])) == 1:
-            r -= 2.0  # looping penalty
+            r -= 3.0
 
-        if (
-            len(self.action_history) >= 10
-            and self.action_history.count(action_idx) >= 4
-        ):
+        if len(self.action_history) >= 10 and len(set(self.action_history[-10:])) <= 2:
+            r -= 1.5
+
+        if len(self.action_history) >= 20 and len(set(self.action_history[-20:])) <= 5:
             r -= 0.5
 
         return r
@@ -547,19 +559,11 @@ class ZappyEnv(EnvBase):
         mask = [True] * len(COMMANDS)
         tile0 = self.last_look[0] if self.last_look else []
 
-        for i, r in enumerate(RESOURCES):
-            if r not in tile0:
-                mask[6 + i] = False  # can't Take what isn't there
-
-        for i, r in enumerate(RESOURCES):
-            if self.inventory.get(r, 0) == 0:
-                mask[13 + i] = False  # can't Set what we don't have
-
         req = ELEVATION_REQ.get(self.level, {})
         has_res = all(self.inventory.get(r, 0) >= req.get(r, 0) for r in RESOURCES)
-        has_plrs = tile0.count("player") >= req.get("players", 1)
+        has_plrs = tile0.count("player") >= req.get("players", 1) - 1
         if not (has_res and has_plrs):
-            mask[21] = False  # Incantation conditions not met
+            mask[21] = False
 
         return mask
 

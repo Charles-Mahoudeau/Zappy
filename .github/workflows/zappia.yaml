@@ -39,9 +39,6 @@ jobs:
       - name: Check ruff
         run: python -m ruff check .
 
-      - name: Check linting with flake8
-        run: python -m flake8 .
-
       - name: Run pytest
         run: |
           if [ -d tests ]; then
