@@ -66,7 +66,7 @@ jobs:
         uses: appleboy/ssh-action@v1.2.5
         env:
           TRAIN_NOTEBOOK_CHANGED: ${{ steps.notebook_changes.outputs.train_notebook }}
-          GIT_TOKEN: ${{ secrets.REPOSITORY_SSH_PRIVATE_KEY }}
+          GIT_TOKEN: ${{ secrets.ZAPPIA_GIT_TOKEN }}
         with:
           host: ${{ secrets.ZAPPIA_SSH_HOST }}
           username: ${{ secrets.ZAPPIA_SSH_USER }}
