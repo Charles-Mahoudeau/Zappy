@@ -66,16 +66,18 @@ jobs:
         uses: appleboy/ssh-action@v1.2.5
         env:
           TRAIN_NOTEBOOK_CHANGED: ${{ steps.notebook_changes.outputs.train_notebook }}
+          GIT_TOKEN: ${{ secrets.REPOSITORY_SSH_PRIVATE_KEY }}
         with:
           host: ${{ secrets.ZAPPIA_SSH_HOST }}
           username: ${{ secrets.ZAPPIA_SSH_USER }}
           key: ${{ secrets.ZAPPIA_SSH_PRIVATE_KEY }}
-          envs: TRAIN_NOTEBOOK_CHANGED
+          envs: TRAIN_NOTEBOOK_CHANGED,GIT_TOKEN
           envs_format: export
           command_timeout: 1m
           script: |
             set -e
             cd /root/Zappy
+            git remote set-url origin "https://x-access-token:${GIT_TOKEN}@github.com/${{ github.repository }}.git"
             git fetch origin "${{ github.ref_name }}"
             git checkout "${{ github.ref_name }}"
             git pull --ff-only origin "${{ github.ref_name }}"
