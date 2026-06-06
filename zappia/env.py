@@ -113,8 +113,26 @@ class ZappyEnv(EnvBase):
             2, shape=torch.Size([1]), dtype=torch.bool, device=self.device
         )
         self.action_spec = Categorical(
-            len(COMMANDS), shape=torch.Size([1]), device=self.device
+            len(COMMANDS), shape=torch.Size([]), device=self.device
         )
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        state["sock"] = None
+        state["_recv_buf"] = ""
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+
+    def close(self):
+        if self.sock is not None:
+            try:
+                self.sock.close()
+            except OSError:
+                pass
+            self.sock = None
+        super().close()
 
     def _send(self, msg: str) -> None:
         if self.sock is None:
@@ -509,7 +527,12 @@ class ZappyEnv(EnvBase):
             r += -2.0 if resp == "ok" else -3.0
 
         elif action_idx == 20:  # Fork
-            r -= 0.5
+            req_players = ELEVATION_REQ.get(self.level, {}).get("players", 1)
+            visible_players = self.last_look[0].count("player") if self.last_look else 0
+            if visible_players < req_players - 1:
+                r += 0.5
+            else:
+                r -= 0.5
 
         elif action_idx in (0, 1, 2):  # Move
             nav_bonus = 0.0

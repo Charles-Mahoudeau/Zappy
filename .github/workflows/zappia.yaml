@@ -22,11 +22,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: "3.9"
+          python-version: "3.13.5"
           cache: pip
           cache-dependency-path: zappia/pyproject.toml
 
@@ -35,6 +37,9 @@ jobs:
 
       - name: Install dependencies
         run: python -m pip install -e .
+
+      - name: List installed packages
+        run: python -m pip list
 
       - name: Check ruff
         run: python -m ruff check .
@@ -54,3 +59,37 @@ jobs:
           else
             echo "No ./app.py found; skipping smoke test."
           fi
+
+      - name: Detect train notebook changes
+        id: notebook_changes
+        uses: dorny/paths-filter@v4
+        with:
+          filters: |
+            train_notebook:
+              - zappia/train.ipynb
+              - zappia/env.py
+
+      - name: Deploy and launch training remotely
+        if: github.event_name == 'push' && success()
+        uses: appleboy/ssh-action@v1.2.5
+        env:
+          TRAIN_NOTEBOOK_CHANGED: ${{ steps.notebook_changes.outputs.train_notebook }}
+        with:
+          host: ${{ secrets.ZAPPIA_SSH_HOST }}
+          username: ${{ secrets.ZAPPIA_SSH_USER }}
+          key: ${{ secrets.ZAPPIA_SSH_PRIVATE_KEY }}
+          envs: TRAIN_NOTEBOOK_CHANGED
+          envs_format: export
+          command_timeout: 1m
+          script: |
+            set -e
+            cd /root/Zappy
+            git fetch origin "${{ github.ref_name }}"
+            git checkout "${{ github.ref_name }}"
+            git pull --ff-only origin "${{ github.ref_name }}"
+            cd zappia
+            python3.13.5 -m pip install --upgrade pip --quiet
+            python3.13.5 -m pip install -e . --quiet
+            if [ "${TRAIN_NOTEBOOK_CHANGED:-false}" = "true" ]; then
+              bash /root/launch_training.sh
+            fi
