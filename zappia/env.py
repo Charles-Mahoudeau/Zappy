@@ -614,3 +614,4 @@ class ZappyEnv(EnvBase):
         if reward is not None:
             source["reward"] = torch.tensor([reward], dtype=torch.float32)
         return TensorDict(source=source, batch_size=self.batch_size, device=self.device)
+        #test
