@@ -79,8 +79,8 @@ jobs:
             git checkout "${{ github.ref_name }}"
             git pull --ff-only origin "${{ github.ref_name }}"
             cd zappia
-            python3.13.5 -m pip install --upgrade pip --quiet
-            python3.13.5 -m pip install -e . --quiet
+            python3.13 -m pip install --upgrade pip --quiet
+            python3.13 -m pip install -e . --quiet
             if [ "${TRAIN_NOTEBOOK_CHANGED:-false}" = "true" ]; then
               bash /root/launch_training.sh
             fi
