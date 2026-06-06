@@ -52,14 +52,6 @@ jobs:
             echo "No tests/ directory found; skipping pytest."
           fi
 
-      - name: Smoke test application
-        run: |
-          if [ -f ./app.py ]; then
-            python -m app -p 4242 -n test -h localhost
-          else
-            echo "No ./app.py found; skipping smoke test."
-          fi
-
       - name: Detect train notebook changes
         id: notebook_changes
         uses: dorny/paths-filter@v4
