@@ -55,7 +55,7 @@ jobs:
       - name: Smoke test application
         run: |
           if [ -f ./app.py ]; then
-            python -m app
+            python -m app -p 4242 -n test -h localhost
           else
             echo "No ./app.py found; skipping smoke test."
           fi
