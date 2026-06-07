@@ -8,7 +8,7 @@ SERVER_LOG="/root/linux/zappy_server.log"
 TRAIN_LOG="$WORKDIR/train.log"
 
 # --- Kill existing processes ---
-pkill -f "jupyter.*train.ipynb" 2>/dev/null && echo "Killed previous training" || true
+pkill -f "papermill.*train.ipynb" 2>/dev/null && echo "Killed previous training" || true
 pkill -f "zappy_server"         2>/dev/null && echo "Killed previous zappy_server" || true
 sleep 2
 
@@ -42,12 +42,10 @@ python -m pip install -e /root/Zappy/zappia
 mkdir -p "$WORKDIR"
 : > "$TRAIN_LOG"
 
-nohup python -m jupyter nbconvert \
-  --to notebook \
-  --execute \
-  --ExecutePreprocessor.timeout=-1 \
-  --output train.executed.ipynb \
+nohup python -m papermill \
+  --log-output \
   train.ipynb \
+  train.executed.ipynb \
   > "$TRAIN_LOG" 2>&1 &
 TRAIN_PID=$!
 disown $TRAIN_PID
