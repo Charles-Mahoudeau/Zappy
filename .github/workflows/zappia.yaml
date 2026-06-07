@@ -54,15 +54,6 @@ jobs:
             echo "No tests/ directory found; skipping pytest."
           fi
 
-      - name: Detect train notebook changes
-        id: notebook_changes
-        uses: dorny/paths-filter@v4
-        with:
-          filters: |
-            train_notebook:
-              - zappia/train.ipynb
-              - zappia/env.py
-
   deploy:
     runs-on: ubuntu-latest
     needs: ci
