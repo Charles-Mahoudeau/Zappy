@@ -60,6 +60,11 @@ jobs:
     if: github.event_name == 'push' && needs.ci.result == 'success'
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
       - name: Prepare remote folder
         uses: appleboy/ssh-action@v1.2.5
         with:
