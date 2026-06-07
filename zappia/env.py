@@ -56,6 +56,16 @@ OBSERVATION_SIZE = (
     + RECENT_ACT_FEAT
 )
 
+SERVER_RESP_NAMES = {
+    0: "",
+    1: "ok",
+    2: "ko",
+    3: "dead",
+    4: "level_up",
+    5: "look_data",
+    6: "ejected",
+}
+
 ELEVATION_REQ = {
     1: {"players": 1, "linemate": 1},
     2: {"players": 2, "linemate": 1, "deraumere": 1, "sibur": 1},
@@ -102,6 +112,9 @@ class ZappyEnv(EnvBase):
             ),
             action_mask=Unbounded(
                 shape=torch.Size([len(COMMANDS)]), dtype=torch.bool, device=self.device
+            ),
+            server_response=Unbounded(
+                shape=torch.Size([]), dtype=torch.int32, device=self.device
             ),
             shape=self.batch_size,
             device=self.device,
@@ -323,7 +336,7 @@ class ZappyEnv(EnvBase):
             if self.sock:
                 self.sock.settimeout(None)
         else:
-            for _attempt in range(30):
+            for _ in range(30):
                 try:
                     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
@@ -442,12 +455,13 @@ class ZappyEnv(EnvBase):
         done = "dead" in action_resp.lower() or self.sock is None
         reward = self._compute_reward(action_idx, action_resp)
         obs = self._build_obs() if not done else self._empty_obs()
+        resp_code = self._encode_server_response(action_resp)
 
         detail = self._describe_command(cmd, prev_inv, self.inventory)
         self.last_command_detail = detail
         self.command_history.append(detail)
 
-        return self._build_tensordict(obs, done, reward)
+        return self._build_tensordict(obs, done, reward, server_response=resp_code)
 
     def _parse_look(self, raw: str) -> List[List[str]]:
         raw = raw.strip().lstrip("[").rstrip("]")
@@ -496,9 +510,9 @@ class ZappyEnv(EnvBase):
 
         food = self.inventory.get("food", 0)
 
-        # Gentle food gradient: encourage keeping food high, not a cliff
-        if food < 5:
-            r -= (5 - food) * 0.3
+        # Reward being well-fed rather than punishing hunger — death (-500) handles starvation
+        if food >= 5:
+            r += 0.3
 
         if "Current level:" in resp:
             r += 200.0 * self.level
@@ -571,6 +585,16 @@ class ZappyEnv(EnvBase):
                     r += 1.0
                     break
 
+        # Reward proportional to incantation readiness (% of resources collected)
+        req = ELEVATION_REQ.get(self.level, {})
+        res_needed = {r: v for r, v in req.items() if r != "players"}
+        if res_needed:
+            ratio = sum(
+                min(self.inventory.get(res, 0), needed) / needed
+                for res, needed in res_needed.items()
+            ) / len(res_needed)
+            r += ratio * 2.0  # up to +2.0 when fully stocked
+
         if resp.startswith("eject:"):
             r -= 1.0
 
@@ -612,7 +636,25 @@ class ZappyEnv(EnvBase):
     def _action_to_cmd(self, idx: int) -> str:
         return COMMANDS[idx]
 
-    def _build_tensordict(self, observation: np.ndarray, done: bool, reward):
+    def _encode_server_response(self, resp: str) -> int:
+        resp = resp.strip()
+        if resp == "ok":
+            return 1
+        if resp == "ko":
+            return 2
+        if "dead" in resp.lower():
+            return 3
+        if "Current level:" in resp or "Elevation underway" in resp:
+            return 4
+        if resp.startswith("["):
+            return 5
+        if resp.startswith("eject:"):
+            return 6
+        return 0
+
+    def _build_tensordict(
+        self, observation: np.ndarray, done: bool, reward, server_response: int = 0
+    ):
         obs_t = torch.as_tensor(observation, dtype=torch.float32)
         flag = torch.tensor([done], dtype=torch.bool)
         mask = torch.tensor(self.get_action_mask(), dtype=torch.bool)
@@ -621,6 +663,7 @@ class ZappyEnv(EnvBase):
             "action_mask": mask,
             "done": flag,
             "terminated": flag.clone(),
+            "server_response": torch.tensor(server_response, dtype=torch.int32),
         }
         if reward is not None:
             source["reward"] = torch.tensor([reward], dtype=torch.float32)
