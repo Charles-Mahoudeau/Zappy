@@ -87,18 +87,12 @@ jobs:
 
       - name: Install and launch training remotely
         uses: appleboy/ssh-action@v1.2.5
-        env:
-          TRAIN_NOTEBOOK_CHANGED: ${{ needs.ci.outputs.train_notebook_changed }}
         with:
           host: ${{ secrets.ZAPPIA_SSH_HOST }}
           username: ${{ secrets.ZAPPIA_SSH_USER }}
           key: ${{ secrets.ZAPPIA_SSH_PRIVATE_KEY }}
-          envs: TRAIN_NOTEBOOK_CHANGED
           envs_format: export
           script: |
             set -e
             cd /root/Zappy/zappia
-            python3.13 -m pip install -e . --break-system-packages --quiet
-            if [ "${TRAIN_NOTEBOOK_CHANGED:-false}" = "true" ]; then
-              bash /root/launch_training.sh
-            fi
+            bash /root/launch_training.sh
