@@ -61,7 +61,38 @@ jobs:
               - zappia/train.ipynb
               - zappia/env.py
 
-      - name: Deploy and launch training remotely
+      - name: Prepare remote folder
+        if: github.event_name == 'push' && success()
+        uses: appleboy/ssh-action@v1.2.5
+        with:
+          host: ${{ secrets.ZAPPIA_SSH_HOST }}
+          username: ${{ secrets.ZAPPIA_SSH_USER }}
+          key: ${{ secrets.ZAPPIA_SSH_PRIVATE_KEY }}
+          script: |
+            set -e
+            rm -rf /root/Zappy/zappia
+            mkdir -p /root/Zappy
+
+      - name: Upload zappia via SCP
+        if: github.event_name == 'push' && success()
+        uses: appleboy/scp-action@v1.0.0
+        with:
+          host: ${{ secrets.ZAPPIA_SSH_HOST }}
+          username: ${{ secrets.ZAPPIA_SSH_USER }}
+          key: ${{ secrets.ZAPPIA_SSH_PRIVATE_KEY }}
+          source: "zappia/**"
+          target: "/root/Zappy"
+      - name: Upload pyproject.toml via SCP
+        if: github.event_name == 'push' && success()
+        uses: appleboy/scp-action@v1.0.0
+        with:
+          host: ${{ secrets.ZAPPIA_SSH_HOST }}
+          username: ${{ secrets.ZAPPIA_SSH_USER }}
+          key: ${{ secrets.ZAPPIA_SSH_PRIVATE_KEY }}
+          source: "zappia/pyproject.toml"
+          target: "/root/Zappy/zappia"
+
+      - name: Install and launch training remotely
         if: github.event_name == 'push' && success()
         uses: appleboy/ssh-action@v1.2.5
         env:
@@ -72,15 +103,10 @@ jobs:
           key: ${{ secrets.ZAPPIA_SSH_PRIVATE_KEY }}
           envs: TRAIN_NOTEBOOK_CHANGED
           envs_format: export
-          command_timeout: 1m
           script: |
             set -e
-            cd /root/Zappy
-            git checkout "${{ github.ref_name }}"
-            git pull --ff-only origin "${{ github.ref_name }}"
-            cd zappia
-            python3.13 -m pip install --upgrade pip --quiet
-            python3.13 -m pip install -e . --quiet
+            cd /root/Zappy/zappia
+            python3.13 -m pip install -e . --break-system-packages --quiet
             if [ "${TRAIN_NOTEBOOK_CHANGED:-false}" = "true" ]; then
               bash /root/launch_training.sh
             fi

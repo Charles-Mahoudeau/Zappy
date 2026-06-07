@@ -492,39 +492,41 @@ class ZappyEnv(EnvBase):
         resp = response.strip()
 
         if "dead" in resp.lower():
-            return r - 500.0
-
-        r += 0.1
+            return -500.0
 
         food = self.inventory.get("food", 0)
-        if food < 2:
-            r -= (2 - food) * 1.5  # critical only — was (food<5)*0.5
+
+        # Gentle food gradient: encourage keeping food high, not a cliff
+        if food < 5:
+            r -= (5 - food) * 0.3
 
         if "Current level:" in resp:
             r += 200.0 * self.level
             return r
 
         if action_idx == 21 and resp == "ko":  # Incantation failed
-            r -= 20.0  # softer: was 200*level
+            r -= 5.0
 
         if action_idx == 6:  # Take food
-            r += (8.0 if food < 15 else 1.0) if resp == "ok" else -0.5
+            if resp == "ok":
+                r += 5.0 if food < 5 else 1.0
+            # no penalty on fail: food wasn't there, neutral
 
         elif 7 <= action_idx <= 12:  # Take resource
             resource = RESOURCES[action_idx - 6]
             req = ELEVATION_REQ.get(self.level, {})
             needed = req.get(resource, 0)
             have = self.inventory.get(resource, 0)
-            r += (20.0 if have < needed else 2.0) if resp == "ok" else -1.0
+            r += (15.0 if have < needed else 1.0) if resp == "ok" else 0.0
 
         elif 13 <= action_idx <= 19:  # Set resource
             resource = RESOURCES[action_idx - 13]
             req = ELEVATION_REQ.get(self.level, {})
             needed_tile = req.get(resource, 0)
-            r += (5.0 if needed_tile > 0 else -1.0) if resp == "ok" else -3.0
+            r += (5.0 if needed_tile > 0 else -1.0) if resp == "ok" else -2.0
 
         elif action_idx == 22:  # Eject
-            r += -2.0 if resp == "ok" else -3.0
+            r -= 2.0
 
         elif action_idx == 20:  # Fork
             req_players = ELEVATION_REQ.get(self.level, {}).get("players", 1)
@@ -543,38 +545,47 @@ class ZappyEnv(EnvBase):
                         break
             r += 0.05 + nav_bonus
 
-        elif action_idx in (3, 4):  # Look / Inventory (standalone)
-            r -= 0.05
-
         elif action_idx == 5:  # Broadcast
             r -= 0.2
+        # Look / Inventory: neutre (ni récompensé ni pénalisé)
+
+        # Reward for seeing food when hungry
+        if action_idx == 3 and self.last_look and food < 8:
+            for tile in self.last_look:
+                if "food" in tile:
+                    r += 0.5
+                    break
 
         if self.last_look and self.level >= 2:
             tile0 = self.last_look[0]
             req_players = ELEVATION_REQ.get(self.level, {}).get("players", 1)
-            # tile0.count("player") counts OTHER players (server doesn't show self)
             if tile0.count("player") >= req_players - 1:
                 r += 3.0
 
+        # Reward for seeing a needed resource on current tile
         if self.last_look:
             tile0 = self.last_look[0]
             req = ELEVATION_REQ.get(self.level, {})
-            for res in RESOURCES[1:]:  # skip food
+            for res in RESOURCES[1:]:
                 if req.get(res, 0) > self.inventory.get(res, 0) and res in tile0:
-                    r += 0.3
+                    r += 1.0
                     break
 
         if resp.startswith("eject:"):
             r -= 1.0
 
-        if len(self.action_history) >= 5 and len(set(self.action_history[-5:])) == 1:
-            r -= 3.0
-
-        if len(self.action_history) >= 10 and len(set(self.action_history[-10:])) <= 2:
-            r -= 1.5
-
-        if len(self.action_history) >= 20 and len(set(self.action_history[-20:])) <= 5:
-            r -= 0.5
+        # Repetition penalty only when NOT hungry (don't punish survival loops)
+        if food >= 3:
+            if (
+                len(self.action_history) >= 5
+                and len(set(self.action_history[-5:])) == 1
+            ):
+                r -= 2.0
+            if (
+                len(self.action_history) >= 10
+                and len(set(self.action_history[-10:])) <= 2
+            ):
+                r -= 1.0
 
         return r
 
@@ -614,3 +625,4 @@ class ZappyEnv(EnvBase):
         if reward is not None:
             source["reward"] = torch.tensor([reward], dtype=torch.float32)
         return TensorDict(source=source, batch_size=self.batch_size, device=self.device)
+        # test
