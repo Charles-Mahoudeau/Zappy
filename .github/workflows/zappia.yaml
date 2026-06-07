@@ -12,8 +12,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  ci:
     runs-on: ubuntu-latest
+    outputs:
+      train_notebook_changed: ${{ steps.notebook_changes.outputs.train_notebook }}
 
     defaults:
       run:
@@ -61,8 +63,13 @@ jobs:
               - zappia/train.ipynb
               - zappia/env.py
 
+  deploy:
+    runs-on: ubuntu-latest
+    needs: ci
+    if: github.event_name == 'push' && needs.ci.result == 'success'
+
+    steps:
       - name: Prepare remote folder
-        if: github.event_name == 'push' && success()
         uses: appleboy/ssh-action@v1.2.5
         with:
           host: ${{ secrets.ZAPPIA_SSH_HOST }}
@@ -74,7 +81,6 @@ jobs:
             mkdir -p /root/Zappy
 
       - name: Upload zappia via SCP
-        if: github.event_name == 'push' && success()
         uses: appleboy/scp-action@v1.0.0
         with:
           host: ${{ secrets.ZAPPIA_SSH_HOST }}
@@ -82,21 +88,11 @@ jobs:
           key: ${{ secrets.ZAPPIA_SSH_PRIVATE_KEY }}
           source: "zappia/**"
           target: "/root/Zappy"
-      - name: Upload pyproject.toml via SCP
-        if: github.event_name == 'push' && success()
-        uses: appleboy/scp-action@v1.0.0
-        with:
-          host: ${{ secrets.ZAPPIA_SSH_HOST }}
-          username: ${{ secrets.ZAPPIA_SSH_USER }}
-          key: ${{ secrets.ZAPPIA_SSH_PRIVATE_KEY }}
-          source: "zappia/pyproject.toml"
-          target: "/root/Zappy/zappia"
 
       - name: Install and launch training remotely
-        if: github.event_name == 'push' && success()
         uses: appleboy/ssh-action@v1.2.5
         env:
-          TRAIN_NOTEBOOK_CHANGED: ${{ steps.notebook_changes.outputs.train_notebook }}
+          TRAIN_NOTEBOOK_CHANGED: ${{ needs.ci.outputs.train_notebook_changed }}
         with:
           host: ${{ secrets.ZAPPIA_SSH_HOST }}
           username: ${{ secrets.ZAPPIA_SSH_USER }}
