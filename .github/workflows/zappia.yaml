@@ -95,4 +95,4 @@ jobs:
           script: |
             set -e
             cd /root/Zappy/zappia
-            bash /root/launch_training.sh
+            bash /root/zappia/launch_training.sh
