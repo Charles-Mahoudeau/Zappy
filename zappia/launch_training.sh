@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
-# Place this file on the VM at /root/launch_training.sh
-# Called by the GitHub Actions workflow after git pull + pip install
-# CWD when called: /root/Zappy/zappia
 set -euo pipefail
 
 WORKDIR="/root/Zappy/zappia"
