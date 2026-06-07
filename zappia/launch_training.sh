@@ -40,13 +40,45 @@ python -m ensurepip --upgrade
 python -m pip install --upgrade pip setuptools wheel
 python -m pip install -e /root/Zappy/zappia
 
-nohup python -m jupyter nbconvert \
-  --to notebook \
-  --execute \
-  --ExecutePreprocessor.timeout=-1 \
-  --output train.executed.ipynb \
-  train.ipynb \
-  > "$TRAIN_LOG" 2>&1 &
+mkdir -p "$WORKDIR"
+: > "$TRAIN_LOG"
+
+nohup python - <<'PY' > "$TRAIN_LOG" 2>&1 &
+from pathlib import Path
+import nbformat
+from nbclient import NotebookClient
+
+workdir = Path("/root/Zappy/zappia")
+input_path = workdir / "train.ipynb"
+output_path = workdir / "train.executed.ipynb"
+
+print(f"[train] Loading {input_path}", flush=True)
+notebook = nbformat.read(input_path, as_version=4)
+code_cells = sum(1 for cell in notebook.cells if cell.cell_type == "code")
+print(f"[train] Executing {len(notebook.cells)} cells ({code_cells} code)", flush=True)
+
+
+class LoggingNotebookClient(NotebookClient):
+  def execute_cell(self, cell, cell_index, execution_count=None, store_history=True):
+    if cell.cell_type == "code":
+      preview = cell.source.strip().splitlines()[0] if cell.source.strip() else "<empty>"
+      print(f"[train] Cell {cell_index + 1}/{len(notebook.cells)} start: {preview[:120]}", flush=True)
+    result = super().execute_cell(cell, cell_index, execution_count=execution_count, store_history=store_history)
+    if cell.cell_type == "code":
+      print(f"[train] Cell {cell_index + 1}/{len(notebook.cells)} done", flush=True)
+    return result
+
+
+client = LoggingNotebookClient(
+  notebook,
+  timeout=-1,
+  kernel_name="python3",
+  resources={"metadata": {"path": str(workdir)}},
+)
+client.execute()
+nbformat.write(notebook, output_path)
+print(f"[train] Wrote {output_path}", flush=True)
+PY
 TRAIN_PID=$!
 disown $TRAIN_PID
 sleep 15
