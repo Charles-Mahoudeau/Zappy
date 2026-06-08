@@ -13,7 +13,7 @@ pkill -f "zappy_server"         2>/dev/null && echo "Killed previous zappy_serve
 sleep 2
 
 # --- Start zappy_server ---
-nohup "$SERVER_BIN" -p 4242 -x 10 -y 10 -n team1 -c 10 -f 10000 \
+nohup "$SERVER_BIN" -p 4242 -x 10 -y 10 -n team1 -c 10 -f 100 \
   > "$SERVER_LOG" 2>&1 &
 SERVER_PID=$!
 disown $SERVER_PID
