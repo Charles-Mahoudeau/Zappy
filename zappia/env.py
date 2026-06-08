@@ -103,6 +103,8 @@ class ZappyEnv(EnvBase):
         self.position = (0, 0)
         self.broadcast_buffer: List[tuple] = []
         self._steps_since_refresh = 0
+        self._ko_streak = 0
+        self._is_dead = False
 
         self.observation_spec = Composite(
             observation=Unbounded(
@@ -195,8 +197,12 @@ class ZappyEnv(EnvBase):
     def _recv_response(self, timeout: float = 3.0) -> str:
         """
         Return the next command response.
-        Spontaneous 'message K, text' broadcasts are intercepted and stored.
-        'eject: K' messages are silently consumed here.
+        Spontaneous messages ('message K,', 'eject:', 'dead') are intercepted:
+        - broadcasts: stored in buffer
+        - eject: silently consumed
+        - dead: async death signal — closes socket, sets _is_dead flag, continues
+          reading so the pipeline stays aligned (the actual command response may
+          still arrive before the server closes the connection).
         """
         deadline = time.time() + timeout
         while time.time() < deadline:
@@ -208,13 +214,19 @@ class ZappyEnv(EnvBase):
                 if line.startswith("eject:"):
                     continue
                 if line == "dead":
+                    # Async death notification — do NOT return here; keep reading
+                    # for the actual command response to stay pipeline-aligned.
                     if self.sock:
                         self.sock.close()
                         self.sock = None
-                    return "dead"
+                    self._is_dead = True
+                    continue
                 if line:
                     return line
                 continue
+            # No line in buffer
+            if self.sock is None:
+                break  # Socket closed, nothing more will arrive — exit fast
             remaining = deadline - time.time()
             if remaining <= 0:
                 break
@@ -317,45 +329,44 @@ class ZappyEnv(EnvBase):
         return np.zeros(OBSERVATION_SIZE, dtype=np.float32)
 
     def _reset(self, tensordict=None, **kwargs):
+        # Always close the existing connection: reusing a dead player's socket
+        # would keep getting "ko" from the server without ever signalling death.
         if self.sock is not None:
             try:
-                self.sock.settimeout(0.05)
-                while True:
-                    try:
-                        if not self.sock.recv(4096):
-                            self.sock.close()
-                            self.sock = None
-                            break
-                    except socket.timeout:
-                        break
-                    except (OSError, BrokenPipeError):
-                        self.sock = None
-                        break
+                self.sock.close()
+            except OSError:
+                pass
+            self.sock = None
+        self._recv_buf = ""
+        self._ko_streak = 0
+        self._is_dead = False
+        self.level = 1
+        self.inventory = {r: 0 for r in RESOURCES}
+        self.last_look = []
+        self.action_history = []
+        self.broadcast_buffer = []
+        self._steps_since_refresh = 0
+
+        for _ in range(30):
+            try:
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+                s.connect((self.host, self.port))
+                self.sock = s
+                self._recv_buf = ""
+                if self._handshake():
+                    self.level = 1
+                    break
             except Exception:
-                self.sock = None
+                pass
             if self.sock:
-                self.sock.settimeout(None)
+                self.sock.close()
+                self.sock = None
+            time.sleep(1.0)
         else:
-            for _ in range(30):
-                try:
-                    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-                    s.connect((self.host, self.port))
-                    self.sock = s
-                    self._recv_buf = ""
-                    if self._handshake():
-                        self.level = 1
-                        break
-                except Exception:
-                    pass
-                if self.sock:
-                    self.sock.close()
-                    self.sock = None
-                time.sleep(1.0)
-            else:
-                raise RuntimeError(
-                    f"Cannot connect to {self.host}:{self.port} after 30 attempts"
-                )
+            raise RuntimeError(
+                f"Cannot connect to {self.host}:{self.port} after 30 attempts"
+            )
 
         self._fetch_state()
         return self._build_tensordict(self._build_obs(), False, None)
@@ -451,6 +462,24 @@ class ZappyEnv(EnvBase):
                 self.level = int(action_resp.split("Current level:")[-1].strip())
             except ValueError:
                 pass
+
+        # Ko-streak backup: some servers never send "dead" and keep responding "ko"
+        # indefinitely. After 10 consecutive "ko" we force a death signal.
+        if action_resp.strip() == "ko":
+            self._ko_streak += 1
+        else:
+            self._ko_streak = 0
+        if self._ko_streak >= 10:
+            action_resp = "dead"
+            if self.sock:
+                self.sock.close()
+                self.sock = None
+
+        # Async death flag set during look/inv reads — override action_resp so
+        # reward and done are computed correctly.
+        if self._is_dead:
+            action_resp = "dead"
+            self._is_dead = False
 
         done = "dead" in action_resp.lower() or self.sock is None
         reward = self._compute_reward(action_idx, action_resp)
@@ -561,7 +590,6 @@ class ZappyEnv(EnvBase):
 
         elif action_idx == 5:  # Broadcast
             r -= 0.2
-        # Look / Inventory: neutre (ni récompensé ni pénalisé)
 
         # Reward for seeing food when hungry
         if action_idx == 3 and self.last_look and food < 8:
@@ -668,4 +696,3 @@ class ZappyEnv(EnvBase):
         if reward is not None:
             source["reward"] = torch.tensor([reward], dtype=torch.float32)
         return TensorDict(source=source, batch_size=self.batch_size, device=self.device)
-        # test
