@@ -45,7 +45,7 @@ It also contains the entity database, which is used to store and manage all game
 * ``zappy::game::entities::Player``: Represents a player in the game, including their inventory, and state.
 * ``zappy::game::entities::Resource``: Represents a resource in the game, including its type.
 * ``zappy::game::entities::Egg``: Represents an egg in the game, including the id of the player how birth it and hatch time.
-* ``zappy::game::World``: Represents the game world, including the map, resources, and entities.
+* ``zappy::game::World``: Represents the game world/map. It contain a list of tiles themself containing a list of IDS on the given tile
 
 ### Why entity database?
 
