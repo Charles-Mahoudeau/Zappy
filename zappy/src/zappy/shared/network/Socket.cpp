@@ -76,8 +76,11 @@ void Socket::bind(const std::uint16_t port) {
                 .s_addr = htonl(INADDR_ANY),
             },
     }};
+
+    sockaddr_in bindAddress = _address.sockaddr();
+
     // NOLINTNEXTLINE(*-pro-type-reinterpret-cast)
-    if (::bind(_socket, reinterpret_cast<sockaddr*>(&_address), sizeof(_address)) == -1) {
+    if (::bind(_socket, reinterpret_cast<sockaddr*>(&bindAddress), sizeof(bindAddress)) == -1) {
         const std::error_code error{errno, std::generic_category()};
 
         throw exception::SocketError{"Failed to bind socket: " + error.message()};
