@@ -51,6 +51,7 @@ Socket& Socket::operator=(Socket&& other) noexcept {
     if (this == &other) {
         return *this;
     }
+    close();
     _socket = other._socket;
     _address = other._address;
     other._socket = -1;
