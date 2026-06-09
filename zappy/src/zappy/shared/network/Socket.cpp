@@ -34,6 +34,8 @@ Socket::Socket() : _socket{socket(AF_INET, SOCK_STREAM, 0)} {
 
     // NOLINTNEXTLINE(misc-include-cleaner)
     if (setsockopt(_socket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) {
+        Socket::close();
+
         const std::error_code error{errno, std::generic_category()};
 
         throw exception::SocketError{"Failed to set socket options: " + error.message()};
