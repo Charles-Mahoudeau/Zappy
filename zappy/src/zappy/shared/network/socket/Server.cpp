@@ -1,6 +1,6 @@
 /*
 ** EPITECH PROJECT, 2026
-** myteams
+** zappy
 ** File description:
 ** ServerSocket
 */
@@ -12,12 +12,10 @@
 
 #include <cerrno>
 #include <cstdint>
-#include <memory>
 #include <system_error>
 
 #include "zappy/shared/exception/SocketError.hpp"
 #include "zappy/shared/network/socket/Client.hpp"
-#include "zappy/shared/network/socket/IClient.hpp"
 
 namespace zappy::network::socket {
 void Server::listen(const std::uint16_t maxConnections) {
@@ -29,7 +27,7 @@ void Server::listen(const std::uint16_t maxConnections) {
     }
 }
 
-std::unique_ptr<IClient> Server::accept() const {
+Client Server::accept() const {
     sockaddr_in address{};
     socklen_t len = sizeof(address);
     const int client =
@@ -41,6 +39,6 @@ std::unique_ptr<IClient> Server::accept() const {
 
         throw exception::SocketError{"Failed to accept connection: " + error.message()};
     }
-    return std::make_unique<Client>(client, address);
+    return {client, address};
 }
 }  // namespace zappy::network::socket

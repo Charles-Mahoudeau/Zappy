@@ -18,7 +18,7 @@
 #include "ISocket.hpp"
 
 namespace zappy::network {
-class Socket : virtual public ISocket {
+class Socket : public ISocket {
   public:
     Socket();
     Socket(int socket, sockaddr_in address);

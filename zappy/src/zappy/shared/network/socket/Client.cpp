@@ -1,6 +1,6 @@
 /*
 ** EPITECH PROJECT, 2026
-** myteams
+** zappy
 ** File description:
 ** ClientSocket
 */
@@ -18,7 +18,7 @@
 #include "zappy/shared/network/Address.hpp"
 
 namespace zappy::network::socket {
-void Client::connect(const Address& address) {
+void Client::connect(const Address& address) const {
     sockaddr_in targetAddress = {
         .sin_family = AF_INET,
         .sin_port = htons(address.port()),

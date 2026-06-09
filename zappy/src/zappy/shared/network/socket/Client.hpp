@@ -1,21 +1,20 @@
 /*
 ** EPITECH PROJECT, 2026
-** myteams
+** zappy
 ** File description:
 ** ClientSocket
 */
 
 #pragma once
 
-#include "IClient.hpp"
 #include "zappy/shared/network/Address.hpp"
 #include "zappy/shared/network/Socket.hpp"
 
 namespace zappy::network::socket {
-class Client : public Socket, public IClient {
+class Client : public Socket {
   public:
     using Socket::Socket;
 
-    void connect(const Address& address) override;
+    void connect(const Address& address) const;
 };
 }  // namespace zappy::network::socket

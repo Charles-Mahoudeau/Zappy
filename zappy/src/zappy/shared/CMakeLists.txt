@@ -10,8 +10,6 @@ add_library(zappy_shared OBJECT
         io/IFileDescriptor.hpp
         network/socket/Client.cpp
         network/socket/Client.hpp
-        network/socket/IClient.hpp
-        network/socket/IServer.hpp
         network/socket/Server.cpp
         network/socket/Server.hpp
         network/Address.cpp
