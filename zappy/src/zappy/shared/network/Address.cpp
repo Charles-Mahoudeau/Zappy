@@ -12,7 +12,6 @@
 #include <sys/socket.h>
 
 #include <array>
-#include <bit>
 #include <cstdint>
 #include <format>
 #include <ostream>
@@ -21,10 +20,15 @@
 #include "zappy/shared/exception/InvalidAddress.hpp"
 
 namespace zappy::network {
-Address::Address(const sockaddr_in sockaddr) : _sockaddr{sockaddr}, _port{_sockaddr.sin_port} {
-    const auto bytes = std::bit_cast<std::array<uint8_t, 4>>(_sockaddr.sin_addr.s_addr);
+Address::Address(const sockaddr_in sockaddr) : _sockaddr{sockaddr}, _port{ntohs(_sockaddr.sin_port)} {
+    const uint32_t host_addr = ntohl(_sockaddr.sin_addr.s_addr);
 
-    _ip = {bytes.at(0), bytes.at(1), bytes.at(2), bytes.at(3)};
+    _ip = {
+        static_cast<uint8_t>((host_addr >> 24) & 0xFF),
+        static_cast<uint8_t>((host_addr >> 16) & 0xFF),
+        static_cast<uint8_t>((host_addr >> 8) & 0xFF),
+        static_cast<uint8_t>(host_addr & 0xFF),
+    };
 }
 
 Address::Address(const std::string& ip, const std::uint16_t port) : _port{port} {
@@ -33,9 +37,14 @@ Address::Address(const std::string& ip, const std::uint16_t port) : _port{port} 
         throw exception::InvalidAddress{"Invalid IP address: " + ip};
     }
 
-    const auto bytes = std::bit_cast<std::array<uint8_t, 4>>(_sockaddr.sin_addr.s_addr);
+    const uint32_t host_addr = ntohl(_sockaddr.sin_addr.s_addr);
 
-    _ip = {bytes.at(0), bytes.at(1), bytes.at(2), bytes.at(3)};
+    _ip = {
+        static_cast<uint8_t>((host_addr >> 24) & 0xFF),
+        static_cast<uint8_t>((host_addr >> 16) & 0xFF),
+        static_cast<uint8_t>((host_addr >> 8) & 0xFF),
+        static_cast<uint8_t>(host_addr & 0xFF),
+    };
 }
 
 Address::operator std::string() const { return string(); }
