@@ -30,7 +30,7 @@ void Server::listen(const std::uint16_t maxConnections) {
 Client Server::accept() const {
     sockaddr_in address{};
     socklen_t len = sizeof(address);
-    int client = -1;
+    int client;
 
     do {
         client =
@@ -42,6 +42,6 @@ Client Server::accept() const {
 
         throw exception::SocketError{"Failed to accept connection: " + error.message()};
     }
-    return {client, address};
+    return {client, Address{address}};
 }
 }  // namespace zappy::network::socket

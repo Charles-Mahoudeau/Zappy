@@ -40,7 +40,7 @@ Socket::Socket() : _socket{socket(AF_INET, SOCK_STREAM, 0)} {
     }
 }
 
-Socket::Socket(const int socket, const sockaddr_in address) : _socket{socket}, _address{address} {}
+Socket::Socket(const int socket, Address address) : _socket{socket}, _address{std::move(address)} {}
 
 Socket::Socket(Socket&& other) noexcept : _socket{other._socket}, _address{other._address} {
     other._socket = -1;
@@ -64,28 +64,20 @@ Socket::~Socket() { Socket::close(); }
 int Socket::fd() const { return _socket; }
 
 Address Socket::address() const {
-    const std::uint32_t ip = ntohl(_address.sin_addr.s_addr);
-    const std::array ipArray{
-        static_cast<std::uint8_t>(ip >> 24 & 0xFF),
-        static_cast<std::uint8_t>(ip >> 16 & 0xFF),
-        static_cast<std::uint8_t>(ip >> 8 & 0xFF),
-        static_cast<std::uint8_t>(ip & 0xFF),
-    };
-
-    return {ipArray, ntohs(_address.sin_port)};
+    return _address;
 }
 
 bool Socket::isOpen() const { return _socket != -1; }
 
 void Socket::bind(const std::uint16_t port) {
-    _address = {
+    _address = Address{{
         .sin_family = AF_INET,
         .sin_port = htons(port),
         .sin_addr =
             {
                 .s_addr = htonl(INADDR_ANY),
             },
-    };
+    }};
     // NOLINTNEXTLINE(*-pro-type-reinterpret-cast)
     if (::bind(_socket, reinterpret_cast<sockaddr*>(&_address), sizeof(_address)) == -1) {
         const std::error_code error{errno, std::generic_category()};

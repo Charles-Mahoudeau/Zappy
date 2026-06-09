@@ -21,7 +21,7 @@ namespace zappy::network {
 class Socket : public ISocket {
   public:
     Socket();
-    Socket(int socket, sockaddr_in address);
+    Socket(int socket, Address address);
     ~Socket() override;
 
     Socket(Socket& other) noexcept = delete;
@@ -47,6 +47,6 @@ class Socket : public ISocket {
 
   private:
     int _socket{-1};
-    sockaddr_in _address{};
+    Address _address{};
 };
 }  // namespace zappy::network
