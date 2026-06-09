@@ -23,7 +23,7 @@
 
 namespace zappy::network {
 Address::Address(sockaddr_in sockaddr) : _sockaddr{std::move(sockaddr)}, _port{_sockaddr.sin_port} {
-    const std::array<uint8_t, 4> bytes = std::bit_cast<std::array<uint8_t, 4>>(_sockaddr.sin_addr.s_addr);
+    const auto bytes = std::bit_cast<std::array<uint8_t, 4>>(_sockaddr.sin_addr.s_addr);
 
     _ip = {bytes.at(0), bytes.at(1), bytes.at(2), bytes.at(3)};
 }
@@ -34,7 +34,7 @@ Address::Address(const std::string& ip, const std::uint16_t port) : _port{port} 
         throw exception::InvalidAddress{"Invalid IP address: " + ip};
     }
 
-    const std::array<uint8_t, 4> bytes = std::bit_cast<std::array<uint8_t, 4>>(_sockaddr.sin_addr.s_addr);
+    const auto bytes = std::bit_cast<std::array<uint8_t, 4>>(_sockaddr.sin_addr.s_addr);
 
     _ip = {bytes.at(0), bytes.at(1), bytes.at(2), bytes.at(3)};
 }
