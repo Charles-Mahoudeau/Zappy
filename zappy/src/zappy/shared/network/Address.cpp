@@ -8,21 +8,21 @@
 #include "Address.hpp"
 
 #include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
 
 #include <array>
+#include <bit>
 #include <cstdint>
-#include <cstdlib>
 #include <format>
 #include <ostream>
-#include <sstream>
 #include <string>
-#include <string_view>
-#include <vector>
+#include <utility>
 
 #include "zappy/shared/exception/InvalidAddress.hpp"
 
 namespace zappy::network {
-Address::Address(sockaddr_in sockaddr) : _sockaddr{std::move(sockaddr)}, _port{_sockaddr.sin_port} {
+Address::Address(const sockaddr_in sockaddr) : _sockaddr{sockaddr}, _port{_sockaddr.sin_port} {
     const auto bytes = std::bit_cast<std::array<uint8_t, 4>>(_sockaddr.sin_addr.s_addr);
 
     _ip = {bytes.at(0), bytes.at(1), bytes.at(2), bytes.at(3)};
