@@ -40,8 +40,8 @@ class Address {
     [[nodiscard]] std::uint16_t port() const;
 
   private:
-    std::array<std::uint8_t, 4> _ip;
-    std::uint16_t _port;
+    std::array<std::uint8_t, 4> _ip{0, 0, 0, 0};
+    std::uint16_t _port{0};
 };
 
 std::ostream& operator<<(std::ostream& os, const Address& address);
