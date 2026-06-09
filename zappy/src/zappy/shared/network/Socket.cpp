@@ -126,15 +126,4 @@ std::size_t Socket::send(const std::span<const std::byte> data) {
     }
     return res;
 }
-
-void Socket::fetch() {
-    socklen_t addrlen = sizeof(_address);
-
-    // NOLINTNEXTLINE(*-pro-type-reinterpret-cast)
-    if (getsockname(_socket, reinterpret_cast<sockaddr*>(&_address), &addrlen) == -1) {
-        const std::error_code error{errno, std::generic_category()};
-
-        throw exception::SocketError{"Failed to fetch socket address: " + error.message()};
-    }
-}
 }  // namespace zappy::network

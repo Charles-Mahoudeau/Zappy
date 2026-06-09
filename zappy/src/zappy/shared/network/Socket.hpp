@@ -41,8 +41,6 @@ class Socket : public ISocket {
 
     [[nodiscard]] std::size_t send(std::span<const std::byte> data) override;
 
-    void fetch() override;
-
   private:
     int _socket{-1};
     Address _address;

@@ -39,8 +39,6 @@ class ISocket : public io::IFileDescriptor {
     [[nodiscard]] virtual std::vector<std::byte> read(std::size_t count) = 0;
 
     [[nodiscard]] virtual std::size_t send(std::span<const std::byte> data) = 0;
-
-    virtual void fetch() = 0;
 };
 
 inline std::ostream& operator<<(std::ostream& os, const ISocket& socket) {
