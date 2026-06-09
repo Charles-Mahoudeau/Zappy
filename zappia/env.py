@@ -600,7 +600,7 @@ class ZappyEnv(EnvBase):
             mask[21] = False
 
         # Moves (0..2), Look (3), Inventory (4), Broadcast (5), Fork (20),
-        # Eject (22) stay enabled — there is always at least one valid action.
+        # Eject (22) stay enabled
         return mask
 
     def _infer_inventory_delta(self, prev: dict, curr: dict) -> str:
