@@ -22,18 +22,23 @@
 namespace zappy::network {
 Address::Address(const std::array<std::uint8_t, 4>& ip, const std::uint16_t port) : _ip{ip}, _port{port} {}
 
-Address::Address(const std::string& ip, std::uint16_t port) : _ip{}, _port{port} {
-    std::vector<std::uint8_t> ip_parts;
+Address::Address(const std::string& ip, const std::uint16_t port) : _ip{}, _port{port} {
+    std::vector<std::uint8_t> ipParts;
     std::string part;
-    std::stringstream ip_stream(ip);
+    std::stringstream ipStream{ip};
 
-    while (std::getline(ip_stream, part, '.')) {
-        ip_parts.push_back(static_cast<std::uint8_t>(std::strtol(part.c_str(), nullptr, 10)));
+    while (std::getline(ipStream, part, '.')) {
+        const int val = std::stoi(part);
+
+        if (val < 0 || val > 255) {
+            throw exception::InvalidAddress{"Invalid ip component: " + ip};
+        }
+        ipParts.push_back(static_cast<std::uint8_t>(val));
     }
-    if (ip_parts.size() != 4) {
-        throw exception::InvalidAddress{"Invalid IP : " + ip};
+    if (ipParts.size() != 4) {
+        throw exception::InvalidAddress{"Invalid ip: " + ip};
     }
-    _ip = {ip_parts.at(0), ip_parts.at(1), ip_parts.at(2), ip_parts.at(3)};
+    _ip = {ipParts.at(0), ipParts.at(1), ipParts.at(2), ipParts.at(3)};
 }
 
 Address::operator std::string() const { return string(); }
