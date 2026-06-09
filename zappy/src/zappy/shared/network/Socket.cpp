@@ -47,6 +47,17 @@ Socket::Socket(Socket&& other) noexcept : _socket{other._socket}, _address{other
     other._address = {};
 }
 
+Socket& Socket::operator=(Socket&& other) noexcept {
+    if (this == &other) {
+        return *this;
+    }
+    _socket = other._socket;
+    _address = other._address;
+    other._socket = -1;
+    other._address = {};
+    return *this;
+}
+
 Socket::~Socket() { Socket::close(); }
 
 int Socket::fd() const { return _socket; }

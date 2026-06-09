@@ -22,12 +22,13 @@ class Socket : virtual public ISocket {
   public:
     Socket();
     Socket(int socket, sockaddr_in address);
-    Socket(Socket& other) noexcept = delete;
-    Socket(Socket&& other) noexcept;
     ~Socket() override;
 
+    Socket(Socket& other) noexcept = delete;
     Socket& operator=(const Socket& other) noexcept = delete;
-    Socket& operator=(Socket&& other) noexcept = default;
+
+    Socket(Socket&& other) noexcept;
+    Socket& operator=(Socket&& other) noexcept;
 
     [[nodiscard]] int fd() const override;
 
