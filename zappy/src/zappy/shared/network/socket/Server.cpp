@@ -36,7 +36,7 @@ Client Server::accept() const {
         if (const int client = ::accept(fd(), reinterpret_cast<sockaddr*>(&address), &len); client != -1) {
             return {client, Address{address}};
         }
-        if (errno == EAGAIN) {
+        if (errno == EINTR) {
             continue;
         }
 
