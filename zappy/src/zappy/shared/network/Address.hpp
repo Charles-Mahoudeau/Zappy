@@ -13,7 +13,6 @@
 #include <cstdint>
 #include <ostream>
 #include <string>
-#include <string_view>
 
 namespace zappy::network {
 class Address {
@@ -32,7 +31,6 @@ class Address {
     explicit operator std::string() const;
 
     bool operator==(const Address& other) const;
-    bool operator!=(const Address&) const = default;
 
     [[nodiscard]] std::string string() const;
 
