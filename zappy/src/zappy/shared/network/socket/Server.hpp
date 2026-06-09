@@ -23,6 +23,8 @@ class Server : public Socket {
     [[nodiscard]] Client accept() const;
 
   private:
+    static constexpr std::uint8_t kAcceptMaximumAttempts = 10;
+
     std::uint16_t _maxConnections{0};
 };
 }  // namespace zappy::network::socket

@@ -30,18 +30,23 @@ void Server::listen(const std::uint16_t maxConnections) {
 Client Server::accept() const {
     sockaddr_in address{};
     socklen_t len = sizeof(address);
-    int client;
 
-    do {
-        client =
+    for (std::uint8_t attemptsRemaining{kAcceptMaximumAttempts}; attemptsRemaining > 0; --attemptsRemaining) {
+        int client =
             // NOLINTNEXTLINE(*-pro-type-reinterpret-cast)
             ::accept(fd(), reinterpret_cast<sockaddr*>(&address), &len);
-    } while (client == -1 && errno == EINTR);
-    if (client == -1) {
+
+        if (client != -1) {
+            return {client, Address{address}};
+        }
+        if (errno == EAGAIN) {
+            continue;
+        }
+
         const std::error_code error{errno, std::generic_category()};
 
         throw exception::SocketError{"Failed to accept connection: " + error.message()};
     }
-    return {client, Address{address}};
+    throw exception::SocketError{"Failed to accept connection: maximum attempts reached."};
 }
 }  // namespace zappy::network::socket
