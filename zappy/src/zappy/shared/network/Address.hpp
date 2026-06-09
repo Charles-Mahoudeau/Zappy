@@ -30,9 +30,6 @@ class Address {
 
     bool operator==(const Address&) const = default;
 
-    [[nodiscard]] std::string tuple() const;
-    void fromTuple(std::string_view tuple);
-
     [[nodiscard]] std::string string() const;
 
     [[nodiscard]] std::array<std::uint8_t, 4> ip() const;

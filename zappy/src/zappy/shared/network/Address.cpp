@@ -43,28 +43,6 @@ Address::Address(const std::string& ip, const std::uint16_t port) : _ip{}, _port
 
 Address::operator std::string() const { return string(); }
 
-std::string Address::tuple() const {
-    const std::uint8_t p1 = _port / 256;
-    const std::uint8_t p2 = _port % 256;
-
-    return std::format("{},{},{},{},{},{}", _ip.at(0), _ip.at(1), _ip.at(2), _ip.at(3), p1, p2);
-}
-
-void Address::fromTuple(const std::string_view tuple) {
-    std::stringstream stream{std::string{tuple}};
-    std::vector<std::uint8_t> parts;
-    std::string part;
-
-    while (std::getline(stream, part, ',')) {
-        parts.push_back(std::stoi(part));
-    }
-    if (parts.size() != 6) {
-        throw exception::InvalidAddress{tuple};
-    }
-    _ip = {parts.at(0), parts.at(1), parts.at(2), parts.at(3)};
-    _port = static_cast<std::uint16_t>((parts.at(4) * 256) + parts.at(5));
-}
-
 std::string Address::string() const {
     return std::format("{}.{}.{}.{}:{}", _ip.at(0), _ip.at(1), _ip.at(2), _ip.at(3), _port);
 }
