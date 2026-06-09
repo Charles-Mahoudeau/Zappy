@@ -482,7 +482,7 @@ class ZappyEnv(EnvBase):
             self._is_dead = False
 
         done = "dead" in action_resp.lower() or self.sock is None
-        reward = self._compute_reward(action_idx, action_resp)
+        reward = self._compute_reward(action_idx, action_resp, prev_inv)
         obs = self._build_obs() if not done else self._empty_obs()
         resp_code = self._encode_server_response(action_resp)
 
@@ -530,127 +530,77 @@ class ZappyEnv(EnvBase):
         except Exception:
             return (0, 0)
 
-    def _compute_reward(self, action_idx: int, response: str) -> float:
-        r = 0.0
+    def _compute_reward(self, action_idx: int, response: str, prev_inv: dict) -> float:
         resp = response.strip()
 
         if "dead" in resp.lower():
-            return -500.0
-
-        food = self.inventory.get("food", 0)
-
-        # Reward being well-fed rather than punishing hunger — death (-500) handles starvation
-        if food >= 5:
-            r += 0.3
+            return -10.0
 
         if "Current level:" in resp:
-            r += 200.0 * self.level
-            return r
+            return 100.0 * self.level
 
-        if action_idx == 21 and resp == "ko":  # Incantation failed
-            r -= 5.0
+        r = 0.0
+        food = self.inventory.get("food", 0)
+        prev_food = prev_inv.get("food", 0)
+        req = ELEVATION_REQ.get(self.level, {})
+
+        r += 0.2 * min(food / 10.0, 1.0)
 
         if action_idx == 6:  # Take food
             if resp == "ok":
-                r += 5.0 if food < 5 else 1.0
-            # no penalty on fail: food wasn't there, neutral
+                r += 10.0 if prev_food < 5 else 3.0  # eating, big when hungry
 
-        elif 7 <= action_idx <= 12:  # Take resource
-            resource = RESOURCES[action_idx - 6]
-            req = ELEVATION_REQ.get(self.level, {})
-            needed = req.get(resource, 0)
-            have = self.inventory.get(resource, 0)
-            r += (15.0 if have < needed else 1.0) if resp == "ok" else 0.0
+        elif 7 <= action_idx <= 12:  # Take a stone
+            if resp == "ok":
+                resource = RESOURCES[action_idx - 6]
+                needed = req.get(resource, 0)
+                have = self.inventory.get(resource, 0)
+                r += 8.0 if have <= needed else 0.0
 
-        elif 13 <= action_idx <= 19:  # Set resource
+        elif 13 <= action_idx <= 19:  # Set a stone down
             resource = RESOURCES[action_idx - 13]
-            req = ELEVATION_REQ.get(self.level, {})
-            needed_tile = req.get(resource, 0)
-            r += (5.0 if needed_tile > 0 else -1.0) if resp == "ok" else -2.0
-
-        elif action_idx == 22:  # Eject
-            r -= 2.0
-
-        elif action_idx == 20:  # Fork
-            req_players = ELEVATION_REQ.get(self.level, {}).get("players", 1)
-            visible_players = self.last_look[0].count("player") if self.last_look else 0
-            if visible_players < req_players - 1:
-                r += 0.5
+            if resp == "ok" and req.get(resource, 0) > 0:
+                r += 4.0  # dropping a needed stone (toward on-tile incantation)
             else:
-                r -= 0.5
-
-        elif action_idx in (0, 1, 2):  # Move
-            nav_bonus = 0.0
-            if action_idx == 0 and self.broadcast_buffer:
-                for direction, _, sender_level in self.broadcast_buffer:
-                    if sender_level == self.level and direction == 1:
-                        nav_bonus = 1.0
-                        break
-            r += 0.05 + nav_bonus
-
-        elif action_idx == 5:  # Broadcast
-            r -= 0.2
-
-        # Reward for seeing food when hungry
-        if action_idx == 3 and self.last_look and food < 8:
-            for tile in self.last_look:
-                if "food" in tile:
-                    r += 0.5
-                    break
-
-        if self.last_look and self.level >= 2:
-            tile0 = self.last_look[0]
-            req_players = ELEVATION_REQ.get(self.level, {}).get("players", 1)
-            if tile0.count("player") >= req_players - 1:
-                r += 3.0
-
-        # Reward for seeing a needed resource on current tile
-        if self.last_look:
-            tile0 = self.last_look[0]
-            req = ELEVATION_REQ.get(self.level, {})
-            for res in RESOURCES[1:]:
-                if req.get(res, 0) > self.inventory.get(res, 0) and res in tile0:
-                    r += 1.0
-                    break
-
-        # Reward proportional to incantation readiness (% of resources collected)
-        req = ELEVATION_REQ.get(self.level, {})
-        res_needed = {r: v for r, v in req.items() if r != "players"}
-        if res_needed:
-            ratio = sum(
-                min(self.inventory.get(res, 0), needed) / needed
-                for res, needed in res_needed.items()
-            ) / len(res_needed)
-            r += ratio * 2.0  # up to +2.0 when fully stocked
-
-        if resp.startswith("eject:"):
-            r -= 1.0
-
-        # Repetition penalty only when NOT hungry (don't punish survival loops)
-        if food >= 3:
-            if (
-                len(self.action_history) >= 5
-                and len(set(self.action_history[-5:])) == 1
-            ):
-                r -= 2.0
-            if (
-                len(self.action_history) >= 10
-                and len(set(self.action_history[-10:])) <= 2
-            ):
                 r -= 1.0
 
+        elif action_idx == 21:  # Incantation
+            if resp == "ko":
+                r -= 2.0
+
+        elif action_idx == 22:  # Eject — useless / harmful at low level
+            r -= 1.0
+
+        elif action_idx == 5:  # Broadcast — minor cost (not needed solo at lvl 1)
+            r -= 0.1
+
+        # Moves, Look, Inventory: neutral — free to explore and observe.
         return r
 
     def get_action_mask(self) -> List[bool]:
         mask = [True] * len(COMMANDS)
-        tile0 = self.last_look[0] if self.last_look else []
-
+        tile0 = self.last_look[0] if self.last_look else None
         req = ELEVATION_REQ.get(self.level, {})
+
+        # Take X (6..12): only enabled when X is on the current tile.
+        if tile0 is not None:
+            for i in range(6, 13):
+                if RESOURCES[i - 6] not in tile0:
+                    mask[i] = False
+
+        # Set X (13..19): only enabled when we actually hold X in inventory.
+        for i in range(13, 20):
+            if self.inventory.get(RESOURCES[i - 13], 0) <= 0:
+                mask[i] = False
+
+        # Incantation (21): only when elevation requirements are met.
         has_res = all(self.inventory.get(r, 0) >= req.get(r, 0) for r in RESOURCES)
-        has_plrs = tile0.count("player") >= req.get("players", 1) - 1
+        has_plrs = (tile0.count("player") if tile0 else 0) >= req.get("players", 1) - 1
         if not (has_res and has_plrs):
             mask[21] = False
 
+        # Moves (0..2), Look (3), Inventory (4), Broadcast (5), Fork (20),
+        # Eject (22) stay enabled — there is always at least one valid action.
         return mask
 
     def _infer_inventory_delta(self, prev: dict, curr: dict) -> str:
