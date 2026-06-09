@@ -22,7 +22,7 @@ class Socket : public ISocket {
     Socket(int socket, const Address& address);
     ~Socket() override;
 
-    Socket(Socket& other) noexcept = delete;
+    Socket(const Socket& other) noexcept = delete;
     Socket& operator=(const Socket& other) noexcept = delete;
 
     Socket(Socket&& other) noexcept;
