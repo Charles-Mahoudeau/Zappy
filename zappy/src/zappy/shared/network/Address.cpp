@@ -10,6 +10,7 @@
 #include <array>
 #include <cstdint>
 #include <cstdlib>
+#include <format>
 #include <ostream>
 #include <sstream>
 #include <string>
@@ -30,7 +31,7 @@ Address::Address(const std::string& ip, std::uint16_t port) : _ip{}, _port{port}
         ip_parts.push_back(static_cast<std::uint8_t>(std::strtol(part.c_str(), nullptr, 10)));
     }
     if (ip_parts.size() != 4) {
-        throw exception::InvalidAddress("Invalid IP : " + ip);
+        throw exception::InvalidAddress{"Invalid IP : " + ip};
     }
     _ip = {ip_parts.at(0), ip_parts.at(1), ip_parts.at(2), ip_parts.at(3)};
 }
@@ -40,8 +41,8 @@ Address::operator std::string() const { return string(); }
 std::string Address::tuple() const {
     const std::uint8_t p1 = _port / 256;
     const std::uint8_t p2 = _port % 256;
-    return std::to_string(_ip.at(0)) + "," + std::to_string(_ip.at(1)) + "," + std::to_string(_ip.at(2)) + "," +
-           std::to_string(_ip.at(3)) + "," + std::to_string(p1) + "," + std::to_string(p2);
+
+    return std::format("{},{},{},{},{},{}", _ip.at(0), _ip.at(1), _ip.at(2), _ip.at(3), p1, p2);
 }
 
 void Address::fromTuple(const std::string_view tuple) {
@@ -60,15 +61,13 @@ void Address::fromTuple(const std::string_view tuple) {
 }
 
 std::string Address::string() const {
-    return std::to_string(_ip.at(0)) + "." + std::to_string(_ip.at(1)) + "." + std::to_string(_ip.at(2)) + "." +
-           std::to_string(_ip.at(3)) + ":" + std::to_string(_port);
+    return std::format("{}.{}.{}.{}:{}", _ip.at(0), _ip.at(1), _ip.at(2), _ip.at(3), _port);
 }
 
 std::array<std::uint8_t, 4> Address::ip() const { return _ip; }
 
 std::string Address::ipString() const {
-    return std::to_string(_ip.at(0)) + "." + std::to_string(_ip.at(1)) + "." + std::to_string(_ip.at(2)) + "." +
-           std::to_string(_ip.at(3));
+    return std::format("{}.{}.{}.{}", _ip.at(0), _ip.at(1), _ip.at(2), _ip.at(3));
 }
 
 std::uint16_t Address::port() const { return _port; }
