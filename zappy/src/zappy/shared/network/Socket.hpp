@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <netinet/in.h>
-
 #include <cstddef>
 #include <cstdint>
 #include <span>
@@ -21,7 +19,7 @@ namespace zappy::network {
 class Socket : public ISocket {
   public:
     Socket();
-    Socket(int socket, Address address);
+    Socket(int socket, const Address& address);
     ~Socket() override;
 
     Socket(Socket& other) noexcept = delete;
@@ -47,6 +45,6 @@ class Socket : public ISocket {
 
   private:
     int _socket{-1};
-    Address _address{};
+    Address _address;
 };
 }  // namespace zappy::network

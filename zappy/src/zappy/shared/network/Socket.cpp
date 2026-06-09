@@ -11,7 +11,6 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-#include <array>
 #include <cerrno>
 #include <cstddef>
 #include <cstdint>
@@ -36,11 +35,12 @@ Socket::Socket() : _socket{socket(AF_INET, SOCK_STREAM, 0)} {
     // NOLINTNEXTLINE(misc-include-cleaner)
     if (setsockopt(_socket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) {
         const std::error_code error{errno, std::generic_category()};
+
         throw exception::SocketError{"Failed to set socket options: " + error.message()};
     }
 }
 
-Socket::Socket(const int socket, Address address) : _socket{socket}, _address{std::move(address)} {}
+Socket::Socket(const int socket, const Address& address) : _socket{socket}, _address{address} {}
 
 Socket::Socket(Socket&& other) noexcept : _socket{other._socket}, _address{other._address} {
     other._socket = -1;

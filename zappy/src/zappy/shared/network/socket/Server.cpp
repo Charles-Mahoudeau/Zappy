@@ -32,11 +32,8 @@ Client Server::accept() const {
     socklen_t len = sizeof(address);
 
     for (std::uint8_t attemptsRemaining{kAcceptMaximumAttempts}; attemptsRemaining > 0; --attemptsRemaining) {
-        int client =
-            // NOLINTNEXTLINE(*-pro-type-reinterpret-cast)
-            ::accept(fd(), reinterpret_cast<sockaddr*>(&address), &len);
-
-        if (client != -1) {
+        // NOLINTNEXTLINE(*-pro-type-reinterpret-cast)
+        if (const int client = ::accept(fd(), reinterpret_cast<sockaddr*>(&address), &len); client != -1) {
             return {client, Address{address}};
         }
         if (errno == EAGAIN) {

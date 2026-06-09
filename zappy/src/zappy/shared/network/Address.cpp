@@ -17,7 +17,6 @@
 #include <format>
 #include <ostream>
 #include <string>
-#include <utility>
 
 #include "zappy/shared/exception/InvalidAddress.hpp"
 
