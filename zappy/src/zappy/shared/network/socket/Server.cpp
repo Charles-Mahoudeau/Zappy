@@ -30,11 +30,14 @@ void Server::listen(const std::uint16_t maxConnections) {
 Client Server::accept() const {
     sockaddr_in address{};
     socklen_t len = sizeof(address);
-    const int client =
+    int client = -1;
+
+    do {
+        client =
         // NOLINTNEXTLINE(*-pro-type-reinterpret-cast)
         ::accept(fd(), reinterpret_cast<sockaddr*>(&address), &len);
-
-    if (client == -1 && errno != EINTR) {
+    } while (client == -1 && errno == EINTR);
+    if (client == -1) {
         const std::error_code error{errno, std::generic_category()};
 
         throw exception::SocketError{"Failed to accept connection: " + error.message()};
