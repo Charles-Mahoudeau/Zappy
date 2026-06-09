@@ -26,8 +26,7 @@ class Address {
     Address& operator=(Address&& other) = default;
     Address& operator=(const Address& other) = default;
 
-    // ReSharper disable once CppNonExplicitConversionOperator
-    operator std::string() const;
+    explicit operator std::string() const;
 
     bool operator==(const Address&) const = default;
 
