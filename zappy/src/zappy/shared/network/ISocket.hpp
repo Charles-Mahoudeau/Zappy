@@ -17,7 +17,7 @@
 #include "zappy/shared/io/IFileDescriptor.hpp"
 
 namespace zappy::network {
-class ISocket : virtual public io::IFileDescriptor {
+class ISocket : public io::IFileDescriptor {
   public:
     ISocket() = default;
     ISocket(const ISocket& other) noexcept = default;
