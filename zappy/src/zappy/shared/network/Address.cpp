@@ -41,23 +41,17 @@ Address::Address(const std::string& ip, const std::uint16_t port) : _port{port} 
 
 Address::operator std::string() const { return string(); }
 
-bool Address::operator==(const Address& other) const {
-    return _ip == other._ip && _port == other._port;
-}
+bool Address::operator==(const Address& other) const { return _ip == other._ip && _port == other._port; }
 
 std::string Address::string() const {
     return std::format("{}.{}.{}.{}:{}", _ip.at(0), _ip.at(1), _ip.at(2), _ip.at(3), _port);
 }
 
-sockaddr_in Address::sockaddr() const {
-    return _sockaddr;
-}
+sockaddr_in Address::sockaddr() const { return _sockaddr; }
 
 std::array<std::uint8_t, 4> Address::ip() const { return _ip; }
 
-std::string Address::ipString() const {
-    return std::format("{}.{}.{}.{}", _ip.at(0), _ip.at(1), _ip.at(2), _ip.at(3));
-}
+std::string Address::ipString() const { return std::format("{}.{}.{}.{}", _ip.at(0), _ip.at(1), _ip.at(2), _ip.at(3)); }
 
 std::uint16_t Address::port() const { return _port; }
 

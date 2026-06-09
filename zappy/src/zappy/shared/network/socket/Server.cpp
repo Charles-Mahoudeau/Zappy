@@ -34,8 +34,8 @@ Client Server::accept() const {
 
     do {
         client =
-        // NOLINTNEXTLINE(*-pro-type-reinterpret-cast)
-        ::accept(fd(), reinterpret_cast<sockaddr*>(&address), &len);
+            // NOLINTNEXTLINE(*-pro-type-reinterpret-cast)
+            ::accept(fd(), reinterpret_cast<sockaddr*>(&address), &len);
     } while (client == -1 && errno == EINTR);
     if (client == -1) {
         const std::error_code error{errno, std::generic_category()};
