@@ -122,7 +122,15 @@ std::vector<std::byte> Socket::read(const std::size_t count) {
 }
 
 std::size_t Socket::send(const std::span<const std::byte> data) {
-    return write(_socket, data.data(), data.size_bytes());
+    const std::make_signed_t<std::size_t> res = write(_socket, data.data(), data.size_bytes());
+
+    if (res == -1) {
+        const std::error_code error{errno, std::generic_category()};
+
+        close();
+        throw exception::SocketError{"Failed to send data: " + error.message()};
+    }
+    return res;
 }
 
 void Socket::fetch() {
