@@ -11,6 +11,7 @@ target_link_libraries(zappy_server_objects PUBLIC
 
 add_executable(zappy_server
         main.cpp
+        game/IEntity.hpp
 )
 target_link_libraries(zappy_server PRIVATE
         zappy_shared
