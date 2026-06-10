@@ -25,15 +25,13 @@
 namespace zappy::server {
 
 CliParser::CliParser(std::span<std::string_view> argv) {
-    const CliParser::CliParameters params = CliParser::parseArguments(argv);
-    CliParser::ensureValidArguments(params);
-    this->_parameters = params;
+    CliParser::parseArguments(argv);
+    CliParser::ensureValidArguments();
 }
 
 const CliParser::CliParameters& CliParser::parameters() { return this->_parameters; }
 
-CliParser::CliParameters CliParser::parseArguments(std::span<std::string_view> argv) {
-    CliParameters params;
+void CliParser::parseArguments(std::span<std::string_view> argv) {
     auto it = argv.cbegin();
 
     while (it != argv.cend()) {
@@ -50,9 +48,8 @@ CliParser::CliParameters CliParser::parseArguments(std::span<std::string_view> a
             ++it;
         }
 
-        handleFlag(param.substr(1), flagParameters, params);
+        handleFlag(param.substr(1), flagParameters);
     }
-    return params;
 }
 
 template <typename T>
@@ -83,8 +80,7 @@ T CliParser::stringToUnNumber(std::string_view value, std::string_view flagName)
     return static_cast<T>(parsed);
 }
 
-void CliParser::handleFlag(std::string_view flag, const std::vector<std::string_view>& flagParams,
-                           CliParameters& param) {
+void CliParser::handleFlag(std::string_view flag, const std::vector<std::string_view>& flagParams) {
     struct FlagBehavior {
         std::optional<size_t> nbParam = 1;
         std::function<void(const std::vector<std::string_view>& flagParams, CliParameters& param)> handle = nullptr;
@@ -111,17 +107,17 @@ void CliParser::handleFlag(std::string_view flag, const std::vector<std::string_
     if (it->second.nbParam.has_value() && it->second.nbParam.value() != flagParams.size()) {
         throw exception::InvalidArgument(std::format("Invalid number parameter of {}", flag));
     }
-    it->second.handle(flagParams, param);
+    it->second.handle(flagParams, this->_parameters);
 }
 
-void CliParser::ensureValidArguments(const CliParameters& arguments) {
+void CliParser::ensureValidArguments() const {
     const std::vector<std::pair<bool, std::string_view>> conditions = {
-        {arguments.port == 0, "port"},
-        {arguments.mapWidth == 0, "mapWidth"},
-        {arguments.mapHeight == 0, "mapHeight"},
-        {arguments.teamsName.size() < 2, "teamsName"},
-        {arguments.nbInitialClient == 0, "nbInitialClient"},
-        {arguments.frequencies == 0, "frequencies"}};
+        {this->_parameters.port == 0, "port"},
+        {this->_parameters.mapWidth == 0, "mapWidth"},
+        {this->_parameters.mapHeight == 0, "mapHeight"},
+        {this->_parameters.teamsName.size() < 2, "teamsName"},
+        {this->_parameters.nbInitialClient == 0, "nbInitialClient"},
+        {this->_parameters.frequencies == 0, "frequencies"}};
 
     for (const auto& [failed, name] : conditions) {
         if (failed) {
