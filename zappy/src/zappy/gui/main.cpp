@@ -8,6 +8,9 @@
 #include <raylib.h>
 
 #include <cstddef>
+#include <span>
+#include <string_view>
+#include <vector>
 
 #include "zappy/gui/display/Window.hpp"
 #include "zappy/gui/render/Camera.hpp"
