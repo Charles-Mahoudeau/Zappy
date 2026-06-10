@@ -77,7 +77,7 @@ TEST(CliParser, teams_flag_block_single_team) {
 }
 
 TEST(CliParser, empty_argv_throws) {
-    std::vector<std::string_view> argv = {};
+    const std::vector<std::string_view> argv = {};
     ASSERT_THROW(build(argv), InvalidArg);
 }
 

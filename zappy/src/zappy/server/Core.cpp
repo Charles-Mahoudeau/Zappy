@@ -7,6 +7,7 @@
 
 #include "zappy/server/Core.hpp"
 
+#include <span>
 #include <string_view>
 
 #include "zappy/server/CliParser.hpp"
