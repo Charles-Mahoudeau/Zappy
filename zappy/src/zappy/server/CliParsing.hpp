@@ -8,8 +8,6 @@
 #pragma once
 
 #include <cstdint>
-#include <expected>
-#include <string>
 #include <string_view>
 #include <vector>
 
@@ -34,7 +32,7 @@ class CliParsing {
     };
 
     static CliParameter parseArguments(const std::vector<std::string_view>& argv);
-    static std::expected<void, std::string> checkArgumentsValidity(const CliParameter& arguments);
+    static void checkArgumentsValidity(const CliParameter& arguments);
 
   private:
     static void handleFlag(std::string_view flag, const std::vector<std::string_view>& flagParams, CliParameter& param);

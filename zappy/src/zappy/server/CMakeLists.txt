@@ -1,9 +1,10 @@
 add_library(zappy_server_objects OBJECT
 	Core.hpp
 	Core.cpp
-	Context.hpp
 	world/Map.hpp
 	world/Map.cpp
+	CliParsing.hpp
+	CliParsing.cpp
 )
 
 target_include_directories(zappy_server_objects PUBLIC

@@ -65,7 +65,7 @@ void CliParsing::handleFlag(std::string_view flag, const std::vector<std::string
     it->second.handle();
 }
 
-std::expected<void, std::string> CliParsing::checkArgumentsValidity(const CliParameter& arguments) {
+void CliParsing::checkArgumentsValidity(const CliParameter& arguments) {
     static const std::vector<std::pair<bool, std::string_view>> conditions = {
         {arguments.port == 0, "port"},
         {arguments.mapWidth == 0, "mapWidth"},
@@ -76,10 +76,9 @@ std::expected<void, std::string> CliParsing::checkArgumentsValidity(const CliPar
 
     for (const auto& [failed, name] : conditions) {
         if (failed) {
-            return std::unexpected(std::format("Missing/Invalid required CLI argument: {}", name));
+            throw exception::InvalidArgument(std::format("Missing/Invalid required CLI argument: {}", name));
         }
     }
-    return {};
 }
 
 }  // namespace zappy::server
