@@ -7,7 +7,6 @@
 
 #include "zappy/server/CliParsing.hpp"
 
-#include <expected>
 #include <format>
 #include <functional>
 #include <map>
@@ -40,19 +39,47 @@ CliParsing::CliParameter CliParsing::parseArguments(const std::vector<std::strin
     return params;
 }
 
+template <typename T>
+T CliParsing::parseAndValidate(std::string_view value, std::string_view flagName) {
+    static constexpr unsigned long long maxVal = std::numeric_limits<T>::max();
+
+    unsigned long long parsed = 0;
+
+    if (!value.empty() && value[0] == '-') {
+        throw exception::InvalidArgument(std::format(OVERFLOW_MESSAGE, flagName, value, maxVal));
+    }
+    try {
+        size_t pos = 0;
+        if (parsed = std::stoull(std::string(value), &pos); pos != value.size()) {
+            throw exception::InvalidArgument(
+                std::format("Invalid value for -{}: '{}' is not a valid number", flagName, value));
+        }
+    } catch (const std::out_of_range&) {
+        throw exception::InvalidArgument(std::format(OVERFLOW_MESSAGE, flagName, value, maxVal));
+    }
+
+    if (parsed > maxVal) {
+        throw exception::InvalidArgument(std::format(OVERFLOW_MESSAGE, flagName, value, maxVal));
+    }
+    return static_cast<T>(parsed);
+}
+
 void CliParsing::handleFlag(std::string_view flag, const std::vector<std::string_view>& flagParams,
                             CliParameter& param) {
     struct FlagBehavior {
         std::optional<size_t> nbParam = 1;
         std::function<void()> handle = nullptr;
     };
+    auto parseNb = [&flagParams](auto& field, std::string_view flag) {
+        field = parseAndValidate<std::decay_t<decltype(field)>>(flagParams.at(0), flag);
+    };
     static const std::map<std::string_view, FlagBehavior> flags = {
-        {"p", {.handle = [&flagParams, &param] { param.port = std::stoi(std::string(flagParams.at(0))); }}},
-        {"x", {.handle = [&flagParams, &param] { param.mapWidth = std::stoul(std::string(flagParams.at(0))); }}},
-        {"y", {.handle = [&flagParams, &param] { param.mapHeight = std::stoul(std::string(flagParams.at(0))); }}},
-        {"n", {.nbParam = std::nullopt, .handle = [&flagParams, &param] { param.teamsName = flagParams; }}},
-        {"c", {.handle = [&flagParams, &param] { param.nbInitialClient = std::stoul(std::string(flagParams.at(0))); }}},
-        {"f", {.handle = [&flagParams, &param] { param.frequencies = std::stoul(std::string(flagParams.at(0))); }}},
+        {"p", {.handle = [&] { parseNb(param.port, "p"); }}},
+        {"x", {.handle = [&] { parseNb(param.mapWidth, "x"); }}},
+        {"y", {.handle = [&] { parseNb(param.mapHeight, "y"); }}},
+        {"c", {.handle = [&] { parseNb(param.nbInitialClient, "c"); }}},
+        {"f", {.handle = [&] { parseNb(param.frequencies, "f"); }}},
+        {"n", {.nbParam = std::nullopt, .handle = [&] { param.teamsName = flagParams; }}},
     };
 
     auto it = flags.find(flag);

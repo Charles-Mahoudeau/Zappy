@@ -18,6 +18,8 @@ void Core::init(const std::vector<std::string_view>& argv) {
     CliParsing::CliParameter params = CliParsing::parseArguments(argv);
     CliParsing::checkArgumentsValidity(params);
 
+    std::cout << params.port << "\n";
+
     this->_serv.bind(params.port);
 }
 

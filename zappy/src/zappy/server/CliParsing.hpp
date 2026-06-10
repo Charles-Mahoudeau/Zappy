@@ -35,7 +35,12 @@ class CliParsing {
     static void checkArgumentsValidity(const CliParameter& arguments);
 
   private:
+    static constexpr std::string_view OVERFLOW_MESSAGE = "Value overflow for -{}: '{}' exceeds allowed range [0, {}]";
+
     static void handleFlag(std::string_view flag, const std::vector<std::string_view>& flagParams, CliParameter& param);
+
+    template <typename T>
+    static T parseAndValidate(std::string_view value, std::string_view flagName);
 };
 
 }  // namespace zappy::server

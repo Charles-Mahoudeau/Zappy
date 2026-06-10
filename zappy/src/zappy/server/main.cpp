@@ -21,8 +21,10 @@ int main(const int argc, char** argv) {
         core.init(arguments);
     } catch (const zappy::exception::Exception& err) {
         std::cerr << "Error: " << err.what() << "\n";
+        return 84;
     } catch (const std::exception& err) {
         std::cerr << "Unknown Error: " << err.what() << "\n";
+        return 84;
     }
     core.run();
     return 0;
