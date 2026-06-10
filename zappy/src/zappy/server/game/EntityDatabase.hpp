@@ -76,11 +76,6 @@ class EntityDatabase {
     /// @brief Get the ID of an entity.
     /// @param entity The entity to get the ID of.
     /// @return The ID of the entity.
-    [[nodiscard]] std::optional<std::uint64_t> id(const IEntity* entity);
-
-    /// @brief Get the ID of an entity.
-    /// @param entity The entity to get the ID of.
-    /// @return The ID of the entity.
     [[nodiscard]] std::optional<std::uint64_t> id(const IEntity& entity);
 
   private:

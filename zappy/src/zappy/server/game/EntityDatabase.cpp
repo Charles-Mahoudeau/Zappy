@@ -55,19 +55,14 @@ IEntity* EntityDatabase::query(const std::uint64_t id) {
 
 std::uint64_t EntityDatabase::countAll() const { return _entities.size(); }
 
-std::optional<std::uint64_t> EntityDatabase::id(const IEntity* entity) {
-    if (entity == nullptr) {
-        return std::nullopt;
-    }
+std::optional<std::uint64_t> EntityDatabase::id(const IEntity& entity) {
     for (const auto& [id, entityPtr] : _entities) {
-        if (entityPtr.get() == entity) {
+        if (entityPtr.get() == &entity) {
             return id;
         }
     }
     return std::nullopt;
 }
-
-std::optional<std::uint64_t> EntityDatabase::id(const IEntity& entity) { return id(&entity); }
 
 std::uint64_t EntityDatabase::generateId() { return _nextId++; }
 
