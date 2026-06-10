@@ -17,6 +17,7 @@ add_library(zappy_shared OBJECT
         network/ISocket.hpp
         network/Socket.cpp
         network/Socket.hpp
+        compat/ranges.hpp
 )
 target_include_directories(zappy_shared PUBLIC
         ${CMAKE_SOURCE_DIR}/src
