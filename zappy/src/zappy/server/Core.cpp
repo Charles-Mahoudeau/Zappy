@@ -14,10 +14,10 @@
 namespace zappy::server {
 
 void Core::init(std::span<std::string_view> argv) {
-    const CliParser::CliParameters params = CliParser::parseArguments(argv);
-    CliParser::ensureValidArguments(params);
+    CliParser parser{argv};
+    const CliParser::CliParameters& parameters = parser.parameters();
 
-    this->_serv.bind(params.port);
+    this->_serv.bind(parameters.port);
 }
 
 }  // namespace zappy::server

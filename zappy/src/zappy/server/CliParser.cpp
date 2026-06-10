@@ -24,6 +24,14 @@
 #include "zappy/shared/exception/InvalidArgument.hpp"
 namespace zappy::server {
 
+CliParser::CliParser(std::span<std::string_view> argv) {
+    const CliParser::CliParameters params = CliParser::parseArguments(argv);
+    CliParser::ensureValidArguments(params);
+    this->_parameters = params;
+}
+
+const CliParser::CliParameters& CliParser::parameters() { return this->_parameters; }
+
 CliParser::CliParameters CliParser::parseArguments(std::span<std::string_view> argv) {
     CliParameters params;
     auto it = argv.cbegin();

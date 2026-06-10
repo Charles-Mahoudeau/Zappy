@@ -15,6 +15,14 @@
 namespace zappy::server {
 class CliParser {
   public:
+    explicit CliParser(std::span<std::string_view> argv);
+    ~CliParser() = default;
+
+    CliParser(const CliParser&) = delete;
+    CliParser(CliParser&&) = delete;
+    CliParser& operator=(const CliParser&) = default;
+    CliParser& operator=(CliParser&&) = delete;
+
     /**
      * @brief Structure holding all CLI configuration parameters.
      */
@@ -26,6 +34,13 @@ class CliParser {
         std::uint32_t nbInitialClient = 0;
         std::uint32_t frequencies = 0;
     };
+
+    const CliParameters& parameters();
+
+  private:
+    CliParameters _parameters;
+
+    static constexpr std::string_view OVERFLOW_MESSAGE = "Value overflow for -{}: '{}' exceeds allowed range [0, {}]";
 
     /**
      * @brief Parses command-line arguments into CLI parameters.
@@ -45,9 +60,6 @@ class CliParser {
      * teamsName (at least 2), nbInitialClient, frequencies).
      */
     static void ensureValidArguments(const CliParameters& arguments);
-
-  private:
-    static constexpr std::string_view OVERFLOW_MESSAGE = "Value overflow for -{}: '{}' exceeds allowed range [0, {}]";
 
     /**
      * @brief Handles a specific flag with its associated parameters.
