@@ -26,6 +26,7 @@ int main(const int argc, char** argv) {
 
     while (!window.shouldClose()) {
         window.beginFrame();
+        camera.Update();
         window.endFrame();
     }
     return 0;
