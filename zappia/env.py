@@ -35,6 +35,32 @@ COMMANDS = [
     "Eject",
 ]
 
+COMMAND_TIME = [
+    7,
+    7,
+    7,
+    7,
+    1,
+    7,  # Forward, Right, Left, Look, Inventory, Broadcast
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,  # Take food + 6 stones
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,  # Set food + 6 stones
+    42,
+    300,
+    7,  # Fork, Incantation, Eject
+]
+
 # FOV: at level L the player sees (L+1)^2 tiles.  Max level = 8 → 81 tiles.
 MAX_LEVEL = 8
 MAX_TILES = (MAX_LEVEL + 1) ** 2  # 81
@@ -105,6 +131,7 @@ class ZappyEnv(EnvBase):
         self._steps_since_refresh = 0
         self._ko_streak = 0
         self._is_dead = False
+        self._stone_high = {r: 0 for r in RESOURCES}
 
         self.observation_spec = Composite(
             observation=Unbounded(
@@ -214,8 +241,6 @@ class ZappyEnv(EnvBase):
                 if line.startswith("eject:"):
                     continue
                 if line == "dead":
-                    # Async death notification — do NOT return here; keep reading
-                    # for the actual command response to stay pipeline-aligned.
                     if self.sock:
                         self.sock.close()
                         self.sock = None
@@ -224,9 +249,8 @@ class ZappyEnv(EnvBase):
                 if line:
                     return line
                 continue
-            # No line in buffer
             if self.sock is None:
-                break  # Socket closed, nothing more will arrive — exit fast
+                break
             remaining = deadline - time.time()
             if remaining <= 0:
                 break
@@ -329,8 +353,6 @@ class ZappyEnv(EnvBase):
         return np.zeros(OBSERVATION_SIZE, dtype=np.float32)
 
     def _reset(self, tensordict=None, **kwargs):
-        # Always close the existing connection: reusing a dead player's socket
-        # would keep getting "ko" from the server without ever signalling death.
         if self.sock is not None:
             try:
                 self.sock.close()
@@ -346,6 +368,7 @@ class ZappyEnv(EnvBase):
         self.action_history = []
         self.broadcast_buffer = []
         self._steps_since_refresh = 0
+        self._stone_high = {r: 0 for r in RESOURCES}
 
         for _ in range(30):
             try:
@@ -463,8 +486,6 @@ class ZappyEnv(EnvBase):
             except ValueError:
                 pass
 
-        # Ko-streak backup: some servers never send "dead" and keep responding "ko"
-        # indefinitely. After 10 consecutive "ko" we force a death signal.
         if action_resp.strip() == "ko":
             self._ko_streak += 1
         else:
@@ -475,8 +496,6 @@ class ZappyEnv(EnvBase):
                 self.sock.close()
                 self.sock = None
 
-        # Async death flag set during look/inv reads — override action_resp so
-        # reward and done are computed correctly.
         if self._is_dead:
             action_resp = "dead"
             self._is_dead = False
@@ -546,6 +565,11 @@ class ZappyEnv(EnvBase):
 
         r += 0.2 * min(food / 10.0, 1.0)
 
+        time_cost = COMMAND_TIME[action_idx]
+        if action_idx == 21 and resp == "ko":
+            time_cost = 7
+        r -= time_cost / 126.0
+
         if action_idx == 6:  # Take food
             if resp == "ok":
                 r += 10.0 if prev_food < 5 else 3.0  # eating, big when hungry
@@ -555,14 +579,9 @@ class ZappyEnv(EnvBase):
                 resource = RESOURCES[action_idx - 6]
                 needed = req.get(resource, 0)
                 have = self.inventory.get(resource, 0)
-                r += 8.0 if have <= needed else 0.0
-
-        elif 13 <= action_idx <= 19:  # Set a stone down
-            resource = RESOURCES[action_idx - 13]
-            if resp == "ok" and req.get(resource, 0) > 0:
-                r += 4.0  # dropping a needed stone (toward on-tile incantation)
-            else:
-                r -= 1.0
+                if needed > 0 and have <= needed and have > self._stone_high[resource]:
+                    self._stone_high[resource] = have
+                    r += 8.0
 
         elif action_idx == 21:  # Incantation
             if resp == "ko":
@@ -592,6 +611,8 @@ class ZappyEnv(EnvBase):
         for i in range(13, 20):
             if self.inventory.get(RESOURCES[i - 13], 0) <= 0:
                 mask[i] = False
+
+        mask[13] = False
 
         # Incantation (21): only when elevation requirements are met.
         has_res = all(self.inventory.get(r, 0) >= req.get(r, 0) for r in RESOURCES)
