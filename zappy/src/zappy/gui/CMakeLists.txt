@@ -1,20 +1,5 @@
-include(FetchContent)
-include(InternetCheck)
-
-check_internet_connection()
-
-if (INTERNET_AVAILABLE)
-    FetchContent_Declare(
-            raylib
-            GIT_REPOSITORY https://github.com/raysan5/raylib.git
-            GIT_TAG 6.0
-    )
-    set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-    set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
-    FetchContent_MakeAvailable(raylib)
-else ()
-    message(WARNING "Raylib not available: no internet connection.")
-endif ()
+include(SetupRaylib)
+setup_raylib()
 
 add_library(zappy_gui_objects OBJECT
         Demo.cpp
