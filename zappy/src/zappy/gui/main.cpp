@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "zappy/gui/display/Window.hpp"
+#include "zappy/gui/render/RaiiCamera.hpp"
 
 int main(const int argc, char** argv) {
     const std::span argsView{argv, static_cast<std::size_t>(argc)};
@@ -18,6 +19,10 @@ int main(const int argc, char** argv) {
 
     zappy::gui::display::Window window{1600, 900, "Zappy"};
     window.setTargetFPS(60);
+
+    zappy::gui::render::RaiiCamera camera{Vector3{0, 0, 10}, Vector3{0, 0, 0}, Vector3{0, 1, 0}, 45.0f,
+                                          zappy::gui::render::CameraProjection::CAMERA_ORTHOGRAPHIC};
+    camera.setCameraMode(zappy::gui::render::CameraMode::CAMERA_ORBITAL);
 
     while (!window.shouldClose()) {
         window.beginFrame();
