@@ -93,7 +93,8 @@ TEST(EntityDatabase, ViewAll) {
 
     std::uint64_t count = 0;
 
-    for (const auto* _ : db.viewAll()) {
+    for (const auto* entity : db.viewAll()) {
+        std::ignore = entity;
         count++;
     }
     EXPECT_EQ(count, 2);
@@ -109,6 +110,7 @@ TEST(EntityDatabase, ViewAllByType) {
     std::uint64_t countA = 0;
 
     for (auto* entity : db.viewAll<EntityA>()) {
+        std::ignore = entity;
         static_assert(std::is_same_v<decltype(entity), EntityA*>);
         countA++;
     }
@@ -117,6 +119,7 @@ TEST(EntityDatabase, ViewAllByType) {
     std::uint64_t countB = 0;
 
     for (auto* entity : db.viewAll<EntityB>()) {
+        std::ignore = entity;
         static_assert(std::is_same_v<decltype(entity), EntityB*>);
         countB++;
     }
