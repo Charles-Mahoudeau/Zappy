@@ -10,6 +10,7 @@
 #include <format>
 #include <functional>
 #include <map>
+#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -54,7 +55,7 @@ T CliParsing::parseAndValidate(std::string_view value, std::string_view flagName
             throw exception::InvalidArgument(
                 std::format("Invalid value for -{}: '{}' is not a valid number", flagName, value));
         }
-    } catch (const std::out_of_range&) {
+    } catch (const std::logic_error&) {
         throw exception::InvalidArgument(std::format(OVERFLOW_MESSAGE, flagName, value, maxVal));
     }
 
@@ -97,7 +98,7 @@ void CliParsing::checkArgumentsValidity(const CliParameter& arguments) {
         {arguments.port == 0, "port"},
         {arguments.mapWidth == 0, "mapWidth"},
         {arguments.mapHeight == 0, "mapHeight"},
-        {arguments.teamsName.empty(), "teamsName"},
+        {arguments.teamsName.size() < 2, "teamsName"},
         {arguments.nbInitialClient == 0, "nbInitialClient"},
         {arguments.frequencies == 0, "frequencies"}};
 
