@@ -9,12 +9,17 @@
 
 #include <raylib.h>
 
+#include <utility>
+
 namespace zappy::gui::render {
 
 Camera::Camera(const Vector3 position, const Vector3 target, const Vector3 up, const float fovy,
                const CameraProjection projection)
-    : _camera{
-          .position = position, .target = target, .up = up, .fovy = fovy, .projection = static_cast<int>(projection)} {}
+    : _camera{.position = position,
+              .target = target,
+              .up = up,
+              .fovy = fovy,
+              .projection = std::to_underlying(projection)} {}
 
 Camera::Camera(Camera&& other) noexcept : _camera(other._camera), _cameraMode(other._cameraMode) {
     other._camera = {};
@@ -51,10 +56,10 @@ void Camera::setUp(const Vector3& up) { _camera.up = up; }
 
 void Camera::setFovy(float fovy) { _camera.fovy = fovy; }
 
-void Camera::setProjection(CameraProjection projection) { _camera.projection = static_cast<int>(projection); }
+void Camera::setProjection(CameraProjection projection) { _camera.projection = std::to_underlying(projection); }
 
 void Camera::setCameraMode(CameraMode mode) { _cameraMode = mode; }
 
-void Camera::Update() { UpdateCamera(&_camera, static_cast<int>(_cameraMode)); }
+void Camera::Update() { UpdateCamera(&_camera, std::to_underlying(_cameraMode)); }
 
 }  // namespace zappy::gui::render
