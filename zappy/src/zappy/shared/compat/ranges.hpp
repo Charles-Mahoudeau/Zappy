@@ -21,21 +21,23 @@ namespace zappy::compat::ranges {
 template <typename ContainerT>
 inline constexpr auto to = std::ranges::to<ContainerT>;
 #else
-template <typename>
-struct ClosureTo {};
+template <typename ContainerT>
+struct ClosureTo {
+    template <typename RangeT>
+    friend constexpr auto operator|(RangeT&& range, ClosureTo /*closure*/) {
+        auto rangeRef = std::forward<RangeT>(range);
+
+        return ContainerT{
+            rangeRef.begin(),
+            rangeRef.end(),
+        };
+    }
+};
 
 /// @brief Compatibility layer for std::ranges::to.
 template <typename ContainerT>
 [[nodiscard]] constexpr auto to() {
     return ClosureTo<ContainerT>{};
-}
-
-template <typename RangeT, typename ContainerT>
-constexpr auto operator|(RangeT&& range, ClosureTo<ContainerT>) {
-    return ContainerT{
-        std::ranges::begin(range),
-        std::ranges::end(range),
-    };
 }
 #endif
 }  // namespace zappy::compat::ranges
