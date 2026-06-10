@@ -60,7 +60,10 @@ T CliParsing::parseAndValidate(std::string_view value, std::string_view flagName
             throw exception::InvalidArgument(
                 std::format("Invalid value for -{}: '{}' is not a valid number", flagName, value));
         }
-    } catch (const std::logic_error&) {
+    } catch (const std::invalid_argument&) {
+        throw exception::InvalidArgument(
+            std::format("Invalid value for -{}: '{}' is not a valid number", flagName, value));
+    } catch (const std::out_of_range&) {
         throw exception::InvalidArgument(std::format(OVERFLOW_MESSAGE, flagName, value, maxVal));
     }
 
@@ -79,13 +82,13 @@ void CliParsing::handleFlag(std::string_view flag, const std::vector<std::string
     auto parseNb = [&flagParams](auto& field, std::string_view flag) {
         field = parseAndValidate<std::decay_t<decltype(field)>>(flagParams.at(0), flag);
     };
-    static const std::map<std::string_view, FlagBehavior> flags = {
-        {"p", {.handle = [&] { parseNb(param.port, "p"); }}},
-        {"x", {.handle = [&] { parseNb(param.mapWidth, "x"); }}},
-        {"y", {.handle = [&] { parseNb(param.mapHeight, "y"); }}},
-        {"c", {.handle = [&] { parseNb(param.nbInitialClient, "c"); }}},
-        {"f", {.handle = [&] { parseNb(param.frequencies, "f"); }}},
-        {"n", {.nbParam = std::nullopt, .handle = [&] { param.teamsName = flagParams; }}},
+    const std::map<std::string_view, FlagBehavior> flags = {
+        {"p", {.handle = [&param, &parseNb] { parseNb(param.port, "p"); }}},
+        {"x", {.handle = [&param, &parseNb] { parseNb(param.mapWidth, "x"); }}},
+        {"y", {.handle = [&param, &parseNb] { parseNb(param.mapHeight, "y"); }}},
+        {"c", {.handle = [&param, &parseNb] { parseNb(param.nbInitialClient, "c"); }}},
+        {"f", {.handle = [&param, &parseNb] { parseNb(param.frequencies, "f"); }}},
+        {"n", {.nbParam = std::nullopt, .handle = [&param, &flagParams] { param.teamsName = flagParams; }}},
     };
 
     auto it = flags.find(flag);
