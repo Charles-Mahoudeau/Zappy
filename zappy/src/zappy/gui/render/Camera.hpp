@@ -56,7 +56,7 @@ class Camera {
     operator const Camera3D&() const { return _camera; }
 
   private:
-    Camera3D _camera{0};
+    Camera3D _camera{};
     CameraMode _cameraMode{CameraMode::CAMERA_CUSTOM};
 };
 }  // namespace zappy::gui::render
