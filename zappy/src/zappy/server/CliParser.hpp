@@ -1,8 +1,8 @@
 /*
 ** EPITECH PROJECT, 2026
-** CliParsing
+** CliParser
 ** File description:
-** CliParsing header
+** CliParser header
 */
 
 #pragma once
@@ -12,7 +12,7 @@
 #include <vector>
 
 namespace zappy::server {
-class CliParsing {
+class CliParser {
   public:
     struct CliParameter {
         std::uint16_t port = 0;

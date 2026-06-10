@@ -1,11 +1,9 @@
 /*
 ** EPITECH PROJECT, 2026
-** CliParsing
+** CliParser
 ** File description:
-** CliParsing code
+** CliParser code
 */
-
-#include "zappy/server/CliParsing.hpp"
 
 #include <cstddef>
 #include <format>
@@ -19,10 +17,11 @@
 #include <utility>
 #include <vector>
 
+#include "zappy/server/CliParser.hpp"
 #include "zappy/shared/exception/InvalidArgument.hpp"
 namespace zappy::server {
 
-CliParsing::CliParameter CliParsing::parseArguments(const std::vector<std::string_view>& argv) {
+CliParser::CliParameter CliParser::parseArguments(const std::vector<std::string_view>& argv) {
     CliParameter params;
     auto it = argv.cbegin();
 
@@ -46,7 +45,7 @@ CliParsing::CliParameter CliParsing::parseArguments(const std::vector<std::strin
 }
 
 template <typename T>
-T CliParsing::parseAndValidate(std::string_view value, std::string_view flagName) {
+T CliParser::parseAndValidate(std::string_view value, std::string_view flagName) {
     static constexpr unsigned long long maxVal = std::numeric_limits<T>::max();
 
     unsigned long long parsed = 0;
@@ -74,8 +73,8 @@ T CliParsing::parseAndValidate(std::string_view value, std::string_view flagName
     return static_cast<T>(parsed);
 }
 
-void CliParsing::handleFlag(std::string_view flag, const std::vector<std::string_view>& flagParams,
-                            CliParameter& param) {
+void CliParser::handleFlag(std::string_view flag, const std::vector<std::string_view>& flagParams,
+                           CliParameter& param) {
     struct FlagBehavior {
         std::optional<size_t> nbParam = 1;
         std::function<void()> handle = nullptr;
@@ -102,7 +101,7 @@ void CliParsing::handleFlag(std::string_view flag, const std::vector<std::string
     it->second.handle();
 }
 
-void CliParsing::checkArgumentsValidity(const CliParameter& arguments) {
+void CliParser::checkArgumentsValidity(const CliParameter& arguments) {
     static const std::vector<std::pair<bool, std::string_view>> conditions = {
         {arguments.port == 0, "port"},
         {arguments.mapWidth == 0, "mapWidth"},

@@ -10,13 +10,13 @@
 #include <string_view>
 #include <vector>
 
-#include "zappy/server/CliParsing.hpp"
+#include "zappy/server/CliParser.hpp"
 
 namespace zappy::server {
 
 void Core::init(const std::vector<std::string_view>& argv) {
-    const CliParsing::CliParameter params = CliParsing::parseArguments(argv);
-    CliParsing::checkArgumentsValidity(params);
+    const CliParser::CliParameter params = CliParser::parseArguments(argv);
+    CliParser::checkArgumentsValidity(params);
 
     this->_serv.bind(params.port);
 }

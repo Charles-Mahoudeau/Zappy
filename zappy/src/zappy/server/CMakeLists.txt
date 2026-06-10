@@ -1,8 +1,8 @@
 add_library(zappy_server_objects OBJECT
 	Core.hpp
 	Core.cpp
-	CliParsing.hpp
-	CliParsing.cpp
+	CliParser.hpp
+	CliParser.cpp
 )
 
 target_include_directories(zappy_server_objects PUBLIC
