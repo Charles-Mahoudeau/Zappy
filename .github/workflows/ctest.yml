@@ -30,7 +30,9 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends build-essential cmake ccache
+          sudo apt-get install -y --no-install-recommends \
+            build-essential cmake ccache \
+            libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
       - name: Cache ccache
         uses: actions/cache@v5
         with:
