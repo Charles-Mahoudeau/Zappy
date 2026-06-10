@@ -26,7 +26,8 @@ enum class CameraProjection { CAMERA_PERSPECTIVE = 0, CAMERA_ORTHOGRAPHIC = 1 };
 
 class RaiiCamera {
   public:
-    RaiiCamera(Vector3 position, Vector3 target, Vector3 up, float fovy, CameraProjection projection);
+    RaiiCamera(const Vector3 position, const Vector3 target, const Vector3 up, const float fovy,
+               const CameraProjection projection);
     ~RaiiCamera() = default;
 
     RaiiCamera(const RaiiCamera&) = delete;
@@ -35,19 +36,19 @@ class RaiiCamera {
     RaiiCamera(RaiiCamera&& other) noexcept;
     RaiiCamera& operator=(RaiiCamera&& other) noexcept;
 
-    Vector3 position();
-    Vector3 target();
-    Vector3 up();
-    float fovy();
-    CameraProjection projection();
-    CameraMode cameraMode();
+    Vector3 position() const;
+    Vector3 target() const;
+    Vector3 up() const;
+    float fovy() const;
+    CameraProjection projection() const;
+    CameraMode cameraMode() const;
 
     void setPosition(const Vector3& position);
     void setTarget(const Vector3& target);
     void setUp(const Vector3& up);
-    void setFovy(float fovy);
-    void setProjection(CameraProjection projection);
-    void setCameraMode(CameraMode mode);
+    void setFovy(const float fovy);
+    void setProjection(const CameraProjection projection);
+    void setCameraMode(const CameraMode mode);
 
     void Update();
 

@@ -7,40 +7,36 @@
 
 #include "RaiiCamera.hpp"
 
+#include <raylib.h>
+
 namespace zappy::gui::render {
 
-RaiiCamera::RaiiCamera(Vector3 position, Vector3 target, Vector3 up, float fovy, CameraProjection projection) {
-    _camera.position = position;
-    _camera.target = target;
-    _camera.up = up;
-    _camera.fovy = fovy;
-    _camera.projection = static_cast<int>(projection);
-}
+RaiiCamera::RaiiCamera(const Vector3 position, const Vector3 target, const Vector3 up, const float fovy,
+                       const CameraProjection projection)
+    : _camera{
+          .position = position, .target = target, .up = up, .fovy = fovy, .projection = static_cast<int>(projection)} {}
 
-RaiiCamera::RaiiCamera(RaiiCamera&& other) noexcept {
-    _camera = other._camera;
-    other._camera = {0};
-}
+RaiiCamera::RaiiCamera(RaiiCamera&& other) noexcept : _camera(other._camera) { other._camera = {}; }
 
 RaiiCamera& RaiiCamera::operator=(RaiiCamera&& other) noexcept {
     if (this != &other) {
         _camera = other._camera;
-        other._camera = {0};
+        other._camera = {};
     }
     return *this;
 }
 
-Vector3 RaiiCamera::position() { return _camera.position; }
+Vector3 RaiiCamera::position() const { return _camera.position; }
 
-Vector3 RaiiCamera::target() { return _camera.target; }
+Vector3 RaiiCamera::target() const { return _camera.target; }
 
-Vector3 RaiiCamera::up() { return _camera.up; }
+Vector3 RaiiCamera::up() const { return _camera.up; }
 
-float RaiiCamera::fovy() { return _camera.fovy; }
+float RaiiCamera::fovy() const { return _camera.fovy; }
 
-CameraProjection RaiiCamera::projection() { return static_cast<CameraProjection>(_camera.projection); }
+CameraProjection RaiiCamera::projection() const { return static_cast<CameraProjection>(_camera.projection); }
 
-CameraMode RaiiCamera::cameraMode() { return _cameraMode; }
+CameraMode RaiiCamera::cameraMode() const { return _cameraMode; }
 
 void RaiiCamera::setPosition(const Vector3& position) { _camera.position = position; }
 
@@ -48,11 +44,11 @@ void RaiiCamera::setTarget(const Vector3& target) { _camera.target = target; }
 
 void RaiiCamera::setUp(const Vector3& up) { _camera.up = up; }
 
-void RaiiCamera::setFovy(float fovy) { _camera.fovy = fovy; }
+void RaiiCamera::setFovy(const float fovy) { _camera.fovy = fovy; }
 
-void RaiiCamera::setProjection(CameraProjection projection) { _camera.projection = static_cast<int>(projection); }
+void RaiiCamera::setProjection(const CameraProjection projection) { _camera.projection = static_cast<int>(projection); }
 
-void RaiiCamera::setCameraMode(CameraMode mode) { _cameraMode = mode; }
+void RaiiCamera::setCameraMode(const CameraMode mode) { _cameraMode = mode; }
 
 void RaiiCamera::Update() { UpdateCamera(&_camera, static_cast<int>(_cameraMode)); }
 
