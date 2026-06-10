@@ -6,8 +6,6 @@ add_library(zappy_gui_objects OBJECT
         Demo.hpp
         display/Window.cpp
         display/Window.hpp
-        network/LineBuffer.cpp
-        network/LineBuffer.hpp
 )
 target_include_directories(zappy_gui_objects PUBLIC
         ${CMAKE_SOURCE_DIR}/src

@@ -7,6 +7,7 @@
 
 #include "LineBuffer.hpp"
 
+#include <bit>
 #include <cstddef>
 #include <span>
 #include <string>
@@ -15,9 +16,9 @@
 #include "zappy/shared/exception/SocketError.hpp"
 #include "zappy/shared/network/Address.hpp"
 
-namespace zappy::gui::network {
+namespace zappy::network {
 
-void LineBuffer::connect(const zappy::network::Address& address) { _client.connect(address); }
+void LineBuffer::connect(const Address& address) { _client.connect(address); }
 
 int LineBuffer::fd() const { return _client.fd(); }
 
@@ -36,10 +37,9 @@ void LineBuffer::poll() {
         throw exception::SocketError{"Connection to server lost"};
     }
 
-    // NOLINTNEXTLINE(*-pro-type-reinterpret-cast)
-    _buffer.append(reinterpret_cast<const char*>(bytes.data()), bytes.size());
+    _buffer.append(std::bit_cast<const char*>(bytes.data()), bytes.size());
 
-    std::size_t pos = 0;
+    std::size_t pos = std::string::npos;  // NOLINT(*-init-variables)
     while ((pos = _buffer.find('\n')) != std::string::npos) {
         _messages.push(_buffer.substr(0, pos));
         _buffer.erase(0, pos + 1);
@@ -47,12 +47,11 @@ void LineBuffer::poll() {
 }
 
 void LineBuffer::send(std::string_view line) {
-    // NOLINTNEXTLINE(*-pro-type-reinterpret-cast)
-    const auto* ptr = reinterpret_cast<const std::byte*>(line.data());
+    const auto* ptr = std::bit_cast<const std::byte*>(line.data());
     std::size_t sent = 0;
     while (sent < line.size()) {
         sent += _client.send(std::span<const std::byte>{ptr + sent, line.size() - sent});
     }
 }
 
-}  // namespace zappy::gui::network
+}  // namespace zappy::network

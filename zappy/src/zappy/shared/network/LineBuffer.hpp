@@ -14,7 +14,7 @@
 #include "zappy/shared/network/Address.hpp"
 #include "zappy/shared/network/socket/Client.hpp"
 
-namespace zappy::gui::network {
+namespace zappy::network {
 class LineBuffer {
   public:
     LineBuffer() = default;
@@ -26,7 +26,7 @@ class LineBuffer {
     LineBuffer(LineBuffer&&) noexcept = default;
     LineBuffer& operator=(LineBuffer&&) noexcept = default;
 
-    void connect(const zappy::network::Address& address);
+    void connect(const Address& address);
 
     [[nodiscard]] int fd() const;
     [[nodiscard]] bool hasMessages() const;
@@ -36,8 +36,8 @@ class LineBuffer {
     void send(std::string_view line);
 
   private:
-    zappy::network::socket::Client _client;
+    socket::Client _client;
     std::string _buffer{};
     std::queue<std::string> _messages{};
 };
-}  // namespace zappy::gui::network
+}  // namespace zappy::network

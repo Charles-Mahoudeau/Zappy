@@ -5,7 +5,7 @@
 ** LineBuffer tests
 */
 
-#include "zappy/gui/network/LineBuffer.hpp"
+#include "zappy/shared/network/LineBuffer.hpp"
 
 #include <gtest/gtest.h>
 
@@ -52,7 +52,7 @@ class LineBufferTest : public ::testing::Test {
   public:
     zappy::network::socket::Server _server;
     std::optional<zappy::network::socket::Client> _serverClient;
-    zappy::gui::network::LineBuffer _lineBuffer;
+    zappy::network::LineBuffer _lineBuffer;
 };
 
 TEST_F(LineBufferTest, FdIsValidAfterConnect) { EXPECT_GT(_lineBuffer.fd(), 0); }

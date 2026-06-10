@@ -15,6 +15,8 @@ add_library(zappy_shared OBJECT
         network/Address.cpp
         network/Address.hpp
         network/ISocket.hpp
+        network/LineBuffer.cpp
+        network/LineBuffer.hpp
         network/Socket.cpp
         network/Socket.hpp
 )
