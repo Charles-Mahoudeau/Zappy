@@ -5,9 +5,9 @@
 ** Camera
 */
 
-#include <raylib.h>
-
 #include "Camera.hpp"
+
+#include <raylib.h>
 
 namespace zappy::gui::render {
 
@@ -16,12 +16,17 @@ Camera::Camera(const Vector3 position, const Vector3 target, const Vector3 up, c
     : _camera{
           .position = position, .target = target, .up = up, .fovy = fovy, .projection = static_cast<int>(projection)} {}
 
-Camera::Camera(Camera&& other) noexcept : _camera(other._camera) { other._camera = {}; }
+Camera::Camera(Camera&& other) noexcept : _camera(other._camera), _cameraMode(other._cameraMode) {
+    other._camera = {};
+    other._cameraMode = CameraMode::CAMERA_CUSTOM;
+}
 
 Camera& Camera::operator=(Camera&& other) noexcept {
     if (this != &other) {
         _camera = other._camera;
+        _cameraMode = other._cameraMode;
         other._camera = {};
+        other._cameraMode = CameraMode::CAMERA_CUSTOM;
     }
     return *this;
 }
