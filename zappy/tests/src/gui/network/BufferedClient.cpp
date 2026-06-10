@@ -2,10 +2,10 @@
 ** EPITECH PROJECT, 2026
 ** zappy
 ** File description:
-** LineBuffer tests
+** BufferedClient tests
 */
 
-#include "zappy/shared/network/LineBuffer.hpp"
+#include "zappy/shared/network/BufferedClient.hpp"
 
 #include <gtest/gtest.h>
 
@@ -23,7 +23,7 @@
 
 static constexpr uint16_t kTestPort = 59998;
 
-class LineBufferTest : public ::testing::Test {
+class BufferedClientTest : public ::testing::Test {
   protected:
     void SetUp() override {
         _server.bind(kTestPort);
@@ -52,14 +52,14 @@ class LineBufferTest : public ::testing::Test {
   public:
     zappy::network::socket::Server _server;
     std::optional<zappy::network::socket::Client> _serverClient;
-    zappy::network::LineBuffer _lineBuffer;
+    zappy::network::BufferedClient _lineBuffer;
 };
 
-TEST_F(LineBufferTest, FdIsValidAfterConnect) { EXPECT_GT(_lineBuffer.fd(), 0); }
+TEST_F(BufferedClientTest, FdIsValidAfterConnect) { EXPECT_GT(_lineBuffer.fd(), 0); }
 
-TEST_F(LineBufferTest, HasNoMessagesInitially) { EXPECT_FALSE(_lineBuffer.hasMessages()); }
+TEST_F(BufferedClientTest, HasNoMessagesInitially) { EXPECT_FALSE(_lineBuffer.hasMessages()); }
 
-TEST_F(LineBufferTest, PollExtractsCompleteLine) {
+TEST_F(BufferedClientTest, PollExtractsCompleteLine) {
     serverSend("hello\n");
     _lineBuffer.poll();
     EXPECT_TRUE(_lineBuffer.hasMessages());
@@ -67,13 +67,13 @@ TEST_F(LineBufferTest, PollExtractsCompleteLine) {
     EXPECT_FALSE(_lineBuffer.hasMessages());
 }
 
-TEST_F(LineBufferTest, PollIgnoresPartialLine) {
+TEST_F(BufferedClientTest, PollIgnoresPartialLine) {
     serverSend("hello");
     _lineBuffer.poll();
     EXPECT_FALSE(_lineBuffer.hasMessages());
 }
 
-TEST_F(LineBufferTest, PollCompletesPartialLineAcrossTwoCalls) {
+TEST_F(BufferedClientTest, PollCompletesPartialLineAcrossTwoCalls) {
     serverSend("hel");
     _lineBuffer.poll();
     EXPECT_FALSE(_lineBuffer.hasMessages());
@@ -83,7 +83,7 @@ TEST_F(LineBufferTest, PollCompletesPartialLineAcrossTwoCalls) {
     EXPECT_EQ(_lineBuffer.popMessage(), "hello");
 }
 
-TEST_F(LineBufferTest, PollExtractsMultipleLines) {
+TEST_F(BufferedClientTest, PollExtractsMultipleLines) {
     serverSend("line1\nline2\n");
     _lineBuffer.poll();
     EXPECT_TRUE(_lineBuffer.hasMessages());
@@ -93,7 +93,7 @@ TEST_F(LineBufferTest, PollExtractsMultipleLines) {
     EXPECT_FALSE(_lineBuffer.hasMessages());
 }
 
-TEST_F(LineBufferTest, PollExtractsCompleteLineAndKeepsPartial) {
+TEST_F(BufferedClientTest, PollExtractsCompleteLineAndKeepsPartial) {
     serverSend("complete\npartial");
     _lineBuffer.poll();
     EXPECT_TRUE(_lineBuffer.hasMessages());
@@ -101,7 +101,7 @@ TEST_F(LineBufferTest, PollExtractsCompleteLineAndKeepsPartial) {
     EXPECT_FALSE(_lineBuffer.hasMessages());
 }
 
-TEST_F(LineBufferTest, PopMessageReturnsInFifoOrder) {
+TEST_F(BufferedClientTest, PopMessageReturnsInFifoOrder) {
     serverSend("first\nsecond\nthird\n");
     _lineBuffer.poll();
     EXPECT_EQ(_lineBuffer.popMessage(), "first");
@@ -109,19 +109,19 @@ TEST_F(LineBufferTest, PopMessageReturnsInFifoOrder) {
     EXPECT_EQ(_lineBuffer.popMessage(), "third");
 }
 
-TEST_F(LineBufferTest, SendDataReachesServer) {
+TEST_F(BufferedClientTest, SendDataReachesServer) {
     _lineBuffer.send("GRAPHIC\n");
     EXPECT_EQ(serverRead(), "GRAPHIC\n");
 }
 
-TEST_F(LineBufferTest, SendMultipleLinesReachServer) {
+TEST_F(BufferedClientTest, SendMultipleLinesReachServer) {
     _lineBuffer.send("msz\n");
     _lineBuffer.send("mct\n");
     const std::string received = serverRead();
     EXPECT_EQ(received, "msz\nmct\n");
 }
 
-TEST_F(LineBufferTest, PollThrowsWhenConnectionLost) {
+TEST_F(BufferedClientTest, PollThrowsWhenConnectionLost) {
     _serverClient.reset();
     EXPECT_THROW(_lineBuffer.poll(), zappy::exception::SocketError);
 }

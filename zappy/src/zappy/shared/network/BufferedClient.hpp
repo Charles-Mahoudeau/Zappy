@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2026
 ** zappy
 ** File description:
-** LineBuffer
+** BufferedClient
 */
 
 #pragma once
@@ -15,16 +15,16 @@
 #include "zappy/shared/network/socket/Client.hpp"
 
 namespace zappy::network {
-class LineBuffer {
+class BufferedClient {
   public:
-    LineBuffer() = default;
-    ~LineBuffer() = default;
+    BufferedClient() = default;
+    ~BufferedClient() = default;
 
-    LineBuffer(const LineBuffer&) = delete;
-    LineBuffer& operator=(const LineBuffer&) = delete;
+    BufferedClient(const BufferedClient&) = delete;
+    BufferedClient& operator=(const BufferedClient&) = delete;
 
-    LineBuffer(LineBuffer&&) noexcept = default;
-    LineBuffer& operator=(LineBuffer&&) noexcept = default;
+    BufferedClient(BufferedClient&&) noexcept = default;
+    BufferedClient& operator=(BufferedClient&&) noexcept = default;
 
     void connect(const Address& address);
 

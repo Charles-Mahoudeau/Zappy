@@ -2,10 +2,10 @@
 ** EPITECH PROJECT, 2026
 ** zappy
 ** File description:
-** LineBuffer
+** BufferedClient
 */
 
-#include "LineBuffer.hpp"
+#include "BufferedClient.hpp"
 
 #include <bit>
 #include <cstddef>
@@ -18,19 +18,19 @@
 
 namespace zappy::network {
 
-void LineBuffer::connect(const Address& address) { _client.connect(address); }
+void BufferedClient::connect(const Address& address) { _client.connect(address); }
 
-int LineBuffer::fd() const { return _client.fd(); }
+int BufferedClient::fd() const { return _client.fd(); }
 
-bool LineBuffer::hasMessages() const { return !_messages.empty(); }
+bool BufferedClient::hasMessages() const { return !_messages.empty(); }
 
-std::string LineBuffer::popMessage() {
+std::string BufferedClient::popMessage() {
     std::string message = std::move(_messages.front());
     _messages.pop();
     return message;
 }
 
-void LineBuffer::poll() {
+void BufferedClient::poll() {
     auto bytes = _client.read(4096);
 
     if (bytes.empty() && !_client.isOpen()) {
@@ -46,7 +46,7 @@ void LineBuffer::poll() {
     }
 }
 
-void LineBuffer::send(std::string_view line) {
+void BufferedClient::send(std::string_view line) {
     const auto* ptr = std::bit_cast<const std::byte*>(line.data());
     std::size_t sent = 0;
     while (sent < line.size()) {
