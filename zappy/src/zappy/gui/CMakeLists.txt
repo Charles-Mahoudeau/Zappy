@@ -1,6 +1,11 @@
+include(SetupRaylib)
+setup_raylib()
+
 add_library(zappy_gui_objects OBJECT
         Demo.cpp
         Demo.hpp
+        display/Window.cpp
+        display/Window.hpp
 )
 target_include_directories(zappy_gui_objects PUBLIC
         ${CMAKE_SOURCE_DIR}/src
@@ -8,6 +13,10 @@ target_include_directories(zappy_gui_objects PUBLIC
 target_link_libraries(zappy_gui_objects PUBLIC
         zappy_shared
 )
+
+if (TARGET raylib)
+    target_link_libraries(zappy_gui_objects PUBLIC raylib)
+endif ()
 
 add_executable(zappy_gui
         main.cpp
