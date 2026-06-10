@@ -20,7 +20,7 @@ class CliParser {
 
     CliParser(const CliParser&) = delete;
     CliParser(CliParser&&) = delete;
-    CliParser& operator=(const CliParser&) = default;
+    CliParser& operator=(const CliParser&) = delete;
     CliParser& operator=(CliParser&&) = delete;
 
     /**
