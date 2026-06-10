@@ -24,17 +24,17 @@ enum class CameraMode {
 
 enum class CameraProjection { CAMERA_PERSPECTIVE = 0, CAMERA_ORTHOGRAPHIC = 1 };
 
-class RaiiCamera {
+class Camera {
   public:
-    RaiiCamera(const Vector3 position, const Vector3 target, const Vector3 up, const float fovy,
-               const CameraProjection projection);
-    ~RaiiCamera() = default;
+    Camera(const Vector3 position, const Vector3 target, const Vector3 up, const float fovy,
+           const CameraProjection projection);
+    ~Camera() = default;
 
-    RaiiCamera(const RaiiCamera&) = delete;
-    RaiiCamera& operator=(const RaiiCamera&) = delete;
+    Camera(const Camera&) = delete;
+    Camera& operator=(const Camera&) = delete;
 
-    RaiiCamera(RaiiCamera&& other) noexcept;
-    RaiiCamera& operator=(RaiiCamera&& other) noexcept;
+    Camera(Camera&& other) noexcept;
+    Camera& operator=(Camera&& other) noexcept;
 
     Vector3 position() const;
     Vector3 target() const;
@@ -52,13 +52,13 @@ class RaiiCamera {
 
     void Update();
 
-    operator Camera() const { return _camera; }
+    operator Camera3D() const { return _camera; }
 
-    operator Camera&() { return _camera; }
-    operator const Camera&() const { return _camera; }
+    operator Camera3D&() { return _camera; }
+    operator const Camera3D&() const { return _camera; }
 
   private:
-    Camera _camera{0};
+    Camera3D _camera{0};
     CameraMode _cameraMode{CameraMode::CAMERA_CUSTOM};
 };
 }  // namespace zappy::gui::render
