@@ -1,7 +1,11 @@
 add_library(zappy_server_objects OBJECT
-        Demo.cpp
-        Demo.hpp
+	Core.hpp
+	Core.cpp
+	Context.hpp
+	world/Map.hpp
+	world/Map.cpp
 )
+
 target_include_directories(zappy_server_objects PUBLIC
         ${CMAKE_SOURCE_DIR}/src
 )
