@@ -33,7 +33,8 @@ std::vector<std::string_view> makeFullArgv(std::string_view port = "4242", std::
     return argv;
 }
 
-Params parse(std::vector<std::string_view> argv) { return CLI::parseArguments(std::span<std::string_view>(argv)); }
+// Builds a CliParser from argv (parsing + validation happen in the constructor).
+CLI build(std::vector<std::string_view> argv) { return CLI{std::span<std::string_view>(argv)}; }
 
 }  // namespace
 
@@ -42,8 +43,9 @@ Params parse(std::vector<std::string_view> argv) { return CLI::parseArguments(st
 // ─────────────────────────────────────────────
 
 TEST(CliParser, valid_full_arguments_parsed_correctly) {
-    auto params = parse(makeFullArgv());
-    ASSERT_NO_THROW(CLI::ensureValidArguments(params));
+    auto argv = makeFullArgv();
+    CLI parser{std::span<std::string_view>(argv)};
+    const auto& params = parser.parameters();
 
     EXPECT_EQ(params.port, 4242);
     EXPECT_EQ(params.mapWidth, 10U);
@@ -56,7 +58,10 @@ TEST(CliParser, valid_full_arguments_parsed_correctly) {
 }
 
 TEST(CliParser, flags_in_different_order_parsed_correctly) {
-    auto params = parse({"-f", "50", "-c", "3", "-n", "red", "blue", "-y", "15", "-x", "25", "-p", "1234"});
+    std::vector<std::string_view> argv = {"-f", "50", "-c", "3",  "-n", "red", "blue",
+                                          "-y", "15", "-x", "25", "-p", "1234"};
+    CLI parser{std::span<std::string_view>(argv)};
+    const auto& params = parser.parameters();
 
     EXPECT_EQ(params.port, 1234);
     EXPECT_EQ(params.mapWidth, 25U);
@@ -67,93 +72,96 @@ TEST(CliParser, flags_in_different_order_parsed_correctly) {
 }
 
 TEST(CliParser, teams_flag_block_single_team) {
-    auto params = parse(makeFullArgv("4242", "10", "10", {"onlyTeam"}));
-    ASSERT_THROW(CLI::ensureValidArguments(params), InvalidArg);
+    auto argv = makeFullArgv("4242", "10", "10", {"onlyTeam"});
+    ASSERT_THROW(build(argv), InvalidArg);
 }
 
-TEST(CliParser, empty_argv_returns_default_params) {
-    auto params = parse({});
-    ASSERT_THROW(CLI::ensureValidArguments(params), InvalidArg);
+TEST(CliParser, empty_argv_throws) {
+    std::vector<std::string_view> argv = {};
+    ASSERT_THROW(build(argv), InvalidArg);
 }
 
 // ─────────────────────────────────────────────
 //  Malformed flags
 // ─────────────────────────────────────────────
 
-TEST(CliParser, unknown_flag_throws) { ASSERT_THROW(parse({"-z", "42"}), InvalidArg); }
+TEST(CliParser, unknown_flag_throws) { ASSERT_THROW(build({"-z", "42"}), InvalidArg); }
 
-TEST(CliParser, no_leading_dash_throws) { ASSERT_THROW(parse({"p", "4242"}), InvalidArg); }
+TEST(CliParser, no_leading_dash_throws) { ASSERT_THROW(build({"p", "4242"}), InvalidArg); }
 
-TEST(CliParser, double_dash_flag_throws) { ASSERT_THROW(parse({"--port", "4242"}), InvalidArg); }
+TEST(CliParser, double_dash_flag_throws) { ASSERT_THROW(build({"--port", "4242"}), InvalidArg); }
 
-TEST(CliParser, only_dash_flag_throws) { ASSERT_THROW(parse({"-", "4242"}), InvalidArg); }
+TEST(CliParser, only_dash_flag_throws) { ASSERT_THROW(build({"-", "4242"}), InvalidArg); }
 
 // ─────────────────────────────────────────────
 //  Parameter count
 // ─────────────────────────────────────────────
 
-TEST(CliParser, flag_without_required_parameter_throws) { ASSERT_THROW(parse({"-p"}), InvalidArg); }
+TEST(CliParser, flag_without_required_parameter_throws) { ASSERT_THROW(build({"-p"}), InvalidArg); }
 
-TEST(CliParser, flag_with_too_many_parameters_throws) { ASSERT_THROW(parse({"-p", "4242", "9999"}), InvalidArg); }
+TEST(CliParser, flag_with_too_many_parameters_throws) { ASSERT_THROW(build({"-p", "4242", "9999"}), InvalidArg); }
 
 // ─────────────────────────────────────────────
 //  Value parsing errors
 // ─────────────────────────────────────────────
 
-TEST(CliParser, non_numeric_value_throws) { ASSERT_THROW(parse({"-p", "abc"}), InvalidArg); }
+TEST(CliParser, non_numeric_value_throws) { ASSERT_THROW(build({"-p", "abc"}), InvalidArg); }
 
-TEST(CliParser, empty_value_throws) { ASSERT_THROW(parse({"-p", ""}), InvalidArg); }
+TEST(CliParser, empty_value_throws) { ASSERT_THROW(build({"-p", ""}), InvalidArg); }
 
-TEST(CliParser, partial_numeric_value_throws) { ASSERT_THROW(parse({"-p", "42abc"}), InvalidArg); }
+TEST(CliParser, partial_numeric_value_throws) { ASSERT_THROW(build({"-p", "42abc"}), InvalidArg); }
 
-TEST(CliParser, negative_value_throws) { ASSERT_THROW(parse({"-p", "-1"}), InvalidArg); }
+TEST(CliParser, negative_value_throws) { ASSERT_THROW(build({"-p", "-1"}), InvalidArg); }
 
 // ─────────────────────────────────────────────
 //  Overflow handling
 // ─────────────────────────────────────────────
 
-TEST(CliParser, uint16_field_above_max_throws) { ASSERT_THROW(parse({"-p", "65536"}), InvalidArg); }
+TEST(CliParser, uint16_field_above_max_throws) { ASSERT_THROW(build({"-p", "65536"}), InvalidArg); }
 
 TEST(CliParser, uint16_field_at_max_accepted) {
-    auto params = parse({"-p", "65535"});
-    EXPECT_EQ(params.port, 65535);
+    // 65535 is a valid port, but the other required args are missing,
+    // so the constructor still rejects it during validation.
+    // Build a fully-valid argv with port at max to assert the value is parsed.
+    auto argv = makeFullArgv("65535");
+    CLI parser{std::span<std::string_view>(argv)};
+    EXPECT_EQ(parser.parameters().port, 65535);
 }
 
 TEST(CliParser, uint32_field_above_max_throws) {
-    ASSERT_THROW(parse({"-x", "99999999999999999999999999"}), InvalidArg);
+    ASSERT_THROW(build({"-x", "99999999999999999999999999"}), InvalidArg);
 }
 
 // ─────────────────────────────────────────────
-//  checkArgumentsValidity
+//  Validity (now enforced by the constructor)
 // ─────────────────────────────────────────────
 
 TEST(CliParser, validity_rejects_zero_port) {
-    auto p = parse(makeFullArgv("0"));
-    ASSERT_THROW(CLI::ensureValidArguments(p), InvalidArg);
+    auto argv = makeFullArgv("0");
+    ASSERT_THROW(build(argv), InvalidArg);
 }
 
 TEST(CliParser, validity_rejects_zero_width) {
-    auto p = parse(makeFullArgv("4242", "0"));
-    ASSERT_THROW(CLI::ensureValidArguments(p), InvalidArg);
+    auto argv = makeFullArgv("4242", "0");
+    ASSERT_THROW(build(argv), InvalidArg);
 }
 
 TEST(CliParser, validity_rejects_zero_height) {
-    auto p = parse(makeFullArgv("4242", "10", "0"));
-    ASSERT_THROW(CLI::ensureValidArguments(p), InvalidArg);
+    auto argv = makeFullArgv("4242", "10", "0");
+    ASSERT_THROW(build(argv), InvalidArg);
 }
 
 TEST(CliParser, validity_rejects_zero_clients) {
-    auto p = parse(makeFullArgv("4242", "10", "10", {"teamA", "teamB"}, "0"));
-    ASSERT_THROW(CLI::ensureValidArguments(p), InvalidArg);
+    auto argv = makeFullArgv("4242", "10", "10", {"teamA", "teamB"}, "0");
+    ASSERT_THROW(build(argv), InvalidArg);
 }
 
 TEST(CliParser, validity_rejects_zero_frequency) {
-    auto p = parse(makeFullArgv("4242", "10", "10", {"teamA", "teamB"}, "5", "0"));
-    ASSERT_THROW(CLI::ensureValidArguments(p), InvalidArg);
+    auto argv = makeFullArgv("4242", "10", "10", {"teamA", "teamB"}, "5", "0");
+    ASSERT_THROW(build(argv), InvalidArg);
 }
 
 TEST(CliParser, validity_rejects_empty_teams) {
-    auto p = parse(makeFullArgv("4242", "10", "10", std::vector<std::string_view>{}));
-    EXPECT_TRUE(p.teamsName.empty());
-    ASSERT_THROW(CLI::ensureValidArguments(p), InvalidArg);
+    auto argv = makeFullArgv("4242", "10", "10", std::vector<std::string_view>{});
+    ASSERT_THROW(build(argv), InvalidArg);
 }
