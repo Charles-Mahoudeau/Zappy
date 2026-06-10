@@ -14,14 +14,6 @@
 namespace zappy::server {
 class CliParsing {
   public:
-    CliParsing() = default;
-    ~CliParsing() = default;
-
-    CliParsing(const CliParsing&) = default;
-    CliParsing(CliParsing&&) = delete;
-    CliParsing& operator=(const CliParsing&) = default;
-    CliParsing& operator=(CliParsing&&) = delete;
-
     struct CliParameter {
         std::uint16_t port = 0;
         std::uint32_t mapWidth = 0;

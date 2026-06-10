@@ -16,7 +16,6 @@
 #include <stdexcept>
 #include <string>
 #include <string_view>
-#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -25,18 +24,20 @@ namespace zappy::server {
 
 CliParsing::CliParameter CliParsing::parseArguments(const std::vector<std::string_view>& argv) {
     CliParameter params;
+    auto it = argv.cbegin();
 
-    for (size_t index = 0; index < argv.size(); ++index) {
-        std::string_view param = argv.at(index);
+    while (it != argv.cend()) {
+        std::string_view param = *it;
 
         if (!param.starts_with("-")) {
             throw zappy::exception::InvalidArgument(std::format("invalid Cli argument: {}", param));
         }
+        ++it;
 
         std::vector<std::string_view> flagParameters;
-        while (index + 1 < argv.size() && !argv.at(index + 1).starts_with("-")) {
-            ++index;
-            flagParameters.emplace_back(argv.at(index));
+        while (it != argv.cend() && !it->starts_with("-")) {
+            flagParameters.emplace_back(*it);
+            ++it;
         }
 
         handleFlag(param.substr(1), flagParameters, params);
@@ -79,8 +80,8 @@ void CliParsing::handleFlag(std::string_view flag, const std::vector<std::string
         std::optional<size_t> nbParam = 1;
         std::function<void()> handle = nullptr;
     };
-    auto parseNb = [&flagParams](auto& field, std::string_view flag) {
-        field = parseAndValidate<std::decay_t<decltype(field)>>(flagParams.at(0), flag);
+    auto parseNb = [&flagParams]<typename T>(T& field, std::string_view flag) {
+        field = parseAndValidate<T>(flagParams.at(0), flag);
     };
     const std::map<std::string_view, FlagBehavior> flags = {
         {"p", {.handle = [&param, &parseNb] { parseNb(param.port, "p"); }}},
