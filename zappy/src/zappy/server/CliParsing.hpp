@@ -24,11 +24,11 @@ class CliParsing {
 
     struct CliParameter {
         std::uint16_t port = 0;
-        std::uint64_t mapWidth = 0;
-        std::uint64_t mapHeight = 0;
+        std::uint32_t mapWidth = 0;
+        std::uint32_t mapHeight = 0;
         std::vector<std::string_view> teamsName;
-        std::uint64_t nbInitialClient = 0;
-        std::uint64_t frequencies = 0;
+        std::uint32_t nbInitialClient = 0;
+        std::uint32_t frequencies = 0;
     };
 
     static CliParameter parseArguments(const std::vector<std::string_view>& argv);

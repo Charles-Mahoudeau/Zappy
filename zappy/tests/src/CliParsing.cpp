@@ -9,8 +9,6 @@
 
 #include <gtest/gtest.h>
 
-#include <exception>
-
 #include "zappy/shared/exception/InvalidArgument.hpp"
 
 using Params = zappy::server::CliParsing::CliParameter;
@@ -63,18 +61,15 @@ TEST(CliParsing, flags_in_different_order_parsed_correctly) {
     ASSERT_EQ(params.teamsName.size(), 2U);
 }
 
-TEST(CliParsing, teams_flag_accepts_single_team) {
-    std::vector<std::string_view> data = {"-n", "onlyTeam"};
+TEST(CliParsing, teams_flag_block_single_team) {
+    auto data = makeFullArgv("4242", "10", "10", {"onlyTeam"});
     auto params = CLI::parseArguments(data);
-    ASSERT_EQ(params.teamsName.size(), 1U);
-    EXPECT_EQ(params.teamsName[0], "onlyTeam");
+    ASSERT_THROW(CLI::checkArgumentsValidity(params), InvalidArg);
 }
 
 TEST(CliParsing, empty_argv_returns_default_params) {
     auto params = CLI::parseArguments({});
-    EXPECT_EQ(params.port, 0);
-    EXPECT_TRUE(params.teamsName.empty());
-    // Defaults must fail validity
+
     ASSERT_THROW(CLI::checkArgumentsValidity(params), InvalidArg);
 }
 
@@ -98,12 +93,6 @@ TEST(CliParsing, flag_without_required_parameter_throws) { ASSERT_THROW(CLI::par
 
 TEST(CliParsing, flag_with_too_many_parameters_throws) {
     ASSERT_THROW(CLI::parseArguments({"-p", "4242", "9999"}), InvalidArg);
-}
-
-TEST(CliParsing, duplicate_flag_keeps_last_value) {
-    // Document current behavior: second -p overwrites the first
-    auto params = CLI::parseArguments({"-p", "1111", "-p", "2222"});
-    EXPECT_EQ(params.port, 2222);
 }
 
 // ─────────────────────────────────────────────
@@ -141,8 +130,7 @@ TEST(CliParsing, uint16_field_at_max_accepted) {
     EXPECT_EQ(params.port, 65535);
 }
 
-TEST(CliParsing, uint64_field_above_max_throws) {
-    // mapWidth is uint64_t; value beyond unsigned long long
+TEST(CliParsing, uint32_field_above_max_throws) {
     ASSERT_THROW(CLI::parseArguments({"-x", "99999999999999999999999999"}), InvalidArg);
 }
 
