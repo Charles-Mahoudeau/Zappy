@@ -7,6 +7,7 @@
 
 #include <exception>
 #include <iostream>
+#include <iterator>
 #include <string_view>
 #include <vector>
 
@@ -15,7 +16,7 @@
 
 int main(const int argc, char** argv) {
     zappy::server::Core core;
-    std::vector<std::string_view> arguments(std::next(argv), std::next(argv, argc));
+    const std::vector<std::string_view> arguments(std::next(argv), std::next(argv, argc));
 
     try {
         core.init(arguments);
@@ -26,6 +27,5 @@ int main(const int argc, char** argv) {
         std::cerr << "Unknown Error: " << err.what() << "\n";
         return 84;
     }
-    core.run();
     return 0;
 }

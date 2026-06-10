@@ -9,6 +9,9 @@
 
 #include <gtest/gtest.h>
 
+#include <string_view>
+#include <vector>
+
 #include "zappy/shared/exception/InvalidArgument.hpp"
 
 using Params = zappy::server::CliParsing::CliParameter;
@@ -45,13 +48,13 @@ TEST(CliParsing, valid_full_arguments_parsed_correctly) {
     EXPECT_EQ(params.nbInitialClient, 5U);
     EXPECT_EQ(params.frequencies, 100U);
     ASSERT_EQ(params.teamsName.size(), 2U);
-    EXPECT_EQ(params.teamsName[0], "teamA");
-    EXPECT_EQ(params.teamsName[1], "teamB");
+    EXPECT_EQ(params.teamsName.at(0), "teamA");
+    EXPECT_EQ(params.teamsName.at(1), "teamB");
 }
 
 TEST(CliParsing, flags_in_different_order_parsed_correctly) {
-    std::vector<std::string_view> data = {"-f", "50", "-c", "3",  "-n", "red", "blue",
-                                          "-y", "15", "-x", "25", "-p", "1234"};
+    const std::vector<std::string_view> data = {"-f", "50", "-c", "3",  "-n", "red", "blue",
+                                                "-y", "15", "-x", "25", "-p", "1234"};
     auto params = CLI::parseArguments(data);
     EXPECT_EQ(params.port, 1234);
     EXPECT_EQ(params.mapWidth, 25U);

@@ -26,8 +26,6 @@ class Core {
 
     void init(const std::vector<std::string_view>& argv);
 
-    void run();
-
   private:
     network::socket::Server _serv{};
 };
