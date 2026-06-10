@@ -11,16 +11,21 @@
 #include <memory>
 #include <optional>
 #include <ranges>
+#include <typeindex>
 #include <utility>
-#include <vector>
 
 #include "IEntity.hpp"
+#include "zappy/shared/exception/InvalidArgument.hpp"
 
 namespace zappy::server::game {
 std::uint64_t EntityDatabase::insert(std::unique_ptr<IEntity> entity) {
+    if (entity == nullptr) {
+        throw exception::InvalidArgument{"Entity cannot be null"};
+    }
+
     auto [it, _] = _entities.emplace(generateId(), std::move(entity));
 
-    _entitiesByType[typeid(it->second.get())][it->first].emplace_back(it->second.get());
+    _entitiesByType[typeIndex(*it->second)][it->first].emplace_back(it->second.get());
     return it->first;
 }
 
@@ -30,7 +35,7 @@ void EntityDatabase::remove(const std::uint64_t id) {
     if (it == _entities.end()) {
         return;
     }
-    _entitiesByType[typeid(it->second.get())].erase(id);
+    _entitiesByType[typeIndex(*it->second)].erase(id);
     _entities.erase(it);
 }
 
@@ -47,13 +52,6 @@ IEntity* EntityDatabase::query(const std::uint64_t id) {
     }
     return it->second.get();
 }
-
-auto EntityDatabase::viewAll() {
-    return _entities | std::views::values |
-           std::views::transform([](const std::unique_ptr<IEntity>& entity) { return entity.get(); });
-}
-
-std::vector<IEntity*> EntityDatabase::toVector() { return viewAll() | std::ranges::to<std::vector<IEntity*>>(); }
 
 std::uint64_t EntityDatabase::countAll() const { return _entities.size(); }
 
@@ -72,4 +70,6 @@ std::optional<std::uint64_t> EntityDatabase::id(const IEntity* entity) {
 std::optional<std::uint64_t> EntityDatabase::id(const IEntity& entity) { return id(&entity); }
 
 std::uint64_t EntityDatabase::generateId() { return _nextId++; }
+
+std::type_index EntityDatabase::typeIndex(const IEntity& entity) { return typeid(entity); }
 }  // namespace zappy::server::game

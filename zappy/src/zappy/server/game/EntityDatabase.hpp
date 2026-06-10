@@ -88,6 +88,11 @@ class EntityDatabase {
     /// @return A unique ID for a new entity.
     [[nodiscard]] std::uint64_t generateId();
 
+    /// @brief Get the type index of an entity.
+    /// @param entity The entity to get the type index of.
+    /// @return The type index of the entity.
+    [[nodiscard]] static std::type_index typeIndex(const IEntity& entity);
+
     std::uint64_t _nextId{0};
     std::unordered_map<std::uint64_t, std::unique_ptr<IEntity>> _entities;
     std::unordered_map<std::type_index, std::unordered_map<std::uint64_t, std::vector<IEntity*>>> _entitiesByType;
@@ -114,7 +119,7 @@ auto EntityDatabase::viewAll() {
 
 template <IsEntity T>
 std::vector<T*> EntityDatabase::toVector() {
-    return viewAll<T>() | std::ranges::to<std::vector<IEntity*>>();
+    return viewAll<T>() | std::ranges::to<std::vector<T*>>();
 }
 
 template <IsEntity T>
