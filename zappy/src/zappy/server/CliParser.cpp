@@ -5,6 +5,8 @@
 ** CliParser code
 */
 
+#include "zappy/server/CliParser.hpp"
+
 #include <cstddef>
 #include <format>
 #include <functional>
@@ -17,7 +19,6 @@
 #include <utility>
 #include <vector>
 
-#include "zappy/server/CliParser.hpp"
 #include "zappy/shared/exception/InvalidArgument.hpp"
 namespace zappy::server {
 
