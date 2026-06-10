@@ -157,18 +157,18 @@ TEST(CliParsing, validity_rejects_zero_height) {
 }
 
 TEST(CliParsing, validity_rejects_zero_clients) {
-    auto p = CLI::parseArguments(makeFullArgv("4242", "10", "10", {"teamA"}, "0"));
+    auto p = CLI::parseArguments(makeFullArgv("4242", "10", "10", {"teamA", "teamB"}, "0"));
     ASSERT_THROW(CLI::checkArgumentsValidity(p), InvalidArg);
 }
 
 TEST(CliParsing, validity_rejects_zero_frequency) {
-    auto p = CLI::parseArguments(makeFullArgv("4242", "10", "10", {"teamA"}, "5", "0"));
+    auto p = CLI::parseArguments(makeFullArgv("4242", "10", "10", {"teamA", "teamB"}, "5", "0"));
     ASSERT_THROW(CLI::checkArgumentsValidity(p), InvalidArg);
 }
 
 TEST(CliParsing, validity_rejects_empty_teams) {
     // -n with no following words → empty teamsName vector
-    auto p = CLI::parseArguments({"-n", "-c", "5"});
+    auto p = CLI::parseArguments(makeFullArgv("4242", "10", "10", std::vector<std::string_view>{}));
     EXPECT_TRUE(p.teamsName.empty());
     ASSERT_THROW(CLI::checkArgumentsValidity(p), InvalidArg);
 }
