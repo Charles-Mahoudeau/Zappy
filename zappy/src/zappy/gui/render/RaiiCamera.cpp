@@ -5,28 +5,22 @@
 ** Camera
 */
 
-#include "Camera.hpp"
-
 #include <raylib.h>
+
+#include "Camera.hpp"
 
 namespace zappy::gui::render {
 
-Camera::Camera(const Vector3 position, const Vector3 target, const Vector3 up, const float fovy,
-               const CameraProjection projection)
+Camera::Camera(Vector3 position, Vector3 target, Vector3 up, float fovy, CameraProjection projection)
     : _camera{
           .position = position, .target = target, .up = up, .fovy = fovy, .projection = static_cast<int>(projection)} {}
 
-Camera::Camera(Camera&& other) noexcept : _camera(other._camera), _cameraMode(other._cameraMode) {
-    other._camera = {};
-    other._cameraMode = CameraMode::CAMERA_CUSTOM;
-}
+Camera::Camera(Camera&& other) noexcept : _camera(other._camera) { other._camera = {}; }
 
 Camera& Camera::operator=(Camera&& other) noexcept {
     if (this != &other) {
         _camera = other._camera;
-        _cameraMode = other._cameraMode;
         other._camera = {};
-        other._cameraMode = CameraMode::CAMERA_CUSTOM;
     }
     return *this;
 }
@@ -49,11 +43,11 @@ void Camera::setTarget(const Vector3& target) { _camera.target = target; }
 
 void Camera::setUp(const Vector3& up) { _camera.up = up; }
 
-void Camera::setFovy(float fovy) { _camera.fovy = fovy; }
+void Camera::setFovy(const float fovy) { _camera.fovy = fovy; }
 
-void Camera::setProjection(CameraProjection projection) { _camera.projection = static_cast<int>(projection); }
+void Camera::setProjection(const CameraProjection projection) { _camera.projection = static_cast<int>(projection); }
 
-void Camera::setCameraMode(CameraMode mode) { _cameraMode = mode; }
+void Camera::setCameraMode(const CameraMode mode) { _cameraMode = mode; }
 
 void Camera::Update() { UpdateCamera(&_camera, static_cast<int>(_cameraMode)); }
 

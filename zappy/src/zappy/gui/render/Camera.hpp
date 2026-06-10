@@ -9,12 +9,11 @@
 
 #include <raylib.h>
 
-#include <string>
-#include <string_view>
+#include <cstdint>
 
 namespace zappy::gui::render {
 
-enum class CameraMode {
+enum class CameraMode : std::uint8_t {
     CAMERA_CUSTOM = 0,
     CAMERA_FREE = 1,
     CAMERA_ORBITAL = 2,
@@ -22,12 +21,11 @@ enum class CameraMode {
     CAMERA_THIRD_PERSON = 4
 };
 
-enum class CameraProjection { CAMERA_PERSPECTIVE = 0, CAMERA_ORTHOGRAPHIC = 1 };
+enum class CameraProjection : std::uint8_t { CAMERA_PERSPECTIVE = 0, CAMERA_ORTHOGRAPHIC = 1 };
 
 class Camera {
   public:
-    Camera(const Vector3 position, const Vector3 target, const Vector3 up, const float fovy,
-           const CameraProjection projection);
+    Camera(Vector3 position, Vector3 target, Vector3 up, float fovy, CameraProjection projection);
     ~Camera() = default;
 
     Camera(const Camera&) = delete;
@@ -36,19 +34,19 @@ class Camera {
     Camera(Camera&& other) noexcept;
     Camera& operator=(Camera&& other) noexcept;
 
-    Vector3 position() const;
-    Vector3 target() const;
-    Vector3 up() const;
-    float fovy() const;
-    CameraProjection projection() const;
-    CameraMode cameraMode() const;
+    [[nodiscard]] Vector3 position() const;
+    [[nodiscard]] Vector3 target() const;
+    [[nodiscard]] Vector3 up() const;
+    [[nodiscard]] float fovy() const;
+    [[nodiscard]] CameraProjection projection() const;
+    [[nodiscard]] CameraMode cameraMode() const;
 
     void setPosition(const Vector3& position);
     void setTarget(const Vector3& target);
     void setUp(const Vector3& up);
-    void setFovy(const float fovy);
-    void setProjection(const CameraProjection projection);
-    void setCameraMode(const CameraMode mode);
+    void setFovy(float fovy);
+    void setProjection(CameraProjection projection);
+    void setCameraMode(CameraMode mode);
 
     void Update();
 
