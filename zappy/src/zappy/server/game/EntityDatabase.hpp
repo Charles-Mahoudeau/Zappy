@@ -106,6 +106,11 @@ void EntityDatabase::removeAll() {
     _entitiesByType.erase(it);
 }
 
+inline auto EntityDatabase::viewAll() {
+    return _entities | std::views::values |
+           std::views::transform([](const std::unique_ptr<IEntity>& entity) { return entity.get(); });
+}
+
 template <IsEntity T>
 auto EntityDatabase::viewAll() {
     return _entitiesByType[typeid(T)] | std::views::values | std::views::join |

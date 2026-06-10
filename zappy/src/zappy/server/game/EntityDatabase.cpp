@@ -13,6 +13,7 @@
 #include <ranges>
 #include <typeindex>
 #include <utility>
+#include <vector>
 
 #include "IEntity.hpp"
 #include "zappy/shared/exception/InvalidArgument.hpp"
@@ -52,6 +53,8 @@ IEntity* EntityDatabase::query(const std::uint64_t id) {
     }
     return it->second.get();
 }
+
+std::vector<IEntity*> EntityDatabase::toVector() { return viewAll() | std::ranges::to<std::vector<IEntity*>>(); }
 
 std::uint64_t EntityDatabase::countAll() const { return _entities.size(); }
 
