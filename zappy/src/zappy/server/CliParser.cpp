@@ -8,11 +8,13 @@
 #include "zappy/server/CliParser.hpp"
 
 #include <cstddef>
+#include <cstdint>
 #include <format>
 #include <functional>
 #include <limits>
 #include <map>
 #include <optional>
+#include <span>
 #include <stdexcept>
 #include <string>
 #include <string_view>
@@ -46,10 +48,9 @@ CliParser::CliParameter CliParser::parseArguments(const std::vector<std::string_
 }
 
 template <typename T>
-T CliParser::parseAndValidate(std::string_view value, std::string_view flagName) {
+T CliParser::stringToUnNumber(std::string_view value, std::string_view flagName) {
     static constexpr unsigned long long maxVal = std::numeric_limits<T>::max();
-
-    unsigned long long parsed = 0;
+    std::uint64_t parsed = 0;
 
     if (!value.empty() && value.at(0) == '-') {
         throw exception::InvalidArgument(std::format(OVERFLOW_MESSAGE, flagName, value, maxVal));
@@ -78,18 +79,21 @@ void CliParser::handleFlag(std::string_view flag, const std::vector<std::string_
                            CliParameter& param) {
     struct FlagBehavior {
         std::optional<size_t> nbParam = 1;
-        std::function<void()> handle = nullptr;
+        std::function<void(const std::vector<std::string_view>& flagParams, CliParameter& param)> handle = nullptr;
     };
-    auto parseNb = [&flagParams]<typename T>(T& field, std::string_view flag) {
-        field = parseAndValidate<T>(flagParams.at(0), flag);
+    static constexpr auto parseNb = []<typename T>(T& field, std::string_view flag,
+                                                   const std::vector<std::string_view>& flagParams) {
+        field = CliParser::stringToUnNumber<T>(flagParams.at(0), flag);
     };
-    const std::map<std::string_view, FlagBehavior> flags = {
-        {"p", {.handle = [&param, &parseNb] { parseNb(param.port, "p"); }}},
-        {"x", {.handle = [&param, &parseNb] { parseNb(param.mapWidth, "x"); }}},
-        {"y", {.handle = [&param, &parseNb] { parseNb(param.mapHeight, "y"); }}},
-        {"c", {.handle = [&param, &parseNb] { parseNb(param.nbInitialClient, "c"); }}},
-        {"f", {.handle = [&param, &parseNb] { parseNb(param.frequencies, "f"); }}},
-        {"n", {.nbParam = std::nullopt, .handle = [&param, &flagParams] { param.teamsName = flagParams; }}},
+    static const std::map<std::string_view, FlagBehavior> flags = {
+        {"p", {.handle = [](const auto& flagParams, auto& param) { parseNb(param.port, "p", flagParams); }}},
+        {"x", {.handle = [](const auto& flagParams, auto& param) { parseNb(param.mapWidth, "x", flagParams); }}},
+        {"y", {.handle = [](const auto& flagParams, auto& param) { parseNb(param.mapHeight, "y", flagParams); }}},
+        {"c", {.handle = [](const auto& flagParams, auto& param) { parseNb(param.nbInitialClient, "c", flagParams); }}},
+        {"f", {.handle = [](const auto& flagParams, auto& param) { parseNb(param.frequencies, "f", flagParams); }}},
+        {"n",
+         {.nbParam = std::nullopt,
+          .handle = [](const auto& flagParams, auto& param) { param.teamsName = flagParams; }}},
     };
 
     auto it = flags.find(flag);
@@ -99,7 +103,7 @@ void CliParser::handleFlag(std::string_view flag, const std::vector<std::string_
     if (it->second.nbParam.has_value() && it->second.nbParam.value() != flagParams.size()) {
         throw exception::InvalidArgument(std::format("Invalid number parameter of {}", flag));
     }
-    it->second.handle();
+    it->second.handle(flagParams, param);
 }
 
 void CliParser::checkArgumentsValidity(const CliParameter& arguments) {

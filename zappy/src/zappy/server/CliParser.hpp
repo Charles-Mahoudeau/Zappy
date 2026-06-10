@@ -69,7 +69,7 @@ class CliParser {
      * negative.
      */
     template <typename T>
-    static T parseAndValidate(std::string_view value, std::string_view flagName);
+    static T stringToUnNumber(std::string_view value, std::string_view flagName);
 };
 
 }  // namespace zappy::server
