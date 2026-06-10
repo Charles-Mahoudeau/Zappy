@@ -16,6 +16,7 @@
 #include <vector>
 
 #include "IEntity.hpp"
+#include "zappy/shared/compat/ranges.hpp"
 
 namespace zappy::server::game {
 /// @brief A database of entities.
@@ -119,7 +120,7 @@ auto EntityDatabase::viewAll() {
 
 template <IsEntity T>
 std::vector<T*> EntityDatabase::toVector() {
-    return viewAll<T>() | std::ranges::to<std::vector<T*>>();
+    return viewAll<T>() | compat::ranges::to<std::vector<T*>>();
 }
 
 template <IsEntity T>
