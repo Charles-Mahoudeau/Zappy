@@ -19,7 +19,6 @@ endif ()
 add_library(zappy_gui_objects OBJECT
         Demo.cpp
         Demo.hpp
-        display/IWindow.hpp
         display/Window.cpp
         display/Window.hpp
 )
