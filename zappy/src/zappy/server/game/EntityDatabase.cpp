@@ -16,7 +16,6 @@
 #include <vector>
 
 #include "IEntity.hpp"
-#include "zappy/shared/compat/ranges.hpp"
 #include "zappy/shared/exception/InvalidArgument.hpp"
 
 namespace zappy::server::game {
@@ -55,7 +54,15 @@ IEntity* EntityDatabase::query(const std::uint64_t id) {
     return it->second.get();
 }
 
-std::vector<IEntity*> EntityDatabase::toVector() { return viewAll() | compat::ranges::to<std::vector<IEntity*>>(); }
+std::vector<IEntity*> EntityDatabase::toVector() {
+    std::vector<IEntity*> result;
+
+    result.reserve(countAll());
+    for (const auto& entity : viewAll()) {
+        result.emplace_back(entity);
+    }
+    return result;
+}
 
 std::uint64_t EntityDatabase::countAll() const { return _entities.size(); }
 
