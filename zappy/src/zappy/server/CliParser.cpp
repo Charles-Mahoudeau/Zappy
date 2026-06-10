@@ -24,8 +24,8 @@
 #include "zappy/shared/exception/InvalidArgument.hpp"
 namespace zappy::server {
 
-CliParser::CliParameter CliParser::parseArguments(const std::vector<std::string_view>& argv) {
-    CliParameter params;
+CliParser::CliParameters CliParser::parseArguments(std::span<std::string_view> argv) {
+    CliParameters params;
     auto it = argv.cbegin();
 
     while (it != argv.cend()) {
@@ -76,10 +76,10 @@ T CliParser::stringToUnNumber(std::string_view value, std::string_view flagName)
 }
 
 void CliParser::handleFlag(std::string_view flag, const std::vector<std::string_view>& flagParams,
-                           CliParameter& param) {
+                           CliParameters& param) {
     struct FlagBehavior {
         std::optional<size_t> nbParam = 1;
-        std::function<void(const std::vector<std::string_view>& flagParams, CliParameter& param)> handle = nullptr;
+        std::function<void(const std::vector<std::string_view>& flagParams, CliParameters& param)> handle = nullptr;
     };
     static constexpr auto parseNb = []<typename T>(T& field, std::string_view flag,
                                                    const std::vector<std::string_view>& flagParams) {
@@ -106,8 +106,8 @@ void CliParser::handleFlag(std::string_view flag, const std::vector<std::string_
     it->second.handle(flagParams, param);
 }
 
-void CliParser::checkArgumentsValidity(const CliParameter& arguments) {
-    static const std::vector<std::pair<bool, std::string_view>> conditions = {
+void CliParser::ensureValidArguments(const CliParameters& arguments) {
+    const std::vector<std::pair<bool, std::string_view>> conditions = {
         {arguments.port == 0, "port"},
         {arguments.mapWidth == 0, "mapWidth"},
         {arguments.mapHeight == 0, "mapHeight"},

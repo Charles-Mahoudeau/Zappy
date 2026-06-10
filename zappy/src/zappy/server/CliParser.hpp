@@ -8,6 +8,7 @@
 #pragma once
 
 #include <cstdint>
+#include <span>
 #include <string_view>
 #include <vector>
 
@@ -17,7 +18,7 @@ class CliParser {
     /**
      * @brief Structure holding all CLI configuration parameters.
      */
-    struct CliParameter {
+    struct CliParameters {
         std::uint16_t port = 0;
         std::uint32_t mapWidth = 0;
         std::uint32_t mapHeight = 0;
@@ -34,7 +35,7 @@ class CliParser {
      * @throws exception::InvalidArgument if an unknown flag is encountered, required parameters are missing, or values
      * are invalid.
      */
-    static CliParameter parseArguments(const std::vector<std::string_view>& argv);
+    static CliParameters parseArguments(std::span<std::string_view> argv);
 
     /**
      * @brief Validates that all required CLI arguments are present and valid.
@@ -43,7 +44,7 @@ class CliParser {
      * @throws exception::InvalidArgument if any required argument is missing or invalid (port, mapWidth, mapHeight,
      * teamsName (at least 2), nbInitialClient, frequencies).
      */
-    static void checkArgumentsValidity(const CliParameter& arguments);
+    static void ensureValidArguments(const CliParameters& arguments);
 
   private:
     static constexpr std::string_view OVERFLOW_MESSAGE = "Value overflow for -{}: '{}' exceeds allowed range [0, {}]";
@@ -56,7 +57,8 @@ class CliParser {
      * @param param The CLI parameter structure to populate.
      * @throws exception::InvalidArgument if the flag is unknown or has invalid number of parameters.
      */
-    static void handleFlag(std::string_view flag, const std::vector<std::string_view>& flagParams, CliParameter& param);
+    static void handleFlag(std::string_view flag, const std::vector<std::string_view>& flagParams,
+                           CliParameters& param);
 
     /**
      * @brief Parses and validates a numeric string value.

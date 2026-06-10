@@ -16,7 +16,7 @@
 
 int main(const int argc, char** argv) {
     zappy::server::Core core;
-    const std::vector<std::string_view> arguments(std::next(argv), std::next(argv, argc));
+    std::vector<std::string_view> arguments(std::next(argv), std::next(argv, argc));
 
     try {
         core.init(arguments);

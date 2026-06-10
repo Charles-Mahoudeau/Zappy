@@ -8,15 +8,14 @@
 #include "zappy/server/Core.hpp"
 
 #include <string_view>
-#include <vector>
 
 #include "zappy/server/CliParser.hpp"
 
 namespace zappy::server {
 
-void Core::init(const std::vector<std::string_view>& argv) {
-    const CliParser::CliParameter params = CliParser::parseArguments(argv);
-    CliParser::checkArgumentsValidity(params);
+void Core::init(std::span<std::string_view> argv) {
+    const CliParser::CliParameters params = CliParser::parseArguments(argv);
+    CliParser::ensureValidArguments(params);
 
     this->_serv.bind(params.port);
 }
