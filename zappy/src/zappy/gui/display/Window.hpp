@@ -9,13 +9,11 @@
 
 #include <string_view>
 
-#include "IWindow.hpp"
-
 namespace zappy::gui::display {
-class Window : public IWindow {
+class Window {
   public:
     Window(int width, int height, std::string_view title);
-    ~Window() override;
+    ~Window();
 
     Window(const Window&) = delete;
     Window& operator=(const Window&) = delete;
@@ -23,11 +21,11 @@ class Window : public IWindow {
     Window(Window&& other) noexcept;
     Window& operator=(Window&& other) noexcept;
 
-    [[nodiscard]] bool shouldClose() const override;
+    [[nodiscard]] bool shouldClose() const;
 
-    void setTargetFPS(int fps) override;
-    void beginFrame() override;
-    void endFrame() override;
+    void setTargetFPS(int fps);
+    void beginFrame();
+    void endFrame();
 
   private:
     bool _open{false};

@@ -44,15 +44,19 @@ Window& Window::operator=(Window&& other) noexcept {
     return *this;
 }
 
+// NOLINTNEXTLINE
 bool Window::shouldClose() const { return WindowShouldClose(); }
 
+// NOLINTNEXTLINE
 void Window::setTargetFPS(int fps) { SetTargetFPS(fps); }
 
+// NOLINTNEXTLINE
 void Window::beginFrame() {
     BeginDrawing();
     ClearBackground(BLACK);
 }
 
+// NOLINTNEXTLINE
 void Window::endFrame() { EndDrawing(); }
 
 }  // namespace zappy::gui::display
