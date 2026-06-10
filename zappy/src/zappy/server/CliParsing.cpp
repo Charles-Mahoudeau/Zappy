@@ -7,12 +7,16 @@
 
 #include "zappy/server/CliParsing.hpp"
 
+#include <cstddef>
 #include <format>
 #include <functional>
+#include <limits>
 #include <map>
+#include <optional>
 #include <stdexcept>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -23,16 +27,16 @@ CliParsing::CliParameter CliParsing::parseArguments(const std::vector<std::strin
     CliParameter params;
 
     for (size_t index = 0; index < argv.size(); ++index) {
-        std::string_view param = argv[index];
+        std::string_view param = argv.at(index);
 
         if (!param.starts_with("-")) {
             throw zappy::exception::InvalidArgument(std::format("invalid Cli argument: {}", param));
         }
 
         std::vector<std::string_view> flagParameters;
-        while (index + 1 < argv.size() && !argv[index + 1].starts_with("-")) {
+        while (index + 1 < argv.size() && !argv.at(index + 1).starts_with("-")) {
             ++index;
-            flagParameters.emplace_back(argv[index]);
+            flagParameters.emplace_back(argv.at(index));
         }
 
         handleFlag(param.substr(1), flagParameters, params);
@@ -46,12 +50,13 @@ T CliParsing::parseAndValidate(std::string_view value, std::string_view flagName
 
     unsigned long long parsed = 0;
 
-    if (!value.empty() && value[0] == '-') {
+    if (!value.empty() && value.at(0) == '-') {
         throw exception::InvalidArgument(std::format(OVERFLOW_MESSAGE, flagName, value, maxVal));
     }
     try {
         size_t pos = 0;
-        if (parsed = std::stoull(std::string(value), &pos); pos != value.size()) {
+        parsed = std::stoull(std::string(value), &pos);
+        if (pos != value.size()) {
             throw exception::InvalidArgument(
                 std::format("Invalid value for -{}: '{}' is not a valid number", flagName, value));
         }
