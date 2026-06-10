@@ -24,7 +24,7 @@
 
 namespace {
 
-static constexpr uint16_t kTestPort = 59998;
+constexpr uint16_t kTestPort = 59998;
 
 class BufferedClientTest : public ::testing::Test {
   protected:
@@ -50,6 +50,7 @@ class BufferedClientTest : public ::testing::Test {
         return {std::bit_cast<const char*>(bytes.data()), bytes.size()};
     }
 
+  public:
     zappy::network::socket::Server _server;
     std::optional<zappy::network::socket::Client> _serverClient;
     zappy::network::BufferedClient _bufferedClient;
