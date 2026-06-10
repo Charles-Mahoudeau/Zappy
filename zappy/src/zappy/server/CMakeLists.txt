@@ -1,8 +1,6 @@
 add_library(zappy_server_objects OBJECT
 	Core.hpp
 	Core.cpp
-	world/Map.hpp
-	world/Map.cpp
 	CliParsing.hpp
 	CliParsing.cpp
 )
