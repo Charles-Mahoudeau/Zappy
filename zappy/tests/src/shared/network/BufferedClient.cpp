@@ -55,10 +55,8 @@ class BufferedClientTest : public ::testing::Test {
             return {};
         }
         std::string result(bytes.size(), '\0');
-        std::ranges::transform(bytes, result.begin(), [](std::byte b) {
-            return static_cast<char>(std::to_underlying(b));
-            ;
-        });
+        std::ranges::transform(bytes, result.begin(),
+                               [](std::byte b) { return static_cast<char>(std::to_underlying(b)); });
         return result;
     }
 
