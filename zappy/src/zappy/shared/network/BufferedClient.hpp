@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include <queue>
 #include <string>
 #include <string_view>
