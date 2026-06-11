@@ -1,11 +1,12 @@
 add_library(zappy_server_objects OBJECT
-	Core.hpp
-	Core.cpp
-	CliParser.hpp
-	CliParser.cpp
-  game/EntityDatabase.cpp
-  game/EntityDatabase.hpp
-  game/IEntity.hpp
+        Core.hpp
+        Core.cpp
+        CliParser.hpp
+        CliParser.cpp
+        game/EntityDatabase.cpp
+        game/EntityDatabase.hpp
+        game/IEntity.hpp
+        game/ResourceType.hpp
 )
 
 target_include_directories(zappy_server_objects PUBLIC
