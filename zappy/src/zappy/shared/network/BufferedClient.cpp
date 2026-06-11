@@ -7,11 +7,11 @@
 
 #include "BufferedClient.hpp"
 
-#include <bit>
 #include <cstddef>
 #include <span>
 #include <string>
 #include <string_view>
+#include <utility>
 
 #include "zappy/shared/exception/SocketError.hpp"
 #include "zappy/shared/network/Address.hpp"
@@ -24,6 +24,7 @@ int BufferedClient::fd() const { return _client.fd(); }
 
 bool BufferedClient::hasMessages() const { return !_messages.empty(); }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 std::string BufferedClient::popMessage() {
     std::string message = std::move(_messages.front());
     _messages.pop();
@@ -37,7 +38,8 @@ void BufferedClient::poll() {
         throw exception::SocketError{"Connection to server lost"};
     }
 
-    _buffer.append(std::bit_cast<const char*>(bytes.data()), bytes.size());
+    _buffer.reserve(_buffer.size() + bytes.size());
+    for (std::byte b : bytes) _buffer += static_cast<char>(b);
 
     std::size_t pos = std::string::npos;  // NOLINT(*-init-variables)
     while ((pos = _buffer.find('\n')) != std::string::npos) {
@@ -46,11 +48,12 @@ void BufferedClient::poll() {
     }
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 void BufferedClient::send(std::string_view line) {
-    const auto* ptr = std::bit_cast<const std::byte*>(line.data());
+    auto bytes = std::as_bytes(std::span{line});
     std::size_t sent = 0;
-    while (sent < line.size()) {
-        sent += _client.send(std::span<const std::byte>{ptr + sent, line.size() - sent});
+    while (sent < bytes.size()) {
+        sent += _client.send(bytes.subspan(sent));
     }
 }
 

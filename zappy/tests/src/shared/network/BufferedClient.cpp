@@ -9,7 +9,7 @@
 
 #include <gtest/gtest.h>
 
-#include <bit>
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <optional>
@@ -38,16 +38,18 @@ class BufferedClientTest : public ::testing::Test {
     void TearDown() override { _serverClient.reset(); }
 
     static void serverSend(std::optional<zappy::network::socket::Client>& client, std::string_view data) {
-        const auto* ptr = std::bit_cast<const std::byte*>(data.data());
+        auto bytes = std::as_bytes(std::span{data});
         std::size_t sent = 0;
-        while (sent < data.size()) {
-            sent += client->send(std::span<const std::byte>{ptr + sent, data.size() - sent});
+        while (sent < bytes.size()) {
+            sent += client.value().send(bytes.subspan(sent));
         }
     }
 
     static std::string serverRead(std::optional<zappy::network::socket::Client>& client) {
-        auto bytes = client->read(4096);
-        return {std::bit_cast<const char*>(bytes.data()), bytes.size()};
+        auto bytes = client.value().read(4096);
+        std::string result(bytes.size(), '\0');
+        std::ranges::transform(bytes, result.begin(), [](std::byte b) { return static_cast<char>(b); });
+        return result;
     }
 
   public:
