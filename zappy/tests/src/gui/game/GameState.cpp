@@ -182,8 +182,7 @@ TEST(GameStateTest, SetWinnerSetsGameOver) {
     GameState state;
     state.setWinner("alpha");
     EXPECT_TRUE(state.isGameOver());
-    ASSERT_TRUE(state.winner().has_value());
-    EXPECT_EQ(*state.winner(), "alpha");
+    EXPECT_EQ(state.winner().value_or(""), "alpha");
 }
 
 }  // namespace
