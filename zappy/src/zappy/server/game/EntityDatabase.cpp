@@ -26,7 +26,7 @@ std::uint64_t EntityDatabase::insert(std::unique_ptr<IEntity> entity) {
 
     auto [it, _] = _entities.emplace(generateId(), std::move(entity));
 
-    _entitiesByType[typeIndex(*it->second)][it->first].emplace_back(it->second.get());
+    _entitiesByType[typeIndex(*it->second)][it->first] = it->second.get();
     return it->first;
 }
 

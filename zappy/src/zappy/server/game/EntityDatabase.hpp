@@ -90,7 +90,7 @@ class EntityDatabase {
 
     std::uint64_t _nextId{0};
     std::unordered_map<std::uint64_t, std::unique_ptr<IEntity>> _entities;
-    std::unordered_map<std::type_index, std::unordered_map<std::uint64_t, std::vector<IEntity*>>> _entitiesByType;
+    std::unordered_map<std::type_index, std::unordered_map<std::uint64_t, IEntity*>> _entitiesByType;
 };
 
 template <IsEntity T>
@@ -113,7 +113,7 @@ inline auto EntityDatabase::viewAll() {
 
 template <IsEntity T>
 auto EntityDatabase::viewAll() {
-    return _entitiesByType[typeid(T)] | std::views::values | std::views::join |
+    return _entitiesByType[typeid(T)] | std::views::values |
            std::views::transform([](IEntity* entity) { return static_cast<T*>(entity); });
 }
 
