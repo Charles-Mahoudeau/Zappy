@@ -37,7 +37,8 @@ void GameState::addTeam(std::string name) { _teams.push_back(std::move(name)); }
 
 void GameState::addPlayer(std::uint32_t id, std::uint32_t x, std::uint32_t y, Orientation orientation,
                           std::uint32_t level, std::string team) {
-    _players.emplace(id, Player{.x = x, .y = y, .orientation = orientation, .level = level, .team = std::move(team)});
+    _players.try_emplace(id,
+                         Player{.x = x, .y = y, .orientation = orientation, .level = level, .team = std::move(team)});
 }
 
 void GameState::setPlayerPosition(std::uint32_t id, std::uint32_t x, std::uint32_t y, Orientation orientation) {
