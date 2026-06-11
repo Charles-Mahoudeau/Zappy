@@ -26,7 +26,7 @@ class BufferedClient {
     BufferedClient(BufferedClient&&) noexcept = default;
     BufferedClient& operator=(BufferedClient&&) noexcept = default;
 
-    void connect(const Address& address);
+    void connect(const Address& address) const;
 
     [[nodiscard]] int fd() const;
     [[nodiscard]] bool hasMessages() const;

@@ -18,7 +18,7 @@
 
 namespace zappy::network {
 
-void BufferedClient::connect(const Address& address) { _client.connect(address); }
+void BufferedClient::connect(const Address& address) const { _client.connect(address); }
 
 int BufferedClient::fd() const { return _client.fd(); }
 
@@ -39,7 +39,7 @@ void BufferedClient::poll() {
     }
 
     _buffer.reserve(_buffer.size() + bytes.size());
-    for (std::byte b : bytes) _buffer += static_cast<char>(b);
+    for (std::byte b : bytes) _buffer += static_cast<char>(std::to_underlying(b));
 
     std::size_t pos = std::string::npos;  // NOLINT(*-init-variables)
     while ((pos = _buffer.find('\n')) != std::string::npos) {

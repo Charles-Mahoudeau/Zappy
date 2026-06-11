@@ -48,7 +48,10 @@ class BufferedClientTest : public ::testing::Test {
     static std::string serverRead(std::optional<zappy::network::socket::Client>& client) {
         auto bytes = client.value().read(4096);
         std::string result(bytes.size(), '\0');
-        std::ranges::transform(bytes, result.begin(), [](std::byte b) { return static_cast<char>(b); });
+        std::ranges::transform(bytes, result.begin(), [](std::byte b) {
+            return static_cast<char>(std::to_underlying(b));
+            ;
+        });
         return result;
     }
 
