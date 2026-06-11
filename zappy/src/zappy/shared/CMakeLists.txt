@@ -13,6 +13,8 @@ add_library(zappy_shared OBJECT
         network/Address.cpp
         network/Address.hpp
         network/ISocket.hpp
+        network/BufferedClient.cpp
+        network/BufferedClient.hpp
         network/Socket.cpp
         network/Socket.hpp
 )
