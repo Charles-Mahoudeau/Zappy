@@ -9,6 +9,7 @@
 
 #include <gtest/gtest.h>
 
+#include <format>
 #include <string>
 
 #include "zappy/shared/exception/InvalidArgument.hpp"
@@ -259,7 +260,7 @@ TEST(GameStateTest, AddBroadcastKeepsOrderAndMultipleMessages) {
 TEST(GameStateTest, AddBroadcastCapsAtTen) {
     GameState state;
     for (int i = 0; i < 12; ++i) {
-        state.addBroadcast("msg" + std::to_string(i));
+        state.addBroadcast(std::format("msg{}", i));
     }
     EXPECT_EQ(state.broadcasts().size(), 10U);
     EXPECT_EQ(state.broadcasts().front(), "msg2");
