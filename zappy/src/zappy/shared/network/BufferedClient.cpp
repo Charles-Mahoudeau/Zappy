@@ -26,6 +26,9 @@ bool BufferedClient::hasMessages() const { return !_messages.empty(); }
 
 // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 std::string BufferedClient::popMessage() {
+    if (_messages.empty()) {
+        throw exception::SocketError{"No buffered message available"};
+    }
     std::string message = std::move(_messages.front());
     _messages.pop();
     return message;
@@ -53,7 +56,11 @@ void BufferedClient::send(std::string_view line) {
     auto bytes = std::as_bytes(std::span{line});
     std::size_t sent = 0;
     while (sent < bytes.size()) {
-        sent += _client.send(bytes.subspan(sent));
+        const std::size_t chunk = _client.send(bytes.subspan(sent));
+        if (chunk == 0) {
+            throw exception::SocketError{"Connection to server lost"};
+        }
+        sent += chunk;
     }
 }
 
