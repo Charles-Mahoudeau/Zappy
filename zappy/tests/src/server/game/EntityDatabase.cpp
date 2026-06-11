@@ -24,7 +24,7 @@ namespace {
 class EntityA : public zappy::server::game::IEntity {
   public:
     MOCK_METHOD(void, update, (), (override));
-};  // namespace zappy::server::game::IEntity
+};
 
 class EntityB : public zappy::server::game::IEntity {
   public:
