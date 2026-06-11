@@ -5,19 +5,27 @@
 ** main
 */
 
-#include <cstddef>
-#include <span>
+#include <exception>
+#include <iostream>
+#include <iterator>
 #include <string_view>
 #include <vector>
 
-#include "Demo.hpp"
-#include "zappy/shared/Demo.hpp"
+#include "zappy/server/Core.hpp"
+#include "zappy/shared/exception/Exception.hpp"
 
 int main(const int argc, char** argv) {
-    const std::span argsView{argv, static_cast<std::size_t>(argc)};
-    const std::vector<std::string_view> args{argsView.begin(), argsView.end()};
+    zappy::server::Core core;
+    std::vector<std::string_view> arguments(std::next(argv), std::next(argv, argc));
 
-    zappy::server::hello();
-    zappy::shared::hello();
+    try {
+        core.init(arguments);
+    } catch (const zappy::exception::Exception& err) {
+        std::cerr << "Error: " << err.what() << "\n";
+        return 84;
+    } catch (const std::exception& err) {
+        std::cerr << "Unknown Error: " << err.what() << "\n";
+        return 84;
+    }
     return 0;
 }

@@ -1,7 +1,13 @@
 add_library(zappy_server_objects OBJECT
-        Demo.cpp
-        Demo.hpp
+	Core.hpp
+	Core.cpp
+	CliParser.hpp
+	CliParser.cpp
+  game/EntityDatabase.cpp
+  game/EntityDatabase.hpp
+  game/IEntity.hpp
 )
+
 target_include_directories(zappy_server_objects PUBLIC
         ${CMAKE_SOURCE_DIR}/src
 )

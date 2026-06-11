@@ -1,6 +1,4 @@
 add_library(zappy_shared OBJECT
-        Demo.cpp
-        Demo.hpp
         exception/Exception.cpp
         exception/Exception.hpp
         exception/InvalidAddress.hpp
