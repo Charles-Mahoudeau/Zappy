@@ -6,6 +6,8 @@ add_library(zappy_gui_objects OBJECT
         Demo.hpp
         display/Window.cpp
         display/Window.hpp
+        game/GameState.cpp
+        game/GameState.hpp
         render/Camera.cpp
         render/Camera.hpp
 )
