@@ -56,7 +56,7 @@ void BufferedClient::send(std::string_view line) {
     auto bytes = std::as_bytes(std::span{line});
     std::size_t sent = 0;
     while (sent < bytes.size()) {
-        const std::size_t chunk = _client.send(bytes.subspan(sent));
+        const std::size_t chunk = _client.send(bytes.subspan(sent));  // NOLINT(*-init-variables)
         if (chunk == 0) {
             throw exception::SocketError{"Connection to server lost"};
         }
