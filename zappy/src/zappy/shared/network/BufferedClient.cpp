@@ -34,7 +34,7 @@ std::string BufferedClient::popMessage() {
 }
 
 void BufferedClient::poll() {
-    auto bytes = _client.read(4096);
+    auto bytes = _client.read(kBUFFER_SIZE);
 
     if (bytes.empty() && !_client.isOpen()) {
         throw exception::SocketError{"Connection to server lost"};

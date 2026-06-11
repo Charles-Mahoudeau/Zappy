@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include <queue>
 #include <string>
 #include <string_view>
@@ -36,6 +37,8 @@ class BufferedClient {
     void send(std::string_view line);
 
   private:
+    static constexpr std::size_t kBUFFER_SIZE = 4096;
+
     socket::Client _client;
     std::string _buffer;
     std::queue<std::string> _messages;
