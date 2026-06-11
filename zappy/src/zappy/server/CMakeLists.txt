@@ -11,6 +11,8 @@ add_library(zappy_server_objects OBJECT
         game/Inventory.hpp
         game/entity/Player.cpp
         game/entity/Player.hpp
+        game/entity/Egg.cpp
+        game/entity/Egg.hpp
 )
 
 target_include_directories(zappy_server_objects PUBLIC
