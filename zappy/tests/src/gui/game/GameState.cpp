@@ -42,8 +42,7 @@ TEST(GameStateTest, SetMapSizeUpdatesDimensions) {
 TEST(GameStateTest, SetMapSizeResizesTiles) {
     GameState state;
     state.setMapSize(5, 3);
-    EXPECT_EQ(state.tiles().size(), 3U);
-    EXPECT_EQ(state.tiles().at(0).size(), 5U);
+    EXPECT_EQ(state.tiles().size(), 15U);
 }
 
 TEST(GameStateTest, IsReadyAfterAllTilesReceived) {
@@ -72,8 +71,8 @@ TEST(GameStateTest, SetTileStoresResources) {
     state.setMapSize(3, 3);
     const Resources res{.food = 5, .linemate = 2};
     state.setTile(1, 2, res);
-    EXPECT_EQ(state.tiles().at(2).at(1).food, 5U);
-    EXPECT_EQ(state.tiles().at(2).at(1).linemate, 2U);
+    EXPECT_EQ(state.tile(1, 2).food, 5U);
+    EXPECT_EQ(state.tile(1, 2).linemate, 2U);
 }
 
 TEST(GameStateTest, SetTileOutOfBoundsThrows) {
@@ -183,6 +182,88 @@ TEST(GameStateTest, SetWinnerSetsGameOver) {
     state.setWinner("alpha");
     EXPECT_TRUE(state.isGameOver());
     EXPECT_EQ(state.winner().value_or(""), "alpha");
+}
+
+TEST(GameStateTest, SetTileDoesNotDoubleCountOnRepeat) {
+    GameState state;
+    state.setMapSize(2, 2);
+    state.setTile(0, 0, {});
+    state.setTile(0, 0, {});
+    state.setTile(0, 0, {});
+    EXPECT_FALSE(state.isReady());
+}
+
+TEST(GameStateTest, SetTileUpdatesResourceOnRepeat) {
+    GameState state;
+    state.setMapSize(2, 2);
+    const Resources first{.food = 1};
+    const Resources second{.food = 9};
+    state.setTile(0, 0, first);
+    state.setTile(0, 0, second);
+    EXPECT_EQ(state.tile(0, 0).food, 9U);
+}
+
+TEST(GameStateTest, TileAccessorReturnsCorrectResources) {
+    GameState state;
+    state.setMapSize(3, 3);
+    const Resources res{.food = 7, .sibur = 3};
+    state.setTile(2, 1, res);
+    EXPECT_EQ(state.tile(2, 1).food, 7U);
+    EXPECT_EQ(state.tile(2, 1).sibur, 3U);
+}
+
+TEST(GameStateTest, TileAccessorOutOfBoundsThrows) {
+    GameState state;
+    state.setMapSize(3, 3);
+    EXPECT_THROW((void)state.tile(3, 0), zappy::exception::InvalidArgument);
+    EXPECT_THROW((void)state.tile(0, 3), zappy::exception::InvalidArgument);
+}
+
+TEST(GameStateTest, AddPlayerDefaultIsNotIncanting) {
+    GameState state;
+    state.addPlayer(1, 0, 0, Orientation::North, 1, "alpha");
+    EXPECT_FALSE(state.players().at(1).isIncanting);
+}
+
+TEST(GameStateTest, SetPlayerIncantingUpdatesFlag) {
+    GameState state;
+    state.addPlayer(1, 0, 0, Orientation::North, 1, "alpha");
+    state.setPlayerIncanting(1, true);
+    EXPECT_TRUE(state.players().at(1).isIncanting);
+    state.setPlayerIncanting(1, false);
+    EXPECT_FALSE(state.players().at(1).isIncanting);
+}
+
+TEST(GameStateTest, SetPlayerIncantingUnknownIdThrows) {
+    GameState state;
+    EXPECT_THROW(state.setPlayerIncanting(99, true), zappy::exception::InvalidArgument);
+}
+
+TEST(GameStateTest, AddBroadcastStoresMessage) {
+    GameState state;
+    state.addBroadcast("hello");
+    EXPECT_EQ(state.broadcasts().size(), 1U);
+    EXPECT_EQ(state.broadcasts().front(), "hello");
+}
+
+TEST(GameStateTest, AddBroadcastKeepsOrderAndMultipleMessages) {
+    GameState state;
+    state.addBroadcast("first");
+    state.addBroadcast("second");
+    state.addBroadcast("third");
+    EXPECT_EQ(state.broadcasts().size(), 3U);
+    EXPECT_EQ(state.broadcasts().at(0), "first");
+    EXPECT_EQ(state.broadcasts().at(2), "third");
+}
+
+TEST(GameStateTest, AddBroadcastCapsAtTen) {
+    GameState state;
+    for (int i = 0; i < 12; ++i) {
+        state.addBroadcast("msg" + std::to_string(i));
+    }
+    EXPECT_EQ(state.broadcasts().size(), 10U);
+    EXPECT_EQ(state.broadcasts().front(), "msg2");
+    EXPECT_EQ(state.broadcasts().back(), "msg11");
 }
 
 }  // namespace

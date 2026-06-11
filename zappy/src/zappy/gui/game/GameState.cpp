@@ -7,6 +7,7 @@
 
 #include "GameState.hpp"
 
+#include <cstddef>
 #include <cstdint>
 #include <optional>
 #include <string>
@@ -18,19 +19,24 @@
 
 namespace zappy::gui::game {
 
-void GameState::setMapSize(std::uint32_t width, std::uint32_t height) {
+void GameState::setMapSize(std::size_t width, std::size_t height) {
     _width = width;
     _height = height;
-    _tiles.assign(height, std::vector<Resources>(width));
+    _tiles.assign(width * height, Resources{});
+    _tileSet.assign(width * height, false);
     _tilesReceived = 0;
 }
 
-void GameState::setTile(std::uint32_t x, std::uint32_t y, const Resources& resources) {
+void GameState::setTile(std::size_t x, std::size_t y, const Resources& resources) {
     if (x >= _width || y >= _height) {
         throw exception::InvalidArgument{"Tile coordinates out of bounds"};
     }
-    _tiles.at(y).at(x) = resources;
-    ++_tilesReceived;
+    const std::size_t idx = (y * _width) + x;
+    if (!_tileSet[idx]) {
+        _tileSet[idx] = true;
+        ++_tilesReceived;
+    }
+    _tiles[idx] = resources;
 }
 
 void GameState::addTeam(std::string name) { _teams.push_back(std::move(name)); }
@@ -81,11 +87,33 @@ void GameState::setTimeUnit(std::uint32_t timeUnit) { _timeUnit = timeUnit; }
 
 void GameState::setWinner(std::string team) { _winner = std::move(team); }
 
-std::uint32_t GameState::width() const { return _width; }
+void GameState::addBroadcast(std::string message) {
+    if (_broadcasts.size() == 10) {
+        _broadcasts.pop_front();
+    }
+    _broadcasts.push_back(std::move(message));
+}
 
-std::uint32_t GameState::height() const { return _height; }
+void GameState::setPlayerIncanting(std::uint32_t id, bool incanting) {
+    auto it = _players.find(id);
+    if (it == _players.end()) {
+        throw exception::InvalidArgument{"Unknown player id"};
+    }
+    it->second.isIncanting = incanting;
+}
 
-const std::vector<std::vector<Resources>>& GameState::tiles() const { return _tiles; }
+std::size_t GameState::width() const { return _width; }
+
+std::size_t GameState::height() const { return _height; }
+
+const std::vector<Resources>& GameState::tiles() const { return _tiles; }
+
+const Resources& GameState::tile(std::size_t x, std::size_t y) const {
+    if (x >= _width || y >= _height) {
+        throw exception::InvalidArgument{"Tile coordinates out of bounds"};
+    }
+    return _tiles.at((y * _width) + x);
+}
 
 const std::unordered_map<std::uint32_t, Player>& GameState::players() const { return _players; }
 
@@ -100,5 +128,7 @@ bool GameState::isGameOver() const { return _winner.has_value(); }
 const std::optional<std::string>& GameState::winner() const { return _winner; }
 
 bool GameState::isReady() const { return _width > 0 && _height > 0 && _tilesReceived >= _width * _height; }
+
+const std::deque<std::string>& GameState::broadcasts() const { return _broadcasts; }
 
 }  // namespace zappy::gui::game

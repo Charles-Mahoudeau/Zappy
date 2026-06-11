@@ -7,7 +7,9 @@
 
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
+#include <deque>
 #include <optional>
 #include <string>
 #include <unordered_map>
@@ -34,6 +36,7 @@ struct Player {
     std::uint32_t level{1};
     std::string team;
     Resources inventory;
+    bool isIncanting{false};
 };
 
 struct Egg {
@@ -53,8 +56,8 @@ class GameState {
     GameState(GameState&&) noexcept = default;
     GameState& operator=(GameState&&) noexcept = default;
 
-    void setMapSize(std::uint32_t width, std::uint32_t height);
-    void setTile(std::uint32_t x, std::uint32_t y, const Resources& resources);
+    void setMapSize(std::size_t width, std::size_t height);
+    void setTile(std::size_t x, std::size_t y, const Resources& resources);
     void addTeam(std::string name);
     void addPlayer(std::uint32_t id, std::uint32_t x, std::uint32_t y, Orientation orientation, std::uint32_t level,
                    std::string team);
@@ -66,10 +69,13 @@ class GameState {
     void removeEgg(std::uint32_t eggId);
     void setTimeUnit(std::uint32_t timeUnit);
     void setWinner(std::string team);
+    void addBroadcast(std::string message);
+    void setPlayerIncanting(std::uint32_t id, bool incanting);
 
-    [[nodiscard]] std::uint32_t width() const;
-    [[nodiscard]] std::uint32_t height() const;
-    [[nodiscard]] const std::vector<std::vector<Resources>>& tiles() const;
+    [[nodiscard]] std::size_t width() const;
+    [[nodiscard]] std::size_t height() const;
+    [[nodiscard]] const std::vector<Resources>& tiles() const;
+    [[nodiscard]] const Resources& tile(std::size_t x, std::size_t y) const;
     [[nodiscard]] const std::unordered_map<std::uint32_t, Player>& players() const;
     [[nodiscard]] const std::vector<std::string>& teams() const;
     [[nodiscard]] const std::unordered_map<std::uint32_t, Egg>& eggs() const;
@@ -77,17 +83,20 @@ class GameState {
     [[nodiscard]] bool isGameOver() const;
     [[nodiscard]] const std::optional<std::string>& winner() const;
     [[nodiscard]] bool isReady() const;
+    [[nodiscard]] const std::deque<std::string>& broadcasts() const;
 
   private:
-    std::uint32_t _width{0};
-    std::uint32_t _height{0};
-    std::vector<std::vector<Resources>> _tiles;
+    std::size_t _width{0};
+    std::size_t _height{0};
+    std::vector<Resources> _tiles;
     std::unordered_map<std::uint32_t, Player> _players;
     std::vector<std::string> _teams;
     std::unordered_map<std::uint32_t, Egg> _eggs;
     std::uint32_t _timeUnit{0};
     std::optional<std::string> _winner;
-    std::uint32_t _tilesReceived{0};
+    std::size_t _tilesReceived{0};
+    std::vector<bool> _tileSet;
+    std::deque<std::string> _broadcasts;
 };
 
 }  // namespace zappy::gui::game
