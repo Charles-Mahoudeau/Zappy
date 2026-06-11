@@ -7,6 +7,8 @@ add_library(zappy_server_objects OBJECT
         game/EntityDatabase.hpp
         game/IEntity.hpp
         game/ResourceType.hpp
+        game/Inventory.cpp
+        game/Inventory.hpp
 )
 
 target_include_directories(zappy_server_objects PUBLIC
