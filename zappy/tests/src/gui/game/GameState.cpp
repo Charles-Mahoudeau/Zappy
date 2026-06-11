@@ -43,7 +43,7 @@ TEST(GameStateTest, SetMapSizeResizesTiles) {
     GameState state;
     state.setMapSize(5, 3);
     EXPECT_EQ(state.tiles().size(), 3U);
-    EXPECT_EQ(state.tiles()[0].size(), 5U);
+    EXPECT_EQ(state.tiles().at(0).size(), 5U);
 }
 
 TEST(GameStateTest, IsReadyAfterAllTilesReceived) {
@@ -72,8 +72,8 @@ TEST(GameStateTest, SetTileStoresResources) {
     state.setMapSize(3, 3);
     const Resources res{.food = 5, .linemate = 2};
     state.setTile(1, 2, res);
-    EXPECT_EQ(state.tiles()[2][1].food, 5U);
-    EXPECT_EQ(state.tiles()[2][1].linemate, 2U);
+    EXPECT_EQ(state.tiles().at(2).at(1).food, 5U);
+    EXPECT_EQ(state.tiles().at(2).at(1).linemate, 2U);
 }
 
 TEST(GameStateTest, SetTileOutOfBoundsThrows) {
@@ -88,8 +88,8 @@ TEST(GameStateTest, AddTeamStoresName) {
     state.addTeam("alpha");
     state.addTeam("beta");
     EXPECT_EQ(state.teams().size(), 2U);
-    EXPECT_EQ(state.teams()[0], "alpha");
-    EXPECT_EQ(state.teams()[1], "beta");
+    EXPECT_EQ(state.teams().at(0), "alpha");
+    EXPECT_EQ(state.teams().at(1), "beta");
 }
 
 TEST(GameStateTest, AddPlayerStoresPlayer) {
@@ -182,7 +182,8 @@ TEST(GameStateTest, SetWinnerSetsGameOver) {
     GameState state;
     state.setWinner("alpha");
     EXPECT_TRUE(state.isGameOver());
-    EXPECT_EQ(state.winner().value(), "alpha");
+    ASSERT_TRUE(state.winner().has_value());
+    EXPECT_EQ(*state.winner(), "alpha");
 }
 
 }  // namespace

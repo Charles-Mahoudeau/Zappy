@@ -29,7 +29,7 @@ void GameState::setTile(std::uint32_t x, std::uint32_t y, const Resources& resou
     if (x >= _width || y >= _height) {
         throw exception::InvalidArgument{"Tile coordinates out of bounds"};
     }
-    _tiles[y][x] = resources;
+    _tiles.at(y).at(x) = resources;
     ++_tilesReceived;
 }
 
