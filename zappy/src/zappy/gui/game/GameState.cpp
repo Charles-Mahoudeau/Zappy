@@ -9,6 +9,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <deque>
 #include <optional>
 #include <string>
 #include <unordered_map>
@@ -32,11 +33,11 @@ void GameState::setTile(std::size_t x, std::size_t y, const Resources& resources
         throw exception::InvalidArgument{"Tile coordinates out of bounds"};
     }
     const std::size_t idx = (y * _width) + x;
-    if (!_tileSet[idx]) {
-        _tileSet[idx] = true;
+    if (!_tileSet.at(idx)) {
+        _tileSet.at(idx) = true;
         ++_tilesReceived;
     }
-    _tiles[idx] = resources;
+    _tiles.at(idx) = resources;
 }
 
 void GameState::addTeam(std::string name) { _teams.push_back(std::move(name)); }
