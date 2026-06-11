@@ -38,19 +38,19 @@ class BufferedClientTest : public ::testing::Test {
 
     void TearDown() override { _serverClient.reset(); }
 
-    static void serverSend(std::optional<zappy::network::socket::Client>& client, std::string_view data) {
+    static void serverSend(zappy::network::socket::Client& client, std::string_view data) {
         auto bytes = std::as_bytes(std::span{data});
         if (bytes.empty()) {
             return;
         }
         std::size_t sent = 0;
         while (sent < bytes.size()) {
-            sent += client.value().send(bytes.subspan(sent));
+            sent += client.send(bytes.subspan(sent));
         }
     }
 
-    static std::string serverRead(std::optional<zappy::network::socket::Client>& client) {
-        auto bytes = client.value().read(4096);
+    static std::string serverRead(zappy::network::socket::Client& client) {
+        auto bytes = client.read(4096);
         if (bytes.empty()) {
             return {};
         }
@@ -71,7 +71,7 @@ TEST_F(BufferedClientTest, FdIsValidAfterConnect) { EXPECT_GT(_bufferedClient.fd
 TEST_F(BufferedClientTest, HasNoMessagesInitially) { EXPECT_FALSE(_bufferedClient.hasMessages()); }
 
 TEST_F(BufferedClientTest, PollExtractsCompleteLine) {
-    serverSend(_serverClient, "hello\n");
+    serverSend(_serverClient.value(), "hello\n");
     _bufferedClient.poll();
     EXPECT_TRUE(_bufferedClient.hasMessages());
     EXPECT_EQ(_bufferedClient.popMessage(), "hello");
@@ -79,23 +79,23 @@ TEST_F(BufferedClientTest, PollExtractsCompleteLine) {
 }
 
 TEST_F(BufferedClientTest, PollIgnoresPartialLine) {
-    serverSend(_serverClient, "hello");
+    serverSend(_serverClient.value(), "hello");
     _bufferedClient.poll();
     EXPECT_FALSE(_bufferedClient.hasMessages());
 }
 
 TEST_F(BufferedClientTest, PollCompletesPartialLineAcrossTwoCalls) {
-    serverSend(_serverClient, "hel");
+    serverSend(_serverClient.value(), "hel");
     _bufferedClient.poll();
     EXPECT_FALSE(_bufferedClient.hasMessages());
-    serverSend(_serverClient, "lo\n");
+    serverSend(_serverClient.value(), "lo\n");
     _bufferedClient.poll();
     EXPECT_TRUE(_bufferedClient.hasMessages());
     EXPECT_EQ(_bufferedClient.popMessage(), "hello");
 }
 
 TEST_F(BufferedClientTest, PollExtractsMultipleLines) {
-    serverSend(_serverClient, "line1\nline2\n");
+    serverSend(_serverClient.value(), "line1\nline2\n");
     _bufferedClient.poll();
     EXPECT_TRUE(_bufferedClient.hasMessages());
     EXPECT_EQ(_bufferedClient.popMessage(), "line1");
@@ -105,7 +105,7 @@ TEST_F(BufferedClientTest, PollExtractsMultipleLines) {
 }
 
 TEST_F(BufferedClientTest, PollExtractsCompleteLineAndKeepsPartial) {
-    serverSend(_serverClient, "complete\npartial");
+    serverSend(_serverClient.value(), "complete\npartial");
     _bufferedClient.poll();
     EXPECT_TRUE(_bufferedClient.hasMessages());
     EXPECT_EQ(_bufferedClient.popMessage(), "complete");
@@ -113,7 +113,7 @@ TEST_F(BufferedClientTest, PollExtractsCompleteLineAndKeepsPartial) {
 }
 
 TEST_F(BufferedClientTest, PopMessageReturnsInFifoOrder) {
-    serverSend(_serverClient, "first\nsecond\nthird\n");
+    serverSend(_serverClient.value(), "first\nsecond\nthird\n");
     _bufferedClient.poll();
     EXPECT_EQ(_bufferedClient.popMessage(), "first");
     EXPECT_EQ(_bufferedClient.popMessage(), "second");
@@ -122,13 +122,13 @@ TEST_F(BufferedClientTest, PopMessageReturnsInFifoOrder) {
 
 TEST_F(BufferedClientTest, SendDataReachesServer) {
     _bufferedClient.send("GRAPHIC\n");
-    EXPECT_EQ(serverRead(_serverClient), "GRAPHIC\n");
+    EXPECT_EQ(serverRead(_serverClient.value()), "GRAPHIC\n");
 }
 
 TEST_F(BufferedClientTest, SendMultipleLinesReachServer) {
     _bufferedClient.send("msz\n");
     _bufferedClient.send("mct\n");
-    const std::string received = serverRead(_serverClient);
+    const std::string received = serverRead(_serverClient.value());
     EXPECT_EQ(received, "msz\nmct\n");
 }
 
