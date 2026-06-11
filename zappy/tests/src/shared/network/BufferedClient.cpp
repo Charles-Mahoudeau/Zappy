@@ -16,6 +16,7 @@
 #include <span>
 #include <string>
 #include <string_view>
+#include <utility>
 
 #include "zappy/shared/exception/SocketError.hpp"
 #include "zappy/shared/network/Address.hpp"
@@ -39,6 +40,9 @@ class BufferedClientTest : public ::testing::Test {
 
     static void serverSend(std::optional<zappy::network::socket::Client>& client, std::string_view data) {
         auto bytes = std::as_bytes(std::span{data});
+        if (bytes.empty()) {
+            return;
+        }
         std::size_t sent = 0;
         while (sent < bytes.size()) {
             sent += client.value().send(bytes.subspan(sent));
@@ -47,6 +51,9 @@ class BufferedClientTest : public ::testing::Test {
 
     static std::string serverRead(std::optional<zappy::network::socket::Client>& client) {
         auto bytes = client.value().read(4096);
+        if (bytes.empty()) {
+            return {};
+        }
         std::string result(bytes.size(), '\0');
         std::ranges::transform(bytes, result.begin(), [](std::byte b) {
             return static_cast<char>(std::to_underlying(b));

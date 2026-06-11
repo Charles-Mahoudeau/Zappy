@@ -37,7 +37,7 @@ class BufferedClient {
 
   private:
     socket::Client _client;
-    std::string _buffer{};
-    std::queue<std::string> _messages{};
+    std::string _buffer;
+    std::queue<std::string> _messages;
 };
 }  // namespace zappy::network
