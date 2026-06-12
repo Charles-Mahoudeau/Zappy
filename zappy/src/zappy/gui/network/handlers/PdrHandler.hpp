@@ -18,7 +18,6 @@
 
 namespace zappy::gui::network::handlers {
 
-// pdr #n i — player #n drops resource i; tile content is updated via bct, so no state change here
 class PdrHandler {
   public:
     explicit PdrHandler(game::GameState& state) : _state(state) {}
