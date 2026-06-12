@@ -8,8 +8,10 @@
 #pragma once
 
 #include <functional>
+#include <istream>
 #include <sstream>
 #include <string>
+#include <utility>
 
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/shared/exception/ParseException.hpp"

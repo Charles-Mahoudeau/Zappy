@@ -11,6 +11,7 @@
 #include <functional>
 #include <sstream>
 #include <string>
+#include <utility>
 
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/network/handlers/ParseHelpers.hpp"

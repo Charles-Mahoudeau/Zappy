@@ -7,6 +7,12 @@
 
 #include "zappy/gui/network/HandlerFactory.hpp"
 
+#include <functional>
+#include <sstream>
+#include <string>
+#include <unordered_map>
+
+#include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/network/handlers/BctHandler.hpp"
 #include "zappy/gui/network/handlers/EboHandler.hpp"
 #include "zappy/gui/network/handlers/EdiHandler.hpp"

@@ -10,13 +10,13 @@
 #include <functional>
 #include <sstream>
 #include <string>
+#include <utility>
 
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/shared/exception/ParseException.hpp"
 
 namespace zappy::gui::network::handlers {
 
-// seg N — team N wins
 class SegHandler {
   public:
     explicit SegHandler(game::GameState& state) : _state(state) {}
