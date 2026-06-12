@@ -8,6 +8,7 @@
 #pragma once
 
 #include <cstdint>
+#include <exception>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -18,7 +19,7 @@
 namespace zappy::gui::network::handlers {
 
 inline std::uint32_t parseId(std::string_view token) {
-    if (token.size() < 2 || token[0] != '#') {
+    if (token.size() < 2 || token.at(0) != '#') {
         throw exception::ParseException{"expected #-prefixed id"};
     }
     try {
