@@ -20,7 +20,7 @@ class SgtHandler {
   public:
     explicit SgtHandler(game::GameState& state) : _state(state) {}
 
-    void operator()(std::istringstream& ss) {
+    void operator()(std::istringstream& ss) const {
         std::uint32_t t = 0;
         if (!(ss >> t)) {
             throw exception::ParseException{"sgt: missing time unit"};

@@ -22,7 +22,7 @@ class PbcHandler {
   public:
     explicit PbcHandler(game::GameState& state) : _state(state) {}
 
-    void operator()(std::istringstream& ss) {
+    void operator()(std::istringstream& ss) const {
         std::string idToken;
         std::string message;
         if (!(ss >> idToken)) {

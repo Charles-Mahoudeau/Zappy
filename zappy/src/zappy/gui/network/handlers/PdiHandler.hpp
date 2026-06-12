@@ -21,7 +21,7 @@ class PdiHandler {
   public:
     explicit PdiHandler(game::GameState& state) : _state(state) {}
 
-    void operator()(std::istringstream& ss) {
+    void operator()(std::istringstream& ss) const {
         std::string idToken;
         if (!(ss >> idToken)) {
             throw exception::ParseException{"pdi: missing player id"};

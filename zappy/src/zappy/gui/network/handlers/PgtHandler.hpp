@@ -22,7 +22,7 @@ class PgtHandler {
   public:
     explicit PgtHandler(game::GameState& state) : _state(state) {}
 
-    void operator()(std::istringstream& ss) {
+    void operator()(std::istringstream& ss) const {
         std::string idToken;
         std::uint32_t resource = 0;
         if (!(ss >> idToken >> resource)) {

@@ -21,7 +21,7 @@ class PexHandler {
   public:
     explicit PexHandler(game::GameState& state) : _state(state) {}
 
-    void operator()(std::istringstream& ss) {
+    void operator()(std::istringstream& ss) const {
         std::string idToken;
         if (!(ss >> idToken)) {
             throw exception::ParseException{"pex: missing player id"};

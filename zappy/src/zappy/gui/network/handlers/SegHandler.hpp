@@ -21,7 +21,7 @@ class SegHandler {
   public:
     explicit SegHandler(game::GameState& state) : _state(state) {}
 
-    void operator()(std::istringstream& ss) {
+    void operator()(std::istringstream& ss) const {
         std::string team;
         if (!(ss >> team)) {
             throw exception::ParseException{"seg: missing team name"};

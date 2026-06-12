@@ -22,7 +22,7 @@ class SmgHandler {
   public:
     explicit SmgHandler(game::GameState& state) : _state(state) {}
 
-    void operator()(std::istringstream& ss) {
+    void operator()(std::istringstream& ss) const {
         std::string message;
         std::getline(ss >> std::ws, message);
         if (message.empty()) {

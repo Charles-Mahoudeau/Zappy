@@ -21,7 +21,7 @@ class EboHandler {
   public:
     explicit EboHandler(game::GameState& state) : _state(state) {}
 
-    void operator()(std::istringstream& ss) {
+    void operator()(std::istringstream& ss) const {
         std::string eggToken;
         if (!(ss >> eggToken)) {
             throw exception::ParseException{"ebo: missing egg id"};

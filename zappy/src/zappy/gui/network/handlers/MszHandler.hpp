@@ -20,7 +20,7 @@ class MszHandler {
   public:
     explicit MszHandler(game::GameState& state) : _state(state) {}
 
-    void operator()(std::istringstream& ss) {
+    void operator()(std::istringstream& ss) const {
         std::size_t width = 0;
         std::size_t height = 0;
         if (!(ss >> width >> height)) {

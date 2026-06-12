@@ -21,7 +21,7 @@ class TnaHandler {
   public:
     explicit TnaHandler(game::GameState& state) : _state(state) {}
 
-    void operator()(std::istringstream& ss) {
+    void operator()(std::istringstream& ss) const {
         std::string name;
         if (!(ss >> name)) {
             throw exception::ParseException{"tna: missing team name"};

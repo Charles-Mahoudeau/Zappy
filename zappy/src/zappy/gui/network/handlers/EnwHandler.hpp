@@ -22,7 +22,7 @@ class EnwHandler {
   public:
     explicit EnwHandler(game::GameState& state) : _state(state) {}
 
-    void operator()(std::istringstream& ss) {
+    void operator()(std::istringstream& ss) const {
         std::string eggToken;
         std::string playerToken;
         std::uint32_t x = 0;

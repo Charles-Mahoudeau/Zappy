@@ -18,7 +18,7 @@ class SucHandler {
   public:
     explicit SucHandler(game::GameState& state) : _state(state) {}
 
-    void operator()(std::istringstream& /*ss*/) {
+    void operator()(std::istringstream& /*ss*/) const {
         // No state change; the GUI can log this if needed
     }
 

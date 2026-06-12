@@ -22,7 +22,7 @@ class PinHandler {
   public:
     explicit PinHandler(game::GameState& state) : _state(state) {}
 
-    void operator()(std::istringstream& ss) {
+    void operator()(std::istringstream& ss) const {
         std::string idToken;
         std::uint32_t x = 0;
         std::uint32_t y = 0;

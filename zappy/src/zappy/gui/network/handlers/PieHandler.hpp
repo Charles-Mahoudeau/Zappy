@@ -20,7 +20,7 @@ class PieHandler {
   public:
     explicit PieHandler(game::GameState& state) : _state(state) {}
 
-    void operator()(std::istringstream& ss) {
+    void operator()(std::istringstream& ss) const {
         std::uint32_t x = 0;
         std::uint32_t y = 0;
         std::uint32_t result = 0;

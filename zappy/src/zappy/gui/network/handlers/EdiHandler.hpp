@@ -21,7 +21,7 @@ class EdiHandler {
   public:
     explicit EdiHandler(game::GameState& state) : _state(state) {}
 
-    void operator()(std::istringstream& ss) {
+    void operator()(std::istringstream& ss) const {
         std::string eggToken;
         if (!(ss >> eggToken)) {
             throw exception::ParseException{"edi: missing egg id"};

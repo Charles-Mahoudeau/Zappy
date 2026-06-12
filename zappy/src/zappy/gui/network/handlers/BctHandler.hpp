@@ -21,7 +21,7 @@ class BctHandler {
   public:
     explicit BctHandler(game::GameState& state) : _state(state) {}
 
-    void operator()(std::istringstream& ss) {
+    void operator()(std::istringstream& ss) const {
         std::size_t x = 0;
         std::size_t y = 0;
         if (!(ss >> x >> y)) {
