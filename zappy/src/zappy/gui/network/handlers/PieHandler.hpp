@@ -16,8 +16,6 @@
 
 namespace zappy::gui::network::handlers {
 
-// pie X Y R — end of incantation at (X,Y), result R (0=fail,1=success)
-// We mark all players at that tile as no longer incanting
 class PieHandler {
   public:
     explicit PieHandler(game::GameState& state) : _state(state) {}

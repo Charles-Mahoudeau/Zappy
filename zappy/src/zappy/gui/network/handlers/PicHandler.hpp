@@ -18,7 +18,6 @@
 
 namespace zappy::gui::network::handlers {
 
-// pic X Y L #n ... — start of incantation at (X,Y) level L by players #n...
 class PicHandler {
   public:
     explicit PicHandler(game::GameState& state) : _state(state) {}

@@ -17,8 +17,6 @@
 
 namespace zappy::gui::network::handlers {
 
-// pfk #n — player #n lays an egg (fork)
-// GUI only: visual notification, no state change needed beyond knowing which player forked
 class PfkHandler {
   public:
     explicit PfkHandler(game::GameState& state) : _state(state) {}
