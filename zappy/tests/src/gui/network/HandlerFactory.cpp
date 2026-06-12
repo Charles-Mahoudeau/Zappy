@@ -169,8 +169,7 @@ TEST_F(HandlerFactoryTest, SstSetsTimeUnit) {
 TEST_F(HandlerFactoryTest, SegSetsWinner) {
     dispatch("seg", "TeamA");
     ASSERT_TRUE(state.isGameOver());
-    ASSERT_TRUE(state.winner().has_value());
-    EXPECT_EQ(state.winner().value(), "TeamA");
+    EXPECT_EQ(state.winner().value_or(""), "TeamA");
 }
 
 TEST_F(HandlerFactoryTest, SmgAddsBroadcast) {
