@@ -9,8 +9,10 @@
 
 #include <gtest/gtest.h>
 
+#include <functional>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/shared/exception/ParseException.hpp"
@@ -55,7 +57,7 @@ TEST_F(HandlerFactoryTest, BctSetsTileResources) {
 TEST_F(HandlerFactoryTest, TnaAddsTeam) {
     dispatch("tna", "TeamA");
     ASSERT_EQ(state.teams().size(), 1U);
-    EXPECT_EQ(state.teams()[0], "TeamA");
+    EXPECT_EQ(state.teams().at(0), "TeamA");
 }
 
 TEST_F(HandlerFactoryTest, PnwAddsPlayer) {
@@ -113,7 +115,7 @@ TEST_F(HandlerFactoryTest, PbcAddsBroadcast) {
     dispatch("pnw", "#1 0 0 1 1 TeamA");
     dispatch("pbc", "#1 hello world");
     ASSERT_EQ(state.broadcasts().size(), 1U);
-    EXPECT_EQ(state.broadcasts()[0], "hello world");
+    EXPECT_EQ(state.broadcasts().at(0), "hello world");
 }
 
 TEST_F(HandlerFactoryTest, PicSetsPlayersIncanting) {
@@ -167,13 +169,14 @@ TEST_F(HandlerFactoryTest, SstSetsTimeUnit) {
 TEST_F(HandlerFactoryTest, SegSetsWinner) {
     dispatch("seg", "TeamA");
     ASSERT_TRUE(state.isGameOver());
+    ASSERT_TRUE(state.winner().has_value());
     EXPECT_EQ(state.winner().value(), "TeamA");
 }
 
 TEST_F(HandlerFactoryTest, SmgAddsBroadcast) {
     dispatch("smg", "server info message");
     ASSERT_EQ(state.broadcasts().size(), 1U);
-    EXPECT_EQ(state.broadcasts()[0], "server info message");
+    EXPECT_EQ(state.broadcasts().at(0), "server info message");
 }
 
 TEST_F(HandlerFactoryTest, SucDoesNothing) { EXPECT_NO_THROW(dispatch("suc", "")); }
