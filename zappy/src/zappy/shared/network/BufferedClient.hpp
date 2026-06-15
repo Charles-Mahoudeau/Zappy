@@ -19,6 +19,7 @@ namespace zappy::network {
 class BufferedClient {
   public:
     BufferedClient() = default;
+    explicit BufferedClient(socket::Client& client);
     ~BufferedClient() = default;
 
     BufferedClient(const BufferedClient&) = delete;
@@ -26,6 +27,8 @@ class BufferedClient {
 
     BufferedClient(BufferedClient&&) noexcept = default;
     BufferedClient& operator=(BufferedClient&&) noexcept = default;
+
+    bool operator==(Address& address) const { return this->_client == address; }
 
     void connect(const Address& address) const;
 

@@ -15,6 +15,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <span>
+#include <string_view>
 #include <system_error>
 #include <type_traits>
 #include <vector>
@@ -23,6 +24,9 @@
 #include "zappy/shared/network/Address.hpp"
 
 namespace zappy::network {
+
+bool Socket::operator==(Address& address) const { return this->_address == address; }
+
 Socket::Socket() : _socket{socket(AF_INET, SOCK_STREAM, 0)} {
     if (_socket == -1) {
         const std::error_code error{errno, std::generic_category()};
@@ -119,6 +123,18 @@ std::vector<std::byte> Socket::read(const std::size_t count) {
 
 std::size_t Socket::send(const std::span<const std::byte> data) {
     const std::make_signed_t<std::size_t> res = write(_socket, data.data(), data.size_bytes());
+
+    if (res == -1) {
+        const std::error_code error{errno, std::generic_category()};
+
+        close();
+        throw exception::SocketError{"Failed to send data: " + error.message()};
+    }
+    return res;
+}
+
+std::size_t Socket::send(std::string_view data) {
+    const std::make_signed_t<std::size_t> res = write(_socket, data.data(), data.size());
 
     if (res == -1) {
         const std::error_code error{errno, std::generic_category()};

@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <ostream>
 #include <span>
+#include <string_view>
 #include <vector>
 
 #include "Address.hpp"
@@ -39,6 +40,8 @@ class ISocket : public io::IFileDescriptor {
     [[nodiscard]] virtual std::vector<std::byte> read(std::size_t count) = 0;
 
     [[nodiscard]] virtual std::size_t send(std::span<const std::byte> data) = 0;
+
+    [[nodiscard]] virtual std::size_t send(std::string_view data) = 0;
 };
 
 inline std::ostream& operator<<(std::ostream& os, const ISocket& socket) {
