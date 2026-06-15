@@ -9,6 +9,7 @@ add_executable(unit_tests
         src/shared/network/BufferedClient.cpp
         src/gui/game/GameState.cpp
         src/gui/network/HandlerFactory.cpp
+        src/gui/network/ProtocolParser.cpp
 )
 target_include_directories(unit_tests PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src

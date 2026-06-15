@@ -10,6 +10,8 @@ add_library(zappy_gui_objects OBJECT
         game/GameState.hpp
         network/HandlerFactory.cpp
         network/HandlerFactory.hpp
+        network/ProtocolParser.cpp
+        network/ProtocolParser.hpp
         render/Camera.cpp
         render/Camera.hpp
 )
