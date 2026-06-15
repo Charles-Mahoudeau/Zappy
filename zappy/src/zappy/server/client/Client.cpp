@@ -13,6 +13,7 @@
 #include <utility>
 
 #include "zappy/server/net/SocketRegistry.hpp"
+#include "zappy/shared/exception/SocketError.hpp"
 #include "zappy/shared/network/Address.hpp"
 #include "zappy/shared/network/BufferedClient.hpp"
 
@@ -65,12 +66,17 @@ std::optional<std::string> Client::getNextRequest() {
 
 void Client::setTimeout(int timeout) { this->_timeout = timeout; }
 
-void Client::sendMessage(std::string_view msg) {
+bool Client::sendMessage(std::string_view msg) {
     auto socket = this->_socketsRegistery.getFromAddress(this->_addr);
     if (!socket.has_value()) {
-        return;
+        return false;
     }
-    socket.value().get().send(msg);
+    try {
+        socket.value().get().send(msg);
+    } catch (const zappy::exception::SocketError& /*err */) {
+        return false;
+    }
+    return true;
 }
 
 }  // namespace zappy::server

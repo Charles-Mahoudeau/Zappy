@@ -13,7 +13,7 @@
 #include <string>
 #include <string_view>
 
-#include "zappy/server/network/SocketRegistery.hpp"
+#include "zappy/server/net/SocketRegistry.hpp"
 #include "zappy/shared/network/Address.hpp"
 
 namespace zappy::server {
@@ -26,7 +26,7 @@ class Client {
         kUNKNOWN,
     };
 
-    Client(net::SocketRegistery& socketRegister, network::Address address);
+    Client(net::SocketRegistry& socketRegister, network::Address address);
     ~Client() = default;
 
     Client(const Client&) = delete;
@@ -44,14 +44,14 @@ class Client {
     std::optional<std::string> getNextRequest();
     void setTimeout(int timeout);
 
-    void sendMessage(std::string_view msg);
+    bool sendMessage(std::string_view msg);
 
   private:
     int _timeout = 0;
     std::queue<std::string> _requests;
     Type _type = Client::Type::kUNKNOWN;
     network::Address _addr;
-    net::SocketRegistery& _socketsRegistery;
+    net::SocketRegistry& _socketsRegistery;
 
     static constexpr int kMAX_REQUEST = 10;
 };
