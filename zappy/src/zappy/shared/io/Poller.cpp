@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <cerrno>
 #include <cstddef>
+#include <cstdint>
 #include <ranges>
 #include <system_error>
 #include <utility>
@@ -46,7 +47,7 @@ void Poller::remove(const IFileDescriptor& fileDescriptor) { _toRemove.push_back
 
 std::size_t Poller::size() const { return _entries.size(); }
 
-void Poller::poll(const int32_t timeout) {
+void Poller::poll(const std::int32_t timeout) {
     if (_entries.size() != _pollFds.size()) {
         throw exception::InvalidState{"Poller _pollFds and _fds size mismatch"};
     }
