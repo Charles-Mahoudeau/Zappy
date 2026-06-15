@@ -42,7 +42,6 @@ bool Client::update() {
     }
     network::BufferedClient& socket = result.value().get();
 
-    socket.poll();
     while (socket.hasMessages()) {
         std::string msg = socket.popMessage();
 

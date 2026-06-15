@@ -32,6 +32,8 @@ class SocketRegistry {
 
     void remove(int fd);
 
+    void clear();
+
     std::expected<std::reference_wrapper<network::BufferedClient>, std::string> getFromAddress(network::Address& addr);
 
   private:

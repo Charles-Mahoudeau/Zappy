@@ -17,45 +17,16 @@
 #include <optional>
 #include <string>
 
+#include "SocketPair.hpp"
 #include "zappy/server/net/SocketRegistry.hpp"
 #include "zappy/shared/network/Address.hpp"
 #include "zappy/shared/network/socket/Client.hpp"
 
-namespace {
-
-struct SocketPair {
-    int local = -1;
-    int peer = -1;
-
-    SocketPair() {
-        std::array<int, 2> fds{};
-        if (::socketpair(AF_UNIX, SOCK_STREAM, 0, fds.data()) == 0) {
-            local = fds.at(0);
-            peer = fds.at(1);
-        }
-    }
-    ~SocketPair() {
-        if (local != -1) {
-            ::close(local);
-        }
-        if (peer != -1) {
-            ::close(peer);
-        }
-    }
-
-    SocketPair(const SocketPair&) = default;
-    SocketPair(SocketPair&&) = delete;
-    SocketPair& operator=(const SocketPair&) = default;
-    SocketPair& operator=(SocketPair&&) = delete;
-};
-
-}  // namespace
-
 namespace zappy::server::test {
 
 class ServerClientTest : public ::testing::Test {
-  protected:
-    net::SocketRegistry registry;
+  public:
+    net::SocketRegistry socketRegistry;
     network::Address addr{"127.0.0.1", 4242};
 };
 
@@ -64,19 +35,19 @@ class ServerClientTest : public ::testing::Test {
 // ---------------------------------------------------------------------------
 
 TEST_F(ServerClientTest, AddressReturnsConstructedAddress) {
-    Client client{registry, addr};
+    Client client{socketRegistry, addr};
 
     EXPECT_EQ(client.address(), addr);
 }
 
 TEST_F(ServerClientTest, TypeDefaultsToUnknown) {
-    Client client{registry, addr};
+    Client client{socketRegistry, addr};
 
     EXPECT_EQ(client.type(), Client::Type::kUNKNOWN);
 }
 
 TEST_F(ServerClientTest, ChangeTypeUpdatesType) {
-    Client client{registry, addr};
+    Client client{socketRegistry, addr};
 
     client.changeType(Client::Type::kPLAYER);
     EXPECT_EQ(client.type(), Client::Type::kPLAYER);
@@ -90,13 +61,13 @@ TEST_F(ServerClientTest, ChangeTypeUpdatesType) {
 // ---------------------------------------------------------------------------
 
 TEST_F(ServerClientTest, GetNextRequestOnEmptyReturnsNullopt) {
-    Client client{registry, addr};
+    Client client{socketRegistry, addr};
 
     EXPECT_FALSE(client.getNextRequest().has_value());
 }
 
 TEST_F(ServerClientTest, GetNextRequestReturnsRequestsInFifoOrder) {
-    Client client{registry, addr};
+    Client client{socketRegistry, addr};
 
     client.addRequest("first");
     client.addRequest("second");
@@ -113,7 +84,7 @@ TEST_F(ServerClientTest, GetNextRequestReturnsRequestsInFifoOrder) {
 }
 
 TEST_F(ServerClientTest, AddRequestRespectsMaxRequestCap) {
-    Client client{registry, addr};
+    Client client{socketRegistry, addr};
 
     for (int i = 0; i < 12; ++i) {
         client.addRequest("req" + std::to_string(i));
@@ -132,7 +103,7 @@ TEST_F(ServerClientTest, AddRequestRespectsMaxRequestCap) {
 // ---------------------------------------------------------------------------
 
 TEST_F(ServerClientTest, GetNextRequestBlockedWhileTimeoutPending) {
-    Client client{registry, addr};
+    Client client{socketRegistry, addr};
     client.addRequest("delayed");
 
     client.setTimeout(2);
@@ -146,7 +117,7 @@ TEST_F(ServerClientTest, GetNextRequestBlockedWhileTimeoutPending) {
 }
 
 TEST_F(ServerClientTest, ZeroTimeoutDoesNotBlock) {
-    Client client{registry, addr};
+    Client client{socketRegistry, addr};
     client.addRequest("immediate");
 
     client.setTimeout(0);
@@ -161,7 +132,7 @@ TEST_F(ServerClientTest, ZeroTimeoutDoesNotBlock) {
 // ---------------------------------------------------------------------------
 
 TEST_F(ServerClientTest, UpdateReturnsFalseWhenSocketNotRegistered) {
-    Client client{registry, addr};
+    Client client{socketRegistry, addr};
 
     EXPECT_FALSE(client.update());
 }
@@ -169,13 +140,14 @@ TEST_F(ServerClientTest, UpdateReturnsFalseWhenSocketNotRegistered) {
 TEST_F(ServerClientTest, UpdateReturnsTrueWhenSocketRegistered) {
     const SocketPair pair;
     network::socket::Client socket{pair.local, addr};
-    registry.insert(socket);
+    socketRegistry.insert(socket);
 
-    Client client{registry, addr};
+    Client client{socketRegistry, addr};
 
     const std::string msg = "ping\n";
     ASSERT_EQ(::write(pair.peer, msg.data(), msg.size()), static_cast<ssize_t>(msg.size()));
 
+    socketRegistry.getFromAddress(addr).value().get().poll();
     EXPECT_TRUE(client.update());
 
     auto request = client.getNextRequest();
@@ -189,7 +161,7 @@ TEST_F(ServerClientTest, UpdateReturnsTrueWhenSocketRegistered) {
 // ---------------------------------------------------------------------------
 
 TEST_F(ServerClientTest, SendMessageWithoutRegisteredSocketIsNoOp) {
-    Client client{registry, addr};
+    Client client{socketRegistry, addr};
 
     EXPECT_FALSE(client.sendMessage("hello"));
 }
@@ -197,9 +169,9 @@ TEST_F(ServerClientTest, SendMessageWithoutRegisteredSocketIsNoOp) {
 TEST_F(ServerClientTest, SendMessageWithRegisteredSocketDoesNotThrow) {
     const SocketPair pair;
     network::socket::Client socket{pair.local, addr};
-    registry.insert(socket);
+    socketRegistry.insert(socket);
 
-    Client client{registry, addr};
+    Client client{socketRegistry, addr};
 
     EXPECT_TRUE(client.sendMessage("hello"));
 

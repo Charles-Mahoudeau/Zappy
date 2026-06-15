@@ -38,4 +38,6 @@ void SocketRegistry::remove(int fd) {
     std::erase_if(this->_sockets, [fd](const network::BufferedClient& socket) { return fd == socket.fd(); });
 }
 
+void SocketRegistry::clear() { this->_sockets.clear(); }
+
 }  // namespace zappy::server::net
