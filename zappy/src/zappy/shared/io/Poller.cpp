@@ -64,7 +64,11 @@ void Poller::poll(const std::int32_t timeout) {
 
     const int ret = ::poll(_pollFds.data(), _entries.size(), timeout);
 
-    if (ret == -1 && errno != EINTR) {
+    if (ret == -1) {
+        if (errno == EINTR) {
+            return;
+        }
+
         const std::error_code error{errno, std::generic_category()};
 
         throw exception::InvalidState{"Failed to poll: " + error.message()};
