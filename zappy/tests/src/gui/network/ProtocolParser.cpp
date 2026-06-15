@@ -18,7 +18,7 @@ using zappy::gui::game::GameState;
 using zappy::gui::network::ProtocolParser;
 
 class ProtocolParserTest : public ::testing::Test {
-  protected:
+  public:
     GameState state;
     ProtocolParser parser{state};
 };
@@ -50,7 +50,7 @@ TEST_F(ProtocolParserTest, DispatchSgtSetsTimeUnit) {
 TEST_F(ProtocolParserTest, DispatchSegSetsWinner) {
     parser.dispatch("seg TeamA");
     ASSERT_TRUE(state.winner().has_value());
-    EXPECT_EQ(state.winner().value(), "TeamA");
+    EXPECT_EQ(state.winner().value_or(""), "TeamA");
 }
 
 TEST_F(ProtocolParserTest, UnknownCommandSilentlyIgnored) { EXPECT_NO_THROW(parser.dispatch("xyz 1 2 3")); }
