@@ -50,10 +50,14 @@ void Poller::poll(const int32_t timeout) {
     if (_entries.size() != _pollFds.size()) {
         throw exception::InvalidState{"Poller _pollFds and _fds size mismatch"};
     }
-    if (std::erase_if(_entries, [this](const auto& fd) {
-            return std::ranges::find(_toRemove, fd.first) != _toRemove.end();
-        }) > 0) {
+
+    const auto removed = std::erase_if(
+        _entries, [this](const auto& fd) { return std::ranges::find(_toRemove, fd.first) != _toRemove.end(); });
+
+    if (!_toRemove.empty()) {
         _toRemove.clear();
+    }
+    if (removed > 0) {
         reconstructPollFds();
     }
 
