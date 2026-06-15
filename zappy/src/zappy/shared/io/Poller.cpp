@@ -107,7 +107,7 @@ void Poller::reconstructPollFds() {
     for (const auto& [fd, entry] : _entries) {
         _pollFds.emplace_back(pollfd{
             .fd = fd,
-            .events = static_cast<std::int16_t>(entry.type),
+            .events = std::to_underlying(entry.type),
             .revents = 0,
         });
     }
