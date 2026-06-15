@@ -39,6 +39,8 @@ class BufferedClient {
     void poll();
     void send(std::string_view line);
 
+    Address addr();
+
   private:
     static constexpr std::size_t kBUFFER_SIZE = 4096;
 

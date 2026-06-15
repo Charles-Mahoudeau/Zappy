@@ -12,13 +12,13 @@
 #include <string_view>
 #include <utility>
 
-#include "zappy/server/network/SocketRegistery.hpp"
+#include "zappy/server/net/SocketRegistry.hpp"
 #include "zappy/shared/network/Address.hpp"
 #include "zappy/shared/network/BufferedClient.hpp"
 
 namespace zappy::server {
 
-Client::Client(net::SocketRegistery& socketRegister, network::Address address)
+Client::Client(net::SocketRegistry& socketRegister, network::Address address)
     : _addr(address), _socketsRegistery(socketRegister) {}
 
 network::Address& Client::address() { return this->_addr; }
