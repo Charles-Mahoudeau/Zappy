@@ -50,7 +50,8 @@ TEST_F(HandlerFactoryTest, MszSetsMapSize) {
 TEST_F(HandlerFactoryTest, BctSetsTileResources) {
     dispatch("msz", "5 5");
     dispatch("bct", "2 3 1 0 0 0 0 0 0");
-    EXPECT_EQ(state.tile(2, 3).food, 1U);  // NOLINT
+    // NOLINTNEXTLINE(bugprone-branch-clone)
+    EXPECT_EQ(state.tile(2, 3).food, 1U);
 }
 
 TEST_F(HandlerFactoryTest, TnaAddsTeam) {
