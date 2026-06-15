@@ -3,7 +3,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include <cstdint>
+#include <cstddef>
 
 #include "zappy/shared/io/IFileDescriptor.hpp"
 
@@ -19,10 +19,10 @@ TEST(PollerTest, BasicFunctionality) {
     Poller poller;
     EXPECT_EQ(poller.size(), 0);
 
-    poller.add(10, Poller::kPollRead, [](std::uint8_t) {});
+    poller.add(10, Poller::kPollRead, [](std::byte) {});
     EXPECT_EQ(poller.size(), 1);
 
-    poller.add(11, Poller::kPollRead, [](std::uint8_t) {});
+    poller.add(11, Poller::kPollRead, [](std::byte) {});
     EXPECT_EQ(poller.size(), 2);
 
     poller.clear();
@@ -34,7 +34,7 @@ TEST(PollerTest, RemoveFunctionality) {
     const MockFileDescriptor mockFd;
     EXPECT_CALL(mockFd, fd()).WillRepeatedly(testing::Return(10));
 
-    poller.add(mockFd, Poller::kPollRead, [](std::uint8_t) {});
+    poller.add(mockFd, Poller::kPollRead, [](std::byte) {});
     EXPECT_EQ(poller.size(), 1);
 
     poller.remove(mockFd);
