@@ -7,11 +7,6 @@
 
 #include "zappy/gui/network/HandlerFactory.hpp"
 
-#include <functional>
-#include <sstream>
-#include <string>
-#include <unordered_map>
-
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/network/handlers/BctHandler.hpp"
 #include "zappy/gui/network/handlers/EboHandler.hpp"
@@ -40,8 +35,7 @@
 
 namespace zappy::gui::network {
 
-std::unordered_map<std::string, std::function<void(std::istringstream&)>> HandlerFactory::create(
-    game::GameState& state) {
+HandlerMap HandlerFactory::create(game::GameState& state) {
     return {
         {"msz", handlers::MszHandler{state}}, {"bct", handlers::BctHandler{state}},
         {"tna", handlers::TnaHandler{state}}, {"pnw", handlers::PnwHandler{state}},

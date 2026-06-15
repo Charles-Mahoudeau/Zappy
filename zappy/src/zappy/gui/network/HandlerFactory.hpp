@@ -8,20 +8,21 @@
 #pragma once
 
 #include <functional>
+#include <map>
 #include <sstream>
 #include <string>
-#include <unordered_map>
 
 #include "zappy/gui/game/GameState.hpp"
 
 namespace zappy::gui::network {
 
+using HandlerMap = std::map<std::string, std::function<void(std::istringstream&)>, std::less<>>;
+
 class HandlerFactory {
   public:
     HandlerFactory() = delete;
 
-    [[nodiscard]] static std::unordered_map<std::string, std::function<void(std::istringstream&)>> create(
-        game::GameState& state);
+    [[nodiscard]] static HandlerMap create(game::GameState& state);
 };
 
 }  // namespace zappy::gui::network

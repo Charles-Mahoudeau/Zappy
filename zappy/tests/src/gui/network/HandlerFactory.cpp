@@ -9,10 +9,8 @@
 
 #include <gtest/gtest.h>
 
-#include <functional>
 #include <sstream>
 #include <string>
-#include <unordered_map>
 
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/shared/exception/ParseException.hpp"
@@ -21,12 +19,13 @@ using zappy::exception::ParseException;
 using zappy::gui::game::GameState;
 using zappy::gui::game::Orientation;
 using zappy::gui::network::HandlerFactory;
+using zappy::gui::network::HandlerMap;
 
 namespace {
 class HandlerFactoryTest : public ::testing::Test {
   public:
     GameState state;
-    std::unordered_map<std::string, std::function<void(std::istringstream&)>> handlers = HandlerFactory::create(state);
+    HandlerMap handlers = HandlerFactory::create(state);
 
   protected:
     void dispatch(const std::string& command, const std::string& args) {
