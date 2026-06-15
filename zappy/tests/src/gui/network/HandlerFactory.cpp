@@ -50,8 +50,7 @@ TEST_F(HandlerFactoryTest, MszSetsMapSize) {
 TEST_F(HandlerFactoryTest, BctSetsTileResources) {
     dispatch("msz", "5 5");
     dispatch("bct", "2 3 1 0 0 0 0 0 0");
-    const auto& tile = state.tile(2, 3);
-    EXPECT_EQ(tile.food, 1U);
+    EXPECT_EQ(state.tile(2, 3).food, 1U);  // NOLINT
 }
 
 TEST_F(HandlerFactoryTest, TnaAddsTeam) {
