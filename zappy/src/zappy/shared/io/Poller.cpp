@@ -12,7 +12,6 @@
 #include <algorithm>
 #include <cerrno>
 #include <cstddef>
-#include <cstdint>
 #include <ranges>
 #include <system_error>
 #include <utility>
@@ -27,7 +26,7 @@ void Poller::clear() {
     _toRemove.clear();
 }
 
-void Poller::add(const IFileDescriptor& fileDescriptor, const std::uint8_t pollEvents, Handler callback) {
+void Poller::add(const IFileDescriptor& fileDescriptor, std::byte pollEvents, Handler callback) {
     _entries.insert_or_assign(fileDescriptor.fd(), PollEntry{
                                                        .type = pollEvents,
                                                        .handler = std::move(callback),
@@ -35,7 +34,7 @@ void Poller::add(const IFileDescriptor& fileDescriptor, const std::uint8_t pollE
     reconstructPollFds();
 }
 
-void Poller::add(int fileDescriptor, const std::uint8_t pollEvents, Handler callback) {
+void Poller::add(int fileDescriptor, std::byte pollEvents, Handler callback) {
     _entries.insert_or_assign(fileDescriptor, PollEntry{
                                                   .type = pollEvents,
                                                   .handler = std::move(callback),
@@ -72,11 +71,12 @@ void Poller::poll(const int32_t timeout) {
         const pollfd& pollEntry = _pollFds.at(i);
         const PollEntry& entry = _entries.at(pollEntry.fd);
 
-        const auto hasEvent = [&pollEntry, &entry](const int event) {
-            return (pollEntry.revents & event) != 0 && (entry.type & event) != 0;
+        const auto hasEvent = [&pollEntry, &entry](const std::byte event) {
+            return (static_cast<std::byte>(pollEntry.revents) & event) != std::byte{0} &&
+                   (entry.type & event) != std::byte{0};
         };
 
-        std::uint8_t events = 0;
+        std::byte events{0};
 
         if (hasEvent(kPollError)) {
             events |= kPollError;
@@ -87,7 +87,7 @@ void Poller::poll(const int32_t timeout) {
         if (hasEvent(kPollWrite)) {
             events |= kPollWrite;
         }
-        if (events != 0) {
+        if (events != std::byte{0}) {
             entry.handler(events);
         }
     }
@@ -98,7 +98,7 @@ void Poller::reconstructPollFds() {
     for (const auto& [fd, entry] : _entries) {
         _pollFds.emplace_back(pollfd{
             .fd = fd,
-            .events = entry.type,
+            .events = static_cast<std::int16_t>(entry.type),
             .revents = 0,
         });
     }
