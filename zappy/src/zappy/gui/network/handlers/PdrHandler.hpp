@@ -24,8 +24,7 @@ class PdrHandler {
 
     void operator()(std::istringstream& ss) const {
         std::string idToken;
-        std::uint32_t resource = 0;
-        if (!(ss >> idToken >> resource)) {
+        if (std::uint32_t resource = 0; !(ss >> idToken >> resource)) {
             throw exception::ParseException{"pdr: malformed arguments"};
         }
         (void)parseId(idToken);
