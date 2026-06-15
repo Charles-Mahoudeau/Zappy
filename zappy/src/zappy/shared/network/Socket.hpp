@@ -33,7 +33,7 @@ class Socket : public ISocket {
 
     [[nodiscard]] int fd() const override;
 
-    [[nodiscard]] Address address() const override;
+    [[nodiscard]] const Address& address() const override;
     [[nodiscard]] bool isOpen() const override;
 
     void bind(std::uint16_t port) override;

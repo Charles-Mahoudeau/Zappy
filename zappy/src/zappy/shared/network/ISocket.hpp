@@ -30,7 +30,7 @@ class ISocket : public io::IFileDescriptor {
 
     [[nodiscard]] int fd() const override = 0;
 
-    [[nodiscard]] virtual Address address() const = 0;
+    [[nodiscard]] virtual const Address& address() const = 0;
     [[nodiscard]] virtual bool isOpen() const = 0;
 
     virtual void bind(std::uint16_t port) = 0;

@@ -69,7 +69,7 @@ Socket::~Socket() { Socket::close(); }
 
 int Socket::fd() const { return _socket; }
 
-Address Socket::address() const { return _address; }
+const Address& Socket::address() const { return _address; }
 
 bool Socket::isOpen() const { return _socket != -1; }
 
