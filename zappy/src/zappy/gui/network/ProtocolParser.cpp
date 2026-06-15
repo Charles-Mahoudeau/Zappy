@@ -11,6 +11,8 @@
 #include <string>
 #include <string_view>
 
+#include "zappy/gui/game/GameState.hpp"
+#include "zappy/gui/network/HandlerFactory.hpp"
 #include "zappy/shared/exception/ParseException.hpp"
 
 namespace zappy::gui::network {
