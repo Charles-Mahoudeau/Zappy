@@ -9,6 +9,7 @@
 
 #include <cstdint>
 #include <exception>
+#include <limits>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -23,7 +24,13 @@ inline std::uint32_t parseId(std::string_view token) {
         throw exception::ParseException{"expected #-prefixed id"};
     }
     try {
-        return static_cast<std::uint32_t>(std::stoul(std::string{token.substr(1)}));
+        const unsigned long value = std::stoul(std::string{token.substr(1)});
+        if (value > std::numeric_limits<std::uint32_t>::max()) {
+            throw exception::ParseException{"id value out of uint32 range"};
+        }
+        return static_cast<std::uint32_t>(value);
+    } catch (const exception::ParseException&) {
+        throw;
     } catch (const std::exception&) {
         throw exception::ParseException{"invalid id value"};
     }

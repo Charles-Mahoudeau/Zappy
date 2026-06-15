@@ -26,7 +26,7 @@ class PexHandler {
         if (!(ss >> idToken)) {
             throw exception::ParseException{"pex: missing player id"};
         }
-        _state.get().removePlayer(parseId(idToken));
+        (void)parseId(idToken);
     }
 
   private:

@@ -9,6 +9,7 @@
 
 #include <cstddef>
 #include <functional>
+#include <istream>
 #include <sstream>
 
 #include "zappy/gui/game/GameState.hpp"
@@ -25,6 +26,10 @@ class MszHandler {
         std::size_t height = 0;
         if (!(ss >> width >> height)) {
             throw exception::ParseException{"msz: malformed arguments"};
+        }
+        ss >> std::ws;
+        if (!ss.eof()) {
+            throw exception::ParseException{"msz: unexpected trailing tokens"};
         }
         _state.get().setMapSize(width, height);
     }

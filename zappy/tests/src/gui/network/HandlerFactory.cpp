@@ -95,11 +95,11 @@ TEST_F(HandlerFactoryTest, PinUpdatesPlayerInventory) {
     EXPECT_EQ(state.players().at(2).inventory.food, 3U);
 }
 
-TEST_F(HandlerFactoryTest, PexRemovesPlayer) {
+TEST_F(HandlerFactoryTest, PexKeepsPlayerAlive) {
     dispatch("msz", "10 10");
     dispatch("pnw", "#3 0 0 1 1 TeamA");
     dispatch("pex", "#3");
-    EXPECT_FALSE(state.players().count(3));
+    EXPECT_TRUE(state.players().count(3));
 }
 
 TEST_F(HandlerFactoryTest, PdiRemovesPlayer) {

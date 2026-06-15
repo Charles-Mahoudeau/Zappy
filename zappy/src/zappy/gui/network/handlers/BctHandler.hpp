@@ -9,6 +9,7 @@
 
 #include <cstddef>
 #include <functional>
+#include <istream>
 #include <sstream>
 
 #include "zappy/gui/game/GameState.hpp"
@@ -27,7 +28,12 @@ class BctHandler {
         if (!(ss >> x >> y)) {
             throw exception::ParseException{"bct: malformed coordinates"};
         }
-        _state.get().setTile(x, y, parseResources(ss));
+        const auto resources = parseResources(ss);
+        ss >> std::ws;
+        if (!ss.eof()) {
+            throw exception::ParseException{"bct: unexpected trailing tokens"};
+        }
+        _state.get().setTile(x, y, resources);
     }
 
   private:

@@ -8,6 +8,7 @@
 #pragma once
 
 #include <functional>
+#include <istream>
 #include <sstream>
 #include <string>
 
@@ -25,6 +26,10 @@ class EdiHandler {
         std::string eggToken;
         if (!(ss >> eggToken)) {
             throw exception::ParseException{"edi: missing egg id"};
+        }
+        ss >> std::ws;
+        if (!ss.eof()) {
+            throw exception::ParseException{"edi: unexpected trailing tokens"};
         }
         _state.get().removeEgg(parseId(eggToken));
     }

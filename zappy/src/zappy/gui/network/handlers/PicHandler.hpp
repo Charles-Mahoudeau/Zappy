@@ -11,6 +11,7 @@
 #include <functional>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/network/handlers/ParseHelpers.hpp"
@@ -26,9 +27,13 @@ class PicHandler {
         if (std::uint32_t x = 0, y = 0, level = 0; !(ss >> x >> y >> level)) {
             throw exception::ParseException{"pic: malformed arguments"};
         }
+        std::vector<std::uint32_t> ids;
         std::string idToken;
         while (ss >> idToken) {
-            _state.get().setPlayerIncanting(parseId(idToken), true);
+            ids.push_back(parseId(idToken));
+        }
+        for (const auto id : ids) {
+            _state.get().setPlayerIncanting(id, true);
         }
     }
 

@@ -9,6 +9,7 @@
 
 #include <cstdint>
 #include <functional>
+#include <istream>
 #include <sstream>
 #include <string>
 
@@ -29,7 +30,12 @@ class PinHandler {
         if (!(ss >> idToken >> x >> y)) {
             throw exception::ParseException{"pin: malformed arguments"};
         }
-        _state.get().setPlayerInventory(parseId(idToken), x, y, parseResources(ss));
+        const auto inventory = parseResources(ss);
+        ss >> std::ws;
+        if (!ss.eof()) {
+            throw exception::ParseException{"pin: unexpected trailing tokens"};
+        }
+        _state.get().setPlayerInventory(parseId(idToken), x, y, inventory);
     }
 
   private:

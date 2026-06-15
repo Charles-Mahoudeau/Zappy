@@ -9,6 +9,7 @@
 
 #include <cstdint>
 #include <functional>
+#include <istream>
 #include <sstream>
 #include <string>
 
@@ -29,6 +30,10 @@ class PpoHandler {
         std::uint32_t o = 0;
         if (!(ss >> idToken >> x >> y >> o)) {
             throw exception::ParseException{"ppo: malformed arguments"};
+        }
+        ss >> std::ws;
+        if (!ss.eof()) {
+            throw exception::ParseException{"ppo: unexpected trailing tokens"};
         }
         _state.get().setPlayerPosition(parseId(idToken), x, y, parseOrientation(o));
     }

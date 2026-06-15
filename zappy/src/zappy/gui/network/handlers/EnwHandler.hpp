@@ -9,6 +9,7 @@
 
 #include <cstdint>
 #include <functional>
+#include <istream>
 #include <sstream>
 #include <string>
 
@@ -29,6 +30,10 @@ class EnwHandler {
         std::uint32_t y = 0;
         if (!(ss >> eggToken >> playerToken >> x >> y)) {
             throw exception::ParseException{"enw: malformed arguments"};
+        }
+        ss >> std::ws;
+        if (!ss.eof()) {
+            throw exception::ParseException{"enw: unexpected trailing tokens"};
         }
         _state.get().addEgg(parseId(eggToken), parseId(playerToken), x, y);
     }

@@ -77,5 +77,6 @@ TEST_F(ProtocolParserTest, DispatchIsMoveOnly) {
     EXPECT_FALSE(std::is_copy_constructible_v<ProtocolParser>);
     EXPECT_FALSE(std::is_copy_assignable_v<ProtocolParser>);
     EXPECT_TRUE(std::is_move_constructible_v<ProtocolParser>);
+    EXPECT_TRUE(std::is_move_assignable_v<ProtocolParser>);
 }
 }  // namespace

@@ -8,6 +8,7 @@
 #pragma once
 
 #include <functional>
+#include <istream>
 #include <sstream>
 #include <string>
 #include <utility>
@@ -25,6 +26,10 @@ class TnaHandler {
         std::string name;
         if (!(ss >> name)) {
             throw exception::ParseException{"tna: missing team name"};
+        }
+        ss >> std::ws;
+        if (!ss.eof()) {
+            throw exception::ParseException{"tna: unexpected trailing tokens"};
         }
         _state.get().addTeam(std::move(name));
     }
