@@ -18,6 +18,7 @@
 #include <utility>
 
 #include "IFileDescriptor.hpp"
+#include "zappy/shared/exception/InvalidState.hpp"
 
 namespace zappy::io {
 void Poller::clear() {
@@ -46,7 +47,7 @@ void Poller::remove(const IFileDescriptor& fileDescriptor) { _toRemove.push_back
 
 std::size_t Poller::size() const { return _entries.size(); }
 
-void Poller::poll() {
+void Poller::poll(const int32_t timeout) {
     if (_entries.size() != _pollFds.size()) {
         throw exception::InvalidState{"Poller _pollFds and _fds size mismatch"};
     }
@@ -57,12 +58,12 @@ void Poller::poll() {
         reconstructPollFds();
     }
 
-    const int ret = ::poll(_pollFds.data(), _entries.size(), -1);
+    const int ret = ::poll(_pollFds.data(), _entries.size(), timeout);
 
     if (ret == -1 && errno != EINTR) {
         const std::error_code error{errno, std::generic_category()};
 
-        throw exception::IoError{"Failed to poll: " + error.message()};
+        throw exception::InvalidState{"Failed to poll: " + error.message()};
     }
     if (ret == 0) {
         return;

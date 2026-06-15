@@ -42,7 +42,7 @@ class Poller {
 
     [[nodiscard]] std::size_t size() const;
 
-    void poll();
+    void poll(int32_t timeout = -1);
 
   private:
     struct PollEntry {
