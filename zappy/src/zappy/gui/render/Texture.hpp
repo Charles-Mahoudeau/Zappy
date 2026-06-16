@@ -27,18 +27,9 @@ class Texture {
         [[nodiscard]] int width() const;
         [[nodiscard]] int height() const;
 
-        bool isValid() const { return _texture.id != 0; }
-        bool reload(const char* path) {
-            UnloadTexture(_texture);
-            _texture = LoadTexture(path);
-            return isValid();
-        }
-        void swap(Texture& other) noexcept {
-            Texture2D tmp = _texture;
-
-            _texture = other._texture;
-            other._texture = tmp;
-        }
+        bool isValid() const;
+        bool reload(const char* path);
+        void swap(Texture& other) noexcept;
 
     private:
         Texture2D _texture{};
