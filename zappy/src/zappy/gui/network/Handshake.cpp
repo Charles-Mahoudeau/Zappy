@@ -9,7 +9,11 @@
 
 #include <chrono>
 
+#include "zappy/gui/game/GameState.hpp"
+#include "zappy/gui/network/CommandSender.hpp"
+#include "zappy/gui/network/ProtocolParser.hpp"
 #include "zappy/shared/exception/InvalidState.hpp"
+#include "zappy/shared/network/BufferedClient.hpp"
 
 namespace zappy::gui::network {
 
