@@ -18,8 +18,8 @@ namespace zappy::gui::network {
 
 class Handshake {
   public:
-    Handshake(zappy::network::BufferedClient& buffer, CommandSender& sender,
-              ProtocolParser& parser, game::GameState& state);
+    Handshake(zappy::network::BufferedClient& buffer, CommandSender& sender, ProtocolParser& parser,
+              game::GameState& state);
     ~Handshake() = default;
 
     Handshake(const Handshake&) = delete;
