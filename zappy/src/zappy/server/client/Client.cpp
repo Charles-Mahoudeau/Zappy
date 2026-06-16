@@ -22,9 +22,9 @@ namespace zappy::server {
 Client::Client(net::SocketRegistry& socketRegister, network::Address address)
     : _addr(address), _socketsRegistery(socketRegister) {}
 
-network::Address& Client::address() { return this->_addr; }
+const network::Address& Client::address() const { return this->_addr; }
 
-Client::Type Client::type() { return this->_type; }
+Client::Type Client::type() const { return this->_type; }
 
 void Client::changeType(Client::Type type) { this->_type = type; }
 

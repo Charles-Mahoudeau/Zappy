@@ -14,6 +14,7 @@
 #include "zappy/server/client/Client.hpp"
 #include "zappy/server/net/SocketRegistry.hpp"
 #include "zappy/shared/network/Address.hpp"
+
 namespace zappy::server::client {
 
 void ClientsRegistry::makeNewClient(net::SocketRegistry& socketRegistery, network::Address addr) {
@@ -40,11 +41,31 @@ void ClientsRegistry::update() {
     for (const auto& client : this->_clients) {
         if (!client->update()) {
             toRemove.push_back(client.get());
+            continue;
         }
     }
 
     for (Client* client : toRemove) {
         this->remove(client);
+    }
+    this->updateTypeGroup();
+}
+
+void ClientsRegistry::updateTypeGroup() {
+    std::vector<std::pair<Client::Type, const Client*>> toMove;
+
+    for (auto& group : this->_clientsPerType) {
+        for (const Client* client : group.second) {
+            if (group.first != client->type()) {
+                toMove.emplace_back(group.first, client);
+            }
+        }
+    }
+
+    for (auto& [fromType, client] : toMove) {
+        this->_clientsPerType.at(client->type()).emplace_back(client);
+        auto& src = this->_clientsPerType.at(fromType);
+        std::erase_if(src, [client](const Client* InnerClient) { return client == InnerClient; });
     }
 }
 

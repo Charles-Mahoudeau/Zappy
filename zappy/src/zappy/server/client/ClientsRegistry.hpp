@@ -45,6 +45,8 @@ class ClientsRegistry {
         {Client::Type::kGUI, {}},
         {Client::Type::kPLAYER, {}},
     };
+
+    void updateTypeGroup();
 };
 
 inline auto ClientsRegistry::viewAll() {

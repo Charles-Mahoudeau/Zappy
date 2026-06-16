@@ -105,7 +105,6 @@ TEST_F(ClientsRegistryTest, UpdateKeepsHealthyClients) {
     EXPECT_EQ(std::ranges::distance(registry.viewAll()), 1);
 }
 
-// TODO
 TEST_F(ClientsRegistryTest, UpdateRemovesClientWhenPeerCloses) {
     registry.makeNewClient(socketRegistry, addr);
 
@@ -117,5 +116,21 @@ TEST_F(ClientsRegistryTest, UpdateRemovesClientWhenPeerCloses) {
 }
 
 TEST_F(ClientsRegistryTest, UpdateEmptyRegistryDoesNotThrow) { EXPECT_NO_THROW(registry.update()); }
+
+TEST_F(ClientsRegistryTest, UpdateClientType) {
+    registry.makeNewClient(socketRegistry, addr);
+
+    EXPECT_EQ(std::ranges::distance(registry.viewAll(zappy::server::Client::Type::kUNKNOWN)), 1);
+    EXPECT_EQ(std::ranges::distance(registry.viewAll(zappy::server::Client::Type::kGUI)), 0);
+    EXPECT_EQ(std::ranges::distance(registry.viewAll(zappy::server::Client::Type::kPLAYER)), 0);
+
+    registry.viewAll().front()->changeType(zappy::server::Client::Type::kGUI);
+
+    registry.update();
+
+    EXPECT_EQ(std::ranges::distance(registry.viewAll(zappy::server::Client::Type::kUNKNOWN)), 0);
+    EXPECT_EQ(std::ranges::distance(registry.viewAll(zappy::server::Client::Type::kGUI)), 1);
+    EXPECT_EQ(std::ranges::distance(registry.viewAll(zappy::server::Client::Type::kPLAYER)), 0);
+}
 
 // ── viewAll(

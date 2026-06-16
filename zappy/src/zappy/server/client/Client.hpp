@@ -36,8 +36,8 @@ class Client {
 
     bool update();
 
-    network::Address& address();
-    Type type();
+    [[nodiscard]] const network::Address& address() const;
+    [[nodiscard]] Type type() const;
     void changeType(Type type);
 
     void addRequest(std::string msg);
