@@ -14,7 +14,9 @@
 namespace zappy::server::game::entity {
 Egg::Egg(std::string teamName) : _teamName{std::move(teamName)} {}
 
-void Egg::update() {}
+void Egg::update() {
+    // Empty
+}
 
 std::string_view Egg::teamName() const { return _teamName; }
 }  // namespace zappy::server::game::entity
