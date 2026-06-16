@@ -17,6 +17,8 @@ add_library(zappy_shared OBJECT
         network/BufferedClient.hpp
         network/Socket.cpp
         network/Socket.hpp
+        io/Poller.cpp
+        io/Poller.hpp
 )
 target_include_directories(zappy_shared PUBLIC
         ${CMAKE_SOURCE_DIR}/src
