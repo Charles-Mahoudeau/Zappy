@@ -73,11 +73,13 @@ bool Player::eat() {
 }
 
 const std::unordered_map<Player::Direction, std::tuple<Player::Direction, Player::Direction>>& Player::turnMap() {
+    using enum Direction;
+
     static const std::unordered_map<Direction, std::tuple<Direction, Direction>> turnMap{
-        {Direction::kNorth, {Direction::kWest, Direction::kEast}},
-        {Direction::kEast, {Direction::kNorth, Direction::kSouth}},
-        {Direction::kSouth, {Direction::kEast, Direction::kWest}},
-        {Direction::kWest, {Direction::kSouth, Direction::kNorth}},
+        {kNorth, {kWest, kEast}},
+        {kEast, {kNorth, kSouth}},
+        {kSouth, {kEast, kWest}},
+        {kWest, {kSouth, kNorth}},
     };
 
     return turnMap;
