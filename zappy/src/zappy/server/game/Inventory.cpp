@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <limits>
 #include <numeric>
 
 #include "ResourceType.hpp"
@@ -31,7 +32,12 @@ std::uint16_t Inventory::resourceCount(const ResourceType type) const {
 std::uint16_t Inventory::addResource(const ResourceType type, const std::uint16_t amount) {
     std::uint16_t& resourceAmount = _resources[type];
 
-    resourceAmount += amount;
+    if (constexpr std::uint16_t maxValue = std::numeric_limits<std::uint16_t>::max();
+        amount > maxValue - resourceAmount) {
+        resourceAmount = maxValue;
+    } else {
+        resourceAmount += amount;
+    }
     return resourceAmount;
 }
 
