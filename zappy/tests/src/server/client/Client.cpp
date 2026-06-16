@@ -12,6 +12,7 @@
 #include <unistd.h>
 
 #include <array>
+#include <format>
 #include <string>
 
 #include "SocketPair.hpp"
@@ -94,7 +95,7 @@ TEST_F(ServerClientTest, AddRequestRespectsMaxRequestCap) {
     Client client{socketRegistry, addr};
 
     for (int i = 0; i < 12; ++i) {
-        client.addRequest("req" + std::to_string(i));
+        client.addRequest(std::format("req {}", std::to_string(i)));
     }
 
     int count = 0;

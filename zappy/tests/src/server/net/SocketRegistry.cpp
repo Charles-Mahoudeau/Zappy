@@ -29,7 +29,7 @@ network::socket::Client makeClient(int fd, const std::string& ip, std::uint16_t 
 namespace {
 
 class SocketRegistryTest : public ::testing::Test {
-  protected:
+  public:
     SocketRegistry registry;
 };
 
@@ -71,13 +71,13 @@ TEST_F(SocketRegistryTest, GetFromAddressWithUnknownAddressFails) {
 }
 
 TEST_F(SocketRegistryTest, GetFromAddressDistinguishesByPort) {
-    auto client = makeClient(10, "192.168.1.1", 1000);
+    auto client = makeClient(10, "127.0.0.1", 1000);
     registry.insert(client);
 
-    network::Address samePortDifferentIp{"10.0.0.1", 1000};
+    network::Address samePortDifferentIp{"127.0.0.2", 1000};
     EXPECT_FALSE(registry.getFromAddress(samePortDifferentIp).has_value());
 
-    network::Address differentPortSameIp{"192.168.1.1", 2000};
+    network::Address differentPortSameIp{"127.0.0.1", 2000};
     EXPECT_FALSE(registry.getFromAddress(differentPortSameIp).has_value());
 }
 

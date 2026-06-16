@@ -3,6 +3,7 @@
 #include <unistd.h>
 
 #include <array>
+
 struct SocketPair {
     int local = -1;
     int peer = -1;
@@ -23,8 +24,8 @@ struct SocketPair {
         }
     }
 
-    SocketPair(const SocketPair&) = default;
+    SocketPair(const SocketPair&) = delete;
     SocketPair(SocketPair&&) = delete;
-    SocketPair& operator=(const SocketPair&) = default;
+    SocketPair& operator=(const SocketPair&) = delete;
     SocketPair& operator=(SocketPair&&) = delete;
 };
