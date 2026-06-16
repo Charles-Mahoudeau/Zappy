@@ -50,6 +50,44 @@ TEST(EntityDatabase, QueryNonExistent) {
     EXPECT_EQ(db.query(42), nullptr);
 }
 
+TEST(EntityDatabase, QueryByTypeReturnsTypedEntityWhenTypeMatches) {
+    EntityDatabase db;
+    auto entity = std::make_unique<EntityA>();
+    const EntityA* ptr = entity.get();
+    const std::uint64_t id = db.insert(std::move(entity));
+    const EntityA* result = db.query<EntityA>(id);
+
+    EXPECT_EQ(result, ptr);
+}
+
+TEST(EntityDatabase, QueryByTypeReturnsNullptrWhenEntityDoesNotExist) {
+    EntityDatabase db;
+
+    EXPECT_EQ(db.query<EntityA>(42), nullptr);
+}
+
+TEST(EntityDatabase, QueryByTypeReturnsNullptrWhenTypeDoesNotMatch) {
+    EntityDatabase db;
+    const std::uint64_t id = db.insert(std::make_unique<EntityA>());
+
+    EXPECT_EQ(db.query<EntityB>(id), nullptr);
+}
+
+TEST(EntityDatabase, QueryByTypeDoesNotConfuseDifferentStoredTypes) {
+    EntityDatabase db;
+    auto entityA = std::make_unique<EntityA>();
+    auto entityB = std::make_unique<EntityB>();
+    const EntityA* ptrA = entityA.get();
+    const EntityB* ptrB = entityB.get();
+    const std::uint64_t idA = db.insert(std::move(entityA));
+    const std::uint64_t idB = db.insert(std::move(entityB));
+
+    EXPECT_EQ(db.query<EntityA>(idA), ptrA);
+    EXPECT_EQ(db.query<EntityB>(idB), ptrB);
+    EXPECT_EQ(db.query<EntityB>(idA), nullptr);
+    EXPECT_EQ(db.query<EntityA>(idB), nullptr);
+}
+
 TEST(EntityDatabase, Remove) {
     EntityDatabase db;
     const std::uint64_t id = db.insert(std::make_unique<EntityA>());
