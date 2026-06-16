@@ -21,10 +21,14 @@ TEST(PollerTest, BasicFunctionality) {
     Poller poller;
     EXPECT_EQ(poller.size(), 0);
 
-    poller.add(10, Poller::kPollRead, [](std::byte) {});
+    poller.add(10, Poller::kPollRead, [](std::byte) {
+        // Poller callback
+    });
     EXPECT_EQ(poller.size(), 1);
 
-    poller.add(11, Poller::kPollRead, [](std::byte) {});
+    poller.add(11, Poller::kPollRead, [](std::byte) {
+        // Poller callback
+    });
     EXPECT_EQ(poller.size(), 2);
 
     poller.clear();
@@ -36,7 +40,9 @@ TEST(PollerTest, RemoveFunctionality) {
     const MockFileDescriptor mockFd;
     EXPECT_CALL(mockFd, fd()).WillRepeatedly(testing::Return(10));
 
-    poller.add(mockFd, Poller::kPollRead, [](std::byte) {});
+    poller.add(mockFd, Poller::kPollRead, [](std::byte) {
+        // Poller callback
+    });
     EXPECT_EQ(poller.size(), 1);
 
     poller.remove(mockFd);
