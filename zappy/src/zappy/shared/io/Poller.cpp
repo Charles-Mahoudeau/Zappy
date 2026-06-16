@@ -18,6 +18,7 @@
 #include <utility>
 
 #include "IFileDescriptor.hpp"
+#include "zappy/shared/exception/InvalidArgument.hpp"
 #include "zappy/shared/exception/InvalidState.hpp"
 
 namespace zappy::io {
@@ -27,7 +28,10 @@ void Poller::clear() {
     _toRemove.clear();
 }
 
-void Poller::add(const IFileDescriptor& fileDescriptor, std::byte pollEvents, Handler callback) {
+void Poller::add(const IFileDescriptor& fileDescriptor, const std::byte pollEvents, Handler callback) {
+    if (callback == nullptr) {
+        throw exception::InvalidArgument{"callback cannot be null"};
+    }
     _entries.insert_or_assign(fileDescriptor.fd(), PollEntry{
                                                        .type = pollEvents,
                                                        .handler = std::move(callback),
@@ -35,7 +39,10 @@ void Poller::add(const IFileDescriptor& fileDescriptor, std::byte pollEvents, Ha
     reconstructPollFds();
 }
 
-void Poller::add(int fileDescriptor, std::byte pollEvents, Handler callback) {
+void Poller::add(const int fileDescriptor, const std::byte pollEvents, Handler callback) {
+    if (callback == nullptr) {
+        throw exception::InvalidArgument{"callback cannot be null"};
+    }
     _entries.insert_or_assign(fileDescriptor, PollEntry{
                                                   .type = pollEvents,
                                                   .handler = std::move(callback),
