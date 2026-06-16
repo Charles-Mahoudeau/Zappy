@@ -76,7 +76,7 @@ TEST(PollerTest, ReadFunctionality) {
 
     // Write to pipe
     constexpr char buffer = 'a';
-    ASSERT_EQ(write(writeFd, &buffer, 1), 1);
+    EXPECT_EQ(write(writeFd, &buffer, 1), 1);
 
     // Verify callback called
     poller.poll(0);
