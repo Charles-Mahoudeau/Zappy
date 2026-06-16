@@ -31,10 +31,9 @@ namespace zappy::gui::render {
 
     bool Texture::isValid() const { return _texture.id != 0; }
 
-    bool Texture::reload(const char* path) {
+    void Texture::reload(const char* path) {
         UnloadTexture(_texture);
         _texture = LoadTexture(path);
-        return isValid();
     }
 
     void Texture::swap(Texture& other) noexcept {

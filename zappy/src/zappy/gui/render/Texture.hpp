@@ -14,25 +14,25 @@
 namespace zappy::gui::render {
 
 class Texture {
-    public:
-        Texture(const char* path);
-        ~Texture();
+  public:
+    Texture(const char* path);
+    ~Texture();
 
-        Texture(const Texture&) = delete;
-        Texture& operator=(const Texture&) = delete;
+    explicit Texture(const Texture&) = delete;
+    Texture& operator=(const Texture&) = delete;
 
-        Texture(Texture&& other) noexcept;
-        Texture& operator=(Texture&& other) noexcept;
+    Texture(Texture&& other) noexcept;
+    Texture& operator=(Texture&& other) noexcept;
 
-        [[nodiscard]] std::uint32_t id() const;
-        [[nodiscard]] int width() const;
-        [[nodiscard]] int height() const;
-        [[nodiscard]] bool isValid() const;
+    [[nodiscard]] std::uint32_t id() const;
+    [[nodiscard]] int width() const;
+    [[nodiscard]] int height() const;
+    [[nodiscard]] bool isValid() const;
 
-        bool reload(const char* path);
-        void swap(Texture& other) noexcept;
+    void reload(const char* path);
+    void swap(Texture& other) noexcept;
 
-    private:
-        Texture2D _texture{};
+  private:
+    Texture2D _texture{};
 };
 }  // namespace zappy::gui::render
