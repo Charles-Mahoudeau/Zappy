@@ -18,8 +18,8 @@
 using zappy::exception::ParseException;
 using zappy::gui::game::GameState;
 using zappy::gui::game::Orientation;
-using zappy::gui::network::HandlerRegistry;
 using zappy::gui::network::HandlerMap;
+using zappy::gui::network::HandlerRegistry;
 
 namespace {
 class HandlerRegistryTest : public ::testing::Test {
