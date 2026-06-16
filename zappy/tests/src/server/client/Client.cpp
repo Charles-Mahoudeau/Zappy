@@ -193,7 +193,7 @@ TEST_F(ServerClientTest, SendMessageWithRegisteredSocketDoesNotThrow) {
 
     Client client{socketRegistry, addr};
 
-    EXPECT_TRUE(client.sendMessage("hello"));
+    ASSERT_TRUE(client.sendMessage("hello"));
 
     std::array<char, 32> buf{};
     const ssize_t n = ::read(pair.peer, buf.data(), buf.size());
