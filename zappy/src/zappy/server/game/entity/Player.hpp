@@ -45,7 +45,7 @@ class Player : public IEntity {
 
     /// @brief Get the player's lifetime left.
     /// @return The player's lifetime left.
-    [[nodiscard]] std::uint16_t lifetimeLeft() const;
+    [[nodiscard]] std::uint32_t lifetimeLeft() const;
 
     /// @brief Check if the player is alive.
     /// @return True if the player is alive, false otherwise.

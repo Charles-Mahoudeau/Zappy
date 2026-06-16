@@ -27,7 +27,7 @@ void Player::update() {
     }
 }
 
-std::uint16_t Player::lifetimeLeft() const { return _lifetimeLeft; }
+std::uint32_t Player::lifetimeLeft() const { return _lifetimeLeft; }
 
 bool Player::alive() const { return _lifetimeLeft > 0; }
 
