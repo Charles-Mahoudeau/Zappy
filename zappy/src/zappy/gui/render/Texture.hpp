@@ -27,8 +27,8 @@ class Texture {
         [[nodiscard]] std::uint32_t id() const;
         [[nodiscard]] int width() const;
         [[nodiscard]] int height() const;
+        [[nodiscard]] bool isValid() const;
 
-        bool isValid() const;
         bool reload(const char* path);
         void swap(Texture& other) noexcept;
 
