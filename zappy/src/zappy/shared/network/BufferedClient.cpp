@@ -67,6 +67,6 @@ void BufferedClient::send(std::string_view line) {
     }
 }
 
-Address BufferedClient::addr() { return this->_client.address(); }
+Address BufferedClient::addr() const { return this->_client.address(); }
 
 }  // namespace zappy::network

@@ -29,7 +29,7 @@ class Socket : public ISocket {
     Socket(Socket&& other) noexcept;
     Socket& operator=(Socket&& other) noexcept;
 
-    bool operator==(Address& address) const;
+    bool operator==(const Address& address) const;
 
     [[nodiscard]] int fd() const override;
 

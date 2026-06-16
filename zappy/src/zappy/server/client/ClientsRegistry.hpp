@@ -32,7 +32,7 @@ class ClientsRegistry {
 
     void update();
 
-    void remove(Client* clientPtr);
+    void remove(const Client* clientPtr);
 
     auto viewAll();
 

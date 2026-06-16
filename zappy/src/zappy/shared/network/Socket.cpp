@@ -25,7 +25,7 @@
 
 namespace zappy::network {
 
-bool Socket::operator==(Address& address) const { return this->_address == address; }
+bool Socket::operator==(const Address& address) const { return this->_address == address; }
 
 Socket::Socket() : _socket{socket(AF_INET, SOCK_STREAM, 0)} {
     if (_socket == -1) {

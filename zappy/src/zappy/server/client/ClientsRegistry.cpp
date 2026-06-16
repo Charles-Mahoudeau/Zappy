@@ -18,13 +18,13 @@
 namespace zappy::server::client {
 
 void ClientsRegistry::makeNewClient(net::SocketRegistry& socketRegistery, network::Address addr) {
-    std::unique_ptr<Client> newClient = std::make_unique<Client>(socketRegistery, addr);
+    auto newClient = std::make_unique<Client>(socketRegistery, addr);
 
     this->_clientsPerType.at(newClient->type()).emplace_back(newClient.get());
     this->_clients.emplace_back(std::move(newClient));
 }
 
-void ClientsRegistry::remove(Client* clientPtr) {
+void ClientsRegistry::remove(const Client* clientPtr) {
     if (clientPtr == nullptr) {
         return;
     }
@@ -45,7 +45,7 @@ void ClientsRegistry::update() {
         }
     }
 
-    for (Client* client : toRemove) {
+    for (const Client* client : toRemove) {
         this->remove(client);
     }
     this->updateTypeGroup();
@@ -54,15 +54,15 @@ void ClientsRegistry::update() {
 void ClientsRegistry::updateTypeGroup() {
     std::vector<std::pair<Client::Type, const Client*>> toMove;
 
-    for (auto& group : this->_clientsPerType) {
-        for (const Client* client : group.second) {
-            if (group.first != client->type()) {
-                toMove.emplace_back(group.first, client);
+    for (const auto& [groupType, groupList] : this->_clientsPerType) {
+        for (const Client* client : groupList) {
+            if (groupType != client->type()) {
+                toMove.emplace_back(groupType, client);
             }
         }
     }
 
-    for (auto& [fromType, client] : toMove) {
+    for (const auto& [fromType, client] : toMove) {
         this->_clientsPerType.at(client->type()).emplace_back(client);
         auto& src = this->_clientsPerType.at(fromType);
         std::erase_if(src, [client](const Client* InnerClient) { return client == InnerClient; });
