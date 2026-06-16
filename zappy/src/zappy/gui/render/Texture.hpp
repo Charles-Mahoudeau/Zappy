@@ -12,6 +12,7 @@
 #include <cstdint>
 
 namespace zappy::gui::render {
+
 class Texture {
     public:
         Texture(const char* path);
