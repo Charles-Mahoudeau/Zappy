@@ -5,24 +5,23 @@
 ** server::Client tests
 */
 
-#include "zappy/server/client/Client.hpp"
+#include "zappy/shared/network/socket/Client.hpp"
 
-#include <fcntl.h>
 #include <gtest/gtest.h>
-#include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
 
 #include <array>
-#include <optional>
 #include <string>
 
 #include "SocketPair.hpp"
+#include "zappy/server/client/Client.hpp"
 #include "zappy/server/net/SocketRegistry.hpp"
 #include "zappy/shared/network/Address.hpp"
-#include "zappy/shared/network/socket/Client.hpp"
 
 namespace zappy::server::test {
+
+namespace {
 
 class ServerClientTest : public ::testing::Test {
   public:
@@ -30,18 +29,20 @@ class ServerClientTest : public ::testing::Test {
     network::Address addr{"127.0.0.1", 4242};
 };
 
+}  // namespace
+
 // ---------------------------------------------------------------------------
 // address / type / changeType
 // ---------------------------------------------------------------------------
 
 TEST_F(ServerClientTest, AddressReturnsConstructedAddress) {
-    Client client{socketRegistry, addr};
+    const Client client{socketRegistry, addr};
 
     EXPECT_EQ(client.address(), addr);
 }
 
 TEST_F(ServerClientTest, TypeDefaultsToUnknown) {
-    Client client{socketRegistry, addr};
+    const Client client{socketRegistry, addr};
 
     EXPECT_EQ(client.type(), Client::Type::kUNKNOWN);
 }
@@ -73,12 +74,18 @@ TEST_F(ServerClientTest, GetNextRequestReturnsRequestsInFifoOrder) {
     client.addRequest("second");
 
     auto firstResult = client.getNextRequest();
-    ASSERT_TRUE(firstResult.has_value());
-    EXPECT_EQ(*firstResult, "first");
-
     auto secondResult = client.getNextRequest();
-    ASSERT_TRUE(secondResult.has_value());
-    EXPECT_EQ(*secondResult, "second");
+
+    if (firstResult.has_value()) {
+        EXPECT_EQ(*firstResult, "first");
+    } else {
+        FAIL() << "Expect first result but got nothing";
+    }
+    if (secondResult.has_value()) {
+        EXPECT_EQ(*secondResult, "second");
+    } else {
+        FAIL() << "Expect second result but got nothing";
+    }
 
     EXPECT_FALSE(client.getNextRequest().has_value());
 }
@@ -108,12 +115,19 @@ TEST_F(ServerClientTest, GetNextRequestBlockedWhileTimeoutPending) {
 
     client.setTimeout(2);
 
-    EXPECT_FALSE(client.getNextRequest().has_value());
-    EXPECT_FALSE(client.getNextRequest().has_value());
+    if (client.getNextRequest().has_value()) {
+        FAIL() << "Expect nothing on first request but got value";
+    }
+    if (client.getNextRequest().has_value()) {
+        FAIL() << "Expect nothing on second request but got value";
+    }
 
     auto result = client.getNextRequest();
-    ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(*result, "delayed");
+    if (result.has_value()) {
+        EXPECT_EQ(*result, "delayed");
+    } else {
+        FAIL() << "Expect result 'delayed' but got nothing";
+    }
 }
 
 TEST_F(ServerClientTest, ZeroTimeoutDoesNotBlock) {
@@ -123,8 +137,11 @@ TEST_F(ServerClientTest, ZeroTimeoutDoesNotBlock) {
     client.setTimeout(0);
 
     auto result = client.getNextRequest();
-    ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(*result, "immediate");
+    if (result.has_value()) {
+        EXPECT_EQ(*result, "immediate");
+    } else {
+        FAIL() << "Expect result but got nothing";
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -151,8 +168,11 @@ TEST_F(ServerClientTest, UpdateReturnsTrueWhenSocketRegistered) {
     EXPECT_TRUE(client.update());
 
     auto request = client.getNextRequest();
-    ASSERT_TRUE(request.has_value());
-    EXPECT_EQ(*request, "ping");
+    if (request.has_value()) {
+        EXPECT_EQ(*request, "ping");
+    } else {
+        FAIL() << "Expect request but got nothing";
+    }
     ASSERT_FALSE(client.getNextRequest().has_value());
 }
 
