@@ -6,6 +6,9 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 add_executable(unit_tests
         src/CliParser.cpp
         src/server/game/EntityDatabase.cpp
+        src/server/game/entity/Egg.cpp
+        src/server/game/entity/Player.cpp
+        src/server/game/entity/Resource.cpp
         src/shared/network/BufferedClient.cpp
         src/gui/game/GameState.cpp
         src/gui/network/HandlerRegistry.cpp
