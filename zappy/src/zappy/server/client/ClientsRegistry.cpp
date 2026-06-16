@@ -47,6 +47,7 @@ void ClientsRegistry::update() {
         std::erase_if(this->_clients,
                       [&clientPtr](const std::unique_ptr<Client>& client) { return client.get() == clientPtr; });
     }
+    this->_toRemove.clear();
 }
 
 void ClientsRegistry::updateTypeGroup() {
