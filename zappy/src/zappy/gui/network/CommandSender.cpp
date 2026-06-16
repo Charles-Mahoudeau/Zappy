@@ -7,9 +7,11 @@
 
 #include "zappy/gui/network/CommandSender.hpp"
 
+#include <cstdint>
 #include <format>
 
 #include "zappy/shared/exception/InvalidArgument.hpp"
+#include "zappy/shared/network/BufferedClient.hpp"
 
 namespace zappy::gui::network {
 
