@@ -52,6 +52,8 @@ void Poller::add(const int fileDescriptor, const std::byte pollEvents, Handler c
 
 void Poller::remove(const IFileDescriptor& fileDescriptor) { _toRemove.push_back(fileDescriptor.fd()); }
 
+void Poller::remove(const int fd) { _toRemove.push_back(fd); }
+
 std::size_t Poller::size() const { return _entries.size(); }
 
 void Poller::poll(const std::int32_t timeout) {

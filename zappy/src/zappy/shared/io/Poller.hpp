@@ -55,6 +55,10 @@ class Poller {
     /// @param fileDescriptor The file descriptor to remove.
     void remove(const IFileDescriptor& fileDescriptor);
 
+    /// @brief Removes a file descriptor from the poller.
+    /// @param fd The file descriptor to remove.
+    void remove(int fd);
+
     /// @brief Retrieves the number of file descriptors currently in the poller.
     /// @return The number of file descriptors.
     [[nodiscard]] std::size_t size() const;
