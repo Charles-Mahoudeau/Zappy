@@ -74,13 +74,13 @@ class Player : public IEntity {
     /// @return The player's direction.
     [[nodiscard]] Direction direction() const;
 
-    /// @brief Turn the player to the right.
-    /// @return The new direction.
-    Direction turnRight();
-
     /// @brief Turn the player to the left.
     /// @return The new direction.
     Direction turnLeft();
+
+    /// @brief Turn the player to the right.
+    /// @return The new direction.
+    Direction turnRight();
 
     /// @brief Get the player's inventory.
     /// @return The player's inventory.

@@ -49,12 +49,12 @@ std::expected<std::uint8_t, std::string> Player::levelUp() {
 
 Player::Direction Player::direction() const { return _direction; }
 
-Player::Direction Player::turnRight() {
+Player::Direction Player::turnLeft() {
     _direction = std::get<0>(turnMap().at(_direction));
     return _direction;
 }
 
-Player::Direction Player::turnLeft() {
+Player::Direction Player::turnRight() {
     _direction = std::get<1>(turnMap().at(_direction));
     return _direction;
 }
