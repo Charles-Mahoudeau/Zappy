@@ -1,6 +1,6 @@
 /*
 ** EPITECH PROJECT, 2026
-** projectMirror
+** Zappy
 ** File description:
 ** Texture
 */
