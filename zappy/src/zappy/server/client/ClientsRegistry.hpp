@@ -32,13 +32,14 @@ class ClientsRegistry {
 
     void update();
 
-    void remove(const Client* clientPtr);
+    void toRemove(const Client* clientPtr);
 
     auto viewAll();
 
     auto viewAll(Client::Type type);
 
   private:
+    std::vector<const Client*> _toRemove;
     std::vector<std::unique_ptr<Client>> _clients;
     std::unordered_map<Client::Type, std::vector<const Client*>> _clientsPerType = {
         {Client::Type::kUNKNOWN, {}},

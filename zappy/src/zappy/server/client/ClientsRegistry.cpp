@@ -24,31 +24,29 @@ void ClientsRegistry::makeNewClient(net::SocketRegistry& socketRegistery, networ
     this->_clients.emplace_back(std::move(newClient));
 }
 
-void ClientsRegistry::remove(const Client* clientPtr) {
+void ClientsRegistry::toRemove(const Client* clientPtr) {
     if (clientPtr == nullptr) {
         return;
     }
-
-    std::vector<const Client*>& typedList = this->_clientsPerType.at(clientPtr->type());
-    std::erase_if(typedList, [&clientPtr](const Client* client) { return client == clientPtr; });
-    std::erase_if(this->_clients,
-                  [&clientPtr](const std::unique_ptr<Client>& client) { return client.get() == clientPtr; });
+    this->_toRemove.emplace_back(clientPtr);
 }
 
 void ClientsRegistry::update() {
-    std::vector<Client*> toRemove;
+    this->updateTypeGroup();
 
     for (const auto& client : this->_clients) {
         if (!client->update()) {
-            toRemove.push_back(client.get());
+            this->_toRemove.emplace_back(client.get());
             continue;
         }
     }
 
-    for (const Client* client : toRemove) {
-        this->remove(client);
+    for (const Client* clientPtr : this->_toRemove) {
+        std::vector<const Client*>& typedList = this->_clientsPerType.at(clientPtr->type());
+        std::erase_if(typedList, [&clientPtr](const Client* client) { return client == clientPtr; });
+        std::erase_if(this->_clients,
+                      [&clientPtr](const std::unique_ptr<Client>& client) { return client.get() == clientPtr; });
     }
-    this->updateTypeGroup();
 }
 
 void ClientsRegistry::updateTypeGroup() {
