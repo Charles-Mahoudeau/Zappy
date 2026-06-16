@@ -14,6 +14,8 @@ add_library(zappy_gui_objects OBJECT
         network/ProtocolParser.hpp
         render/Camera.cpp
         render/Camera.hpp
+        render/objects/Model.cpp
+        render/objects/Model.hpp
 )
 target_include_directories(zappy_gui_objects PUBLIC
         ${CMAKE_SOURCE_DIR}/src
@@ -32,4 +34,10 @@ add_executable(zappy_gui
 target_link_libraries(zappy_gui PRIVATE
         zappy_shared
         zappy_gui_objects
+)
+
+# Copy GUI assets next to the executable so they ship with the binary
+add_custom_command(TARGET zappy_gui POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+                ${CMAKE_CURRENT_SOURCE_DIR}/assets $<TARGET_FILE_DIR:zappy_gui>/assets
 )
