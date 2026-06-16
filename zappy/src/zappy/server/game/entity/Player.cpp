@@ -18,6 +18,10 @@
 
 namespace zappy::server::game::entity {
 void Player::update() {
+    if (!alive()) {
+        return;
+    }
+    --_lifetimeLeft;
     if (_freezeTime > 0) {
         --_freezeTime;
     }
