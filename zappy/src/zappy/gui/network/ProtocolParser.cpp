@@ -12,12 +12,12 @@
 #include <string_view>
 
 #include "zappy/gui/game/GameState.hpp"
-#include "zappy/gui/network/HandlerFactory.hpp"
+#include "zappy/gui/network/HandlerRegistry.hpp"
 #include "zappy/shared/exception/ParseException.hpp"
 
 namespace zappy::gui::network {
 
-ProtocolParser::ProtocolParser(game::GameState& state) : _state{state}, _handlers{HandlerFactory::create(state)} {}
+ProtocolParser::ProtocolParser(game::GameState& state) : _state{state}, _handlers{HandlerRegistry::create(state)} {}
 
 void ProtocolParser::dispatch(std::string_view line) {
     std::istringstream ss{std::string{line}};

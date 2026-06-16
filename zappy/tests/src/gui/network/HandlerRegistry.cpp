@@ -2,10 +2,10 @@
 ** EPITECH PROJECT, 2026
 ** zappy
 ** File description:
-** HandlerFactory tests
+** HandlerRegistry tests
 */
 
-#include "zappy/gui/network/HandlerFactory.hpp"
+#include "zappy/gui/network/HandlerRegistry.hpp"
 
 #include <gtest/gtest.h>
 
@@ -18,14 +18,14 @@
 using zappy::exception::ParseException;
 using zappy::gui::game::GameState;
 using zappy::gui::game::Orientation;
-using zappy::gui::network::HandlerFactory;
+using zappy::gui::network::HandlerRegistry;
 using zappy::gui::network::HandlerMap;
 
 namespace {
-class HandlerFactoryTest : public ::testing::Test {
+class HandlerRegistryTest : public ::testing::Test {
   public:
     GameState state;
-    HandlerMap handlers = HandlerFactory::create(state);
+    HandlerMap handlers = HandlerRegistry::create(state);
 
   protected:
     void dispatch(const std::string& command, const std::string& args) {
@@ -34,32 +34,32 @@ class HandlerFactoryTest : public ::testing::Test {
     }
 };
 
-TEST_F(HandlerFactoryTest, ContainsAllExpectedCommands) {
+TEST_F(HandlerRegistryTest, ContainsAllExpectedCommands) {
     for (const auto& cmd : {"msz", "bct", "tna", "pnw", "ppo", "plv", "pin", "pex", "pbc", "pic", "pie", "pfk",
                             "pdr", "pgt", "pdi", "enw", "ebo", "edi", "sgt", "sst", "seg", "smg", "suc", "sbp"}) {
         EXPECT_TRUE(handlers.count(cmd) == 1) << "missing handler: " << cmd;
     }
 }
 
-TEST_F(HandlerFactoryTest, MszSetsMapSize) {
+TEST_F(HandlerRegistryTest, MszSetsMapSize) {
     dispatch("msz", "10 5");
     EXPECT_EQ(state.width(), 10U);
     EXPECT_EQ(state.height(), 5U);
 }
 
-TEST_F(HandlerFactoryTest, BctSetsTileResources) {
+TEST_F(HandlerRegistryTest, BctSetsTileResources) {
     dispatch("msz", "5 5");
     dispatch("bct", "2 3 1 0 0 0 0 0 0");
     EXPECT_EQ(state.tile(2, 3).food, 1U);
 }
 
-TEST_F(HandlerFactoryTest, TnaAddsTeam) {
+TEST_F(HandlerRegistryTest, TnaAddsTeam) {
     dispatch("tna", "TeamA");
     ASSERT_EQ(state.teams().size(), 1U);
     EXPECT_EQ(state.teams().at(0), "TeamA");
 }
 
-TEST_F(HandlerFactoryTest, PnwAddsPlayer) {
+TEST_F(HandlerRegistryTest, PnwAddsPlayer) {
     dispatch("msz", "10 10");
     dispatch("pnw", "#1 3 4 1 2 TeamA");
     ASSERT_TRUE(state.players().count(1));
@@ -71,7 +71,7 @@ TEST_F(HandlerFactoryTest, PnwAddsPlayer) {
     EXPECT_EQ(p.team, "TeamA");
 }
 
-TEST_F(HandlerFactoryTest, PpoUpdatesPlayerPosition) {
+TEST_F(HandlerRegistryTest, PpoUpdatesPlayerPosition) {
     dispatch("msz", "10 10");
     dispatch("pnw", "#1 0 0 1 1 TeamA");
     dispatch("ppo", "#1 5 6 3");
@@ -81,35 +81,35 @@ TEST_F(HandlerFactoryTest, PpoUpdatesPlayerPosition) {
     EXPECT_EQ(p.orientation, Orientation::South);
 }
 
-TEST_F(HandlerFactoryTest, PlvUpdatesPlayerLevel) {
+TEST_F(HandlerRegistryTest, PlvUpdatesPlayerLevel) {
     dispatch("msz", "10 10");
     dispatch("pnw", "#1 0 0 1 1 TeamA");
     dispatch("plv", "#1 5");
     EXPECT_EQ(state.players().at(1).level, 5U);
 }
 
-TEST_F(HandlerFactoryTest, PinUpdatesPlayerInventory) {
+TEST_F(HandlerRegistryTest, PinUpdatesPlayerInventory) {
     dispatch("msz", "10 10");
     dispatch("pnw", "#2 0 0 1 1 TeamB");
     dispatch("pin", "#2 0 0 3 0 0 0 0 0 0");
     EXPECT_EQ(state.players().at(2).inventory.food, 3U);
 }
 
-TEST_F(HandlerFactoryTest, PexKeepsPlayerAlive) {
+TEST_F(HandlerRegistryTest, PexKeepsPlayerAlive) {
     dispatch("msz", "10 10");
     dispatch("pnw", "#3 0 0 1 1 TeamA");
     dispatch("pex", "#3");
     EXPECT_TRUE(state.players().count(3));
 }
 
-TEST_F(HandlerFactoryTest, PdiRemovesPlayer) {
+TEST_F(HandlerRegistryTest, PdiRemovesPlayer) {
     dispatch("msz", "10 10");
     dispatch("pnw", "#4 0 0 1 1 TeamA");
     dispatch("pdi", "#4");
     EXPECT_FALSE(state.players().count(4));
 }
 
-TEST_F(HandlerFactoryTest, PbcAddsBroadcast) {
+TEST_F(HandlerRegistryTest, PbcAddsBroadcast) {
     dispatch("msz", "10 10");
     dispatch("pnw", "#1 0 0 1 1 TeamA");
     dispatch("pbc", "#1 hello world");
@@ -117,7 +117,7 @@ TEST_F(HandlerFactoryTest, PbcAddsBroadcast) {
     EXPECT_EQ(state.broadcasts().at(0), "hello world");
 }
 
-TEST_F(HandlerFactoryTest, PicSetsPlayersIncanting) {
+TEST_F(HandlerRegistryTest, PicSetsPlayersIncanting) {
     dispatch("msz", "10 10");
     dispatch("pnw", "#1 2 2 1 1 TeamA");
     dispatch("pnw", "#2 2 2 1 1 TeamA");
@@ -126,7 +126,7 @@ TEST_F(HandlerFactoryTest, PicSetsPlayersIncanting) {
     EXPECT_TRUE(state.players().at(2).isIncanting);
 }
 
-TEST_F(HandlerFactoryTest, PieClearsIncantingAtTile) {
+TEST_F(HandlerRegistryTest, PieClearsIncantingAtTile) {
     dispatch("msz", "10 10");
     dispatch("pnw", "#1 2 2 1 1 TeamA");
     dispatch("pic", "2 2 2 #1");
@@ -134,7 +134,7 @@ TEST_F(HandlerFactoryTest, PieClearsIncantingAtTile) {
     EXPECT_FALSE(state.players().at(1).isIncanting);
 }
 
-TEST_F(HandlerFactoryTest, EnwAddsEgg) {
+TEST_F(HandlerRegistryTest, EnwAddsEgg) {
     dispatch("enw", "#10 #1 3 4");
     ASSERT_TRUE(state.eggs().count(10));
     const auto& e = state.eggs().at(10);
@@ -143,49 +143,49 @@ TEST_F(HandlerFactoryTest, EnwAddsEgg) {
     EXPECT_EQ(e.y, 4U);
 }
 
-TEST_F(HandlerFactoryTest, EboRemovesEgg) {
+TEST_F(HandlerRegistryTest, EboRemovesEgg) {
     dispatch("enw", "#10 #1 3 4");
     dispatch("ebo", "#10");
     EXPECT_FALSE(state.eggs().count(10));
 }
 
-TEST_F(HandlerFactoryTest, EdiRemovesEgg) {
+TEST_F(HandlerRegistryTest, EdiRemovesEgg) {
     dispatch("enw", "#11 #1 0 0");
     dispatch("edi", "#11");
     EXPECT_FALSE(state.eggs().count(11));
 }
 
-TEST_F(HandlerFactoryTest, SgtSetsTimeUnit) {
+TEST_F(HandlerRegistryTest, SgtSetsTimeUnit) {
     dispatch("sgt", "100");
     EXPECT_EQ(state.timeUnit(), 100U);
 }
 
-TEST_F(HandlerFactoryTest, SstSetsTimeUnit) {
+TEST_F(HandlerRegistryTest, SstSetsTimeUnit) {
     dispatch("sst", "200");
     EXPECT_EQ(state.timeUnit(), 200U);
 }
 
-TEST_F(HandlerFactoryTest, SegSetsWinner) {
+TEST_F(HandlerRegistryTest, SegSetsWinner) {
     dispatch("seg", "TeamA");
     ASSERT_TRUE(state.isGameOver());
     EXPECT_EQ(state.winner().value_or(""), "TeamA");
 }
 
-TEST_F(HandlerFactoryTest, SmgAddsBroadcast) {
+TEST_F(HandlerRegistryTest, SmgAddsBroadcast) {
     dispatch("smg", "server info message");
     ASSERT_EQ(state.broadcasts().size(), 1U);
     EXPECT_EQ(state.broadcasts().at(0), "server info message");
 }
 
-TEST_F(HandlerFactoryTest, SucDoesNothing) { EXPECT_NO_THROW(dispatch("suc", "")); }
+TEST_F(HandlerRegistryTest, SucDoesNothing) { EXPECT_NO_THROW(dispatch("suc", "")); }
 
-TEST_F(HandlerFactoryTest, SbpDoesNothing) { EXPECT_NO_THROW(dispatch("sbp", "")); }
+TEST_F(HandlerRegistryTest, SbpDoesNothing) { EXPECT_NO_THROW(dispatch("sbp", "")); }
 
-TEST_F(HandlerFactoryTest, MszMalformedThrows) { EXPECT_THROW(dispatch("msz", "10"), ParseException); }
+TEST_F(HandlerRegistryTest, MszMalformedThrows) { EXPECT_THROW(dispatch("msz", "10"), ParseException); }
 
-TEST_F(HandlerFactoryTest, PnwBadIdThrows) { EXPECT_THROW(dispatch("pnw", "1 0 0 1 1 TeamA"), ParseException); }
+TEST_F(HandlerRegistryTest, PnwBadIdThrows) { EXPECT_THROW(dispatch("pnw", "1 0 0 1 1 TeamA"), ParseException); }
 
-TEST_F(HandlerFactoryTest, PpoInvalidOrientationThrows) {
+TEST_F(HandlerRegistryTest, PpoInvalidOrientationThrows) {
     dispatch("msz", "10 10");
     dispatch("pnw", "#1 0 0 1 1 TeamA");
     EXPECT_THROW(dispatch("ppo", "#1 0 0 9"), ParseException);

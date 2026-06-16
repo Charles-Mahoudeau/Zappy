@@ -2,10 +2,10 @@
 ** EPITECH PROJECT, 2026
 ** zappy
 ** File description:
-** HandlerFactory
+** HandlerRegistry
 */
 
-#include "zappy/gui/network/HandlerFactory.hpp"
+#include "zappy/gui/network/HandlerRegistry.hpp"
 
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/network/handlers/BctHandler.hpp"
@@ -35,7 +35,7 @@
 
 namespace zappy::gui::network {
 
-HandlerMap HandlerFactory::create(game::GameState& state) {
+HandlerMap HandlerRegistry::create(game::GameState& state) {
     return {
         {"msz", handlers::MszHandler{state}}, {"bct", handlers::BctHandler{state}},
         {"tna", handlers::TnaHandler{state}}, {"pnw", handlers::PnwHandler{state}},

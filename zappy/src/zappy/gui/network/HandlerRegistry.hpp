@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2026
 ** zappy
 ** File description:
-** HandlerFactory
+** HandlerRegistry
 */
 
 #pragma once
@@ -18,9 +18,9 @@ namespace zappy::gui::network {
 
 using HandlerMap = std::map<std::string, std::function<void(std::istringstream&)>, std::less<>>;
 
-class HandlerFactory {
+class HandlerRegistry {
   public:
-    HandlerFactory() = delete;
+    HandlerRegistry() = delete;
 
     [[nodiscard]] static HandlerMap create(game::GameState& state);
 };

@@ -11,7 +11,7 @@
 #include <string_view>
 
 #include "zappy/gui/game/GameState.hpp"
-#include "zappy/gui/network/HandlerFactory.hpp"
+#include "zappy/gui/network/HandlerRegistry.hpp"
 
 namespace zappy::gui::network {
 
