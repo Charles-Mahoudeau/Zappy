@@ -25,10 +25,10 @@ class CommandSender {
     CommandSender(CommandSender&&) noexcept = default;
     CommandSender& operator=(CommandSender&&) noexcept = default;
 
-    void requestPlayer(std::uint32_t id);
-    void requestTile(std::uint32_t x, std::uint32_t y);
-    void setTimeUnit(int t);
-    void requestInitialState();
+    void requestPlayer(std::uint32_t id) const;
+    void requestTile(std::uint32_t x, std::uint32_t y) const;
+    void setTimeUnit(int t) const;
+    void requestInitialState() const;
 
   private:
     std::reference_wrapper<zappy::network::BufferedClient> _buffer;
