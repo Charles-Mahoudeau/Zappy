@@ -1,10 +1,10 @@
 
-#include <gtest/gtest.h>
 #include <sys/socket.h>
 #include <unistd.h>
 
 #include <array>
-#include <stdexcept>
+
+#include "zappy/shared/exception/Exception.hpp"
 
 struct SocketPair {
     int local = -1;
@@ -16,7 +16,7 @@ struct SocketPair {
             local = fds.at(0);
             peer = fds.at(1);
         } else {
-            throw std::runtime_error("socketpair creation failed");
+            throw zappy::exception::Exception("socketpair creation failed");
         }
     }
     ~SocketPair() {
