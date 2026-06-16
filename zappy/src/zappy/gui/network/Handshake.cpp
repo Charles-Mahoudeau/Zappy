@@ -40,14 +40,15 @@ void Handshake::run() {
     _buffer.get().send("GRAPHIC\n");
     _sender.get().requestInitialState();
 
+    const auto stateDeadline = std::chrono::steady_clock::now() + kTimeout;
     while (!_state.get().isReady()) {
-        if (std::chrono::steady_clock::now() > deadline) {
-            throw exception::InvalidState{"handshake timeout: initial state not received"};
-        }
-        _buffer.get().poll();
         while (_buffer.get().hasMessages()) {
             _parser.get().dispatch(_buffer.get().popMessage());
         }
+        if (std::chrono::steady_clock::now() > stateDeadline) {
+            throw exception::InvalidState{"handshake timeout: initial state not received"};
+        }
+        _buffer.get().poll();
     }
 }
 
