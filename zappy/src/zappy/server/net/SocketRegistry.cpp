@@ -25,7 +25,7 @@ void SocketRegistry::insert(zappy::network::socket::Client& socket) {
 }
 
 std::expected<std::reference_wrapper<network::BufferedClient>, std::string> SocketRegistry::getFromAddress(
-    network::Address& addr) {
+    const network::Address& addr) {
     for (auto& socket : this->_sockets) {
         if (socket == addr) {
             return {socket};

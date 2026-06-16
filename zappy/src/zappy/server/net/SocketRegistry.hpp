@@ -34,7 +34,8 @@ class SocketRegistry {
 
     void clear();
 
-    std::expected<std::reference_wrapper<network::BufferedClient>, std::string> getFromAddress(network::Address& addr);
+    std::expected<std::reference_wrapper<network::BufferedClient>, std::string> getFromAddress(
+        const network::Address& addr);
 
   private:
     std::vector<zappy::network::BufferedClient> _sockets;

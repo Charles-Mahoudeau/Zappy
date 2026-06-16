@@ -95,7 +95,7 @@ TEST_F(ServerClientTest, AddRequestRespectsMaxRequestCap) {
     Client client{socketRegistry, addr};
 
     for (int i = 0; i < 12; ++i) {
-        client.addRequest(std::format("req", std::to_string(i)));
+        client.addRequest(std::format("req{}", std::to_string(i)));
     }
 
     int count = 0;
