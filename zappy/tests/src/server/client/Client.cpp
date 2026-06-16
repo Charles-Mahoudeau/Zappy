@@ -95,7 +95,7 @@ TEST_F(ServerClientTest, AddRequestRespectsMaxRequestCap) {
     Client client{socketRegistry, addr};
 
     for (int i = 0; i < 12; ++i) {
-        client.addRequest(std::format("req {}", std::to_string(i)));
+        client.addRequest(std::format("req", std::to_string(i)));
     }
 
     int count = 0;
@@ -168,8 +168,7 @@ TEST_F(ServerClientTest, UpdateReturnsTrueWhenSocketRegistered) {
     socketRegistry.getFromAddress(addr).value().get().poll();
     EXPECT_TRUE(client.update());
 
-    auto request = client.getNextRequest();
-    if (request.has_value()) {
+    if (auto request = client.getNextRequest(); request.has_value()) {
         EXPECT_EQ(*request, "ping");
     } else {
         FAIL() << "Expect request but got nothing";

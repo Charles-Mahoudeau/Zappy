@@ -7,7 +7,6 @@
 #include "zappy/server/client/ClientsRegistry.hpp"
 
 #include <gtest/gtest.h>
-#include <unistd.h>
 
 #include <iterator>
 #include <ranges>
@@ -20,6 +19,8 @@
 
 using namespace zappy::server;
 using namespace zappy::server::client;
+
+namespace {
 
 class ClientsRegistryTest : public ::testing::Test {
   public:
@@ -34,6 +35,8 @@ class ClientsRegistryTest : public ::testing::Test {
         socketRegistry.insert(sock);
     }
 };
+
+}  // namespace
 
 // ── makeNewClient ────────────────────────────────────────────────────────────
 
@@ -70,7 +73,7 @@ TEST_F(ClientsRegistryTest, RemoveClientDecreasesSize) {
 
     EXPECT_EQ(std::ranges::distance(registry.viewAll()), 1);
     EXPECT_EQ(std::ranges::distance(registry.viewAll(Client::Type::kUNKNOWN)), 1);
-    Client* ptr = *registry.viewAll().begin();
+    const Client* ptr = *registry.viewAll().begin();
     registry.remove(ptr);
 
     EXPECT_EQ(std::ranges::distance(registry.viewAll()), 0);
@@ -81,7 +84,7 @@ TEST_F(ClientsRegistryTest, RemoveOneOfManyLeavesOthers) {
     registry.makeNewClient(socketRegistry, addr);
     registry.makeNewClient(socketRegistry, addr);
 
-    Client* ptr = *registry.viewAll().begin();
+    const Client* ptr = *registry.viewAll().begin();
     registry.remove(ptr);
 
     EXPECT_EQ(std::ranges::distance(registry.viewAll()), 1);
@@ -90,7 +93,7 @@ TEST_F(ClientsRegistryTest, RemoveOneOfManyLeavesOthers) {
 TEST_F(ClientsRegistryTest, RemoveUnknownPtrDoesNothing) {
     registry.makeNewClient(socketRegistry, addr);
 
-    Client fake{socketRegistry, addr};
+    const Client fake{socketRegistry, addr};
     registry.remove(&fake);  // not owned by registry
 
     EXPECT_EQ(std::ranges::distance(registry.viewAll()), 1);

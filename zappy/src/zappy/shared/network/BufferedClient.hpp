@@ -28,7 +28,7 @@ class BufferedClient {
     BufferedClient(BufferedClient&&) noexcept = default;
     BufferedClient& operator=(BufferedClient&&) noexcept = default;
 
-    bool operator==(Address& address) const { return this->_client == address; }
+    bool operator==(const Address& address) const { return this->_client == address; }
 
     void connect(const Address& address) const;
 
