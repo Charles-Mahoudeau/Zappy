@@ -1,18 +1,26 @@
 add_library(zappy_server_objects OBJECT
-	Core.hpp
-	Core.cpp
-	CliParser.hpp
-	CliParser.cpp
-	game/EntityDatabase.cpp
-	game/EntityDatabase.hpp
-	game/IEntity.hpp
-	net/SocketRegistry.hpp
-	net/SocketRegistry.cpp
-	client/Client.hpp
-	client/Client.cpp
-	client/ClientsRegistry.hpp
-	client/ClientsRegistry.cpp
-
+        Core.hpp
+        Core.cpp
+        CliParser.hpp
+        CliParser.cpp
+        game/EntityDatabase.cpp
+        game/EntityDatabase.hpp
+        game/IEntity.hpp
+        game/ResourceType.hpp
+        game/Inventory.cpp
+        game/Inventory.hpp
+        game/entity/Player.cpp
+        game/entity/Player.hpp
+        game/entity/Egg.cpp
+        game/entity/Egg.hpp
+        game/entity/Resource.cpp
+        game/entity/Resource.hpp
+        net/SocketRegistry.hpp
+        net/SocketRegistry.cpp
+        client/Client.hpp
+        client/Client.cpp
+        client/ClientsRegistry.hpp
+        client/ClientsRegistry.cpp
 )
 
 target_include_directories(zappy_server_objects PUBLIC

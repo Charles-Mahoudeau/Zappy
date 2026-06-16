@@ -10,6 +10,9 @@ add_executable(unit_tests
 		src/server/client/ClientsRegistry.cpp
 		src/server/client/SocketPair.hpp
         src/server/net/SocketRegistry.cpp
+        src/server/game/entity/Egg.cpp
+        src/server/game/entity/Player.cpp
+        src/server/game/entity/Resource.cpp
         src/shared/network/BufferedClient.cpp
         src/gui/game/GameState.cpp
         src/gui/network/HandlerRegistry.cpp
