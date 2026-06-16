@@ -8,7 +8,8 @@ add_executable(unit_tests
         src/server/game/EntityDatabase.cpp
         src/shared/network/BufferedClient.cpp
         src/gui/game/GameState.cpp
-        src/shared/io/Poller.cpp
+        src/gui/network/HandlerRegistry.cpp
+        src/gui/network/ProtocolParser.cpp
 )
 target_include_directories(unit_tests PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
