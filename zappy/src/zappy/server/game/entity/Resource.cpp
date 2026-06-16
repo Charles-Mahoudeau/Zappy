@@ -12,7 +12,9 @@
 namespace zappy::server::game::entity {
 Resource::Resource(const ResourceType type) : _type{type} {}
 
-void Resource::update() {}
+void Resource::update() {
+    // Empty
+}
 
 ResourceType Resource::type() const { return _type; }
 }  // namespace zappy::server::game::entity
