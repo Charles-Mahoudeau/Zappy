@@ -105,6 +105,10 @@ void Model::updateAnimation() {
         return;
     }
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-avoid-unchecked-container-access)
+    if (_currentFrame < 0 || _currentFrame >= animations[_currentAnim].keyframeCount) {
+        _currentFrame = 0;
+    }
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-avoid-unchecked-container-access)
     UpdateModelAnimation(_model, animations[_currentAnim], static_cast<float>(_currentFrame));
 }
 
