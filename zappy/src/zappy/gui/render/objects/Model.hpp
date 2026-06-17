@@ -16,6 +16,20 @@
 namespace zappy::gui::render {
 class Model {
   public:
+    enum class MaterialMapIndex {
+        MATERIAL_MAP_ALBEDO = 0,     // Albedo material (alias: MATERIAL_MAP_DIFFUSE)
+        MATERIAL_MAP_METALNESS = 1,  // Metalness material (alias: MATERIAL_MAP_SPECULAR)
+        MATERIAL_MAP_NORMAL,         // Normal material
+        MATERIAL_MAP_ROUGHNESS,      // Roughness material
+        MATERIAL_MAP_OCCLUSION,      // Ambient occlusion material
+        MATERIAL_MAP_EMISSION,       // Emission material
+        MATERIAL_MAP_HEIGHT,         // Heightmap material
+        MATERIAL_MAP_CUBEMAP,        // Cubemap material (NOTE: Uses GL_TEXTURE_CUBE_MAP)
+        MATERIAL_MAP_IRRADIANCE,     // Irradiance material (NOTE: Uses GL_TEXTURE_CUBE_MAP)
+        MATERIAL_MAP_PREFILTER,      // Prefilter material (NOTE: Uses GL_TEXTURE_CUBE_MAP)
+        MATERIAL_MAP_BRDF            // Brdf material
+    };
+
     Model(std::string_view path);
     Model(std::string_view path, std::string_view animationPath);
     Model(const Model&) = delete;
@@ -38,9 +52,12 @@ class Model {
     void subtractAnimationCount() { --_animCount; }
     void resetAnimationCount() { _animCount = 0; }
 
+    void setTexture(int materialIndex, MaterialMapIndex mapIndex, ::Texture texture);
+    void setMeshTexture(int meshIndex, MaterialMapIndex mapIndex, ::Texture texture);
+
   protected:
   private:
-    ::Model _model;
+    ::Model _model{};
     ModelAnimation* _animations;
     int _animCount;
     int _currentAnim;

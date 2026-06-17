@@ -15,6 +15,7 @@
 #include "zappy/gui/display/Window.hpp"
 #include "zappy/gui/render/Camera.hpp"
 #include "zappy/gui/render/objects/Model.hpp"
+#include "zappy/gui/render/objects/Texture.hpp"
 
 int main(const int argc, char** argv) {
     const std::span argsView{argv, static_cast<std::size_t>(argc)};
@@ -27,7 +28,9 @@ int main(const int argc, char** argv) {
                                       Vector3{.x = 0, .y = 1, .z = 0}, 45.0F,
                                       zappy::gui::render::CameraProjection::CAMERA_PERSPECTIVE};
     camera.setCameraMode(zappy::gui::render::CameraMode::CAMERA_FREE);
-    const zappy::gui::render::Model model{"assets/models/burpy/source/burpy.glb"};
+    zappy::gui::render::Model model{"assets/models/burpy/source/burpy.glb"};
+    const zappy::gui::render::Texture texture{"assets/models/burpy/textures/burpy.png", true};
+    model.setMeshTexture(0, zappy::gui::render::Model::MaterialMapIndex::MATERIAL_MAP_ALBEDO, texture);
 
     while (!window.shouldClose()) {
         window.beginFrame();

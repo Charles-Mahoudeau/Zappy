@@ -15,7 +15,7 @@ namespace zappy::gui::render {
 
 class Texture {
   public:
-    explicit Texture(const char* path);
+    explicit Texture(const char* path, bool flipVertical = false);
     ~Texture();
 
     Texture(const Texture&) = delete;
@@ -29,8 +29,12 @@ class Texture {
     [[nodiscard]] int height() const;
     [[nodiscard]] bool isValid() const;
 
+    operator Texture2D&() { return _texture; }
+    operator const Texture2D&() const { return _texture; }
+
     void reload(const char* path);
     void swap(Texture& other) noexcept;
+    static Texture2D loadTexture(const char* path, bool flipVertical = false);
 
   private:
     Texture2D _texture{};
