@@ -7,8 +7,10 @@
 
 #include "zappy/gui/GuiCliParser.hpp"
 
+#include <cstdint>
 #include <exception>
 #include <limits>
+#include <span>
 #include <string>
 #include <string_view>
 
@@ -17,12 +19,18 @@
 namespace zappy::gui {
 
 GuiCliParser::GuiCliParser(std::span<const std::string_view> args) {
-    for (std::size_t i = 0; i + 1 < args.size(); ++i) {
-        if (args[i] == "-h") {
-            _host = args[i + 1];
-        } else if (args[i] == "-p") {
+    auto it = args.begin();
+    while (it != args.end()) {
+        const std::string_view flag = *it;
+        ++it;
+        if (it == args.end()) {
+            break;
+        }
+        if (flag == "-h") {
+            _host = *it;
+        } else if (flag == "-p") {
             try {
-                const unsigned long parsed = std::stoul(std::string{args[i + 1]});
+                const unsigned long parsed = std::stoul(std::string{*it});
                 if (parsed > std::numeric_limits<std::uint16_t>::max()) {
                     throw exception::InvalidArgument{"port out of range"};
                 }
@@ -33,6 +41,7 @@ GuiCliParser::GuiCliParser(std::span<const std::string_view> args) {
                 throw exception::InvalidArgument{"invalid port value"};
             }
         }
+        ++it;
     }
     if (_host.empty()) {
         throw exception::InvalidArgument{"missing required argument: -h machine"};

@@ -9,7 +9,11 @@
 
 #include <raylib.h>
 
+#include <cstddef>
+#include <string>
+
 #include "zappy/gui/GuiCliParser.hpp"
+#include "zappy/gui/render/Camera.hpp"
 #include "zappy/shared/exception/InvalidState.hpp"
 
 namespace zappy::gui {
