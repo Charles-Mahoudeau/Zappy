@@ -10,9 +10,15 @@
 #include <raylib.h>
 
 #include <cstdint>
+#include <string>
 
 namespace zappy::gui::render {
-Texture::Texture(const char* path) { _texture = LoadTexture(path); }
+Texture::Texture(std::string_view path) {
+    if (!isValid()) {
+        throw TextureException{"Failed to load texture from path: " + std::string{path}};
+    }
+    _texture = LoadTexture(path.data());
+}
 
 Texture::~Texture() { UnloadTexture(_texture); }
 
@@ -35,9 +41,9 @@ int Texture::height() const { return _texture.height; }
 
 bool Texture::isValid() const { return IsTextureValid(_texture); }
 
-void Texture::reload(const char* path) {
+void Texture::reload(std::string_view path) {
     UnloadTexture(_texture);
-    _texture = LoadTexture(path);
+    _texture = LoadTexture(path.data());
 }
 
 void Texture::swap(Texture& other) noexcept {

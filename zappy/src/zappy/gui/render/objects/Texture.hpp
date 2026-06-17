@@ -10,12 +10,14 @@
 #include <raylib.h>
 
 #include <cstdint>
+#include <stdexcept>
+#include <string>
 
 namespace zappy::gui::render {
 
 class Texture {
   public:
-    explicit Texture(const char* path);
+    explicit Texture(std::string_view path);
     ~Texture();
 
     Texture(const Texture&) = delete;
@@ -29,10 +31,15 @@ class Texture {
     [[nodiscard]] int height() const;
     [[nodiscard]] bool isValid() const;
 
-    void reload(const char* path);
+    void reload(std::string_view path);
     void swap(Texture& other) noexcept;
 
   private:
     Texture2D _texture{};
+};
+
+class TextureException : public std::runtime_error {
+  public:
+    explicit TextureException(const std::string& message) : std::runtime_error(message) {}
 };
 }  // namespace zappy::gui::render
