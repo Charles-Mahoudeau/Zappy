@@ -8,6 +8,10 @@ add_library(zappy_gui_objects OBJECT
         display/Window.hpp
         game/GameState.cpp
         game/GameState.hpp
+        GUI.cpp
+        GUI.hpp
+        GuiCliParser.cpp
+        GuiCliParser.hpp
         network/CommandSender.cpp
         network/CommandSender.hpp
         network/Handshake.cpp
