@@ -18,8 +18,8 @@ add_library(zappy_gui_objects OBJECT
         network/ProtocolParser.hpp
         render/Camera.cpp
         render/Camera.hpp
-        render/Texture.cpp
-        render/Texture.hpp
+        render/objects/Texture.cpp
+        render/objects/Texture.hpp
         render/objects/Model.cpp
         render/objects/Model.hpp
 )
