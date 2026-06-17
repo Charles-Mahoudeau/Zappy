@@ -32,9 +32,9 @@ CliParser::CliParser(std::span<std::string_view> argv) {
 const CliParser::CliParameters& CliParser::parameters() { return this->_parameters; }
 
 void CliParser::parseArguments(std::span<std::string_view> argv) {
-    auto it = argv.cbegin();
+    auto it = std::cbegin(argv);
 
-    while (it != argv.cend()) {
+    while (it != std::cend(argv)) {
         std::string_view param = *it;
 
         if (!param.starts_with("-")) {
@@ -43,7 +43,7 @@ void CliParser::parseArguments(std::span<std::string_view> argv) {
         ++it;
 
         std::vector<std::string_view> flagParameters;
-        while (it != argv.cend() && !it->starts_with("-")) {
+        while (it != std::cend(argv) && !it->starts_with("-")) {
             flagParameters.emplace_back(*it);
             ++it;
         }
