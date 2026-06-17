@@ -21,9 +21,12 @@ def _load_policy(device, obs_size, n_actions):
         raise SystemExit("No trained policy found (ppo_policy.pth)")
 
     actor_net = nn.Sequential(
-        nn.LazyLinear(256, device=device), nn.Tanh(),
-        nn.LazyLinear(256, device=device), nn.Tanh(),
-        nn.LazyLinear(256, device=device), nn.Tanh(),
+        nn.LazyLinear(256, device=device),
+        nn.Tanh(),
+        nn.LazyLinear(256, device=device),
+        nn.Tanh(),
+        nn.LazyLinear(256, device=device),
+        nn.Tanh(),
         nn.LazyLinear(n_actions, device=device),
     )
     policy = TensorDictModule(actor_net, in_keys=["observation"], out_keys=["logits"])

@@ -204,7 +204,11 @@ class ZappyClient:
 
     def inventory(self) -> Dict[str, int]:
         resp = self._command("Inventory")
-        return parse_inventory(resp) if resp and resp.startswith("[") else {r: 0 for r in RESOURCES}
+        return (
+            parse_inventory(resp)
+            if resp and resp.startswith("[")
+            else {r: 0 for r in RESOURCES}
+        )
 
     def connect_nbr(self) -> int:
         resp = self._command("Connect_nbr")

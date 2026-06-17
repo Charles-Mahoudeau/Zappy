@@ -618,7 +618,8 @@ class ZappyEnv(EnvBase):
         # Food is never required for elevation, so skip it.
         has_res = all(
             (tile0.count(r) if tile0 else 0) >= req.get(r, 0)
-            for r in RESOURCES if r != "food"
+            for r in RESOURCES
+            if r != "food"
         )
         has_plrs = (tile0.count("player") if tile0 else 0) >= req.get("players", 1) - 1
         can_incantate = has_res and has_plrs
