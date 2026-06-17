@@ -13,6 +13,7 @@
 #include <span>
 #include <string>
 #include <string_view>
+#include <utility>
 
 namespace zappy::gui::render {
 Model::Model(std::string_view path)
@@ -113,7 +114,7 @@ void Model::updateAnimation() {
 }
 
 void Model::setTexture(int materialIndex, MaterialMapIndex mapIndex, ::Texture texture) {
-    static constexpr std::size_t kMaterialMapCount = static_cast<std::size_t>(MaterialMapIndex::MATERIAL_MAP_BRDF) + 1;
+    static constexpr std::size_t kMaterialMapCount = std::to_underlying(MaterialMapIndex::MATERIAL_MAP_BRDF) + 1;
 
     if (!IsModelValid(_model)) {
         throw ModelException{"Cannot set texture for a model that failed to load"};
@@ -121,7 +122,7 @@ void Model::setTexture(int materialIndex, MaterialMapIndex mapIndex, ::Texture t
     if (materialIndex < 0 || materialIndex >= _model.materialCount) {
         throw ModelException{"Material index out of bounds"};
     }
-    const auto map = static_cast<std::size_t>(mapIndex);
+    const auto map = std::to_underlying(mapIndex);
     if (map >= kMaterialMapCount) {
         throw ModelException{"Material map index out of bounds"};
     }
