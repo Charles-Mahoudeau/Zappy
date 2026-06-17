@@ -33,7 +33,7 @@ int Texture::width() const { return _texture.width; }
 
 int Texture::height() const { return _texture.height; }
 
-bool Texture::isValid() const { return _texture.id != 0; }
+bool Texture::isValid() const { return IsTextureValid(_texture); }
 
 void Texture::reload(const char* path) {
     UnloadTexture(_texture);

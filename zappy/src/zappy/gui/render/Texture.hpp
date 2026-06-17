@@ -15,10 +15,10 @@ namespace zappy::gui::render {
 
 class Texture {
   public:
-    Texture(const char* path);
+    explicit Texture(const char* path);
     ~Texture();
 
-    explicit Texture(const Texture&) = delete;
+    Texture(const Texture&) = delete;
     Texture& operator=(const Texture&) = delete;
 
     Texture(Texture&& other) noexcept;
