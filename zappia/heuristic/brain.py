@@ -1,5 +1,5 @@
 import math
-import random
+import secrets
 from typing import Dict, List, Optional
 
 from client import RESOURCES, STONES
@@ -202,10 +202,10 @@ class HeuristicAI:
         return True
 
     def explore(self) -> None:
-        r = random.random()
-        if r < 0.7:
+        roll = secrets.randbelow(100)
+        if roll < 70:
             self.c.forward()
-        elif r < 0.85:
+        elif roll < 85:
             self.c.right()
         else:
             self.c.left()
