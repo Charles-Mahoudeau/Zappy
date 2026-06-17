@@ -32,9 +32,19 @@ Model::Model(std::string_view path, std::string_view animationPath)
         throw ModelException{"Failed to load mesh from path: " + std::string{path}};
     }
 
-    _animations = LoadModelAnimations(std::string(animationPath).c_str(), &_animCount);
-    if (_animations == nullptr || _animCount == 0) {
-        throw ModelException{"Failed to load animation from path: " + std::string{animationPath}};
+    try {
+        _animations = LoadModelAnimations(std::string(animationPath).c_str(), &_animCount);
+        if (_animations == nullptr || _animCount <= 0) {
+            throw ModelException{"Failed to load animation from path: " + std::string{animationPath}};
+        }
+    } catch (const ModelException& e) {
+        if (_animations != nullptr && _animCount > 0) {
+            UnloadModelAnimations(_animations, _animCount);
+        }
+        if (IsModelValid(_model)) {
+            UnloadModel(_model);
+        }
+        throw;
     }
 }
 
@@ -47,6 +57,37 @@ Model::~Model() {
     }
     _animations = nullptr;
     _animCount = 0;
+}
+
+Model::Model(Model&& other) noexcept
+    : _model(other._model),
+      _animations(other._animations),
+      _animCount(other._animCount),
+      _currentAnim(other._currentAnim),
+      _currentFrame(other._currentFrame) {
+    other._model = {};
+    other._animations = nullptr;
+    other._animCount = 0;
+}
+
+Model& Model::operator=(Model&& other) noexcept {
+    if (this != &other) {
+        if (IsModelValid(_model)) {
+            UnloadModel(_model);
+        }
+        if (_animations != nullptr && _animCount > 0) {
+            UnloadModelAnimations(_animations, _animCount);
+        }
+        _model = other._model;
+        _animations = other._animations;
+        _animCount = other._animCount;
+        _currentAnim = other._currentAnim;
+        _currentFrame = other._currentFrame;
+        other._model = {};
+        other._animations = nullptr;
+        other._animCount = 0;
+    }
+    return *this;
 }
 void Model::draw(Vector3 position, float scale, Color tint) const {
     if (!IsModelValid(_model)) {

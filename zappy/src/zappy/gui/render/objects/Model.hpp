@@ -9,11 +9,9 @@
 
 #include <raylib.h>
 
-#include <memory>
 #include <stdexcept>
 #include <string>
 #include <string_view>
-#include <vector>
 
 namespace zappy::gui::render {
 class Model {
@@ -22,6 +20,8 @@ class Model {
     Model(std::string_view path, std::string_view animationPath);
     Model(const Model&) = delete;
     Model& operator=(const Model&) = delete;
+    Model(Model&& other) noexcept;
+    Model& operator=(Model&& other) noexcept;
     ~Model();
 
     void draw(Vector3 position, float scale, Color tint) const;
