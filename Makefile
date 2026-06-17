@@ -19,12 +19,14 @@ zappy_gui: | cpp_build
 	cp build/src/zappy/gui/zappy_gui .
 
 zappy_ai:
-	echo 'zappy_ai is not implemented yet'
+	@printf '#!/bin/sh\nexec python3 "%s/zappia/app.py" "$$@"\n' "$$(pwd)" > zappy_ai
+	@chmod +x zappy_ai
+	@echo 'zappy_ai wrapper generated'
 
 clean:
 	rm -rf build
 
 fclean: clean
-	rm -f zappy_server zappy_gui
+	rm -f zappy_server zappy_gui zappy_ai
 
 .PHONY: all cpp_build clean fclean

@@ -7,4 +7,3 @@ __pycache__/
 zappy_server
 *.csv
 traces/
-*.pth

@@ -614,10 +614,19 @@ class ZappyEnv(EnvBase):
 
         mask[13] = False
 
-        # Incantation (21): only when elevation requirements are met.
-        has_res = all(self.inventory.get(r, 0) >= req.get(r, 0) for r in RESOURCES)
+        # Incantation (21): resources must be ON THE TILE (not in inventory).
+        # Food is never required for elevation, so skip it.
+        has_res = all(
+            (tile0.count(r) if tile0 else 0) >= req.get(r, 0)
+            for r in RESOURCES if r != "food"
+        )
         has_plrs = (tile0.count("player") if tile0 else 0) >= req.get("players", 1) - 1
-        if not (has_res and has_plrs):
+        can_incantate = has_res and has_plrs
+
+        if can_incantate:
+            # Force incantation: conditions are met, no reason to do anything else.
+            return [False] * 21 + [True] + [False]
+        else:
             mask[21] = False
 
         # Moves (0..2), Look (3), Inventory (4), Broadcast (5), Fork (20),

@@ -105,7 +105,7 @@ jobs:
           host: ${{ secrets.ZAPPIA_SSH_HOST }}
           username: ${{ secrets.ZAPPIA_SSH_USER }}
           key: ${{ secrets.ZAPPIA_SSH_PRIVATE_KEY }}
-          source: "zappia/**"
+          source: "zappia/rl/**"
           target: "/root/Zappy"
 
       - name: Install and launch training remotely
