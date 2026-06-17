@@ -29,8 +29,10 @@ class Texture {
     [[nodiscard]] int height() const;
     [[nodiscard]] bool isValid() const;
 
-    operator Texture2D&() { return _texture; }
-    operator const Texture2D&() const { return _texture; }
+    operator Texture2D&() & { return _texture; }
+    operator const Texture2D&() const& { return _texture; }
+    operator Texture2D&() && = delete;
+    operator const Texture2D&() const&& = delete;
 
     void reload(const char* path);
     void swap(Texture& other) noexcept;
