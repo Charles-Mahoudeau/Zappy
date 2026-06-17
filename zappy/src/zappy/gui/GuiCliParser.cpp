@@ -29,17 +29,16 @@ GuiCliParser::GuiCliParser(std::span<const std::string_view> args) {
         if (flag == "-h") {
             _host = *it;
         } else if (flag == "-p") {
+            unsigned long parsed = 0;
             try {
-                const unsigned long parsed = std::stoul(std::string{*it});
-                if (parsed > std::numeric_limits<std::uint16_t>::max()) {
-                    throw exception::InvalidArgument{"port out of range"};
-                }
-                _port = static_cast<std::uint16_t>(parsed);
-            } catch (const exception::InvalidArgument&) {
-                throw;
+                parsed = std::stoul(std::string{*it});
             } catch (const std::exception&) {
                 throw exception::InvalidArgument{"invalid port value"};
             }
+            if (parsed > std::numeric_limits<std::uint16_t>::max()) {
+                throw exception::InvalidArgument{"port out of range"};
+            }
+            _port = static_cast<std::uint16_t>(parsed);
         }
         ++it;
     }
