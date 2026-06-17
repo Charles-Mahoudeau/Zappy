@@ -15,6 +15,8 @@ add_executable(unit_tests
         src/server/game/entity/Resource.cpp
         src/shared/network/BufferedClient.cpp
         src/gui/game/GameState.cpp
+        src/gui/network/CommandSender.cpp
+        src/gui/network/Handshake.cpp
         src/gui/network/HandlerRegistry.cpp
         src/gui/network/ProtocolParser.cpp
         src/shared/io/Poller.cpp
