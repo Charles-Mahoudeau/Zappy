@@ -2,8 +2,6 @@ include(SetupRaylib)
 setup_raylib()
 
 add_library(zappy_gui_objects OBJECT
-        Demo.cpp
-        Demo.hpp
         display/Window.cpp
         display/Window.hpp
         game/GameState.cpp
