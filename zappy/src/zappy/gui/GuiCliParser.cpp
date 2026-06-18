@@ -39,6 +39,8 @@ GuiCliParser::GuiCliParser(std::span<const std::string_view> args) {
                 throw exception::InvalidArgument{"port out of range"};
             }
             _port = static_cast<std::uint16_t>(parsed);
+        } else {
+            throw exception::InvalidArgument{std::string{"unknown flag: "} + std::string{flag}};
         }
         ++it;
     }

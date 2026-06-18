@@ -21,7 +21,7 @@ namespace zappy::gui {
 static constexpr int kWindowWidth = 1600;
 static constexpr int kWindowHeight = 900;
 static constexpr int kTargetFPS = 60;
-static constexpr int kPollTimeoutMs = 1000;
+static constexpr int kPollTimeoutMs = 16;
 
 GUI::GUI()
     : _parser{_state},

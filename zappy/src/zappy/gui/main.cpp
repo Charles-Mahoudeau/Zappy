@@ -15,6 +15,7 @@
 
 #include "zappy/gui/GUI.hpp"
 #include "zappy/gui/GuiCliParser.hpp"
+#include "zappy/shared/exception/InvalidArgument.hpp"
 
 static constexpr std::string_view kUsage = "USAGE: ./zappy_gui -p port -h machine\n";
 
@@ -30,8 +31,11 @@ int main(const int argc, char** argv) {
     try {
         const zappy::gui::GuiCliParser cli{std::span{args}.subspan(1)};
         return zappy::gui::GUI{}.run(cli);
-    } catch (const std::exception&) {
+    } catch (const zappy::exception::InvalidArgument&) {
         std::cerr << kUsage;
+        return EXIT_FAILURE;
+    } catch (const std::exception& err) {
+        std::cerr << err.what() << '\n';
         return EXIT_FAILURE;
     }
 }
