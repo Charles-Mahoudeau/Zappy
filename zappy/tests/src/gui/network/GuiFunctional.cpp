@@ -12,12 +12,11 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
-#include <span>
 #include <string>
 #include <string_view>
 #include <thread>
-#include <utility>
 
+#include "shared/network/MockServerHelpers.hpp"
 #include "zappy/gui/GUI.hpp"
 #include "zappy/gui/GuiCliParser.hpp"
 #include "zappy/gui/game/GameState.hpp"
@@ -30,6 +29,8 @@ namespace {
 using zappy::gui::GUI;
 using zappy::gui::GuiCliParser;
 using zappy::gui::game::Orientation;
+using zappy::test::serverRead;
+using zappy::test::serverSend;
 
 constexpr uint16_t kTestPort = 59997;
 constexpr std::array<std::string_view, 4> kCliArgs{"-h", "127.0.0.1", "-p", "59997"};
@@ -42,28 +43,6 @@ class GuiFunctionalTest : public ::testing::Test {
     }
 
     void TearDown() override { _serverClient.reset(); }
-
-    static void serverSend(zappy::network::socket::Client& client, std::string_view data) {
-        auto bytes = std::as_bytes(std::span{data});
-        if (bytes.empty()) {
-            return;
-        }
-        std::size_t sent = 0;
-        while (sent < bytes.size()) {
-            sent += client.send(bytes.subspan(sent));
-        }
-    }
-
-    static std::string serverRead(zappy::network::socket::Client& client) {
-        auto bytes = client.read(4096);
-        if (bytes.empty()) {
-            return {};
-        }
-        std::string result(bytes.size(), '\0');
-        std::ranges::transform(bytes, result.begin(),
-                               [](std::byte b) { return static_cast<char>(std::to_underlying(b)); });
-        return result;
-    }
 
     std::string serverReadLines(zappy::network::socket::Client& client, std::size_t expectedLines) {
         std::size_t newlines = static_cast<std::size_t>(std::ranges::count(_leftover, '\n'));
