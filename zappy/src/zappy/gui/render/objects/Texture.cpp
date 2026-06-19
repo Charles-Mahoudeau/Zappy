@@ -15,9 +15,11 @@
 
 namespace zappy::gui::render {
 Texture::Texture(std::string_view path) {
-    _texture = LoadTexture(path.data());
+    const std::string pathStr{path};
+
+    _texture = LoadTexture(pathStr.c_str());
     if (!isValid()) {
-        throw TextureException{"Failed to load texture from path: " + std::string{path}};
+        throw TextureException{"Failed to load texture from path: " + pathStr};
     }
 }
 
@@ -43,10 +45,12 @@ int Texture::height() const { return _texture.height; }
 bool Texture::isValid() const { return IsTextureValid(_texture); }
 
 void Texture::reload(std::string_view path) {
+    const std::string pathStr{path};
+
     UnloadTexture(_texture);
-    _texture = LoadTexture(path.data());
+    _texture = LoadTexture(pathStr.c_str());
     if (!isValid()) {
-        throw TextureException{"Failed to reload texture from path: " + std::string{path}};
+        throw TextureException{"Failed to reload texture from path: " + pathStr};
     }
 }
 
