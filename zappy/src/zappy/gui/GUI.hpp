@@ -8,7 +8,6 @@
 #pragma once
 
 #include "zappy/gui/GuiCliParser.hpp"
-#include "zappy/gui/display/Window.hpp"
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/network/CommandSender.hpp"
 #include "zappy/gui/network/Handshake.hpp"
@@ -33,6 +32,11 @@ class GUI {
 
     int run(const GuiCliParser& cli);
 
+    void connect(const GuiCliParser& cli);
+    void pump();
+
+    [[nodiscard]] const game::GameState& state() const;
+
   private:
     zappy::network::Address _address;
     zappy::network::BufferedClient _buffer;
@@ -41,7 +45,6 @@ class GUI {
     network::CommandSender _sender;
     network::Handshake _handshake;
     zappy::io::Poller _poller;
-    display::Window _window;
     render::Camera _camera;
 };
 

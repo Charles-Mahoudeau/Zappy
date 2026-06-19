@@ -45,6 +45,9 @@ void Handshake::run() {
         while (_buffer.get().hasMessages()) {
             _parser.get().dispatch(_buffer.get().popMessage());
         }
+        if (_state.get().isReady()) {
+            break;
+        }
         if (std::chrono::steady_clock::now() > stateDeadline) {
             throw exception::InvalidState{"handshake timeout: initial state not received"};
         }
