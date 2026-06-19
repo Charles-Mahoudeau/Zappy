@@ -19,6 +19,7 @@ add_library(zappy_shared OBJECT
         network/Socket.hpp
         io/Poller.cpp
         io/Poller.hpp
+        exception/OutOfRange.hpp
 )
 target_include_directories(zappy_shared PUBLIC
         ${CMAKE_SOURCE_DIR}/src
