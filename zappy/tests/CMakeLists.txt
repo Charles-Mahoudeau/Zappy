@@ -15,10 +15,12 @@ add_executable(unit_tests
         src/server/game/entity/Resource.cpp
         src/shared/network/BufferedClient.cpp
         src/gui/game/GameState.cpp
+        src/gui/GuiCliParser.cpp
         src/gui/network/CommandSender.cpp
         src/gui/network/Handshake.cpp
         src/gui/network/HandlerRegistry.cpp
         src/gui/network/ProtocolParser.cpp
+        src/gui/network/GuiFunctional.cpp
         src/shared/io/Poller.cpp
 )
 target_include_directories(unit_tests PRIVATE

@@ -1,0 +1,51 @@
+/*
+** EPITECH PROJECT, 2026
+** zappy
+** File description:
+** GUI
+*/
+
+#pragma once
+
+#include "zappy/gui/GuiCliParser.hpp"
+#include "zappy/gui/game/GameState.hpp"
+#include "zappy/gui/network/CommandSender.hpp"
+#include "zappy/gui/network/Handshake.hpp"
+#include "zappy/gui/network/ProtocolParser.hpp"
+#include "zappy/gui/render/Camera.hpp"
+#include "zappy/shared/io/Poller.hpp"
+#include "zappy/shared/network/Address.hpp"
+#include "zappy/shared/network/BufferedClient.hpp"
+
+namespace zappy::gui {
+
+class GUI {
+  public:
+    GUI();
+    ~GUI() = default;
+
+    GUI(const GUI&) = delete;
+    GUI& operator=(const GUI&) = delete;
+
+    GUI(GUI&&) noexcept = default;
+    GUI& operator=(GUI&&) noexcept = default;
+
+    int run(const GuiCliParser& cli);
+
+    void connect(const GuiCliParser& cli);
+    void pump();
+
+    [[nodiscard]] const game::GameState& state() const;
+
+  private:
+    zappy::network::Address _address;
+    zappy::network::BufferedClient _buffer;
+    game::GameState _state;
+    network::ProtocolParser _parser;
+    network::CommandSender _sender;
+    network::Handshake _handshake;
+    zappy::io::Poller _poller;
+    render::Camera _camera;
+};
+
+}  // namespace zappy::gui
