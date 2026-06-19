@@ -45,7 +45,7 @@ class GuiFunctionalTest : public ::testing::Test {
     void TearDown() override { _serverClient.reset(); }
 
     std::string serverReadLines(zappy::network::socket::Client& client, std::size_t expectedLines) {
-        std::size_t newlines = static_cast<std::size_t>(std::ranges::count(_leftover, '\n'));
+        auto newlines = static_cast<std::size_t>(std::ranges::count(_leftover, '\n'));
         while (newlines < expectedLines) {
             _leftover += serverRead(client);
             newlines = static_cast<std::size_t>(std::ranges::count(_leftover, '\n'));
@@ -61,7 +61,7 @@ class GuiFunctionalTest : public ::testing::Test {
 
     void connectGui() {
         const GuiCliParser cli{std::span{kCliArgs}};
-        std::thread clientThread([this, &cli]() { _gui.connect(cli); });
+        std::jthread clientThread([this, &cli]() { _gui.connect(cli); });
 
         _serverClient = std::make_unique<zappy::network::socket::Client>(_server.accept());
 
@@ -100,7 +100,7 @@ TEST_F(GuiFunctionalTest, ConnectCompletesHandshakeAgainstRealServer) {
 
 TEST_F(GuiFunctionalTest, ConnectThrowsWhenFirstMessageIsNotWelcome) {
     const GuiCliParser cli{std::span{kCliArgs}};
-    std::thread clientThread([this, &cli]() { EXPECT_THROW(_gui.connect(cli), zappy::exception::InvalidState); });
+    std::jthread clientThread([this, &cli]() { EXPECT_THROW(_gui.connect(cli), zappy::exception::InvalidState); });
 
     _serverClient = std::make_unique<zappy::network::socket::Client>(_server.accept());
     serverSend(*_serverClient, "NOTWELCOME\n");

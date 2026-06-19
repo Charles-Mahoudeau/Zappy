@@ -10,11 +10,11 @@
 #include <algorithm>
 #include <cstddef>
 #include <span>
-#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <utility>
 
+#include "zappy/shared/exception/SocketError.hpp"
 #include "zappy/shared/io/Poller.hpp"
 #include "zappy/shared/network/socket/Client.hpp"
 
@@ -33,9 +33,6 @@ inline void serverSend(zappy::network::socket::Client& client, std::string_view 
     }
 }
 
-// Waits for the socket to become readable before calling the blocking
-// read(), so a peer that never sends anything causes a clear failure
-// instead of hanging the test suite indefinitely.
 inline std::string serverRead(zappy::network::socket::Client& client, int timeoutMs = kMockServerReadTimeoutMs) {
     zappy::io::Poller poller;
     bool ready = false;
@@ -43,7 +40,7 @@ inline std::string serverRead(zappy::network::socket::Client& client, int timeou
                [&ready](std::byte /*events*/) { ready = true; });
     poller.poll(timeoutMs);
     if (!ready) {
-        throw std::runtime_error{"serverRead: timed out waiting for data"};
+        throw zappy::exception::SocketError{"serverRead: timed out waiting for data"};
     }
 
     auto bytes = client.read(4096);
