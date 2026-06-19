@@ -35,7 +35,7 @@ constexpr uint16_t kTestPort = 59997;
 constexpr std::array<std::string_view, 4> kCliArgs{"-h", "127.0.0.1", "-p", "59997"};
 
 class GuiFunctionalTest : public ::testing::Test {
-  public:
+  protected:
     void SetUp() override {
         _server.bind(kTestPort);
         _server.listen();
@@ -66,8 +66,10 @@ class GuiFunctionalTest : public ::testing::Test {
     }
 
     std::string serverReadLines(zappy::network::socket::Client& client, std::size_t expectedLines) {
-        while (static_cast<std::size_t>(std::ranges::count(_leftover, '\n')) < expectedLines) {
+        std::size_t newlines = static_cast<std::size_t>(std::ranges::count(_leftover, '\n'));
+        while (newlines < expectedLines) {
             _leftover += serverRead(client);
+            newlines = static_cast<std::size_t>(std::ranges::count(_leftover, '\n'));
         }
         std::size_t pos = 0;
         for (std::size_t i = 0; i < expectedLines; ++i) {
@@ -97,11 +99,11 @@ class GuiFunctionalTest : public ::testing::Test {
 
         clientThread.join();
     }
+
+  public:
     zappy::network::socket::Server _server;
     std::unique_ptr<zappy::network::socket::Client> _serverClient;
     GUI _gui;
-
-  private:
     std::string _leftover;
 };
 
@@ -185,8 +187,7 @@ TEST_F(GuiFunctionalTest, FullProtocolBatchUpdatesGameStateAcrossTheWire) {
     EXPECT_EQ(_gui.state().timeUnit(), 150U);
 
     // seg -> winner set, game over.
-    ASSERT_TRUE(_gui.state().winner().has_value());
-    EXPECT_EQ(_gui.state().winner().value(), "TeamA");
+    EXPECT_EQ(_gui.state().winner().value_or(""), "TeamA");
     EXPECT_TRUE(_gui.state().isGameOver());
 
     // bct -> tile resources updated for a tile distinct from the initial one.

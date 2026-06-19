@@ -14,6 +14,7 @@
 
 #include "zappy/gui/GuiCliParser.hpp"
 #include "zappy/gui/display/Window.hpp"
+#include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/render/Camera.hpp"
 #include "zappy/shared/exception/InvalidState.hpp"
 
