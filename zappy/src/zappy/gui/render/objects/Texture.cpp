@@ -11,6 +11,7 @@
 
 #include <cstdint>
 #include <string>
+#include <string_view>
 
 namespace zappy::gui::render {
 Texture::Texture(std::string_view path) {
