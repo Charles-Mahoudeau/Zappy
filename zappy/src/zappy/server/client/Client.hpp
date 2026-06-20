@@ -21,9 +21,9 @@ namespace zappy::server {
 class Client {
   public:
     enum class Type : std::uint8_t {
-        kPLAYER,
-        kGUI,
-        kUNKNOWN,
+        kPlayer,
+        kGui,
+        kUnknown,
     };
 
     Client(net::SocketRegistry& socketRegister, network::Address address);
@@ -41,7 +41,7 @@ class Client {
     void changeType(Type type);
 
     void addRequest(std::string msg);
-    std::optional<std::string> getNextRequest();
+    std::optional<std::string> nextRequest();
     void setTimeout(int timeout);
 
     bool sendMessage(std::string_view msg);
@@ -49,7 +49,7 @@ class Client {
   private:
     int _timeout = 0;
     std::queue<std::string> _requests;
-    Type _type = Client::Type::kUNKNOWN;
+    Type _type = Client::Type::kUnknown;
     network::Address _addr;
     net::SocketRegistry& _socketsRegistery;
 

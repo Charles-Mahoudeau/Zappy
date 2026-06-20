@@ -45,27 +45,27 @@ TEST_F(ServerClientTest, AddressReturnsConstructedAddress) {
 TEST_F(ServerClientTest, TypeDefaultsToUnknown) {
     const Client client{socketRegistry, addr};
 
-    EXPECT_EQ(client.type(), Client::Type::kUNKNOWN);
+    EXPECT_EQ(client.type(), Client::Type::kUnknown);
 }
 
 TEST_F(ServerClientTest, ChangeTypeUpdatesType) {
     Client client{socketRegistry, addr};
 
-    client.changeType(Client::Type::kPLAYER);
-    EXPECT_EQ(client.type(), Client::Type::kPLAYER);
+    client.changeType(Client::Type::kPlayer);
+    EXPECT_EQ(client.type(), Client::Type::kPlayer);
 
-    client.changeType(Client::Type::kGUI);
-    EXPECT_EQ(client.type(), Client::Type::kGUI);
+    client.changeType(Client::Type::kGui);
+    EXPECT_EQ(client.type(), Client::Type::kGui);
 }
 
 // ---------------------------------------------------------------------------
-// addRequest / getNextRequest
+// addRequest / nextRequest
 // ---------------------------------------------------------------------------
 
 TEST_F(ServerClientTest, GetNextRequestOnEmptyReturnsNullopt) {
     Client client{socketRegistry, addr};
 
-    EXPECT_FALSE(client.getNextRequest().has_value());
+    EXPECT_FALSE(client.nextRequest().has_value());
 }
 
 TEST_F(ServerClientTest, GetNextRequestReturnsRequestsInFifoOrder) {
@@ -74,8 +74,8 @@ TEST_F(ServerClientTest, GetNextRequestReturnsRequestsInFifoOrder) {
     client.addRequest("first");
     client.addRequest("second");
 
-    auto firstResult = client.getNextRequest();
-    auto secondResult = client.getNextRequest();
+    auto firstResult = client.nextRequest();
+    auto secondResult = client.nextRequest();
 
     if (firstResult.has_value()) {
         EXPECT_EQ(*firstResult, "first");
@@ -88,7 +88,7 @@ TEST_F(ServerClientTest, GetNextRequestReturnsRequestsInFifoOrder) {
         FAIL() << "Expect second result but got nothing";
     }
 
-    EXPECT_FALSE(client.getNextRequest().has_value());
+    EXPECT_FALSE(client.nextRequest().has_value());
 }
 
 TEST_F(ServerClientTest, AddRequestRespectsMaxRequestCap) {
@@ -99,7 +99,7 @@ TEST_F(ServerClientTest, AddRequestRespectsMaxRequestCap) {
     }
 
     int count = 0;
-    while (auto request = client.getNextRequest()) {
+    while (auto request = client.nextRequest()) {
         EXPECT_EQ(*request, "req" + std::to_string(count));
         ++count;
     }
@@ -116,14 +116,14 @@ TEST_F(ServerClientTest, GetNextRequestBlockedWhileTimeoutPending) {
 
     client.setTimeout(2);
 
-    if (client.getNextRequest().has_value()) {
+    if (client.nextRequest().has_value()) {
         FAIL() << "Expect nothing on first request but got value";
     }
-    if (client.getNextRequest().has_value()) {
+    if (client.nextRequest().has_value()) {
         FAIL() << "Expect nothing on second request but got value";
     }
 
-    auto result = client.getNextRequest();
+    auto result = client.nextRequest();
     if (result.has_value()) {
         EXPECT_EQ(*result, "delayed");
     } else {
@@ -137,7 +137,7 @@ TEST_F(ServerClientTest, ZeroTimeoutDoesNotBlock) {
 
     client.setTimeout(0);
 
-    auto result = client.getNextRequest();
+    auto result = client.nextRequest();
     if (result.has_value()) {
         EXPECT_EQ(*result, "immediate");
     } else {
@@ -168,12 +168,12 @@ TEST_F(ServerClientTest, UpdateReturnsTrueWhenSocketRegistered) {
     socketRegistry.getFromAddress(addr).value().get().poll();
     EXPECT_TRUE(client.update());
 
-    if (auto request = client.getNextRequest(); request.has_value()) {
+    if (auto request = client.nextRequest(); request.has_value()) {
         EXPECT_EQ(*request, "ping");
     } else {
         FAIL() << "Expect request but got nothing";
     }
-    ASSERT_FALSE(client.getNextRequest().has_value());
+    ASSERT_FALSE(client.nextRequest().has_value());
 }
 
 // ---------------------------------------------------------------------------

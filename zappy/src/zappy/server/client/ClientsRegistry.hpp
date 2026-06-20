@@ -42,9 +42,9 @@ class ClientsRegistry {
     std::vector<const Client*> _toRemove;
     std::vector<std::unique_ptr<Client>> _clients;
     std::unordered_map<Client::Type, std::vector<const Client*>> _clientsPerType = {
-        {Client::Type::kUNKNOWN, {}},
-        {Client::Type::kGUI, {}},
-        {Client::Type::kPLAYER, {}},
+        {Client::Type::kUnknown, {}},
+        {Client::Type::kGui, {}},
+        {Client::Type::kPlayer, {}},
     };
 
     void updateTypeGroup();

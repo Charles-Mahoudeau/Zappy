@@ -50,9 +50,9 @@ TEST_F(ClientsRegistryTest, MakeNewClientIncreasesViewAllSize) {
 TEST_F(ClientsRegistryTest, MakeNewClientAppearsInType) {
     registry.makeNewClient(socketRegistry, addr);
 
-    EXPECT_EQ(std::ranges::distance(registry.viewAll(Client::Type::kUNKNOWN)), 1);
-    EXPECT_EQ(std::ranges::distance(registry.viewAll(Client::Type::kGUI)), 0);
-    EXPECT_EQ(std::ranges::distance(registry.viewAll(Client::Type::kPLAYER)), 0);
+    EXPECT_EQ(std::ranges::distance(registry.viewAll(Client::Type::kUnknown)), 1);
+    EXPECT_EQ(std::ranges::distance(registry.viewAll(Client::Type::kGui)), 0);
+    EXPECT_EQ(std::ranges::distance(registry.viewAll(Client::Type::kPlayer)), 0);
 }
 
 TEST_F(ClientsRegistryTest, MakeMultipleClientsAllVisible) {
@@ -61,7 +61,7 @@ TEST_F(ClientsRegistryTest, MakeMultipleClientsAllVisible) {
     registry.makeNewClient(socketRegistry, addr);
 
     EXPECT_EQ(std::ranges::distance(registry.viewAll()), 3);
-    EXPECT_EQ(std::ranges::distance(registry.viewAll(Client::Type::kUNKNOWN)), 3);
+    EXPECT_EQ(std::ranges::distance(registry.viewAll(Client::Type::kUnknown)), 3);
 }
 
 // ── remove ───────────────────────────────────────────────────────────────────
@@ -70,17 +70,17 @@ TEST_F(ClientsRegistryTest, RemoveClientDecreasesSize) {
     registry.makeNewClient(socketRegistry, addr);
 
     EXPECT_EQ(std::ranges::distance(registry.viewAll()), 1);
-    EXPECT_EQ(std::ranges::distance(registry.viewAll(Client::Type::kUNKNOWN)), 1);
+    EXPECT_EQ(std::ranges::distance(registry.viewAll(Client::Type::kUnknown)), 1);
     const Client* ptr = *registry.viewAll().begin();
     registry.toRemove(ptr);
 
     EXPECT_EQ(std::ranges::distance(registry.viewAll()), 1);
-    EXPECT_EQ(std::ranges::distance(registry.viewAll(Client::Type::kUNKNOWN)), 1);
+    EXPECT_EQ(std::ranges::distance(registry.viewAll(Client::Type::kUnknown)), 1);
 
     registry.update();
 
     EXPECT_EQ(std::ranges::distance(registry.viewAll()), 0);
-    EXPECT_EQ(std::ranges::distance(registry.viewAll(Client::Type::kUNKNOWN)), 0);
+    EXPECT_EQ(std::ranges::distance(registry.viewAll(Client::Type::kUnknown)), 0);
 }
 
 TEST_F(ClientsRegistryTest, RemoveOneOfManyLeavesOthers) {
@@ -128,17 +128,17 @@ TEST_F(ClientsRegistryTest, UpdateEmptyRegistryDoesNotThrow) { EXPECT_NO_THROW(r
 TEST_F(ClientsRegistryTest, UpdateClientType) {
     registry.makeNewClient(socketRegistry, addr);
 
-    EXPECT_EQ(std::ranges::distance(registry.viewAll(zappy::server::Client::Type::kUNKNOWN)), 1);
-    EXPECT_EQ(std::ranges::distance(registry.viewAll(zappy::server::Client::Type::kGUI)), 0);
-    EXPECT_EQ(std::ranges::distance(registry.viewAll(zappy::server::Client::Type::kPLAYER)), 0);
+    EXPECT_EQ(std::ranges::distance(registry.viewAll(zappy::server::Client::Type::kUnknown)), 1);
+    EXPECT_EQ(std::ranges::distance(registry.viewAll(zappy::server::Client::Type::kGui)), 0);
+    EXPECT_EQ(std::ranges::distance(registry.viewAll(zappy::server::Client::Type::kPlayer)), 0);
 
-    registry.viewAll().front()->changeType(zappy::server::Client::Type::kGUI);
+    registry.viewAll().front()->changeType(zappy::server::Client::Type::kGui);
 
     registry.update();
 
-    EXPECT_EQ(std::ranges::distance(registry.viewAll(zappy::server::Client::Type::kUNKNOWN)), 0);
-    EXPECT_EQ(std::ranges::distance(registry.viewAll(zappy::server::Client::Type::kGUI)), 1);
-    EXPECT_EQ(std::ranges::distance(registry.viewAll(zappy::server::Client::Type::kPLAYER)), 0);
+    EXPECT_EQ(std::ranges::distance(registry.viewAll(zappy::server::Client::Type::kUnknown)), 0);
+    EXPECT_EQ(std::ranges::distance(registry.viewAll(zappy::server::Client::Type::kGui)), 1);
+    EXPECT_EQ(std::ranges::distance(registry.viewAll(zappy::server::Client::Type::kPlayer)), 0);
 }
 
 // ── viewAll(

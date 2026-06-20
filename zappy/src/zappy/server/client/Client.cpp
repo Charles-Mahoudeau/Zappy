@@ -50,7 +50,7 @@ bool Client::update() {
     return true;
 }
 
-std::optional<std::string> Client::getNextRequest() {
+std::optional<std::string> Client::nextRequest() {
     if (this->_timeout > 0) {
         this->_timeout--;
         return std::nullopt;
