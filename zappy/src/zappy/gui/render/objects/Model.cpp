@@ -114,7 +114,7 @@ void Model::updateAnimation() {
 }
 
 void Model::setTexture(int materialIndex, MaterialMapIndex mapIndex, ::Texture texture) {
-    static constexpr std::size_t kMaterialMapCount = std::to_underlying(MaterialMapIndex::MATERIAL_MAP_BRDF) + 1;
+    static constexpr std::size_t kMaterialMapCount = std::to_underlying(MaterialMapIndex::BRDF) + 1;
 
     if (!IsModelValid(_model)) {
         throw ModelException{"Cannot set texture for a model that failed to load"};
