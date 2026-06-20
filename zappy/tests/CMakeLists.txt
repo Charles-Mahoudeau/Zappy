@@ -7,7 +7,7 @@ add_executable(unit_tests
         src/CliParser.cpp
         src/server/game/EntityDatabase.cpp
 		src/server/client/Client.cpp
-		src/server/client/ClientsRegistry.cpp
+		src/server/client/ClientRegistry.cpp
 		src/server/client/SocketPair.hpp
         src/server/net/SocketRegistry.cpp
         src/server/game/entity/Egg.cpp

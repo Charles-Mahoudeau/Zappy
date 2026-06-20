@@ -53,7 +53,7 @@ class Client {
     network::Address _addr;
     net::SocketRegistry& _socketsRegistery;
 
-    static constexpr int kMAX_REQUEST = 10;
+    static constexpr int kMaxRequests = 10;
 };
 
 }  // namespace zappy::server

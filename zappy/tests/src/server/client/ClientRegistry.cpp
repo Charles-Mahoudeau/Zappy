@@ -1,10 +1,10 @@
 
 /*
 ** EPITECH PROJECT, 2026
-** ClientsRegistry tests
+** ClientRegistry tests
 */
 
-#include "zappy/server/client/ClientsRegistry.hpp"
+#include "zappy/server/client/ClientRegistry.hpp"
 
 #include <gtest/gtest.h>
 
@@ -22,12 +22,12 @@ using namespace zappy::server::client;
 
 namespace {
 
-class ClientsRegistryTest : public ::testing::Test {
+class ClientRegistryTest : public ::testing::Test {
   public:
     SocketPair pair;
     net::SocketRegistry socketRegistry;
     zappy::network::Address addr{"127.0.0.1", 4242};
-    ClientsRegistry registry;
+    ClientRegistry registry;
 
   protected:
     void SetUp() override {
@@ -40,14 +40,14 @@ class ClientsRegistryTest : public ::testing::Test {
 
 // ── makeNewClient ────────────────────────────────────────────────────────────
 
-TEST_F(ClientsRegistryTest, MakeNewClientIncreasesViewAllSize) {
+TEST_F(ClientRegistryTest, MakeNewClientIncreasesViewAllSize) {
     registry.makeNewClient(socketRegistry, addr);
 
     const auto all = registry.viewAll();
     EXPECT_EQ(std::ranges::distance(all), 1);
 }
 
-TEST_F(ClientsRegistryTest, MakeNewClientAppearsInType) {
+TEST_F(ClientRegistryTest, MakeNewClientAppearsInType) {
     registry.makeNewClient(socketRegistry, addr);
 
     EXPECT_EQ(std::ranges::distance(registry.viewAll(Client::Type::kUnknown)), 1);
@@ -55,7 +55,7 @@ TEST_F(ClientsRegistryTest, MakeNewClientAppearsInType) {
     EXPECT_EQ(std::ranges::distance(registry.viewAll(Client::Type::kPlayer)), 0);
 }
 
-TEST_F(ClientsRegistryTest, MakeMultipleClientsAllVisible) {
+TEST_F(ClientRegistryTest, MakeMultipleClientsAllVisible) {
     registry.makeNewClient(socketRegistry, addr);
     registry.makeNewClient(socketRegistry, addr);
     registry.makeNewClient(socketRegistry, addr);
@@ -66,7 +66,7 @@ TEST_F(ClientsRegistryTest, MakeMultipleClientsAllVisible) {
 
 // ── remove ───────────────────────────────────────────────────────────────────
 
-TEST_F(ClientsRegistryTest, RemoveClientDecreasesSize) {
+TEST_F(ClientRegistryTest, RemoveClientDecreasesSize) {
     registry.makeNewClient(socketRegistry, addr);
 
     EXPECT_EQ(std::ranges::distance(registry.viewAll()), 1);
@@ -83,7 +83,7 @@ TEST_F(ClientsRegistryTest, RemoveClientDecreasesSize) {
     EXPECT_EQ(std::ranges::distance(registry.viewAll(Client::Type::kUnknown)), 0);
 }
 
-TEST_F(ClientsRegistryTest, RemoveOneOfManyLeavesOthers) {
+TEST_F(ClientRegistryTest, RemoveOneOfManyLeavesOthers) {
     registry.makeNewClient(socketRegistry, addr);
     registry.makeNewClient(socketRegistry, addr);
 
@@ -94,7 +94,7 @@ TEST_F(ClientsRegistryTest, RemoveOneOfManyLeavesOthers) {
     EXPECT_EQ(std::ranges::distance(registry.viewAll()), 1);
 }
 
-TEST_F(ClientsRegistryTest, RemoveUnknownPtrDoesNothing) {
+TEST_F(ClientRegistryTest, RemoveUnknownPtrDoesNothing) {
     registry.makeNewClient(socketRegistry, addr);
 
     const Client fake{socketRegistry, addr};
@@ -106,14 +106,14 @@ TEST_F(ClientsRegistryTest, RemoveUnknownPtrDoesNothing) {
 
 // ── update ───────────────────────────────────────────────────────────────────
 
-TEST_F(ClientsRegistryTest, UpdateKeepsHealthyClients) {
+TEST_F(ClientRegistryTest, UpdateKeepsHealthyClients) {
     registry.makeNewClient(socketRegistry, addr);
 
     EXPECT_NO_THROW(registry.update());
     EXPECT_EQ(std::ranges::distance(registry.viewAll()), 1);
 }
 
-TEST_F(ClientsRegistryTest, UpdateRemovesClientWhenPeerCloses) {
+TEST_F(ClientRegistryTest, UpdateRemovesClientWhenPeerCloses) {
     registry.makeNewClient(socketRegistry, addr);
 
     socketRegistry.clear();
@@ -123,9 +123,9 @@ TEST_F(ClientsRegistryTest, UpdateRemovesClientWhenPeerCloses) {
     EXPECT_EQ(std::ranges::distance(registry.viewAll()), 0);
 }
 
-TEST_F(ClientsRegistryTest, UpdateEmptyRegistryDoesNotThrow) { EXPECT_NO_THROW(registry.update()); }
+TEST_F(ClientRegistryTest, UpdateEmptyRegistryDoesNotThrow) { EXPECT_NO_THROW(registry.update()); }
 
-TEST_F(ClientsRegistryTest, UpdateClientType) {
+TEST_F(ClientRegistryTest, UpdateClientType) {
     registry.makeNewClient(socketRegistry, addr);
 
     EXPECT_EQ(std::ranges::distance(registry.viewAll(zappy::server::Client::Type::kUnknown)), 1);

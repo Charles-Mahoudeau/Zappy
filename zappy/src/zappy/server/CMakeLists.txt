@@ -19,8 +19,8 @@ add_library(zappy_server_objects OBJECT
         net/SocketRegistry.cpp
         client/Client.hpp
         client/Client.cpp
-        client/ClientsRegistry.hpp
-        client/ClientsRegistry.cpp
+        client/ClientRegistry.hpp
+        client/ClientRegistry.cpp
 )
 
 target_include_directories(zappy_server_objects PUBLIC

@@ -1,11 +1,11 @@
 /*
 ** EPITECH PROJECT, 2026
-** ClientsRegistry
+** ClientRegistry
 ** File description:
-** ClientsRegistry code
+** ClientRegistry code
 */
 
-#include "zappy/server/client/ClientsRegistry.hpp"
+#include "zappy/server/client/ClientRegistry.hpp"
 
 #include <memory>
 #include <utility>
@@ -17,21 +17,21 @@
 
 namespace zappy::server::client {
 
-void ClientsRegistry::makeNewClient(net::SocketRegistry& socketRegistery, network::Address addr) {
+void ClientRegistry::makeNewClient(net::SocketRegistry& socketRegistery, network::Address addr) {
     auto newClient = std::make_unique<Client>(socketRegistery, addr);
 
     this->_clientsPerType.at(newClient->type()).emplace_back(newClient.get());
     this->_clients.emplace_back(std::move(newClient));
 }
 
-void ClientsRegistry::toRemove(const Client* clientPtr) {
+void ClientRegistry::toRemove(const Client* clientPtr) {
     if (clientPtr == nullptr) {
         return;
     }
     this->_toRemove.emplace_back(clientPtr);
 }
 
-void ClientsRegistry::update() {
+void ClientRegistry::update() {
     this->updateTypeGroup();
 
     for (const auto& client : this->_clients) {
@@ -50,7 +50,7 @@ void ClientsRegistry::update() {
     this->_toRemove.clear();
 }
 
-void ClientsRegistry::updateTypeGroup() {
+void ClientRegistry::updateTypeGroup() {
     std::vector<std::pair<Client::Type, const Client*>> toMove;
 
     for (const auto& [groupType, groupList] : this->_clientsPerType) {

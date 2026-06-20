@@ -18,15 +18,15 @@
 
 namespace zappy::server::client {
 
-class ClientsRegistry {
+class ClientRegistry {
   public:
-    ClientsRegistry() = default;
-    ~ClientsRegistry() = default;
+    ClientRegistry() = default;
+    ~ClientRegistry() = default;
 
-    ClientsRegistry(const ClientsRegistry&) = delete;
-    ClientsRegistry(ClientsRegistry&&) = delete;
-    ClientsRegistry& operator=(const ClientsRegistry&) = delete;
-    ClientsRegistry& operator=(ClientsRegistry&&) = delete;
+    ClientRegistry(const ClientRegistry&) = delete;
+    ClientRegistry(ClientRegistry&&) = delete;
+    ClientRegistry& operator=(const ClientRegistry&) = delete;
+    ClientRegistry& operator=(ClientRegistry&&) = delete;
 
     void makeNewClient(net::SocketRegistry& socketRegistery, network::Address addr);
 
@@ -50,10 +50,10 @@ class ClientsRegistry {
     void updateTypeGroup();
 };
 
-inline auto ClientsRegistry::viewAll() {
+inline auto ClientRegistry::viewAll() {
     return this->_clients | std::views::transform([](const std::unique_ptr<Client>& client) { return client.get(); });
 }
 
-inline auto ClientsRegistry::viewAll(Client::Type type) { return this->_clientsPerType.at(type) | std::views::all; }
+inline auto ClientRegistry::viewAll(Client::Type type) { return this->_clientsPerType.at(type) | std::views::all; }
 
 }  // namespace zappy::server::client

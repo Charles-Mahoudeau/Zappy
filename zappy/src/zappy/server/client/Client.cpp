@@ -29,7 +29,7 @@ Client::Type Client::type() const { return this->_type; }
 void Client::changeType(Client::Type type) { this->_type = type; }
 
 void Client::addRequest(std::string msg) {
-    if (this->_requests.size() >= kMAX_REQUEST) {
+    if (this->_requests.size() >= kMaxRequests) {
         return;
     }
     this->_requests.emplace(std::move(msg));
