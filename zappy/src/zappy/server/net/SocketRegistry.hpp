@@ -25,12 +25,28 @@ class SocketRegistry {
     SocketRegistry& operator=(const SocketRegistry&) = delete;
     SocketRegistry& operator=(SocketRegistry&&) = delete;
 
+    /**
+     * @brief insert a socket to the Registry
+     * @param socket A Client type Socket which will then stored as a BufferedClient
+     */
     void insert(zappy::network::socket::Client& socket);
 
+    /**
+     * @brief remove a client from the registry
+     * @param fd file descriptor of the socket
+     */
     void remove(int fd);
 
+    /**
+     * @brief Remove all socket from the registry
+     */
     void clear();
 
+    /**
+     * @brief use a address to get the socket related to it
+     * @param addr address of the socket
+     * @return ptr of the socket as BufferedClient. nullptr if fail to find it
+     */
     network::BufferedClient* findByAddress(const network::Address& addr);
 
   private:
