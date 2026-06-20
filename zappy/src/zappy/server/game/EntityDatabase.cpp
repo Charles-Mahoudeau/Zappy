@@ -30,14 +30,22 @@ std::uint64_t EntityDatabase::insert(std::unique_ptr<IEntity> entity) {
     return it->first;
 }
 
-void EntityDatabase::remove(const std::uint64_t id) {
+bool EntityDatabase::remove(const std::uint64_t id) {
     const auto it = _entities.find(id);
 
     if (it == _entities.end()) {
-        return;
+        return false;
     }
     _entitiesByType[typeIndex(*it->second)].erase(id);
     _entities.erase(it);
+    return true;
+}
+
+bool EntityDatabase::remove(const IEntity& entity) {
+    if (const std::optional<std::uint64_t> entityId = id(entity)) {
+        return remove(*entityId);
+    }
+    return false;
 }
 
 void EntityDatabase::removeAll() {

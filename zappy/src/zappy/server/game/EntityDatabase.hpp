@@ -31,7 +31,13 @@ class EntityDatabase {
 
     /// @brief Remove an entity from the database.
     /// @param id The id of the entity to remove.
-    void remove(std::uint64_t id);
+    /// @return True if the entity was removed, false otherwise.
+    bool remove(std::uint64_t id);
+
+    /// @brief Remove an entity from the database.
+    /// @param entity The entity to remove.
+    /// @return True if the entity was removed, false otherwise.
+    bool remove(const IEntity& entity);
 
     /// @brief Remove all entities from the database.
     void removeAll();
