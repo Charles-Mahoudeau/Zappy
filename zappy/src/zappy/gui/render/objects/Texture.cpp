@@ -12,7 +12,8 @@
 #include <cstdint>
 
 namespace zappy::gui::render {
-Texture::Texture(const char* path) { _texture = LoadTexture(path); }
+
+Texture::Texture(const char* path, bool flipVertical) { _texture = loadTexture(path, flipVertical); }
 
 Texture::~Texture() { UnloadTexture(_texture); }
 
@@ -45,5 +46,16 @@ void Texture::swap(Texture& other) noexcept {
 
     _texture = other._texture;
     other._texture = tmp;
+}
+
+Texture2D Texture::loadTexture(const char* path, bool flipVertical) {
+    if (!flipVertical) {
+        return LoadTexture(path);
+    }
+    Image image = LoadImage(path);
+    ImageFlipVertical(&image);
+    const Texture2D texture = LoadTextureFromImage(image);
+    UnloadImage(image);
+    return texture;
 }
 }  // namespace zappy::gui::render

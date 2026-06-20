@@ -9,6 +9,7 @@
 
 #include <raylib.h>
 
+#include <cstdint>
 #include <stdexcept>
 #include <string>
 #include <string_view>
@@ -16,6 +17,20 @@
 namespace zappy::gui::render {
 class Model {
   public:
+    enum class MaterialMapIndex : std::uint8_t {
+        ALBEDO = 0,      // Albedo material (alias: DIFFUSE)
+        METALNESS = 1,   // Metalness material (alias: SPECULAR)
+        NORMAL = 2,      // Normal material
+        ROUGHNESS = 3,   // Roughness material
+        OCCLUSION = 4,   // Ambient occlusion material
+        EMISSION = 5,    // Emission material
+        HEIGHT = 6,      // Heightmap material
+        CUBEMAP = 7,     // Cubemap material
+        IRRADIANCE = 8,  // Irradiance material
+        PREFILTER = 9,   // Prefilter material
+        BRDF = 10        // Brdf material
+    };
+
     Model(std::string_view path);
     Model(std::string_view path, std::string_view animationPath);
     Model(const Model&) = delete;
@@ -38,9 +53,12 @@ class Model {
     void subtractAnimationCount() { --_animCount; }
     void resetAnimationCount() { _animCount = 0; }
 
+    void setTexture(int materialIndex, MaterialMapIndex mapIndex, ::Texture texture);
+    void setMeshTexture(int meshIndex, MaterialMapIndex mapIndex, ::Texture texture);
+
   protected:
   private:
-    ::Model _model;
+    ::Model _model{};
     ModelAnimation* _animations;
     int _animCount;
     int _currentAnim;
