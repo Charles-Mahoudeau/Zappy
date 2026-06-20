@@ -18,6 +18,7 @@ add_executable(unit_tests
         src/gui/network/ProtocolParser.cpp
         src/gui/network/GuiFunctional.cpp
         src/shared/io/Poller.cpp
+        src/server/game/World.cpp
 )
 target_include_directories(unit_tests PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
