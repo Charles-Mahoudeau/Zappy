@@ -7,10 +7,13 @@
 
 #pragma once
 
+#include <algorithm>
 #include <cstdint>
 #include <memory>
 #include <optional>
 #include <ranges>
+#include <span>
+#include <type_traits>
 #include <typeindex>
 #include <unordered_map>
 #include <vector>
@@ -53,7 +56,17 @@ class EntityDatabase {
 
     /// @brief Get all entities from the database.
     /// @return A view of pointers to all entities in the database.
+    auto viewAll() const;
+
+    /// @brief Get all entities from the database.
+    /// @return A view of pointers to all entities in the database.
     auto viewAll();
+
+    /// @brief Get all entities of a given type from the database.
+    /// @tparam T The type of the entities to get.
+    /// @return A view of pointers to all entities of the given type in the database.
+    template <IsEntity T>
+    auto viewAll() const;
 
     /// @brief Get all entities of a given type from the database.
     /// @tparam T The type of the entities to get.
@@ -79,12 +92,19 @@ class EntityDatabase {
     /// @tparam T The type of the entities to count.
     /// @return The number of entities of the given type in the database.
     template <IsEntity T>
-    [[nodiscard]] std::uint64_t countAll();
+    [[nodiscard]] std::uint64_t countAll() const;
 
     /// @brief Get the ID of an entity.
     /// @param entity The entity to get the ID of.
     /// @return The ID of the entity.
     [[nodiscard]] std::optional<std::uint64_t> id(const IEntity& entity);
+
+    /// @brief Get the entities of a given type from a list of IDs.
+    /// @tparam T The type of the entities to get.
+    /// @param ids The list of IDs to get the entities from.
+    /// @return A vector of all entity ids of the given type in the database.
+    template <IsEntity T>
+    auto filter(std::span<std::uint64_t> ids) const;
 
   private:
     /// @brief Generate a unique ID for a new entity.
@@ -127,14 +147,33 @@ T* EntityDatabase::query(const std::uint64_t id) {
     return static_cast<T*>(entity);
 }
 
+inline auto EntityDatabase::viewAll() const {
+    return _entities | std::views::values |
+           std::views::transform([](const std::unique_ptr<IEntity>& entity) { return entity.get(); });
+}
+
 inline auto EntityDatabase::viewAll() {
     return _entities | std::views::values |
            std::views::transform([](const std::unique_ptr<IEntity>& entity) { return entity.get(); });
 }
 
 template <IsEntity T>
+auto EntityDatabase::viewAll() const {
+    const auto it = _entitiesByType.find(typeid(T));
+    static const std::remove_cvref_t<decltype(it->second)> emptyMap;
+    const auto& entities = it != _entitiesByType.end() ? it->second : emptyMap;
+
+    return entities | std::views::values |
+           std::views::transform([](IEntity* entity) { return static_cast<T*>(entity); });
+}
+
+template <IsEntity T>
 auto EntityDatabase::viewAll() {
-    return _entitiesByType[typeid(T)] | std::views::values |
+    const auto it = _entitiesByType.find(typeid(T));
+    static const std::remove_cvref_t<decltype(it->second)> emptyMap;
+    const auto& entities = it != _entitiesByType.end() ? it->second : emptyMap;
+
+    return entities | std::views::values |
            std::views::transform([](IEntity* entity) { return static_cast<T*>(entity); });
 }
 
@@ -150,7 +189,20 @@ std::vector<T*> EntityDatabase::toVector() {
 }
 
 template <IsEntity T>
-std::uint64_t EntityDatabase::countAll() {
-    return _entitiesByType[typeid(T)].size();
+std::uint64_t EntityDatabase::countAll() const {
+    const auto it = _entitiesByType.find(typeid(T));
+
+    return (it != _entitiesByType.end()) ? it->second.size() : 0;
+}
+
+template <IsEntity T>
+auto EntityDatabase::filter(std::span<std::uint64_t> ids) const {
+    const auto it = _entitiesByType.find(typeid(T));
+    static const std::remove_cvref_t<decltype(it->second)> emptyMap;
+    const auto& entities = it != _entitiesByType.end() ? it->second : emptyMap;
+
+    return entities |
+           std::views::filter([ids](const auto& pair) { return std::ranges::find(ids, pair.first) != ids.end(); }) |
+           std::views::keys;
 }
 }  // namespace zappy::server::game
