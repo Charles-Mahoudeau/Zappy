@@ -30,12 +30,48 @@ class ClientRegistry {
 
     void makeNewClient(net::SocketRegistry& socketRegistery, network::Address addr);
 
+    /**
+     * @brief Update all managed clients and remove any that are no longer alive.
+     *
+     * @details This method performs a full tick:
+     *   1. Re-evaluates which type group each client belongs to (e.g. a client
+     *      may have been promoted from kUnknown to kPlayer).
+     *   2. Calls Client::update() on every managed client. Any client that
+     *      returns false (indicating disconnection or fatal error) is marked
+     *      for removal immediately.
+     *   3. Removes all marked clients from the registry in a second pass,
+     *      leaving the container in a valid state.
+     *
+     * Call this once per server tick.
+     */
     void update();
 
+    /**
+     * @brief Mark a specific client for removal.
+     *
+     * @param clientPtr Pointer to the Client to remove. no-op if nullptr.
+     *
+     * @details The removal is stored until the next call to update() so that
+     * iterators over the client container remain valid during a tick.
+     */
     void markForRemoval(const Client* clientPtr);
 
+    /**
+     * @brief Obtain a range view over all managed clients.
+     *
+     * @return A range (std::ranges::range) yielding raw pointers to every
+     *         Client owned by the registry.
+     */
     auto viewAll();
 
+    /**
+     * @brief Obtain a range view over all managed clients of a given type.
+     *
+     * @param type The Client::Type to filter on (e.g. Client::Type::kPlayer).
+     *
+     * @return A range yielding raw pointers to every Client of
+     *         the specified type.
+     */
     auto viewAll(Client::Type type);
 
   private:
