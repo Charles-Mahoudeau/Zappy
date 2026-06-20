@@ -5,17 +5,19 @@
 ** main
 */
 
-#include <raylib.h>
-
-#include <cstddef>
+#include <cstdlib>
+#include <exception>
+#include <iostream>
 #include <span>
 #include <string_view>
 #include <vector>
 
+#include "zappy/gui/GUI.hpp"
+#include "zappy/gui/GuiCliParser.hpp"
 #include "zappy/gui/display/Window.hpp"
-#include "zappy/gui/render/Camera.hpp"
-#include "zappy/gui/render/objects/Model.hpp"
-#include "zappy/gui/render/objects/Texture.hpp"
+#include "zappy/shared/exception/InvalidArgument.hpp"
+
+static constexpr std::string_view kUsage = "USAGE: ./zappy_gui -p port -h machine\n";
 
 int main(const int argc, char** argv) {
     const std::span argsView{argv, static_cast<std::size_t>(argc)};
@@ -24,23 +26,16 @@ int main(const int argc, char** argv) {
     zappy::gui::display::Window window{1600, 900, "Zappy"};
     window.setTargetFPS(60);
 
-    zappy::gui::render::Camera camera{Vector3{.x = 0, .y = 0, .z = 10}, Vector3{.x = 0, .y = 0, .z = 0},
-                                      Vector3{.x = 0, .y = 1, .z = 0}, 45.0F,
-                                      zappy::gui::render::CameraProjection::CAMERA_PERSPECTIVE};
-    camera.setCameraMode(zappy::gui::render::CameraMode::CAMERA_FREE);
-    zappy::gui::render::Model model{"assets/models/burpy/source/burpy.glb"};
-    const zappy::gui::render::Texture texture{"assets/models/burpy/textures/burpy.png", true};
-    model.setMeshTexture(0, zappy::gui::render::Model::MaterialMapIndex::MATERIAL_MAP_ALBEDO, texture);
-
     while (!window.shouldClose()) {
-        window.beginFrame();
-        camera.Update();
-        BeginMode3D(camera);
-
-        model.draw(Vector3{.x = 0, .y = 0, .z = 0}, 10.0F, WHITE);
-
-        EndMode3D();
-        window.endFrame();
+        try {
+            const zappy::gui::GuiCliParser cli{std::span{args}.subspan(1)};
+            return zappy::gui::GUI{}.run(cli);
+        } catch (const zappy::exception::InvalidArgument&) {
+            std::cerr << kUsage;
+            return EXIT_FAILURE;
+        } catch (const std::exception& err) {
+            std::cerr << err.what() << '\n';
+            return EXIT_FAILURE;
+        }
     }
-    return 0;
 }
