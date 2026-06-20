@@ -18,17 +18,17 @@ namespace zappy::gui::render {
 class Model {
   public:
     enum class MaterialMapIndex : std::uint8_t {
-        MATERIAL_MAP_ALBEDO = 0,      // Albedo material (alias: MATERIAL_MAP_DIFFUSE)
-        MATERIAL_MAP_METALNESS = 1,   // Metalness material (alias: MATERIAL_MAP_SPECULAR)
-        MATERIAL_MAP_NORMAL = 2,      // Normal material
-        MATERIAL_MAP_ROUGHNESS = 3,   // Roughness material
-        MATERIAL_MAP_OCCLUSION = 4,   // Ambient occlusion material
-        MATERIAL_MAP_EMISSION = 5,    // Emission material
-        MATERIAL_MAP_HEIGHT = 6,      // Heightmap material
-        MATERIAL_MAP_CUBEMAP = 7,     // Cubemap material (NOTE: Uses GL_TEXTURE_CUBE_MAP)
-        MATERIAL_MAP_IRRADIANCE = 8,  // Irradiance material (NOTE: Uses GL_TEXTURE_CUBE_MAP)
-        MATERIAL_MAP_PREFILTER = 9,   // Prefilter material (NOTE: Uses GL_TEXTURE_CUBE_MAP)
-        MATERIAL_MAP_BRDF = 10        // Brdf material
+        ALBEDO = 0,      // Albedo material (alias: DIFFUSE)
+        METALNESS = 1,   // Metalness material (alias: SPECULAR)
+        NORMAL = 2,      // Normal material
+        ROUGHNESS = 3,   // Roughness material
+        OCCLUSION = 4,   // Ambient occlusion material
+        EMISSION = 5,    // Emission material
+        HEIGHT = 6,      // Heightmap material
+        CUBEMAP = 7,     // Cubemap material
+        IRRADIANCE = 8,  // Irradiance material
+        PREFILTER = 9,   // Prefilter material
+        BRDF = 10        // Brdf material
     };
 
     Model(std::string_view path);
