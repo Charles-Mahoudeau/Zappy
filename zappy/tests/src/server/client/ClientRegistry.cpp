@@ -72,7 +72,7 @@ TEST_F(ClientRegistryTest, RemoveClientDecreasesSize) {
     EXPECT_EQ(std::ranges::distance(registry.viewAll()), 1);
     EXPECT_EQ(std::ranges::distance(registry.viewAll(Client::Type::kUnknown)), 1);
     const Client* ptr = *registry.viewAll().begin();
-    registry.toRemove(ptr);
+    registry.markForRemoval(ptr);
 
     EXPECT_EQ(std::ranges::distance(registry.viewAll()), 1);
     EXPECT_EQ(std::ranges::distance(registry.viewAll(Client::Type::kUnknown)), 1);
@@ -88,7 +88,7 @@ TEST_F(ClientRegistryTest, RemoveOneOfManyLeavesOthers) {
     registry.makeNewClient(socketRegistry, addr);
 
     const Client* ptr = *registry.viewAll().begin();
-    registry.toRemove(ptr);
+    registry.markForRemoval(ptr);
     registry.update();
 
     EXPECT_EQ(std::ranges::distance(registry.viewAll()), 1);
@@ -98,7 +98,7 @@ TEST_F(ClientRegistryTest, RemoveUnknownPtrDoesNothing) {
     registry.makeNewClient(socketRegistry, addr);
 
     const Client fake{socketRegistry, addr};
-    registry.toRemove(&fake);  // not owned by registry
+    registry.markForRemoval(&fake);  // not owned by registry
     registry.update();
 
     EXPECT_EQ(std::ranges::distance(registry.viewAll()), 1);

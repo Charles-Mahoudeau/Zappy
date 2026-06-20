@@ -24,7 +24,7 @@ void ClientRegistry::makeNewClient(net::SocketRegistry& socketRegistery, network
     this->_clients.emplace_back(std::move(newClient));
 }
 
-void ClientRegistry::toRemove(const Client* clientPtr) {
+void ClientRegistry::markForRemoval(const Client* clientPtr) {
     if (clientPtr == nullptr) {
         return;
     }
