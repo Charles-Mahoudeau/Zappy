@@ -52,6 +52,7 @@ TEST_F(SocketRegistryTest, GetFromAddressReturnsInsertedClient) {
     const network::Address addr{"127.0.0.1", 4242};
     const auto* result = registry.findByAddress(addr);
 
+    ASSERT_NE(result, nullptr);
     ASSERT_EQ(result->fd(), 10);
 }
 
