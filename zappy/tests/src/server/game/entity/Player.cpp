@@ -14,22 +14,23 @@
 
 namespace zappy::server::game::entity {
 TEST(PlayerTest, DefaultConstructor) {
-    const Player player;
+    const Player player{0};
 
+    EXPECT_EQ(player.teamId(), 0);
     EXPECT_TRUE(player.alive());
     EXPECT_EQ(player.level(), 1);
     EXPECT_EQ(player.lifetimeLeft(), Player::kDefaultLifetime);
 }
 
 TEST(PlayerTest, KillPlayer) {
-    Player player;
+    Player player{0};
 
     player.kill();
     EXPECT_FALSE(player.alive());
 }
 
 TEST(PlayerTest, FreezePlayer) {
-    Player player;
+    Player player{0};
 
     EXPECT_FALSE(player.frozen());
     player.freeze(10);
@@ -37,7 +38,7 @@ TEST(PlayerTest, FreezePlayer) {
 }
 
 TEST(PlayerTest, LevelUp) {
-    Player player;
+    Player player{0};
     const std::expected<std::uint8_t, std::string> result = player.levelUp();
 
     EXPECT_TRUE(result.has_value());

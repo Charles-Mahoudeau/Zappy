@@ -17,6 +17,8 @@
 #include "zappy/server/game/ResourceType.hpp"
 
 namespace zappy::server::game::entity {
+Player::Player(const std::uint16_t teamId) : _teamId{teamId} {}
+
 void Player::update() {
     if (!alive()) {
         return;
@@ -26,6 +28,8 @@ void Player::update() {
         --_freezeTime;
     }
 }
+
+std::uint16_t Player::teamId() const { return _teamId; }
 
 std::uint32_t Player::lifetimeLeft() const { return _lifetimeLeft; }
 

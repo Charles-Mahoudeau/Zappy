@@ -31,7 +31,7 @@ class Player : public IEntity {
     static constexpr std::uint8_t kTimeUnitsPerFood{126};
     static constexpr std::uint16_t kDefaultLifetime{kDefaultLifeUnits * kTimeUnitsPerFood};
 
-    Player() = default;
+    Player(std::uint16_t teamId);
     ~Player() override = default;
 
     Player(const Player&) = default;
@@ -42,6 +42,10 @@ class Player : public IEntity {
 
     /// @brief Update the player.
     void update() override;
+
+    /// @brief Get the player's team id.
+    /// @return The player's team id.
+    [[nodiscard]] std::uint16_t teamId() const;
 
     /// @brief Get the player's lifetime left.
     /// @return The player's lifetime left.
@@ -100,6 +104,7 @@ class Player : public IEntity {
     /// directions.
     [[nodiscard]] static const std::unordered_map<Direction, std::tuple<Direction, Direction>>& turnMap();
 
+    std::uint16_t _teamId;
     std::uint32_t _lifetimeLeft{kDefaultLifetime};
     std::uint8_t _level{1};
     std::uint32_t _freezeTime{0};
