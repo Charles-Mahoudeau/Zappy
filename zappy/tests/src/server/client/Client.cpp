@@ -165,7 +165,7 @@ TEST_F(ServerClientTest, UpdateReturnsTrueWhenSocketRegistered) {
     const std::string msg = "ping\n";
     ASSERT_EQ(::write(pair.peer, msg.data(), msg.size()), static_cast<ssize_t>(msg.size()));
 
-    socketRegistry.getFromAddress(addr).value().get().poll();
+    socketRegistry.findByAddress(addr)->poll();
     EXPECT_TRUE(client.update());
 
     if (auto request = client.nextRequest(); request.has_value()) {

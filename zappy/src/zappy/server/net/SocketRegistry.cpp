@@ -7,9 +7,6 @@
 
 #include "zappy/server/net/SocketRegistry.hpp"
 
-#include <expected>
-#include <functional>
-#include <string>
 #include <utility>
 
 #include "zappy/shared/network/Address.hpp"
@@ -24,14 +21,13 @@ void SocketRegistry::insert(zappy::network::socket::Client& socket) {
     this->_sockets.emplace_back(std::move(client));
 }
 
-std::expected<std::reference_wrapper<network::BufferedClient>, std::string> SocketRegistry::getFromAddress(
-    const network::Address& addr) {
+network::BufferedClient* SocketRegistry::findByAddress(const network::Address& addr) {
     for (auto& socket : this->_sockets) {
         if (socket == addr) {
-            return {socket};
+            return &socket;
         }
     }
-    return std::unexpected("Failed to get client Socket");
+    return nullptr;
 }
 
 void SocketRegistry::remove(int fd) {

@@ -36,16 +36,13 @@ class SocketRegistryTest : public ::testing::Test {
 }  // namespace
 
 // ---------------------------------------------------------------------------
-// getFromAddress
+// findByAddress
 // ---------------------------------------------------------------------------
 
 TEST_F(SocketRegistryTest, GetFromAddressOnEmptyRegistryFails) {
     const network::Address addr{"127.0.0.1", 4242};
 
-    auto result = registry.getFromAddress(addr);
-
-    EXPECT_FALSE(result.has_value());
-    EXPECT_EQ(result.error(), "Failed to get client Socket");
+    ASSERT_EQ(registry.findByAddress(addr), nullptr);
 }
 
 TEST_F(SocketRegistryTest, GetFromAddressReturnsInsertedClient) {
@@ -53,10 +50,9 @@ TEST_F(SocketRegistryTest, GetFromAddressReturnsInsertedClient) {
     registry.insert(client);
 
     const network::Address addr{"127.0.0.1", 4242};
-    auto result = registry.getFromAddress(addr);
+    const auto* result = registry.findByAddress(addr);
 
-    ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(result->get().fd(), 10);
+    ASSERT_EQ(result->fd(), 10);
 }
 
 TEST_F(SocketRegistryTest, GetFromAddressWithUnknownAddressFails) {
@@ -64,10 +60,8 @@ TEST_F(SocketRegistryTest, GetFromAddressWithUnknownAddressFails) {
     registry.insert(client);
 
     const network::Address addr{"127.0.0.1", 9999};
-    auto result = registry.getFromAddress(addr);
 
-    EXPECT_FALSE(result.has_value());
-    EXPECT_EQ(result.error(), "Failed to get client Socket");
+    ASSERT_EQ(registry.findByAddress(addr), nullptr);
 }
 
 TEST_F(SocketRegistryTest, GetFromAddressDistinguishesByPort) {
@@ -75,10 +69,10 @@ TEST_F(SocketRegistryTest, GetFromAddressDistinguishesByPort) {
     registry.insert(client);
 
     const network::Address samePortDifferentIp{"127.0.0.2", 1000};
-    EXPECT_FALSE(registry.getFromAddress(samePortDifferentIp).has_value());
+    EXPECT_EQ(registry.findByAddress(samePortDifferentIp), nullptr);
 
     const network::Address differentPortSameIp{"127.0.0.1", 2000};
-    EXPECT_FALSE(registry.getFromAddress(differentPortSameIp).has_value());
+    EXPECT_EQ(registry.findByAddress(differentPortSameIp), nullptr);
 }
 
 TEST_F(SocketRegistryTest, GetFromAddressReturnsCorrectClientAmongMany) {
@@ -90,10 +84,8 @@ TEST_F(SocketRegistryTest, GetFromAddressReturnsCorrectClientAmongMany) {
     registry.insert(third);
 
     const network::Address addr{"127.0.0.2", 4001};
-    auto result = registry.getFromAddress(addr);
 
-    ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(result->get().fd(), 2);
+    ASSERT_EQ(registry.findByAddress(addr)->fd(), 2);
 }
 
 // ---------------------------------------------------------------------------
@@ -112,8 +104,8 @@ TEST_F(SocketRegistryTest, RemoveDeletesClientByFd) {
     const network::Address invalidaddr{"127.0.0.1", 4242};
     const network::Address validaddr{"127.0.0.1", 4200};
 
-    EXPECT_FALSE(registry.getFromAddress(invalidaddr).has_value());
-    EXPECT_TRUE(registry.getFromAddress(validaddr).has_value());
+    EXPECT_EQ(registry.findByAddress(invalidaddr), nullptr);
+    EXPECT_NE(registry.findByAddress(validaddr), nullptr);
 }
 
 // Removing one client among many only affects the targeted fd.
@@ -126,12 +118,10 @@ TEST_F(SocketRegistryTest, RemoveOnlyAffectsTargetedClient) {
     registry.remove(1);
 
     const network::Address removedAddr{"127.0.0.1", 4000};
-    EXPECT_FALSE(registry.getFromAddress(removedAddr).has_value());
+    EXPECT_EQ(registry.findByAddress(removedAddr), nullptr);
 
     const network::Address keptAddr{"127.0.0.2", 4001};
-    auto kept = registry.getFromAddress(keptAddr);
-    ASSERT_TRUE(kept.has_value());
-    EXPECT_EQ(kept->get().fd(), 2);
+    ASSERT_EQ(registry.findByAddress(keptAddr)->fd(), 2);
 }
 
 // Removing on an empty registry must not crash.

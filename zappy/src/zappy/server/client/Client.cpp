@@ -36,14 +36,14 @@ void Client::addRequest(std::string msg) {
 }
 
 bool Client::update() {
-    auto result = this->_socketsRegistery.getFromAddress(this->_addr);
-    if (!result.has_value()) {
+    auto* socket = this->_socketsRegistery.findByAddress(this->_addr);
+
+    if (socket == nullptr) {
         return false;
     }
-    network::BufferedClient& socket = result.value().get();
 
-    while (socket.hasMessages()) {
-        std::string msg = socket.popMessage();
+    while (socket->hasMessages()) {
+        std::string msg = socket->popMessage();
 
         this->addRequest(std::move(msg));
     }
@@ -66,12 +66,13 @@ std::optional<std::string> Client::nextRequest() {
 void Client::setTimeout(int timeout) { this->_timeout = timeout; }
 
 bool Client::sendMessage(std::string_view msg) {
-    auto socket = this->_socketsRegistery.getFromAddress(this->_addr);
-    if (!socket.has_value()) {
+    auto* socket = this->_socketsRegistery.findByAddress(this->_addr);
+
+    if (socket == nullptr) {
         return false;
     }
     try {
-        socket.value().get().send(msg);
+        socket->send(msg);
     } catch (const zappy::exception::SocketError& /*err */) {
         return false;
     }
