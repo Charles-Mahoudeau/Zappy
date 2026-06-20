@@ -33,14 +33,16 @@ class SocketRegistry {
 
     /**
      * @brief remove a client from the registry
-     * @param fd file descriptor of the socket
+     * @param address @c network::Address class
      */
-    void remove(int fd);
+    void remove(const network::Address& addr);
 
     /**
      * @brief Remove all socket from the registry
      */
     void clear();
+
+    int size();
 
     /**
      * @brief use a address to get the socket related to it
