@@ -20,10 +20,27 @@ namespace zappy::server {
 
 class Client {
   public:
+    /**
+     * @brief Represents all possible client types in the system.
+     *
+     * @details Each client connected to the server is assigned a type that
+     * determines its role and behavior within the application.
+     *
+     * @note A client starts as @c kUnknown until it identifies itself.
+     * A @c kUnknown client **must** be assigned a team before it can be
+     * promoted to another type.
+     *
+     * ### Types overview:
+     * | Value      | Description                              |
+     * |------------|------------------------------------------|
+     * | kPlayer    | An AI-controlled client (game logic)     |
+     * | kGui       | A graphical client (rendering/display)   |
+     * | kUnknown   | Default type, pending identification     |
+     */
     enum class Type : std::uint8_t {
-        kPlayer,
-        kGui,
-        kUnknown,
+        kPlayer,   ///< AI-controlled client managing game logic.
+        kGui,      ///< Graphical client responsible for rendering.
+        kUnknown,  ///< Default unidentified client; requires a team assignment before promotion.
     };
 
     Client(net::SocketRegistry& socketRegister, network::Address address);
