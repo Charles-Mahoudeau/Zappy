@@ -15,6 +15,8 @@ add_library(zappy_server_objects OBJECT
         game/entity/Egg.hpp
         game/entity/Resource.cpp
         game/entity/Resource.hpp
+        game/World.cpp
+        game/World.hpp
         game/Tile.cpp
         game/Tile.hpp
 )

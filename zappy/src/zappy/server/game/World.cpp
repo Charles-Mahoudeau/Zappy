@@ -1,0 +1,217 @@
+/*
+** EPITECH PROJECT, 2026
+** zappy
+** File description:
+** World
+*/
+
+#include "World.hpp"
+
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <expected>
+#include <format>
+#include <memory>
+#include <optional>
+#include <random>
+#include <ranges>
+#include <string>
+#include <tuple>
+#include <unordered_map>
+#include <utility>
+
+#include "EntityDatabase.hpp"
+#include "ResourceType.hpp"
+#include "Tile.hpp"
+#include "entity/Egg.hpp"
+#include "entity/Player.hpp"
+#include "entity/Resource.hpp"
+#include "zappy/shared/exception/OutOfRange.hpp"
+
+namespace zappy::server::game {
+World::World(Config config) : _config{std::move(config)} {
+    const auto size = static_cast<std::size_t>(_config.width * _config.height);
+
+    if (size == 0) {
+        throw exception::OutOfRange{"trying to create world with 0 width or height"};
+    }
+    _tiles.reserve(size);
+    for (std::size_t i = 0; i < size; ++i) {
+        _tiles.emplace_back(*this, i % _config.width, i / _config.width);
+    }
+    generateResourceThresholds();
+    spawnStartEggs();
+    if (_config.logger) {
+        _config.logger->info("World initialized.");
+    }
+}
+
+void World::update() {
+    --_nextMajorTick;
+    if (_nextMajorTick != 0) {
+        return;
+    }
+    spawnResources();
+    _nextMajorTick = kMajorTickInterval;
+}
+
+std::uint16_t World::width() const { return _config.width; }
+
+std::uint16_t World::height() const { return _config.height; }
+
+const EntityDatabase& World::entityDatabase() const { return _entityDatabase; }
+
+EntityDatabase& World::entityDatabase() { return _entityDatabase; }
+
+const Tile& World::tile(const std::uint16_t x, const std::uint16_t y) const {
+    if (!isInBounds(x, y)) {
+        throw exception::OutOfRange{"trying to access tile out of bounds"};
+    }
+    return _tiles.at((y * _config.width) + x);
+}
+
+Tile& World::tile(const std::uint16_t x, const std::uint16_t y) {
+    if (!isInBounds(x, y)) {
+        throw exception::OutOfRange{"trying to access tile out of bounds"};
+    }
+    return _tiles.at((y * _config.width) + x);
+}
+
+const Tile* World::tile(const std::uint64_t entityId) const {
+    for (const auto& tile : _tiles) {
+        if (tile.hasEntity(entityId)) {
+            return &tile;
+        }
+    }
+    return nullptr;
+}
+
+Tile* World::tile(const std::uint64_t entityId) {
+    for (auto& tile : _tiles) {
+        if (tile.hasEntity(entityId)) {
+            return &tile;
+        }
+    }
+    return nullptr;
+}
+
+std::uint64_t World::countResources(const ResourceType type) const {
+    const auto resources = _entityDatabase.viewAll<entity::Resource>();
+    std::uint64_t count = 0;
+
+    for (const auto& resource : resources) {
+        if (resource->type() == type) {
+            ++count;
+        }
+    }
+    return count;
+}
+
+std::uint64_t World::spawnEgg(std::uint16_t teamId) {
+    const std::uint16_t eggId = _entityDatabase.insert(std::make_unique<entity::Egg>(teamId));
+    Tile& tile = randomTile();
+
+    tile.addEntity(eggId);
+    if (_config.logger) {
+        _config.logger->info(
+            std::format("Spawned egg #{} for team #{} at ({}, {})", eggId, teamId, tile.x(), tile.y()));
+    }
+    return eggId;
+}
+
+std::uint64_t World::spawnResource(ResourceType type) {
+    const std::uint64_t entityId = _entityDatabase.insert(std::make_unique<entity::Resource>(type));
+
+    randomTile().addEntity(entityId);
+    return entityId;
+}
+
+std::expected<std::uint16_t, std::string> World::hatchRandomEgg(const std::uint16_t teamId) {
+    auto eggs = _entityDatabase.viewAll<entity::Egg>() | std::views::filter([teamId](const entity::Egg* egg) {
+                    return egg != nullptr && egg->teamId() == teamId;
+                });
+
+    if (eggs.empty()) {
+        return std::unexpected{"No eggs available to hatch."};
+    }
+
+    const entity::Egg* egg = eggs.front();
+
+    if (egg == nullptr) {
+        return std::unexpected{"Egg is null (this should never happen)."};
+    }
+
+    const std::optional<std::uint64_t> eggIdOpt = _entityDatabase.id(*egg);
+
+    if (!eggIdOpt) {
+        return std::unexpected{"Egg was retrieved from the database, but its id is null (this should never happen)."};
+    }
+
+    Tile* parentTile = tile(*eggIdOpt);
+
+    if (parentTile == nullptr) {
+        return std::unexpected{"Egg is not on a tile."};
+    }
+
+    _entityDatabase.remove(*eggIdOpt);
+    parentTile->removeEntity(*eggIdOpt);
+
+    const std::uint64_t playerId = _entityDatabase.insert(std::make_unique<entity::Player>(teamId));
+
+    parentTile->addEntity(playerId);
+    return playerId;
+}
+
+const std::unordered_map<ResourceType, float>& World::resourceDensities() {
+    static const std::unordered_map<ResourceType, float> resourceDensities = {
+        {ResourceType::kFood, 0.5F},      {ResourceType::kLinemate, 0.3F}, {ResourceType::kDeraumere, 0.15F},
+        {ResourceType::kSibur, 0.1F},     {ResourceType::kMendiane, 0.1F}, {ResourceType::kPhiras, 0.08F},
+        {ResourceType::kThystame, 0.05F},
+    };
+    return resourceDensities;
+}
+
+bool World::isInBounds(const std::uint16_t x, const std::uint16_t y) const {
+    return x < _config.width && y < _config.height;
+}
+
+void World::spawnStartEggs() {
+    for (std::uint16_t teamId = 0; teamId < _config.teamCount; ++teamId) {
+        for (std::uint16_t i = 0; i < _config.playersPerTeam; ++i) {
+            std::ignore = spawnEgg(teamId);
+        }
+    }
+    if (_config.logger) {
+        _config.logger->info("Start eggs spawned.");
+    }
+}
+
+void World::spawnResources() {
+    for (const auto& [resourceType, quantity] : _resourceThresholds) {
+        for (std::uint64_t count = countResources(resourceType); count < quantity; ++count) {
+            std::ignore = spawnResource(resourceType);
+        }
+    }
+    if (_config.logger) {
+        _config.logger->info("Resources spawned.");
+    }
+}
+
+Tile& World::randomTile() {
+    std::uniform_int_distribution<std::size_t> distribution{0, _tiles.size() - 1};
+
+    return _tiles.at(distribution(_randomEngine));
+}
+
+void World::generateResourceThresholds() {
+    _resourceThresholds.clear();
+    for (const auto& [resourceType, density] : resourceDensities()) {
+        _resourceThresholds[resourceType] =
+            static_cast<std::uint16_t>(std::ceil(static_cast<float>(_config.width * _config.height) * density));
+    }
+    if (_config.logger) {
+        _config.logger->info("Resources thresholds generated.");
+    }
+}
+}  // namespace zappy::server::game
