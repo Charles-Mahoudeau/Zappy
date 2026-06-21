@@ -13,12 +13,21 @@
 #include <algorithm>
 #include <array>
 #include <cstddef>
+#include <filesystem>
 #include <span>
 #include <string>
 #include <string_view>
 #include <utility>
 
 namespace zappy::gui::render {
+namespace {
+#ifdef PLATFORM_DESKTOP
+constexpr int kGlslVersion = 330;
+#else  // PLATFORM_ANDROID, PLATFORM_WEB
+constexpr int kGlslVersion = 100;
+#endif
+}  // namespace
+
 Model::Model(std::string_view path)
     : _model(LoadModel(std::string(path).c_str())),
       _animCount(0),
@@ -56,6 +65,9 @@ Model::~Model() {
     if (IsModelValid(_model)) {
         UnloadModel(_model);
     }
+    if (_hasSkinningShader) {
+        UnloadShader(_skinningShader);
+    }
     if (_animations != nullptr && _animCount > 0) {
         UnloadModelAnimations(_animations, _animCount);
     }
@@ -70,16 +82,23 @@ Model::Model(Model&& other) noexcept
       _animations(other._animations),
       _animCount(other._animCount),
       _currentAnim(other._currentAnim),
-      _currentFrame(other._currentFrame) {
+      _currentFrame(other._currentFrame),
+      _skinningShader(other._skinningShader),
+      _hasSkinningShader(other._hasSkinningShader) {
     other._model = {};
     other._animations = nullptr;
     other._animCount = 0;
+    other._skinningShader = {};
+    other._hasSkinningShader = false;
 }
 
 Model& Model::operator=(Model&& other) noexcept {
     if (this != &other) {
         if (IsModelValid(_model)) {
             UnloadModel(_model);
+        }
+        if (_hasSkinningShader) {
+            UnloadShader(_skinningShader);
         }
         if (_animations != nullptr && _animCount > 0) {
             UnloadModelAnimations(_animations, _animCount);
@@ -91,9 +110,13 @@ Model& Model::operator=(Model&& other) noexcept {
         _animCount = other._animCount;
         _currentAnim = other._currentAnim;
         _currentFrame = other._currentFrame;
+        _skinningShader = other._skinningShader;
+        _hasSkinningShader = other._hasSkinningShader;
         other._model = {};
         other._animations = nullptr;
         other._animCount = 0;
+        other._skinningShader = {};
+        other._hasSkinningShader = false;
     }
     return *this;
 }
@@ -192,6 +215,33 @@ void Model::setMeshTexture(int meshIndex, MaterialMapIndex mapIndex, ::Texture t
     const std::span<int> meshMaterial{_model.meshMaterial, static_cast<std::size_t>(_model.meshCount)};
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-avoid-unchecked-container-access)
     setTexture(meshMaterial[meshIndex], mapIndex, texture);
+}
+
+void Model::useSkinningShader(std::string_view shaderDirectory) {
+    if (!IsModelValid(_model)) {
+        throw ModelException{"Cannot set skinning shader for a model that failed to load"};
+    }
+    const std::string directory = std::string{shaderDirectory} + "/glsl" + std::to_string(kGlslVersion);
+    const std::string vsPath = directory + "/skinning.vs";
+    const std::string fsPath = directory + "/skinning.fs";
+    if (!std::filesystem::is_regular_file(vsPath) || !std::filesystem::is_regular_file(fsPath)) {
+        throw ModelException{"Skinning shader not found in: " + directory};
+    }
+
+    const ::Shader shader = LoadShader(vsPath.c_str(), fsPath.c_str());
+    if (!IsShaderValid(shader)) {
+        throw ModelException{"Failed to load skinning shader from: " + directory};
+    }
+    if (_hasSkinningShader) {
+        UnloadShader(_skinningShader);
+    }
+    _skinningShader = shader;
+    _hasSkinningShader = true;
+
+    const std::span<Material> materials{_model.materials, static_cast<std::size_t>(_model.materialCount)};
+    for (auto& material : materials) {
+        material.shader = _skinningShader;
+    }
 }
 
 }  // namespace zappy::gui::render

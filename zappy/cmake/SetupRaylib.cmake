@@ -15,6 +15,7 @@ macro(setup_raylib)
         set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 
         FetchContent_MakeAvailable(raylib)
+        target_compile_definitions(raylib PRIVATE SUPPORT_GPU_SKINNING=1)
     else ()
         message(WARNING "Raylib not available: no internet connection.")
     endif ()

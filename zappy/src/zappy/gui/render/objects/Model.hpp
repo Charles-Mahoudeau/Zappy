@@ -60,6 +60,8 @@ class Model {
     void setTexture(int materialIndex, MaterialMapIndex mapIndex, ::Texture texture);
     void setMeshTexture(int meshIndex, MaterialMapIndex mapIndex, ::Texture texture);
 
+    void useSkinningShader(std::string_view shaderDirectory = "assets/shaders");
+
   protected:
   private:
     ::Model _model{};
@@ -69,6 +71,8 @@ class Model {
     int _animCount;
     int _currentAnim;
     int _currentFrame;
+    ::Shader _skinningShader{};
+    bool _hasSkinningShader{false};
 };
 
 class ModelException : public std::runtime_error {

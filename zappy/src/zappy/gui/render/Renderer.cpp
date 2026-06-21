@@ -34,9 +34,9 @@ void Renderer::init() {
     _skybox = Skybox{"assets/skybox/skybox.png", "assets/shaders", true};
 
     _playerModels.reserve(kMaxModels);
-    _playerModels.emplace_back(createModel("assets/models/burpy/source/burpy.glb",
-                                           {{.mapIndex = ALBEDO, .path = "assets/models/burpy/textures/burpy.png"}},
-                                           true));
+    _playerModels.emplace_back(
+        createModel("assets/models/burpy/source/burpy.glb", "assets/models/burpy/source/burpy.glb",
+                    {{.mapIndex = ALBEDO, .path = "assets/models/burpy/textures/burpy.png"}}, true));
 
     _resourcesModels.emplace(Food, createModel("assets/models/resources/source/food.glb", {}));
     _resourcesModels.emplace(
@@ -146,6 +146,24 @@ Model Renderer::createModel(std::string_view path, std::initializer_list<Texture
     return model;
 }
 
+Model Renderer::createModel(std::string_view path, std::string_view animationPath,
+                            std::initializer_list<TextureMap> textures, bool flipVertical) {
+    Model model{path, animationPath};
+    for (const auto& [mapIndex, texturePath] : textures) {
+        const auto texturePathStr = std::string{texturePath};
+        Texture texture{texturePathStr.c_str(), flipVertical};
+        model.setMeshTexture(0, mapIndex, texture);
+        texture.release();
+    }
+    // GPU skinning is required: with SUPPORT_GPU_SKINNING=1 raylib does not allocate animVertices,
+    // so CPU skinning (UpdateModelAnimation's vertex update) is a no-op. The skinning shader is the
+    // only path that animates the mesh.
+    model.useSkinningShader();
+    model.normalizeOnGround();
+
+    return model;
+}
+
 // TODO: real grid
 void Renderer::drawGrid(const game::GameState& state) {
     const auto width = static_cast<int>(state.width());
@@ -173,9 +191,11 @@ void Renderer::drawPlayers(const game::GameState& state) {
     for (const auto& [playerId, player] : state.players()) {
         const auto teamIt = std::ranges::find(teams, player.team);
         const auto teamIndex = static_cast<std::size_t>(std::distance(teams.begin(), teamIt));
-        const auto& model = _playerModels.at(teamIndex % _playerModels.size());
+        auto& model = _playerModels.at(teamIndex % _playerModels.size());
         const float scale = kScale * static_cast<float>(player.level);
         Vector3 position(static_cast<float>(player.x), 0.0F, static_cast<float>(player.y));
+        model.addAnimationFrame();
+        model.updateAnimation();
         model.drawEx(position, Vector3(0.0F, 1.0F, 0.0F), calculAngle(player.orientation), scale, Color::kWHITE);
     }
 }

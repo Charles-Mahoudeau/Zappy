@@ -41,6 +41,8 @@ class Renderer {
 
     static Model createModel(std::string_view path, std::initializer_list<TextureMap> textures,
                              bool flipVertical = false);
+    static Model createModel(std::string_view path, std::string_view animationPath,
+                             std::initializer_list<TextureMap> textures, bool flipVertical = false);
 
     static void drawGrid(const game::GameState& state);
 
