@@ -103,7 +103,7 @@ void Renderer::drawTileResources(const game::Resources& tile, const Vector3& pos
 void Renderer::drawResourceStack(const Model& model, const Vector3& position, std::uint32_t count) {
     for (std::uint32_t i = 0; i < count; ++i) {
         const float offsetX = (static_cast<float>(i % 2) * 0.5F) - 0.25F;
-        const float offsetZ = (static_cast<float>(i / 2) * 0.5F) - 0.25F;
+        const float offsetZ = ((static_cast<float>(i) / 2.0F) * 0.5F) - 0.25F;
         const Vector3 resourcePosition(position.x() + offsetX, position.y(), position.z() + offsetZ);
         model.draw(resourcePosition, kScale, Color::kWHITE);
     }
