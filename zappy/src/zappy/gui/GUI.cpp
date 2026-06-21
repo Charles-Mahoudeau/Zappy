@@ -9,6 +9,7 @@
 
 #include <raylib.h>
 
+#include <algorithm>
 #include <cstddef>
 #include <string>
 
@@ -16,8 +17,9 @@
 #include "zappy/gui/display/Window.hpp"
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/render/Camera.hpp"
+#include "zappy/gui/render/Renderer.hpp"
+#include "zappy/gui/render/utils/Vector3.hpp"
 #include "zappy/shared/exception/InvalidState.hpp"
-
 namespace zappy::gui {
 
 static constexpr int kWindowWidth = 1600;
@@ -25,17 +27,7 @@ static constexpr int kWindowHeight = 900;
 static constexpr int kTargetFPS = 60;
 static constexpr int kPollTimeoutMs = 16;
 
-GUI::GUI()
-    : _parser{_state},
-      _sender{_buffer},
-      _handshake{_buffer, _sender, _parser, _state},
-      _camera{
-          Vector3{.x = 0, .y = 0, .z = 10},
-          Vector3{.x = 0, .y = 0, .z = 0},
-          Vector3{.x = 0, .y = 1, .z = 0},
-          45.0F,
-          render::CameraProjection::CAMERA_ORTHOGRAPHIC,
-      } {}
+GUI::GUI() : _parser{_state}, _sender{_buffer}, _handshake{_buffer, _sender, _parser, _state} {}
 
 void GUI::connect(const GuiCliParser& cli) {
     _address = zappy::network::Address{std::string{cli.host()}, cli.port()};
@@ -53,12 +45,36 @@ void GUI::pump() {
     }
 }
 
-int GUI::run(const GuiCliParser& cli) {
+int GUI::init(const GuiCliParser& cli) {
+    // TODO: Not HERE but:
+    // InitAudioDevice();
+    // if (!IsAudioDeviceReady()) {
+    //     throw exception::InvalidState{"Failed to initialize audio device"};
+    // }
+
     connect(cli);
 
-    display::Window window{kWindowWidth, kWindowHeight, "Zappy"};
-    window.setTargetFPS(kTargetFPS);
+    _window = display::Window{kWindowWidth, kWindowHeight, "Zappy"};
+    _window.setTargetFPS(kTargetFPS);
 
+    const auto width = static_cast<float>(_state.width());
+    const auto height = static_cast<float>(_state.height());
+    const float span = std::max({width, height, 1.0F});
+    const float centerX = width / 2.0F;
+    const float centerZ = height / 2.0F;
+    const float offset = span;
+    const float fovy = span * 1.5F;
+
+    _camera = render::Camera{render::Vector3(centerX + offset, span, centerZ + offset),
+                             render::Vector3(centerX, 0.0F, centerZ), render::Vector3(0, 1, 0), fovy,
+                             render::CameraProjection::CAMERA_ORTHOGRAPHIC};
+
+    _renderer.init();
+
+    return 0;
+}
+
+int GUI::run() {
     _poller.add(_buffer.fd(), zappy::io::Poller::kPollRead | zappy::io::Poller::kPollError, [this](std::byte events) {
         if ((events & zappy::io::Poller::kPollError) != zappy::io::Poller::kPollNone) {
             throw exception::InvalidState{"server disconnected"};
@@ -66,10 +82,11 @@ int GUI::run(const GuiCliParser& cli) {
         pump();
     });
 
-    while (!window.shouldClose()) {
+    while (!_window.shouldClose()) {
         _poller.poll(kPollTimeoutMs);
-        window.beginFrame();
-        window.endFrame();
+        _window.beginFrame();
+        _renderer.update(_camera, _state);
+        _window.endFrame();
     }
     return 0;
 }

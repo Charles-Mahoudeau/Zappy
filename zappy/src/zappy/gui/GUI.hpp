@@ -8,11 +8,13 @@
 #pragma once
 
 #include "zappy/gui/GuiCliParser.hpp"
+#include "zappy/gui/display/Window.hpp"
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/network/CommandSender.hpp"
 #include "zappy/gui/network/Handshake.hpp"
 #include "zappy/gui/network/ProtocolParser.hpp"
 #include "zappy/gui/render/Camera.hpp"
+#include "zappy/gui/render/Renderer.hpp"
 #include "zappy/shared/io/Poller.hpp"
 #include "zappy/shared/network/Address.hpp"
 #include "zappy/shared/network/BufferedClient.hpp"
@@ -30,7 +32,8 @@ class GUI {
     GUI(GUI&&) noexcept = default;
     GUI& operator=(GUI&&) noexcept = default;
 
-    int run(const GuiCliParser& cli);
+    int init(const GuiCliParser& cli);
+    int run();
 
     void connect(const GuiCliParser& cli);
     void pump();
@@ -45,7 +48,10 @@ class GUI {
     network::CommandSender _sender;
     network::Handshake _handshake;
     zappy::io::Poller _poller;
-    render::Camera _camera;
+
+    display::Window _window;
+    render::Camera _camera;  // May be placed in renderer ?
+    render::Renderer _renderer;
 };
 
 }  // namespace zappy::gui
