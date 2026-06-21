@@ -42,9 +42,6 @@ class Model {
     void draw(Vector3 position, float scale, Color tint) const;
     void drawEx(Vector3 position, Vector3 rotationAxis, float rotationAngle, Vector3 scale, Color tint) const;
     void drawEx(Vector3 position, Vector3 rotationAxis, float rotationAngle, float scale, Color tint) const;
-
-    // Computes the base scale and ground offset from the model's bounding box so that
-    // draw()/drawEx() can place its bottom-center on the requested position, scale-independently.
     void normalizeOnGround(float targetSize = 1.0F);
 
     void updateAnimation();
