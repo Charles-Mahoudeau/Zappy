@@ -14,7 +14,7 @@ class Vector3 {
   public:
     Vector3(float x, float y, float z) : _vector{.x = x, .y = y, .z = z} {}
     Vector3() : _vector{.x = 0.0F, .y = 0.0F, .z = 0.0F} {}
-    Vector3(const ::Vector3& vector) : _vector{vector} {}
+    explicit Vector3(const ::Vector3& vector) : _vector{vector} {}
     Vector3(const Vector3&) = default;
     Vector3& operator=(const Vector3&) = default;
     Vector3(Vector3&&) noexcept = default;
