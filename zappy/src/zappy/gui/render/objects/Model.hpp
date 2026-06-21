@@ -39,9 +39,9 @@ class Model {
     Model& operator=(Model&& other) noexcept;
     ~Model();
 
-    void draw(Vector3 position, float scale, Color tint) const;
-    void drawEx(Vector3 position, Vector3 rotationAxis, float rotationAngle, Vector3 scale, Color tint) const;
-    void drawEx(Vector3 position, Vector3 rotationAxis, float rotationAngle, float scale, Color tint) const;
+    void draw(::Vector3 position, float scale, Color tint) const;
+    void drawEx(::Vector3 position, ::Vector3 rotationAxis, float rotationAngle, ::Vector3 scale, Color tint) const;
+    void drawEx(::Vector3 position, ::Vector3 rotationAxis, float rotationAngle, float scale, Color tint) const;
     void normalizeOnGround(float targetSize = 1.0F);
 
     void updateAnimation();
@@ -64,7 +64,7 @@ class Model {
   private:
     ::Model _model{};
     float _baseScale{1.0F};
-    Vector3 _groundOffset{};
+    ::Vector3 _groundOffset{};
     ModelAnimation* _animations;
     int _animCount;
     int _currentAnim;

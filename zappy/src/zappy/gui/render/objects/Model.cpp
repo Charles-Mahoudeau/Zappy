@@ -97,28 +97,28 @@ Model& Model::operator=(Model&& other) noexcept {
     }
     return *this;
 }
-void Model::draw(Vector3 position, float scale, Color tint) const {
+void Model::draw(::Vector3 position, float scale, Color tint) const {
     if (!IsModelValid(_model)) {
         throw ModelException{"Cannot draw a model that failed to load"};
     }
     const float finalScale = scale * _baseScale;
-    const Vector3 groundedPosition = Vector3Subtract(position, Vector3Scale(_groundOffset, finalScale));
+    const ::Vector3 groundedPosition = Vector3Subtract(position, Vector3Scale(_groundOffset, finalScale));
     DrawModel(_model, groundedPosition, finalScale, tint);
 }
 
-void Model::drawEx(Vector3 position, Vector3 rotationAxis, float rotationAngle, Vector3 scale, Color tint) const {
+void Model::drawEx(::Vector3 position, ::Vector3 rotationAxis, float rotationAngle, ::Vector3 scale, Color tint) const {
     if (!IsModelValid(_model)) {
         throw ModelException{"Cannot draw a model that failed to load"};
     }
-    const Vector3 finalScale = Vector3Scale(scale, _baseScale);
-    const Vector3 scaledOffset = Vector3Multiply(_groundOffset, finalScale);
-    const Vector3 rotatedOffset = Vector3RotateByAxisAngle(scaledOffset, rotationAxis, rotationAngle * DEG2RAD);
-    const Vector3 groundedPosition = Vector3Subtract(position, rotatedOffset);
+    const ::Vector3 finalScale = Vector3Scale(scale, _baseScale);
+    const ::Vector3 scaledOffset = Vector3Multiply(_groundOffset, finalScale);
+    const ::Vector3 rotatedOffset = Vector3RotateByAxisAngle(scaledOffset, rotationAxis, rotationAngle * DEG2RAD);
+    const ::Vector3 groundedPosition = Vector3Subtract(position, rotatedOffset);
     DrawModelEx(_model, groundedPosition, rotationAxis, rotationAngle, finalScale, tint);
 }
 
-void Model::drawEx(Vector3 position, Vector3 rotationAxis, float rotationAngle, float scale, Color tint) const {
-    drawEx(position, rotationAxis, rotationAngle, Vector3{.x = scale, .y = scale, .z = scale}, tint);
+void Model::drawEx(::Vector3 position, ::Vector3 rotationAxis, float rotationAngle, float scale, Color tint) const {
+    drawEx(position, rotationAxis, rotationAngle, ::Vector3{.x = scale, .y = scale, .z = scale}, tint);
 }
 
 void Model::normalizeOnGround(float targetSize) {
@@ -126,24 +126,24 @@ void Model::normalizeOnGround(float targetSize) {
         return;
     }
     const BoundingBox local = GetModelBoundingBox(_model);
-    const std::array<Vector3, 8> corners = {{{.x = local.min.x, .y = local.min.y, .z = local.min.z},
-                                             {.x = local.max.x, .y = local.min.y, .z = local.min.z},
-                                             {.x = local.min.x, .y = local.max.y, .z = local.min.z},
-                                             {.x = local.min.x, .y = local.min.y, .z = local.max.z},
-                                             {.x = local.max.x, .y = local.max.y, .z = local.min.z},
-                                             {.x = local.max.x, .y = local.min.y, .z = local.max.z},
-                                             {.x = local.min.x, .y = local.max.y, .z = local.max.z},
-                                             {.x = local.max.x, .y = local.max.y, .z = local.max.z}}};
-    Vector3 mn = Vector3Transform(corners.at(0), _model.transform);
-    Vector3 mx = mn;
+    const std::array<::Vector3, 8> corners = {{{.x = local.min.x, .y = local.min.y, .z = local.min.z},
+                                               {.x = local.max.x, .y = local.min.y, .z = local.min.z},
+                                               {.x = local.min.x, .y = local.max.y, .z = local.min.z},
+                                               {.x = local.min.x, .y = local.min.y, .z = local.max.z},
+                                               {.x = local.max.x, .y = local.max.y, .z = local.min.z},
+                                               {.x = local.max.x, .y = local.min.y, .z = local.max.z},
+                                               {.x = local.min.x, .y = local.max.y, .z = local.max.z},
+                                               {.x = local.max.x, .y = local.max.y, .z = local.max.z}}};
+    ::Vector3 mn = Vector3Transform(corners.at(0), _model.transform);
+    ::Vector3 mx = mn;
     for (const auto& corner : corners) {
-        const Vector3 point = Vector3Transform(corner, _model.transform);
-        mn = Vector3{.x = std::min(mn.x, point.x), .y = std::min(mn.y, point.y), .z = std::min(mn.z, point.z)};
-        mx = Vector3{.x = std::max(mx.x, point.x), .y = std::max(mx.y, point.y), .z = std::max(mx.z, point.z)};
+        const ::Vector3 point = Vector3Transform(corner, _model.transform);
+        mn = ::Vector3{.x = std::min(mn.x, point.x), .y = std::min(mn.y, point.y), .z = std::min(mn.z, point.z)};
+        mx = ::Vector3{.x = std::max(mx.x, point.x), .y = std::max(mx.y, point.y), .z = std::max(mx.z, point.z)};
     }
     const float maxDim = std::max({mx.x - mn.x, mx.y - mn.y, mx.z - mn.z});
     _baseScale = (maxDim > 0.0F) ? targetSize / maxDim : 1.0F;
-    _groundOffset = Vector3{.x = (mn.x + mx.x) * 0.5F, .y = mn.y, .z = (mn.z + mx.z) * 0.5F};
+    _groundOffset = ::Vector3{.x = (mn.x + mx.x) * 0.5F, .y = mn.y, .z = (mn.z + mx.z) * 0.5F};
 }
 
 void Model::updateAnimation() {
