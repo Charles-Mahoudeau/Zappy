@@ -79,7 +79,7 @@ void Renderer::update(Camera& camera, game::GameState& state) {
         const auto& model = _playerModels.at(teamIndex % _playerModels.size());
         const float scale = kScale * static_cast<float>(player.level);
         Vector3 position(static_cast<float>(player.x), 0.0F, static_cast<float>(player.y));
-        model.drawEx(position, Vector3{0.0F, 1.0F, 0.0F}, calculAngle(player.orientation), scale, Color::WHITE);
+        model.drawEx(position, Vector3{0.0F, 1.0F, 0.0F}, calculAngle(player.orientation), scale, Color::kWHITE);
     }
 
     drawResources(state);
@@ -106,7 +106,7 @@ void Renderer::drawResourceStack(const Model& model, const Vector3& position, st
         const float offsetX = static_cast<float>(i % 2) * 0.5F - 0.25F;
         const float offsetZ = static_cast<float>(i / 2) * 0.5F - 0.25F;
         const Vector3 resourcePosition(position.x() + offsetX, position.y(), position.z() + offsetZ);
-        model.draw(resourcePosition, kScale, Color::WHITE);
+        model.draw(resourcePosition, kScale, Color::kWHITE);
     }
 }
 
