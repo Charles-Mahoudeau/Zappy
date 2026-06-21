@@ -26,6 +26,8 @@ add_library(zappy_gui_objects OBJECT
         render/objects/Texture.hpp
         render/objects/Model.cpp
         render/objects/Model.hpp
+        render/objects/Skybox.cpp
+        render/objects/Skybox.hpp
         render/utils/Color.hpp
         render/utils/Vector3.hpp
 )

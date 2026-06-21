@@ -15,6 +15,7 @@
 
 #include "Camera.hpp"
 #include "objects/Model.hpp"
+#include "objects/Skybox.hpp"
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/render/utils/Vector3.hpp"
 
@@ -55,6 +56,7 @@ class Renderer {
     static constexpr float kScale = 0.5F;
     std::vector<Model> _playerModels;
     std::map<game::ResourceType, Model> _resourcesModels;
+    Skybox _skybox;
     // Grid _grid; TODO: Implement a grid class to render a grid in the scene
 };
 }  // namespace zappy::gui::render

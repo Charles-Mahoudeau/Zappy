@@ -9,9 +9,11 @@
 
 #include <raylib.h>
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <initializer_list>
+#include <iterator>
 #include <string>
 #include <string_view>
 
@@ -28,6 +30,8 @@ namespace zappy::gui::render {
 void Renderer::init() {
     using enum Model::MaterialMapIndex;
     using enum game::ResourceType;
+
+    _skybox = Skybox{"assets/skybox/skybox.png", "assets/shaders", true};
 
     _playerModels.reserve(kMaxModels);
     _playerModels.emplace_back(createModel("assets/models/burpy/source/burpy.glb",
@@ -77,6 +81,7 @@ void Renderer::init() {
 void Renderer::update(Camera& camera, game::GameState& state) {
     camera.Update();
     display::Window::BeginMode3D(camera);
+    _skybox.draw();
     drawGrid(state);  // TODO: Implement a grid class to render a grid in the scene
     drawPlayers(state);
     drawResources(state);
