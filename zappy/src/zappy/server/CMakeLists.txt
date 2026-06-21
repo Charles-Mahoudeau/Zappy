@@ -15,6 +15,8 @@ add_library(zappy_server_objects OBJECT
         game/entity/Egg.hpp
         game/entity/Resource.cpp
         game/entity/Resource.hpp
+		net/Server.hpp
+		net/Server.cpp
         net/SocketRegistry.hpp
         net/SocketRegistry.cpp
         client/Client.hpp
