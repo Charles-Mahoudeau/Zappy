@@ -15,7 +15,7 @@ namespace zappy::gui::render {
 
 enum class CameraMode : std::uint8_t {
     CAMERA_CUSTOM = 0,
-    ddqCAMERA_FREE = 1,
+    CAMERA_FREE = 1,
     CAMERA_ORBITAL = 2,
     CAMERA_FIRST_PERSON = 3,
     CAMERA_THIRD_PERSON = 4
