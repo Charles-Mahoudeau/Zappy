@@ -46,12 +46,12 @@ class Renderer {
     void drawResources(const game::GameState& state);
     void drawTileResources(const game::Resources& tile, const Vector3& position);
     static void drawResourceStack(const Model& model, const Vector3& position, std::uint32_t count);
-    static std::uint32_t resourceCount(const game::Resources& tile, game::RessourceType type);
+    static std::uint32_t resourceCount(const game::Resources& tile, game::ResourceType type);
 
     static constexpr int kMaxModels = 10;
     static constexpr float kScale = 0.5F;
     std::vector<Model> _playerModels;
-    std::map<game::RessourceType, Model> _resourcesModels;
+    std::map<game::ResourceType, Model> _resourcesModels;
     // Grid _grid; TODO: Implement a grid class to render a grid in the scene
 };
 }  // namespace zappy::gui::render

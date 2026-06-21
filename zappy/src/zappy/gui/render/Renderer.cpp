@@ -27,7 +27,7 @@ namespace zappy::gui::render {
 
 void Renderer::init() {
     using enum Model::MaterialMapIndex;
-    using enum game::RessourceType;
+    using enum game::ResourceType;
 
     _playerModels.reserve(kMaxModels);
     _playerModels.emplace_back(createModel("assets/models/burpy/source/burpy.glb",
@@ -110,8 +110,8 @@ void Renderer::drawResourceStack(const Model& model, const Vector3& position, st
     }
 }
 
-std::uint32_t Renderer::resourceCount(const game::Resources& tile, game::RessourceType type) {
-    using enum game::RessourceType;
+std::uint32_t Renderer::resourceCount(const game::Resources& tile, game::ResourceType type) {
+    using enum game::ResourceType;
     switch (type) {
         case Food:
             return tile.food;
