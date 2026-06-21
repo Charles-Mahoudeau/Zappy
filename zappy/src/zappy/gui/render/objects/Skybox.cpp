@@ -61,8 +61,10 @@ std::string Skybox::shadersPath(std::string_view shadersDirectory) {
     rlFramebufferAttach(fbo, rbo, RL_ATTACHMENT_DEPTH, RL_ATTACHMENT_RENDERBUFFER, 0);
     rlFramebufferAttach(fbo, cubemap.id, RL_ATTACHMENT_COLOR_CHANNEL0, RL_ATTACHMENT_CUBEMAP_POSITIVE_X, 0);
     if (!rlFramebufferComplete(fbo)) {
+        rlUnloadTexture(cubemap.id);
         rlUnloadFramebuffer(fbo);
-        return cubemap;
+        rlEnableBackfaceCulling();
+        return {};
     }
 
     rlEnableShader(shader.id);
@@ -103,6 +105,7 @@ std::string Skybox::shadersPath(std::string_view shadersDirectory) {
     rlDisableTexture();
     rlDisableFramebuffer();
     rlUnloadFramebuffer(fbo);
+    rlEnableBackfaceCulling();
     rlViewport(0, 0, rlGetFramebufferWidth(), rlGetFramebufferHeight());
 
     cubemap.width = size;
