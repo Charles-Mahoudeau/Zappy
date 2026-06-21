@@ -113,7 +113,7 @@ std::string Skybox::shadersPath(std::string_view shadersDirectory) {
 }
 
 ::TextureCubemap Skybox::loadPanoramaCubemap(std::string_view path, const std::string& shadersDirectory) {
-    ::Shader conversion =
+    const ::Shader conversion =
         LoadShader((shadersDirectory + "/cubemap.vs").c_str(), (shadersDirectory + "/cubemap.fs").c_str());
     if (!IsShaderValid(conversion)) {
         throw SkyboxException{"Failed to load cubemap conversion shader from: " + shadersDirectory};
