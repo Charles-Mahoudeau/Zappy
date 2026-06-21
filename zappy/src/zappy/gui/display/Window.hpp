@@ -9,9 +9,12 @@
 
 #include <string_view>
 
+#include "zappy/gui/render/Camera.hpp"
+
 namespace zappy::gui::display {
 class Window {
   public:
+    Window() = default;
     Window(int width, int height, std::string_view title);
     ~Window();
 
@@ -26,6 +29,9 @@ class Window {
     void setTargetFPS(int fps);
     void beginFrame();
     void endFrame();
+
+    static void BeginMode3D(render::Camera& camera);
+    static void EndMode3D();
 
   private:
     bool _open{false};
