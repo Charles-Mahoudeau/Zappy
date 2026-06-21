@@ -30,7 +30,7 @@ class Window {
     void beginFrame();
     void endFrame();
 
-    static void BeginMode3D(render::Camera& camera);
+    static void BeginMode3D(render::Camera& camera3D);
     static void EndMode3D();
 
   private:
