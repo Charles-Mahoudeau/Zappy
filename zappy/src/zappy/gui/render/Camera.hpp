@@ -25,6 +25,7 @@ enum class CameraProjection : std::uint8_t { CAMERA_PERSPECTIVE = 0, CAMERA_ORTH
 
 class Camera {
   public:
+    Camera() = default;
     Camera(Vector3 position, Vector3 target, Vector3 up, float fovy, CameraProjection projection);
     ~Camera() = default;
 
