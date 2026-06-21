@@ -40,13 +40,16 @@ class Renderer {
 
     static Model createModel(std::string_view path, std::initializer_list<TextureMap> textures,
                              bool flipVertical = false);
-    static float calculAngle(game::Orientation orientation);
+
     static void drawGrid(const game::GameState& state);
 
     void drawResources(const game::GameState& state);
     void drawTileResources(const game::Resources& tile, const Vector3& position);
     static void drawResourceStack(const Model& model, const Vector3& position, std::uint32_t count);
     static std::uint32_t resourceCount(const game::Resources& tile, game::ResourceType type);
+
+    void drawPlayers(const game::GameState& state);
+    static float calculAngle(game::Orientation orientation);
 
     static constexpr int kMaxModels = 10;
     static constexpr float kScale = 0.5F;

@@ -76,19 +76,9 @@ void Renderer::init() {
 
 void Renderer::update(Camera& camera, game::GameState& state) {
     camera.Update();
-
-    const auto& teams = state.teams();
     display::Window::BeginMode3D(camera);
     drawGrid(state);  // TODO: Implement a grid class to render a grid in the scene
-    for (const auto& [playerId, player] : state.players()) {
-        const auto teamIt = std::ranges::find(teams, player.team);
-        const auto teamIndex = static_cast<std::size_t>(std::distance(teams.begin(), teamIt));
-        const auto& model = _playerModels.at(teamIndex % _playerModels.size());
-        const float scale = kScale * static_cast<float>(player.level);
-        Vector3 position(static_cast<float>(player.x), 0.0F, static_cast<float>(player.y));
-        model.drawEx(position, Vector3{0.0F, 1.0F, 0.0F}, calculAngle(player.orientation), scale, Color::kWHITE);
-    }
-
+    drawPlayers(state);
     drawResources(state);
     display::Window::EndMode3D();
 }
@@ -170,6 +160,18 @@ void Renderer::drawGrid(const game::GameState& state) {
     for (int z = 0; z <= height; ++z) {
         const auto fz = static_cast<float>(z) - kOffset;
         DrawLine3D(::Vector3{-kOffset, 0.0F, fz}, ::Vector3{fWidth - kOffset, 0.0F, fz}, color);
+    }
+}
+
+void Renderer::drawPlayers(const game::GameState& state) {
+    const auto& teams = state.teams();
+    for (const auto& [playerId, player] : state.players()) {
+        const auto teamIt = std::ranges::find(teams, player.team);
+        const auto teamIndex = static_cast<std::size_t>(std::distance(teams.begin(), teamIt));
+        const auto& model = _playerModels.at(teamIndex % _playerModels.size());
+        const float scale = kScale * static_cast<float>(player.level);
+        Vector3 position(static_cast<float>(player.x), 0.0F, static_cast<float>(player.y));
+        model.drawEx(position, Vector3{0.0F, 1.0F, 0.0F}, calculAngle(player.orientation), scale, Color::kWHITE);
     }
 }
 
