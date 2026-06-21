@@ -77,8 +77,7 @@ void Renderer::update(Camera& camera, game::GameState& state) {
     const auto& teams = state.teams();
     display::Window::BeginMode3D(camera);
     drawGrid(state);  // TODO: Implement a grid class to render a grid in the scene
-    for (const auto& entry : state.players()) {
-        const auto& player = entry.second;
+    for (const auto& [playerId, player] : state.players()) {
         const auto teamIt = std::ranges::find(teams, player.team);
         const auto teamIndex = static_cast<std::size_t>(std::distance(teams.begin(), teamIt));
         const auto& model = _playerModels.at(teamIndex % _playerModels.size());
@@ -138,7 +137,7 @@ std::uint32_t Renderer::resourceCount(const game::Resources& tile, game::Ressour
 Model Renderer::createModel(std::string_view path, std::initializer_list<TextureMap> textures, bool flipVertical) {
     Model model{path};
     for (const auto& [mapIndex, texturePath] : textures) {
-        const std::string texturePathStr = std::string{texturePath};
+        const auto texturePathStr = std::string{texturePath};
         Texture texture{texturePathStr.c_str(), flipVertical};
         model.setMeshTexture(0, mapIndex, texture);
         texture.release();
