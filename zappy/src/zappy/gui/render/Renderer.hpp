@@ -32,7 +32,6 @@ class Renderer {
     void init();
     void update(Camera& camera, game::GameState& state);
 
-  protected:
   private:
     struct TextureMap {
         Model::MaterialMapIndex mapIndex;
