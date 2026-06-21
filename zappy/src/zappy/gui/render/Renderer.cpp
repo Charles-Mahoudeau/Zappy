@@ -26,49 +26,45 @@
 namespace zappy::gui::render {
 
 void Renderer::init() {
-    using Map = Model::MaterialMapIndex;
+    using enum Model::MaterialMapIndex;
+    using enum game::RessourceType;
 
     _playerModels.reserve(kMaxModels);
     _playerModels.emplace_back(createModel("assets/models/burpy/source/burpy.glb",
-                                           {{Map::ALBEDO, "assets/models/burpy/textures/burpy.png"}}, true));
+                                           {{ALBEDO, "assets/models/burpy/textures/burpy.png"}}, true));
 
-    _resourcesModels.emplace(game::RessourceType::Food, createModel("assets/models/resources/source/food.glb", {}));
-    _resourcesModels.emplace(game::RessourceType::Linemate,
-                             createModel("assets/models/resources/source/linemate.glb",
-                                         {{Map::ALBEDO, "assets/models/resources/textures/linemateBase.png"},
-                                          {Map::EMISSION, "assets/models/resources/textures/linemateEmissive.png"},
-                                          {Map::NORMAL, "assets/models/resources/textures/normal1.png"},
-                                          {Map::OCCLUSION, "assets/models/resources/textures/occlusionB.png"}}));
-    _resourcesModels.emplace(game::RessourceType::Deraumere,
+    _resourcesModels.emplace(Food, createModel("assets/models/resources/source/food.glb", {}));
+    _resourcesModels.emplace(Linemate, createModel("assets/models/resources/source/linemate.glb",
+                                                   {{ALBEDO, "assets/models/resources/textures/linemateBase.png"},
+                                                    {EMISSION, "assets/models/resources/textures/linemateEmissive.png"},
+                                                    {NORMAL, "assets/models/resources/textures/normal1.png"},
+                                                    {OCCLUSION, "assets/models/resources/textures/occlusionB.png"}}));
+    _resourcesModels.emplace(Deraumere,
                              createModel("assets/models/resources/source/deraumere.glb",
-                                         {{Map::ALBEDO, "assets/models/resources/textures/deraumereBase.png"},
-                                          {Map::EMISSION, "assets/models/resources/textures/deraumereEmissive.png"},
-                                          {Map::NORMAL, "assets/models/resources/textures/normal1.png"},
-                                          {Map::OCCLUSION, "assets/models/resources/textures/occlusionB.png"}}));
-    _resourcesModels.emplace(game::RessourceType::Sibur,
-                             createModel("assets/models/resources/source/sibur.glb",
-                                         {{Map::ALBEDO, "assets/models/resources/textures/siburBase.png"},
-                                          {Map::EMISSION, "assets/models/resources/textures/siburEmissive.png"},
-                                          {Map::NORMAL, "assets/models/resources/textures/normal1.png"},
-                                          {Map::OCCLUSION, "assets/models/resources/textures/occlusionB.png"}}));
-    _resourcesModels.emplace(game::RessourceType::Mendiane,
-                             createModel("assets/models/resources/source/mendiane.glb",
-                                         {{Map::ALBEDO, "assets/models/resources/textures/mendianeBase.png"},
-                                          {Map::EMISSION, "assets/models/resources/textures/mendianeEmissive.png"},
-                                          {Map::NORMAL, "assets/models/resources/textures/normal1.png"},
-                                          {Map::OCCLUSION, "assets/models/resources/textures/occlusionB.png"}}));
-    _resourcesModels.emplace(game::RessourceType::Phiras,
-                             createModel("assets/models/resources/source/phiras.glb",
-                                         {{Map::ALBEDO, "assets/models/resources/textures/phirasBase.png"},
-                                          {Map::EMISSION, "assets/models/resources/textures/phirasEmissive.png"},
-                                          {Map::NORMAL, "assets/models/resources/textures/normal1.png"},
-                                          {Map::OCCLUSION, "assets/models/resources/textures/occlusionB.png"}}));
-    _resourcesModels.emplace(game::RessourceType::Thystame,
-                             createModel("assets/models/resources/source/thystame.glb",
-                                         {{Map::ALBEDO, "assets/models/resources/textures/thystameBase.png"},
-                                          {Map::EMISSION, "assets/models/resources/textures/thystameEmissive.png"},
-                                          {Map::NORMAL, "assets/models/resources/textures/normal1.png"},
-                                          {Map::OCCLUSION, "assets/models/resources/textures/occlusionB.png"}}));
+                                         {{ALBEDO, "assets/models/resources/textures/deraumereBase.png"},
+                                          {EMISSION, "assets/models/resources/textures/deraumereEmissive.png"},
+                                          {NORMAL, "assets/models/resources/textures/normal1.png"},
+                                          {OCCLUSION, "assets/models/resources/textures/occlusionB.png"}}));
+    _resourcesModels.emplace(Sibur, createModel("assets/models/resources/source/sibur.glb",
+                                                {{ALBEDO, "assets/models/resources/textures/siburBase.png"},
+                                                 {EMISSION, "assets/models/resources/textures/siburEmissive.png"},
+                                                 {NORMAL, "assets/models/resources/textures/normal1.png"},
+                                                 {OCCLUSION, "assets/models/resources/textures/occlusionB.png"}}));
+    _resourcesModels.emplace(Mendiane, createModel("assets/models/resources/source/mendiane.glb",
+                                                   {{ALBEDO, "assets/models/resources/textures/mendianeBase.png"},
+                                                    {EMISSION, "assets/models/resources/textures/mendianeEmissive.png"},
+                                                    {NORMAL, "assets/models/resources/textures/normal1.png"},
+                                                    {OCCLUSION, "assets/models/resources/textures/occlusionB.png"}}));
+    _resourcesModels.emplace(Phiras, createModel("assets/models/resources/source/phiras.glb",
+                                                 {{ALBEDO, "assets/models/resources/textures/phirasBase.png"},
+                                                  {EMISSION, "assets/models/resources/textures/phirasEmissive.png"},
+                                                  {NORMAL, "assets/models/resources/textures/normal1.png"},
+                                                  {OCCLUSION, "assets/models/resources/textures/occlusionB.png"}}));
+    _resourcesModels.emplace(Thystame, createModel("assets/models/resources/source/thystame.glb",
+                                                   {{ALBEDO, "assets/models/resources/textures/thystameBase.png"},
+                                                    {EMISSION, "assets/models/resources/textures/thystameEmissive.png"},
+                                                    {NORMAL, "assets/models/resources/textures/normal1.png"},
+                                                    {OCCLUSION, "assets/models/resources/textures/occlusionB.png"}}));
 }
 
 void Renderer::update(Camera& camera, game::GameState& state) {
@@ -115,20 +111,21 @@ void Renderer::drawResourceStack(const Model& model, const Vector3& position, st
 }
 
 std::uint32_t Renderer::resourceCount(const game::Resources& tile, game::RessourceType type) {
+    using enum game::RessourceType;
     switch (type) {
-        case game::RessourceType::Food:
+        case Food:
             return tile.food;
-        case game::RessourceType::Linemate:
+        case Linemate:
             return tile.linemate;
-        case game::RessourceType::Deraumere:
+        case Deraumere:
             return tile.deraumere;
-        case game::RessourceType::Sibur:
+        case Sibur:
             return tile.sibur;
-        case game::RessourceType::Mendiane:
+        case Mendiane:
             return tile.mendiane;
-        case game::RessourceType::Phiras:
+        case Phiras:
             return tile.phiras;
-        case game::RessourceType::Thystame:
+        case Thystame:
             return tile.thystame;
     }
     return 0;
@@ -170,14 +167,15 @@ void Renderer::drawGrid(const game::GameState& state) {
 }
 
 float Renderer::calculAngle(game::Orientation orientation) {
+    using enum game::Orientation;
     switch (orientation) {
-        case game::Orientation::South:
+        case South:
             return 0.0F;
-        case game::Orientation::East:
+        case East:
             return 90.0F;
-        case game::Orientation::North:
+        case North:
             return 180.0F;
-        case game::Orientation::West:
+        case West:
             return 270.0F;
         default:
             return 0.0F;
