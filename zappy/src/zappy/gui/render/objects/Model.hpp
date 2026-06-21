@@ -45,6 +45,8 @@ class Model {
     void normalizeOnGround(float targetSize = 1.0F);
 
     void updateAnimation();
+    [[nodiscard]] int currentAnimationKeyframeCount() const;
+    [[nodiscard]] int animationCount() const { return _animCount; }
 
     void setCurrentAnimation(int anim) { _currentAnim = anim; }
     void setCurrentFrame(int frame) { _currentFrame = frame; }

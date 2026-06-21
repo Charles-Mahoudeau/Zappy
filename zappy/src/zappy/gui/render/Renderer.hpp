@@ -11,6 +11,7 @@
 #include <initializer_list>
 #include <map>
 #include <string_view>
+#include <unordered_map>
 #include <vector>
 
 #include "Camera.hpp"
@@ -51,13 +52,37 @@ class Renderer {
     static void drawResourceStack(const Model& model, const Vector3& position, std::uint32_t count);
     static std::uint32_t resourceCount(const game::Resources& tile, game::ResourceType type);
 
+    struct PlayerVisual {
+        Vector3 position;
+        Vector3 moveStart;
+        Vector3 moveTarget;
+        float moveProgress{0.0F};
+        float animFrame{0.0F};
+        int animIndex{-1};
+        std::uint32_t tileX{0};
+        std::uint32_t tileY{0};
+        bool initialized{false};
+        bool moving{false};
+    };
+
     void drawPlayers(const game::GameState& state);
+    static void updatePlayerVisual(PlayerVisual& visual, const game::Player& player, float width, float height,
+                                   float dt, Model& model);
+    static float torusNearest(float current, float target, float size);
+    static void updatePlayerPos(PlayerVisual& visual, const game::Player& player, float width, float height, float dt);
+    static void updatePlayerAnimation(PlayerVisual& visual, float dt, Model& model);
     static float calculAngle(game::Orientation orientation);
 
     static constexpr int kMaxModels = 10;
     static constexpr float kScale = 0.5F;
+    static constexpr float kMoveDuration = 0.8F;
+    static constexpr float kIdleFps = 36.0F;
+    static constexpr float kWalkCycles = 1.0F;
+    static constexpr int kIdleAnim = 0;
+    static constexpr int kMoveAnim = 1;
     std::vector<Model> _playerModels;
     std::map<game::ResourceType, Model> _resourcesModels;
+    std::unordered_map<std::uint32_t, PlayerVisual> _playerVisuals;
     Skybox _skybox;
     // Grid _grid; TODO: Implement a grid class to render a grid in the scene
 };

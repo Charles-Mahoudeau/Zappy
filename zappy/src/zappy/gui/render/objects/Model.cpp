@@ -185,6 +185,18 @@ void Model::updateAnimation() {
     UpdateModelAnimation(_model, animations[_currentAnim], static_cast<float>(_currentFrame));
 }
 
+int Model::currentAnimationKeyframeCount() const {
+    if (_animations == nullptr) {
+        return 0;
+    }
+    const std::span<ModelAnimation> animations{_animations, static_cast<std::size_t>(_animCount)};
+    if (_currentAnim < 0 || static_cast<std::size_t>(_currentAnim) >= animations.size()) {
+        return 0;
+    }
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-avoid-unchecked-container-access)
+    return animations[_currentAnim].keyframeCount;
+}
+
 void Model::setTexture(int materialIndex, MaterialMapIndex mapIndex, ::Texture texture) {
     static constexpr std::size_t kMaterialMapCount = std::to_underlying(MaterialMapIndex::BRDF) + 1;
 

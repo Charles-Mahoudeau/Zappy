@@ -10,12 +10,14 @@
 #include <raylib.h>
 
 #include <algorithm>
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <initializer_list>
 #include <iterator>
 #include <string>
 #include <string_view>
+#include <unordered_map>
 
 #include "Camera.hpp"
 #include "objects/Model.hpp"
@@ -155,9 +157,6 @@ Model Renderer::createModel(std::string_view path, std::string_view animationPat
         model.setMeshTexture(0, mapIndex, texture);
         texture.release();
     }
-    // GPU skinning is required: with SUPPORT_GPU_SKINNING=1 raylib does not allocate animVertices,
-    // so CPU skinning (UpdateModelAnimation's vertex update) is a no-op. The skinning shader is the
-    // only path that animates the mesh.
     model.useSkinningShader();
     model.normalizeOnGround();
 
@@ -188,16 +187,104 @@ void Renderer::drawGrid(const game::GameState& state) {
 
 void Renderer::drawPlayers(const game::GameState& state) {
     const auto& teams = state.teams();
-    for (const auto& [playerId, player] : state.players()) {
+    const auto& players = state.players();
+    const float dt = GetFrameTime();
+    const auto width = static_cast<float>(state.width());
+    const auto height = static_cast<float>(state.height());
+
+    std::erase_if(_playerVisuals, [&players](const auto& entry) { return !players.contains(entry.first); });
+
+    for (const auto& [playerId, player] : players) {
         const auto teamIt = std::ranges::find(teams, player.team);
         const auto teamIndex = static_cast<std::size_t>(std::distance(teams.begin(), teamIt));
         auto& model = _playerModels.at(teamIndex % _playerModels.size());
         const float scale = kScale * static_cast<float>(player.level);
-        Vector3 position(static_cast<float>(player.x), 0.0F, static_cast<float>(player.y));
-        model.addAnimationFrame();
-        model.updateAnimation();
-        model.drawEx(position, Vector3(0.0F, 1.0F, 0.0F), calculAngle(player.orientation), scale, Color::kWHITE);
+
+        PlayerVisual& visual = _playerVisuals[playerId];
+        updatePlayerVisual(visual, player, width, height, dt, model);
+
+        model.drawEx(visual.position, Vector3(0.0F, 1.0F, 0.0F), calculAngle(player.orientation), scale, Color::kWHITE);
     }
+}
+
+float Renderer::torusNearest(float current, float target, float size) {
+    float best = target;
+    float bestDist = std::fabs(target - current);
+    for (const float offset : {-size, size}) {
+        const float candidate = target + offset;
+        const float dist = std::fabs(candidate - current);
+        if (dist < bestDist) {
+            bestDist = dist;
+            best = candidate;
+        }
+    }
+    return best;
+}
+
+void Renderer::updatePlayerPos(PlayerVisual& visual, const game::Player& player, float width, float height, float dt) {
+    const auto logicalX = static_cast<float>(player.x);
+    const auto logicalZ = static_cast<float>(player.y);
+
+    if (!visual.initialized) {
+        visual.position = Vector3(logicalX, 0.0F, logicalZ);
+        visual.tileX = player.x;
+        visual.tileY = player.y;
+        visual.initialized = true;
+    }
+
+    if (player.x != visual.tileX || player.y != visual.tileY) {
+        visual.moveStart = visual.position;
+        visual.moveTarget = Vector3(torusNearest(visual.position.x(), logicalX, width), 0.0F,
+                                    torusNearest(visual.position.z(), logicalZ, height));
+        visual.moveProgress = 0.0F;
+        visual.moving = true;
+        visual.tileX = player.x;
+        visual.tileY = player.y;
+    }
+
+    if (visual.moving) {
+        visual.moveProgress += (kMoveDuration > 0.0F) ? dt / kMoveDuration : 1.0F;
+        if (visual.moveProgress >= 1.0F) {
+            visual.moving = false;
+            visual.position = Vector3(logicalX, 0.0F, logicalZ);
+        } else {
+            const float t = visual.moveProgress;
+            const float posX = visual.moveStart.x() + ((visual.moveTarget.x() - visual.moveStart.x()) * t);
+            const float posZ = visual.moveStart.z() + ((visual.moveTarget.z() - visual.moveStart.z()) * t);
+            visual.position = Vector3(posX, 0.0F, posZ);
+        }
+    }
+}
+
+void Renderer::updatePlayerAnimation(PlayerVisual& visual, float dt, Model& model) {
+    int desiredAnim = visual.moving ? kMoveAnim : kIdleAnim;
+    if (desiredAnim >= model.animationCount()) {
+        desiredAnim = kIdleAnim;
+    }
+    if (desiredAnim != visual.animIndex) {
+        visual.animIndex = desiredAnim;
+        visual.animFrame = 0.0F;
+    }
+    model.setCurrentAnimation(visual.animIndex);
+
+    const int keyframeCount = model.currentAnimationKeyframeCount();
+    if (keyframeCount > 0) {
+        float frame = 0.0F;
+        if (visual.moving) {
+            frame = visual.moveProgress * static_cast<float>(keyframeCount - 1) * kWalkCycles;
+        } else {
+            visual.animFrame += dt * kIdleFps;
+            frame = visual.animFrame;
+        }
+        model.setCurrentFrame(static_cast<int>(std::fmod(frame, static_cast<float>(keyframeCount))));
+    }
+    model.updateAnimation();
+}
+
+void Renderer::updatePlayerVisual(PlayerVisual& visual, const game::Player& player, float width, float height, float dt,
+                                  Model& model) {
+    updatePlayerPos(visual, player, width, height, dt);
+    updatePlayerAnimation(visual, dt, model);
 }
 
 float Renderer::calculAngle(game::Orientation orientation) {
