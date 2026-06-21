@@ -11,6 +11,8 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <cstdint>
+#include <initializer_list>
 #include <iterator>
 #include <string>
 #include <string_view>
@@ -100,8 +102,8 @@ void Renderer::drawTileResources(const game::Resources& tile, const Vector3& pos
 
 void Renderer::drawResourceStack(const Model& model, const Vector3& position, std::uint32_t count) {
     for (std::uint32_t i = 0; i < count; ++i) {
-        const float offsetX = static_cast<float>(i % 2) * 0.5F - 0.25F;
-        const float offsetZ = static_cast<float>(i / 2) * 0.5F - 0.25F;
+        const float offsetX = (static_cast<float>(i % 2) * 0.5F) - 0.25F;
+        const float offsetZ = (static_cast<float>(i / 2) * 0.5F) - 0.25F;
         const Vector3 resourcePosition(position.x() + offsetX, position.y(), position.z() + offsetZ);
         model.draw(resourcePosition, kScale, Color::kWHITE);
     }
@@ -149,17 +151,17 @@ void Renderer::drawGrid(const game::GameState& state) {
         return;
     }
     constexpr float kOffset = 0.5F;
-    const ::Color color{60, 60, 60, 255};
+    const Color color(60, 60, 60, 255);
     const auto fWidth = static_cast<float>(width);
     const auto fHeight = static_cast<float>(height);
 
     for (int x = 0; x <= width; ++x) {
         const auto fx = static_cast<float>(x) - kOffset;
-        DrawLine3D(::Vector3{fx, 0.0F, -kOffset}, ::Vector3{fx, 0.0F, fHeight - kOffset}, color);
+        DrawLine3D(Vector3(fx, 0.0F, -kOffset), Vector3(fx, 0.0F, fHeight - kOffset), color);
     }
     for (int z = 0; z <= height; ++z) {
         const auto fz = static_cast<float>(z) - kOffset;
-        DrawLine3D(::Vector3{-kOffset, 0.0F, fz}, ::Vector3{fWidth - kOffset, 0.0F, fz}, color);
+        DrawLine3D(Vector3(-kOffset, 0.0F, fz), Vector3(fWidth - kOffset, 0.0F, fz), color);
     }
 }
 
@@ -171,7 +173,7 @@ void Renderer::drawPlayers(const game::GameState& state) {
         const auto& model = _playerModels.at(teamIndex % _playerModels.size());
         const float scale = kScale * static_cast<float>(player.level);
         Vector3 position(static_cast<float>(player.x), 0.0F, static_cast<float>(player.y));
-        model.drawEx(position, Vector3{0.0F, 1.0F, 0.0F}, calculAngle(player.orientation), scale, Color::kWHITE);
+        model.drawEx(position, Vector3(0.0F, 1.0F, 0.0F), calculAngle(player.orientation), scale, Color::kWHITE);
     }
 }
 
