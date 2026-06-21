@@ -31,40 +31,47 @@ void Renderer::init() {
 
     _playerModels.reserve(kMaxModels);
     _playerModels.emplace_back(createModel("assets/models/burpy/source/burpy.glb",
-                                           {{ALBEDO, "assets/models/burpy/textures/burpy.png"}}, true));
+                                           {{.mapIndex = ALBEDO, .path = "assets/models/burpy/textures/burpy.png"}},
+                                           true));
 
     _resourcesModels.emplace(Food, createModel("assets/models/resources/source/food.glb", {}));
-    _resourcesModels.emplace(Linemate, createModel("assets/models/resources/source/linemate.glb",
-                                                   {{ALBEDO, "assets/models/resources/textures/linemateBase.png"},
-                                                    {EMISSION, "assets/models/resources/textures/linemateEmissive.png"},
-                                                    {NORMAL, "assets/models/resources/textures/normal1.png"},
-                                                    {OCCLUSION, "assets/models/resources/textures/occlusionB.png"}}));
-    _resourcesModels.emplace(Deraumere,
-                             createModel("assets/models/resources/source/deraumere.glb",
-                                         {{ALBEDO, "assets/models/resources/textures/deraumereBase.png"},
-                                          {EMISSION, "assets/models/resources/textures/deraumereEmissive.png"},
-                                          {NORMAL, "assets/models/resources/textures/normal1.png"},
-                                          {OCCLUSION, "assets/models/resources/textures/occlusionB.png"}}));
-    _resourcesModels.emplace(Sibur, createModel("assets/models/resources/source/sibur.glb",
-                                                {{ALBEDO, "assets/models/resources/textures/siburBase.png"},
-                                                 {EMISSION, "assets/models/resources/textures/siburEmissive.png"},
-                                                 {NORMAL, "assets/models/resources/textures/normal1.png"},
-                                                 {OCCLUSION, "assets/models/resources/textures/occlusionB.png"}}));
-    _resourcesModels.emplace(Mendiane, createModel("assets/models/resources/source/mendiane.glb",
-                                                   {{ALBEDO, "assets/models/resources/textures/mendianeBase.png"},
-                                                    {EMISSION, "assets/models/resources/textures/mendianeEmissive.png"},
-                                                    {NORMAL, "assets/models/resources/textures/normal1.png"},
-                                                    {OCCLUSION, "assets/models/resources/textures/occlusionB.png"}}));
-    _resourcesModels.emplace(Phiras, createModel("assets/models/resources/source/phiras.glb",
-                                                 {{ALBEDO, "assets/models/resources/textures/phirasBase.png"},
-                                                  {EMISSION, "assets/models/resources/textures/phirasEmissive.png"},
-                                                  {NORMAL, "assets/models/resources/textures/normal1.png"},
-                                                  {OCCLUSION, "assets/models/resources/textures/occlusionB.png"}}));
-    _resourcesModels.emplace(Thystame, createModel("assets/models/resources/source/thystame.glb",
-                                                   {{ALBEDO, "assets/models/resources/textures/thystameBase.png"},
-                                                    {EMISSION, "assets/models/resources/textures/thystameEmissive.png"},
-                                                    {NORMAL, "assets/models/resources/textures/normal1.png"},
-                                                    {OCCLUSION, "assets/models/resources/textures/occlusionB.png"}}));
+    _resourcesModels.emplace(
+        Linemate, createModel("assets/models/resources/source/linemate.glb",
+                              {{.mapIndex = ALBEDO, .path = "assets/models/resources/textures/linemateBase.png"},
+                               {.mapIndex = EMISSION, .path = "assets/models/resources/textures/linemateEmissive.png"},
+                               {.mapIndex = NORMAL, .path = "assets/models/resources/textures/normal1.png"},
+                               {.mapIndex = OCCLUSION, .path = "assets/models/resources/textures/occlusionB.png"}}));
+    _resourcesModels.emplace(
+        Deraumere,
+        createModel("assets/models/resources/source/deraumere.glb",
+                    {{.mapIndex = ALBEDO, .path = "assets/models/resources/textures/deraumereBase.png"},
+                     {.mapIndex = EMISSION, .path = "assets/models/resources/textures/deraumereEmissive.png"},
+                     {.mapIndex = NORMAL, .path = "assets/models/resources/textures/normal1.png"},
+                     {.mapIndex = OCCLUSION, .path = "assets/models/resources/textures/occlusionB.png"}}));
+    _resourcesModels.emplace(
+        Sibur, createModel("assets/models/resources/source/sibur.glb",
+                           {{.mapIndex = ALBEDO, .path = "assets/models/resources/textures/siburBase.png"},
+                            {.mapIndex = EMISSION, .path = "assets/models/resources/textures/siburEmissive.png"},
+                            {.mapIndex = NORMAL, .path = "assets/models/resources/textures/normal1.png"},
+                            {.mapIndex = OCCLUSION, .path = "assets/models/resources/textures/occlusionB.png"}}));
+    _resourcesModels.emplace(
+        Mendiane, createModel("assets/models/resources/source/mendiane.glb",
+                              {{.mapIndex = ALBEDO, .path = "assets/models/resources/textures/mendianeBase.png"},
+                               {.mapIndex = EMISSION, .path = "assets/models/resources/textures/mendianeEmissive.png"},
+                               {.mapIndex = NORMAL, .path = "assets/models/resources/textures/normal1.png"},
+                               {.mapIndex = OCCLUSION, .path = "assets/models/resources/textures/occlusionB.png"}}));
+    _resourcesModels.emplace(
+        Phiras, createModel("assets/models/resources/source/phiras.glb",
+                            {{.mapIndex = ALBEDO, .path = "assets/models/resources/textures/phirasBase.png"},
+                             {.mapIndex = EMISSION, .path = "assets/models/resources/textures/phirasEmissive.png"},
+                             {.mapIndex = NORMAL, .path = "assets/models/resources/textures/normal1.png"},
+                             {.mapIndex = OCCLUSION, .path = "assets/models/resources/textures/occlusionB.png"}}));
+    _resourcesModels.emplace(
+        Thystame, createModel("assets/models/resources/source/thystame.glb",
+                              {{.mapIndex = ALBEDO, .path = "assets/models/resources/textures/thystameBase.png"},
+                               {.mapIndex = EMISSION, .path = "assets/models/resources/textures/thystameEmissive.png"},
+                               {.mapIndex = NORMAL, .path = "assets/models/resources/textures/normal1.png"},
+                               {.mapIndex = OCCLUSION, .path = "assets/models/resources/textures/occlusionB.png"}}));
 }
 
 void Renderer::update(Camera& camera, game::GameState& state) {

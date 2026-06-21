@@ -60,8 +60,10 @@ void Window::beginFrame() {
 // NOLINTNEXTLINE
 void Window::endFrame() { EndDrawing(); }
 
-void Window::BeginMode3D(render::Camera& camera3D) { ::BeginMode3D(camera3D); }
+// NOLINTNEXTLINE
+void Window::BeginMode3D(render::Camera& camera) { ::BeginMode3D(camera); }
 
+// NOLINTNEXTLINE
 void Window::EndMode3D() { ::EndMode3D(); }
 
 }  // namespace zappy::gui::display
