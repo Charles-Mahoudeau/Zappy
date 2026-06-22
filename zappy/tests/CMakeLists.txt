@@ -23,6 +23,7 @@ add_executable(unit_tests
         src/gui/network/GuiFunctional.cpp
         src/gui/ui/ChatPanel.cpp
         src/gui/ui/GuiTheme.cpp
+        src/gui/ui/InfoPanel.cpp
         src/gui/ui/TimeUnitSlider.cpp
         src/gui/ui/utils/Rectangle.cpp
         src/gui/ui/utils/Vector2.cpp
