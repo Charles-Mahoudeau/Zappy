@@ -173,6 +173,34 @@ EntityDatabase::EntityView<entity::Player> World::players(const std::uint16_t te
            std::views::filter([teamId](const entity::Player* player) { return player->teamId() == teamId; });
 }
 
+math::Vector2u World::position(const std::uint64_t entityId) const {
+    const Tile* entityTile = tile(entityId);
+
+    if (entityTile == nullptr) {
+        throw exception::InvalidState{"entity is not on a tile"};
+    }
+    return entityTile->position();
+}
+
+void World::moveTo(const std::uint64_t entityId, const math::Vector2u position) {
+    if (!isInBounds(position)) {
+        throw exception::InvalidArgument{"position is out of bounds"};
+    }
+
+    Tile* sourceTile = tile(entityId);
+
+    if (sourceTile == nullptr) {
+        throw exception::InvalidState{"entity is not on a tile"};
+    }
+    if (!sourceTile->removeEntity(entityId)) {
+        throw exception::InvalidState{"entity is not on the source tile (this should never happen)"};
+    }
+
+    Tile& destinationTile = tile(position);
+
+    destinationTile.addEntity(entityId);
+}
+
 math::Vector2u World::moveBy(const std::uint64_t entityId, const math::Vector2i delta) {
     Tile* sourceTile = tile(entityId);
 

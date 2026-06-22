@@ -116,6 +116,16 @@ class World {
     /// @return A view of all players in the specified team.
     [[nodiscard]] EntityDatabase::EntityView<entity::Player> players(std::uint16_t teamId);
 
+    /// @brief Returns the position of the specified entity.
+    /// @param entityId The ID of the entity to get the position of.
+    /// @return The position of the specified entity.
+    [[nodiscard]] math::Vector2u position(std::uint64_t entityId) const;
+
+    /// @brief Moves the specified entity to the specified position.
+    /// @param entityId The ID of the entity to move.
+    /// @param position The position to move the entity to.
+    void moveTo(std::uint64_t entityId, math::Vector2u position);
+
     /// @brief Moves the specified entity by the specified delta.
     /// @param entityId The ID of the entity to move.
     /// @param delta The delta to move the entity by.
