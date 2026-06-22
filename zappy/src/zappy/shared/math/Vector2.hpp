@@ -39,26 +39,54 @@ struct Vector2 {
     constexpr Vector2& operator*=(T scalar) noexcept;
     constexpr Vector2& operator/=(T scalar);
 
-    friend constexpr Vector2 operator+(Vector2 lhs, const Vector2& rhs) noexcept { return lhs += rhs; }
-    friend constexpr Vector2 operator-(Vector2 lhs, const Vector2& rhs) noexcept { return lhs -= rhs; }
-    friend constexpr Vector2 operator*(Vector2 lhs, const Vector2& rhs) noexcept { return lhs *= rhs; }
-    friend constexpr Vector2 operator/(Vector2 lhs, const Vector2& rhs) { return lhs /= rhs; }
+    friend constexpr Vector2 operator+(Vector2 lhs, const Vector2& rhs) noexcept {
+        lhs += rhs;
+        return lhs;
+    }
+    friend constexpr Vector2 operator-(Vector2 lhs, const Vector2& rhs) noexcept {
+        lhs -= rhs;
+        return lhs;
+    }
+    friend constexpr Vector2 operator*(Vector2 lhs, const Vector2& rhs) noexcept {
+        lhs *= rhs;
+        return lhs;
+    }
+    friend constexpr Vector2 operator/(Vector2 lhs, const Vector2& rhs) {
+        lhs /= rhs;
+        return lhs;
+    }
 
-    friend constexpr Vector2 operator+(Vector2 lhs, const T scalar) noexcept { return lhs += scalar; }
-    friend constexpr Vector2 operator-(Vector2 lhs, const T scalar) noexcept { return lhs -= scalar; }
-    friend constexpr Vector2 operator*(Vector2 lhs, const T scalar) noexcept { return lhs *= scalar; }
-    friend constexpr Vector2 operator/(Vector2 lhs, const T scalar) { return lhs /= scalar; }
+    friend constexpr Vector2 operator+(Vector2 lhs, const T scalar) noexcept {
+        lhs += scalar;
+        return lhs;
+    }
+    friend constexpr Vector2 operator-(Vector2 lhs, const T scalar) noexcept {
+        lhs -= scalar;
+        return lhs;
+    }
+    friend constexpr Vector2 operator*(Vector2 lhs, const T scalar) noexcept {
+        lhs *= scalar;
+        return lhs;
+    }
+    friend constexpr Vector2 operator/(Vector2 lhs, const T scalar) {
+        lhs /= scalar;
+        return lhs;
+    }
 
-    friend constexpr Vector2 operator+(const T scalar, Vector2 rhs) noexcept { return rhs += scalar; }
+    friend constexpr Vector2 operator+(const T scalar, Vector2 rhs) noexcept {
+        rhs += scalar;
+        return rhs;
+    }
     friend constexpr Vector2 operator-(const T scalar, Vector2 rhs) noexcept {
         return {scalar - rhs.x, scalar - rhs.y};
     }
-    friend constexpr Vector2 operator*(const T scalar, Vector2 rhs) noexcept { return rhs *= scalar; }
+    friend constexpr Vector2 operator*(const T scalar, Vector2 rhs) noexcept {
+        rhs *= scalar;
+        return rhs;
+    }
     friend constexpr Vector2 operator/(const T scalar, Vector2 rhs) {
-        if (rhs.x == 0 || rhs.y == 0) {
-            throw exception::InvalidArgument{"division by zero"};
-        }
-        return {scalar / rhs.x, scalar / rhs.y};
+        rhs /= scalar;
+        return rhs;
     }
 };
 
