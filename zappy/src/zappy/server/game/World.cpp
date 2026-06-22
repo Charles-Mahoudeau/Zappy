@@ -33,17 +33,14 @@
 
 namespace zappy::server::game {
 World::World(Config config) : _config{std::move(config)} {
-    const auto size = static_cast<std::size_t>(_config.size.x * _config.size.y);
+    const std::uint32_t size = _config.size.x * _config.size.y;
 
     if (size == 0) {
         throw exception::OutOfRange{"trying to create world with 0 width or height"};
     }
     _tiles.reserve(size);
-    for (std::size_t i = 0; i < size; ++i) {
-        _tiles.emplace_back(*this, math::Vector2u{
-                                       static_cast<std::uint32_t>(i % _config.size.x),
-                                       static_cast<std::uint32_t>(i / _config.size.x),
-                                   });
+    for (std::uint32_t i = 0; i < size; ++i) {
+        _tiles.emplace_back(*this, math::Vector2u{i % _config.size.x, i / _config.size.x});
     }
     generateResourceThresholds();
     spawnStartEggs();
