@@ -35,8 +35,17 @@ static constexpr float kChatPanelWidth = 320.0F;
 static constexpr float kChatPanelHeight = 180.0F;
 static constexpr float kChatPanelMargin = 8.0F;
 static constexpr std::string_view kStylePath = "assets/styles/style_lavanda_kyrou.rgs";
+static constexpr float kTimeSliderWidth = 220.0F;
+static constexpr float kTimeSliderHeight = 24.0F;
+static constexpr float kTimeSliderMarginTop = 8.0F;
+static constexpr float kTimeSliderMarginRight = 70.0F;
+static constexpr int kTimeSliderInitialValue = 1;
 
-GUI::GUI() : _parser{_state}, _sender{_buffer}, _handshake{_buffer, _sender, _parser, _state} {}
+GUI::GUI()
+    : _parser{_state},
+      _sender{_buffer},
+      _handshake{_buffer, _sender, _parser, _state},
+      _timeSlider{_sender, kTimeSliderInitialValue} {}
 
 void GUI::connect(const GuiCliParser& cli) {
     _address = zappy::network::Address{std::string{cli.host()}, cli.port()};
@@ -118,6 +127,8 @@ int GUI::run() {
             _state.broadcasts(),
             ui::Rectangle{kChatPanelMargin, static_cast<float>(kWindowHeight) - kChatPanelHeight - kChatPanelMargin,
                           kChatPanelWidth, kChatPanelHeight});
+        _timeSlider.draw(
+            ui::Rectangle{kTimeSliderMarginRight, kTimeSliderMarginTop, kTimeSliderWidth, kTimeSliderHeight});
         _window.endFrame();
     }
     return 0;
