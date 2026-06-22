@@ -19,60 +19,60 @@ struct Vector2 {
     T y{0};
 
     template <IsArithmetic U>
-    explicit operator Vector2<U>() const noexcept;
+    constexpr explicit operator Vector2<U>() const noexcept;
 
-    Vector2& operator+=(const Vector2& other) noexcept;
-    Vector2& operator-=(const Vector2& other) noexcept;
-    Vector2& operator*=(const Vector2& other) noexcept;
-    Vector2& operator/=(const Vector2& other);
+    [[nodiscard]] constexpr auto operator<=>(const Vector2& other) const noexcept = default;
 
-    Vector2& operator+=(T scalar) noexcept;
-    Vector2& operator-=(T scalar) noexcept;
-    Vector2& operator*=(T scalar) noexcept;
-    Vector2& operator/=(T scalar);
+    constexpr Vector2& operator+=(const Vector2& other) noexcept;
+    constexpr Vector2& operator-=(const Vector2& other) noexcept;
+    constexpr Vector2& operator*=(const Vector2& other) noexcept;
+    constexpr Vector2& operator/=(const Vector2& other);
 
-    [[nodiscard]] Vector2 operator+(const Vector2& other) const noexcept;
-    [[nodiscard]] Vector2 operator-(const Vector2& other) const noexcept;
-    [[nodiscard]] Vector2 operator*(const Vector2& other) const noexcept;
-    [[nodiscard]] Vector2 operator/(const Vector2& other) const;
+    constexpr Vector2& operator+=(T scalar) noexcept;
+    constexpr Vector2& operator-=(T scalar) noexcept;
+    constexpr Vector2& operator*=(T scalar) noexcept;
+    constexpr Vector2& operator/=(T scalar);
 
-    [[nodiscard]] Vector2 operator+(T scalar) const noexcept;
-    [[nodiscard]] Vector2 operator-(T scalar) const noexcept;
-    [[nodiscard]] Vector2 operator*(T scalar) const noexcept;
-    [[nodiscard]] Vector2 operator/(T scalar) const;
+    [[nodiscard]] constexpr Vector2 operator+(const Vector2& other) const noexcept;
+    [[nodiscard]] constexpr Vector2 operator-(const Vector2& other) const noexcept;
+    [[nodiscard]] constexpr Vector2 operator*(const Vector2& other) const noexcept;
+    [[nodiscard]] constexpr Vector2 operator/(const Vector2& other) const;
 
-    [[nodiscard]] auto operator<=>(const Vector2& other) const noexcept = default;
+    [[nodiscard]] constexpr Vector2 operator+(T scalar) const noexcept;
+    [[nodiscard]] constexpr Vector2 operator-(T scalar) const noexcept;
+    [[nodiscard]] constexpr Vector2 operator*(T scalar) const noexcept;
+    [[nodiscard]] constexpr Vector2 operator/(T scalar) const;
 };
 
 template <IsArithmetic T>
 template <IsArithmetic U>
-Vector2<T>::operator Vector2<U>() const noexcept {
+constexpr Vector2<T>::operator Vector2<U>() const noexcept {
     return {static_cast<U>(x), static_cast<U>(y)};
 }
 
 template <IsArithmetic T>
-Vector2<T>& Vector2<T>::operator+=(const Vector2& other) noexcept {
+constexpr Vector2<T>& Vector2<T>::operator+=(const Vector2& other) noexcept {
     x += other.x;
     y += other.y;
     return *this;
 }
 
 template <IsArithmetic T>
-Vector2<T>& Vector2<T>::operator-=(const Vector2& other) noexcept {
+constexpr Vector2<T>& Vector2<T>::operator-=(const Vector2& other) noexcept {
     x -= other.x;
     y -= other.y;
     return *this;
 }
 
 template <IsArithmetic T>
-Vector2<T>& Vector2<T>::operator*=(const Vector2& other) noexcept {
+constexpr Vector2<T>& Vector2<T>::operator*=(const Vector2& other) noexcept {
     x *= other.x;
     y *= other.y;
     return *this;
 }
 
 template <IsArithmetic T>
-Vector2<T>& Vector2<T>::operator/=(const Vector2& other) {
+constexpr Vector2<T>& Vector2<T>::operator/=(const Vector2& other) {
     if (other.x == 0 || other.y == 0) {
         throw exception::InvalidArgument{"division by zero"};
     }
@@ -82,28 +82,28 @@ Vector2<T>& Vector2<T>::operator/=(const Vector2& other) {
 }
 
 template <IsArithmetic T>
-Vector2<T>& Vector2<T>::operator+=(const T scalar) noexcept {
+constexpr Vector2<T>& Vector2<T>::operator+=(const T scalar) noexcept {
     x += scalar;
     y += scalar;
     return *this;
 }
 
 template <IsArithmetic T>
-Vector2<T>& Vector2<T>::operator-=(const T scalar) noexcept {
+constexpr Vector2<T>& Vector2<T>::operator-=(const T scalar) noexcept {
     x -= scalar;
     y -= scalar;
     return *this;
 }
 
 template <IsArithmetic T>
-Vector2<T>& Vector2<T>::operator*=(const T scalar) noexcept {
+constexpr Vector2<T>& Vector2<T>::operator*=(const T scalar) noexcept {
     x *= scalar;
     y *= scalar;
     return *this;
 }
 
 template <IsArithmetic T>
-Vector2<T>& Vector2<T>::operator/=(const T scalar) {
+constexpr Vector2<T>& Vector2<T>::operator/=(const T scalar) {
     if (scalar == 0) {
         throw exception::InvalidArgument{"division by zero"};
     }
@@ -113,7 +113,7 @@ Vector2<T>& Vector2<T>::operator/=(const T scalar) {
 }
 
 template <IsArithmetic T>
-Vector2<T> Vector2<T>::operator+(const Vector2& other) const noexcept {
+constexpr Vector2<T> Vector2<T>::operator+(const Vector2& other) const noexcept {
     Vector2 result = *this;
 
     result += other;
@@ -121,7 +121,7 @@ Vector2<T> Vector2<T>::operator+(const Vector2& other) const noexcept {
 }
 
 template <IsArithmetic T>
-Vector2<T> Vector2<T>::operator-(const Vector2& other) const noexcept {
+constexpr Vector2<T> Vector2<T>::operator-(const Vector2& other) const noexcept {
     Vector2 result = *this;
 
     result -= other;
@@ -129,7 +129,7 @@ Vector2<T> Vector2<T>::operator-(const Vector2& other) const noexcept {
 }
 
 template <IsArithmetic T>
-Vector2<T> Vector2<T>::operator*(const Vector2& other) const noexcept {
+constexpr Vector2<T> Vector2<T>::operator*(const Vector2& other) const noexcept {
     Vector2 result = *this;
 
     result *= other;
@@ -137,7 +137,7 @@ Vector2<T> Vector2<T>::operator*(const Vector2& other) const noexcept {
 }
 
 template <IsArithmetic T>
-Vector2<T> Vector2<T>::operator/(const Vector2& other) const {
+constexpr Vector2<T> Vector2<T>::operator/(const Vector2& other) const {
     Vector2 result = *this;
 
     result /= other;
@@ -145,7 +145,7 @@ Vector2<T> Vector2<T>::operator/(const Vector2& other) const {
 }
 
 template <IsArithmetic T>
-Vector2<T> Vector2<T>::operator+(const T scalar) const noexcept {
+constexpr Vector2<T> Vector2<T>::operator+(const T scalar) const noexcept {
     Vector2 result = *this;
 
     result += scalar;
@@ -153,7 +153,7 @@ Vector2<T> Vector2<T>::operator+(const T scalar) const noexcept {
 }
 
 template <IsArithmetic T>
-Vector2<T> Vector2<T>::operator-(const T scalar) const noexcept {
+constexpr Vector2<T> Vector2<T>::operator-(const T scalar) const noexcept {
     Vector2 result = *this;
 
     result -= scalar;
@@ -161,7 +161,7 @@ Vector2<T> Vector2<T>::operator-(const T scalar) const noexcept {
 }
 
 template <IsArithmetic T>
-Vector2<T> Vector2<T>::operator*(const T scalar) const noexcept {
+constexpr Vector2<T> Vector2<T>::operator*(const T scalar) const noexcept {
     Vector2 result = *this;
 
     result *= scalar;
@@ -169,7 +169,7 @@ Vector2<T> Vector2<T>::operator*(const T scalar) const noexcept {
 }
 
 template <IsArithmetic T>
-Vector2<T> Vector2<T>::operator/(T scalar) const {
+constexpr Vector2<T> Vector2<T>::operator/(T scalar) const {
     Vector2 result = *this;
 
     result /= scalar;
@@ -177,7 +177,7 @@ Vector2<T> Vector2<T>::operator/(T scalar) const {
 }
 
 template <IsArithmetic T>
-[[nodiscard]] Vector2<T> operator+(T scalar, const Vector2<T>& vec) noexcept {
+[[nodiscard]] constexpr Vector2<T> operator+(T scalar, const Vector2<T>& vec) noexcept {
     Vector2<T> result = vec;
 
     result += scalar;
@@ -185,7 +185,7 @@ template <IsArithmetic T>
 }
 
 template <IsArithmetic T>
-[[nodiscard]] Vector2<T> operator-(T scalar, const Vector2<T>& vec) noexcept {
+[[nodiscard]] constexpr Vector2<T> operator-(T scalar, const Vector2<T>& vec) noexcept {
     Vector2<T> result = vec;
 
     result -= scalar;
@@ -193,7 +193,7 @@ template <IsArithmetic T>
 }
 
 template <IsArithmetic T>
-[[nodiscard]] Vector2<T> operator*(T scalar, const Vector2<T>& vec) noexcept {
+[[nodiscard]] constexpr Vector2<T> operator*(T scalar, const Vector2<T>& vec) noexcept {
     Vector2<T> result = vec;
 
     result *= scalar;
@@ -201,7 +201,7 @@ template <IsArithmetic T>
 }
 
 template <IsArithmetic T>
-[[nodiscard]] Vector2<T> operator/(T scalar, const Vector2<T>& vec) {
+[[nodiscard]] constexpr Vector2<T> operator/(T scalar, const Vector2<T>& vec) {
     Vector2<T> result = vec;
 
     result /= scalar;
