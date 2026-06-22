@@ -58,11 +58,11 @@ class Billboard : public Texture {
   private:
     Rectangle _source{};
     Vector3 _position{};
-    Vector3 _up{0.0f, 1.0f, 0.0f};
-    Vector2 _size{1.0f, 1.0f};
-    Vector2 _origin{0.5f, 0.5f};
-    float _billboardSize{1.0f};
-    float _rotation{0.0f};
+    Vector3 _up{.x = 0.0F, .y = 1.0F, .z = 0.0F};
+    Vector2 _size{1.0F, 0.0F};
+    Vector2 _origin{0.5F, 0.5F};
+    float _billboardSize{1.0F};
+    float _rotation{0.0F};
     Color _tint{WHITE};
     bool _usePro{false};
 };

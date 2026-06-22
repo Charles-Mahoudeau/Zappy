@@ -9,14 +9,17 @@
 
 #include <raylib.h>
 
+#include <string_view>
+
 #include "../Camera.hpp"
 
 namespace zappy::gui::render {
 Billboard::Billboard(std::string_view path) : Texture(path) {}
 
 Billboard::Billboard(std::string_view path, Vector3 position, float size, Color tint)
-    : Texture(path), _position(position), _billboardSize(size), _tint(tint), _usePro(false) {
-    _source = Rectangle{0.0f, 0.0f, static_cast<float>(width()), static_cast<float>(height())};
+    : Texture(path), _position(position), _billboardSize(size), _tint(tint) {
+    _source =
+        Rectangle{.x = 0.0F, .y = 0.0F, .width = static_cast<float>(width()), .height = static_cast<float>(height())};
 }
 
 Billboard::Billboard(std::string_view path, Rectangle source, Vector3 position, Vector3 up, Vector2 size,
@@ -79,10 +82,13 @@ void Billboard::drawPro(const Camera& camera) const {
     const Camera3D& rlCamera{static_cast<const Camera3D&>(camera)};
 
     const Rectangle source = _source.width == 0.0f || _source.height == 0.0f
-                                 ? Rectangle{0.0f, 0.0f, static_cast<float>(width()), static_cast<float>(height())}
+                                 ? Rectangle{.x = 0.0F,
+                                             .y = 0.0F,
+                                             .width = static_cast<float>(width()),
+                                             .height = static_cast<float>(height())}
                                  : _source;
-    const Vector2 size = _usePro ? _size : Vector2{source.width / source.height, 1.0f};
-    const Vector2 origin = _usePro ? _origin : Vector2{size.x * 0.5f, size.y * 0.5f};
+    const Vector2 size = _usePro ? _size : Vector2{source.width / source.height, 1.0F};
+    const Vector2 origin = _usePro ? _origin : Vector2{size.x * 0.5F, size.y * 0.5F};
 
     DrawBillboardPro(rlCamera, texture(), source, _position, _up, size, origin, _rotation, _tint);
 }
