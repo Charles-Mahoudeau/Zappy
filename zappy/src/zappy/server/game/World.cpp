@@ -163,6 +163,16 @@ std::expected<std::uint16_t, std::string> World::hatchRandomEgg(const std::uint1
     return playerId;
 }
 
+EntityDatabase::EntityView<const entity::Player> World::players(const std::uint16_t teamId) const {
+    return _entityDatabase.viewAll<entity::Player>() |
+           std::views::filter([teamId](const entity::Player* player) { return player->teamId() == teamId; });
+}
+
+EntityDatabase::EntityView<entity::Player> World::players(const std::uint16_t teamId) {
+    return _entityDatabase.viewAll<entity::Player>() |
+           std::views::filter([teamId](const entity::Player* player) { return player->teamId() == teamId; });
+}
+
 const std::unordered_map<ResourceType, float>& World::resourceDensities() {
     using enum ResourceType;
 

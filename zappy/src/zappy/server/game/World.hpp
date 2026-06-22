@@ -19,6 +19,7 @@
 #include "IEntity.hpp"
 #include "ResourceType.hpp"
 #include "Tile.hpp"
+#include "entity/Player.hpp"
 #include "zappy/shared/io/Logger.hpp"
 
 namespace zappy::server::game {
@@ -109,6 +110,16 @@ class World {
     /// @param teamId The ID of the team to hatch the egg for.
     /// @return The ID of the new player, or an error message if no egg could be hatched.
     std::expected<std::uint16_t, std::string> hatchRandomEgg(std::uint16_t teamId);
+
+    /// @brief Returns a view of all players in the specified team.
+    /// @param teamId The ID of the team to get the players from.
+    /// @return A view of all players in the specified team.
+    EntityDatabase::EntityView<const entity::Player> players(std::uint16_t teamId) const;
+
+    /// @brief Returns a view of all players in the specified team.
+    /// @param teamId The ID of the team to get the players from.
+    /// @return A view of all players in the specified team.
+    EntityDatabase::EntityView<entity::Player> players(std::uint16_t teamId);
 
   private:
     /// @brief Returns the resource densities for the world.
