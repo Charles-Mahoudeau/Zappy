@@ -13,6 +13,7 @@
 #include "zappy/gui/network/CommandSender.hpp"
 #include "zappy/gui/network/Handshake.hpp"
 #include "zappy/gui/network/ProtocolParser.hpp"
+#include "zappy/gui/render/AssetStore.hpp"
 #include "zappy/gui/render/Camera.hpp"
 #include "zappy/gui/render/Renderer.hpp"
 #include "zappy/shared/io/Poller.hpp"
@@ -41,6 +42,9 @@ class GUI {
     [[nodiscard]] const game::GameState& state() const;
 
   private:
+    void setupCamera();
+    void drawLoadingFrame();
+
     zappy::network::Address _address;
     zappy::network::BufferedClient _buffer;
     game::GameState _state;
@@ -51,7 +55,9 @@ class GUI {
 
     display::Window _window;
     render::Camera _camera;  // May be placed in renderer ?
+    render::AssetStore _assets;
     render::Renderer _renderer;
+    int _loadingDots{0};
 };
 
 }  // namespace zappy::gui

@@ -18,6 +18,10 @@ add_library(zappy_gui_objects OBJECT
         network/HandlerRegistry.hpp
         network/ProtocolParser.cpp
         network/ProtocolParser.hpp
+        render/AssetLoaderRegistry.cpp
+        render/AssetLoaderRegistry.hpp
+        render/AssetStore.cpp
+        render/AssetStore.hpp
         render/Renderer.cpp
         render/Renderer.hpp
         render/Camera.cpp

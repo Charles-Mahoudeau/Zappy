@@ -11,6 +11,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <format>
 #include <string>
 
 #include "zappy/gui/GuiCliParser.hpp"
@@ -26,6 +27,8 @@ static constexpr int kWindowWidth = 1600;
 static constexpr int kWindowHeight = 900;
 static constexpr int kTargetFPS = 60;
 static constexpr int kPollTimeoutMs = 16;
+static constexpr int kLoadingFontSize = 30;
+static constexpr int kLoadingMaxDots = 3;
 
 GUI::GUI() : _parser{_state}, _sender{_buffer}, _handshake{_buffer, _sender, _parser, _state} {}
 
@@ -45,18 +48,7 @@ void GUI::pump() {
     }
 }
 
-int GUI::init(const GuiCliParser& cli) {
-    // TODO: Not HERE but:
-    // InitAudioDevice();
-    // if (!IsAudioDeviceReady()) {
-    //     throw exception::InvalidState{"Failed to initialize audio device"};
-    // }
-
-    connect(cli);
-
-    _window = display::Window{kWindowWidth, kWindowHeight, "Zappy"};
-    _window.setTargetFPS(kTargetFPS);
-
+void GUI::setupCamera() {
     const auto width = static_cast<float>(_state.width());
     const auto height = static_cast<float>(_state.height());
     const float span = std::max({width, height, 1.0F});
@@ -69,8 +61,36 @@ int GUI::init(const GuiCliParser& cli) {
                              render::Vector3(centerX, 0.0F, centerZ), render::Vector3(0, 1, 0), fovy,
                              render::CameraProjection::CAMERA_ORTHOGRAPHIC};
     _camera.setCameraMode(render::CameraMode::CAMERA_FREE);
+}
 
-    _renderer.init();
+void GUI::drawLoadingFrame() {
+    _loadingDots = (_loadingDots % kLoadingMaxDots) + 1;
+    const std::string text = std::format("Loading{}", std::string(static_cast<std::size_t>(_loadingDots), '.'));
+
+    static constexpr const char* kWidestText = "Loading...";
+    const int textX = (kWindowWidth - MeasureText(kWidestText, kLoadingFontSize)) / 2;
+
+    _window.beginFrame();
+    DrawText(text.c_str(), textX, (kWindowHeight - kLoadingFontSize) / 2, kLoadingFontSize, WHITE);
+    _window.endFrame();
+}
+
+int GUI::init(const GuiCliParser& cli) {
+    // TODO: Not HERE but:
+    // InitAudioDevice();
+    // if (!IsAudioDeviceReady()) {
+    //     throw exception::InvalidState{"Failed to initialize audio device"};
+    // }
+
+    connect(cli);
+
+    _window = display::Window{kWindowWidth, kWindowHeight, "Zappy"};
+    _window.setTargetFPS(kTargetFPS);
+    drawLoadingFrame();
+
+    setupCamera();
+
+    _assets.load([this]() { drawLoadingFrame(); });
 
     return 0;
 }
@@ -86,7 +106,7 @@ int GUI::run() {
     while (!_window.shouldClose()) {
         _poller.poll(kPollTimeoutMs);
         _window.beginFrame();
-        _renderer.update(_camera, _state);
+        _renderer.update(_camera, _state, _assets);
         _window.endFrame();
     }
     return 0;
