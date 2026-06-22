@@ -10,6 +10,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <span>
+#include <string_view>
 #include <vector>
 
 #include "Address.hpp"
@@ -28,9 +29,11 @@ class Socket : public ISocket {
     Socket(Socket&& other) noexcept;
     Socket& operator=(Socket&& other) noexcept;
 
+    bool operator==(const Address& address) const;
+
     [[nodiscard]] int fd() const override;
 
-    [[nodiscard]] Address address() const override;
+    [[nodiscard]] const Address& address() const override;
     [[nodiscard]] bool isOpen() const override;
 
     void bind(std::uint16_t port) override;
@@ -41,8 +44,11 @@ class Socket : public ISocket {
 
     [[nodiscard]] std::size_t send(std::span<const std::byte> data) override;
 
+    std::size_t send(std::string_view data) override;
+
   private:
     int _socket{-1};
     Address _address;
 };
+
 }  // namespace zappy::network

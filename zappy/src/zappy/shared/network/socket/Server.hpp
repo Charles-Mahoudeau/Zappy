@@ -11,8 +11,8 @@
 
 #include <cstdint>
 
-#include "Client.hpp"
 #include "zappy/shared/network/Socket.hpp"
+#include "zappy/shared/network/socket/Client.hpp"
 
 namespace zappy::network::socket {
 class Server : public Socket {
