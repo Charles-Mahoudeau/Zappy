@@ -21,6 +21,7 @@ add_executable(unit_tests
         src/gui/network/HandlerRegistry.cpp
         src/gui/network/ProtocolParser.cpp
         src/gui/network/GuiFunctional.cpp
+        src/gui/ui/GuiTheme.cpp
         src/shared/io/Poller.cpp
 )
 target_include_directories(unit_tests PRIVATE
