@@ -18,6 +18,8 @@ struct Vector2 {
     T x{0};
     T y{0};
 
+    [[nodiscard]] constexpr Vector2 wrapped(const Vector2& bounds) const noexcept;
+
     template <IsArithmetic U>
     constexpr explicit operator Vector2<U>() const noexcept;
 
@@ -43,6 +45,14 @@ struct Vector2 {
     [[nodiscard]] constexpr Vector2 operator*(T scalar) const noexcept;
     [[nodiscard]] constexpr Vector2 operator/(T scalar) const;
 };
+
+template <IsArithmetic T>
+constexpr Vector2<T> Vector2<T>::wrapped(const Vector2& bounds) const noexcept {
+    return {
+        .x = mod(x, bounds.x),
+        .y = mod(y, bounds.y),
+    };
+}
 
 template <IsArithmetic T>
 template <IsArithmetic U>
