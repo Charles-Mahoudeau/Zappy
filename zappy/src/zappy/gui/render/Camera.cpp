@@ -60,6 +60,6 @@ void Camera::setProjection(CameraProjection projection) { _camera.projection = s
 
 void Camera::setCameraMode(CameraMode mode) { _cameraMode = mode; }
 
-void Camera::Update() { UpdateCamera(&_camera, std::to_underlying(_cameraMode)); }
+void Camera::update() { UpdateCamera(&_camera, std::to_underlying(_cameraMode)); }
 
 }  // namespace zappy::gui::render

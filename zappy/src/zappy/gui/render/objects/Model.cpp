@@ -8,14 +8,27 @@
 #include "Model.hpp"
 
 #include <raylib.h>
+#include <raymath.h>
 
+#include <algorithm>
+#include <array>
 #include <cstddef>
+#include <filesystem>
+#include <format>
 #include <span>
 #include <string>
 #include <string_view>
 #include <utility>
 
 namespace zappy::gui::render {
+namespace {
+#ifdef PLATFORM_DESKTOP
+constexpr int kGlslVersion = 330;
+#else  // PLATFORM_ANDROID, PLATFORM_WEB
+constexpr int kGlslVersion = 100;
+#endif
+}  // namespace
+
 Model::Model(std::string_view path)
     : _model(LoadModel(std::string(path).c_str())),
       _animCount(0),
@@ -23,20 +36,20 @@ Model::Model(std::string_view path)
       _currentFrame(0),
       _animations(nullptr) {
     if (!IsModelValid(_model)) {
-        throw ModelException{"Failed to load mesh from path: " + std::string{path}};
+        throw ModelException{std::format("Failed to load mesh from path: {}", path)};
     }
 }
 
 Model::Model(std::string_view path, std::string_view animationPath)
     : _model(LoadModel(std::string(path).c_str())), _animCount(0), _currentAnim(0), _currentFrame(0) {
     if (!IsModelValid(_model)) {
-        throw ModelException{"Failed to load mesh from path: " + std::string{path}};
+        throw ModelException{std::format("Failed to load mesh from path: {}", path)};
     }
 
     try {
         _animations = LoadModelAnimations(std::string(animationPath).c_str(), &_animCount);
         if (_animations == nullptr || _animCount <= 0) {
-            throw ModelException{"Failed to load animation from path: " + std::string{animationPath}};
+            throw ModelException{std::format("Failed to load animation from path: {}", animationPath)};
         }
     } catch (const ModelException& e) {
         if (_animations != nullptr && _animCount > 0) {
@@ -53,6 +66,9 @@ Model::~Model() {
     if (IsModelValid(_model)) {
         UnloadModel(_model);
     }
+    if (_hasSkinningShader) {
+        UnloadShader(_skinningShader);
+    }
     if (_animations != nullptr && _animCount > 0) {
         UnloadModelAnimations(_animations, _animCount);
     }
@@ -62,13 +78,19 @@ Model::~Model() {
 
 Model::Model(Model&& other) noexcept
     : _model(other._model),
+      _baseScale(other._baseScale),
+      _groundOffset(other._groundOffset),
       _animations(other._animations),
       _animCount(other._animCount),
       _currentAnim(other._currentAnim),
-      _currentFrame(other._currentFrame) {
+      _currentFrame(other._currentFrame),
+      _skinningShader(other._skinningShader),
+      _hasSkinningShader(other._hasSkinningShader) {
     other._model = {};
     other._animations = nullptr;
     other._animCount = 0;
+    other._skinningShader = {};
+    other._hasSkinningShader = false;
 }
 
 Model& Model::operator=(Model&& other) noexcept {
@@ -76,25 +98,76 @@ Model& Model::operator=(Model&& other) noexcept {
         if (IsModelValid(_model)) {
             UnloadModel(_model);
         }
+        if (_hasSkinningShader) {
+            UnloadShader(_skinningShader);
+        }
         if (_animations != nullptr && _animCount > 0) {
             UnloadModelAnimations(_animations, _animCount);
         }
         _model = other._model;
+        _baseScale = other._baseScale;
+        _groundOffset = other._groundOffset;
         _animations = other._animations;
         _animCount = other._animCount;
         _currentAnim = other._currentAnim;
         _currentFrame = other._currentFrame;
+        _skinningShader = other._skinningShader;
+        _hasSkinningShader = other._hasSkinningShader;
         other._model = {};
         other._animations = nullptr;
         other._animCount = 0;
+        other._skinningShader = {};
+        other._hasSkinningShader = false;
     }
     return *this;
 }
-void Model::draw(Vector3 position, float scale, Color tint) const {
+void Model::draw(::Vector3 position, float scale, Color tint) const {
     if (!IsModelValid(_model)) {
         throw ModelException{"Cannot draw a model that failed to load"};
     }
-    DrawModel(_model, position, scale, tint);
+    const float finalScale = scale * _baseScale;
+    const ::Vector3 groundedPosition = Vector3Subtract(position, Vector3Scale(_groundOffset, finalScale));
+    DrawModel(_model, groundedPosition, finalScale, tint);
+}
+
+void Model::drawEx(::Vector3 position, ::Vector3 rotationAxis, float rotationAngle, ::Vector3 scale, Color tint) const {
+    if (!IsModelValid(_model)) {
+        throw ModelException{"Cannot draw a model that failed to load"};
+    }
+    const ::Vector3 finalScale = Vector3Scale(scale, _baseScale);
+    const ::Vector3 scaledOffset = Vector3Multiply(_groundOffset, finalScale);
+    const ::Vector3 rotatedOffset = Vector3RotateByAxisAngle(scaledOffset, rotationAxis, rotationAngle * DEG2RAD);
+    const ::Vector3 groundedPosition = Vector3Subtract(position, rotatedOffset);
+    DrawModelEx(_model, groundedPosition, rotationAxis, rotationAngle, finalScale, tint);
+}
+
+void Model::drawEx(::Vector3 position, ::Vector3 rotationAxis, float rotationAngle, float scale, Color tint) const {
+    drawEx(position, rotationAxis, rotationAngle, ::Vector3{.x = scale, .y = scale, .z = scale}, tint);
+}
+
+void Model::normalizeOnGround(float targetSize) {
+    if (!IsModelValid(_model)) {
+        return;
+    }
+    const BoundingBox local = GetModelBoundingBox(_model);
+    const std::array<::Vector3, 8> corners = {{{.x = local.min.x, .y = local.min.y, .z = local.min.z},
+                                               {.x = local.max.x, .y = local.min.y, .z = local.min.z},
+                                               {.x = local.min.x, .y = local.max.y, .z = local.min.z},
+                                               {.x = local.min.x, .y = local.min.y, .z = local.max.z},
+                                               {.x = local.max.x, .y = local.max.y, .z = local.min.z},
+                                               {.x = local.max.x, .y = local.min.y, .z = local.max.z},
+                                               {.x = local.min.x, .y = local.max.y, .z = local.max.z},
+                                               {.x = local.max.x, .y = local.max.y, .z = local.max.z}}};
+    ::Vector3 mn = Vector3Transform(corners.at(0), _model.transform);
+    ::Vector3 mx = mn;
+    for (const auto& corner : corners) {
+        const ::Vector3 point = Vector3Transform(corner, _model.transform);
+        mn = ::Vector3{.x = std::min(mn.x, point.x), .y = std::min(mn.y, point.y), .z = std::min(mn.z, point.z)};
+        mx = ::Vector3{.x = std::max(mx.x, point.x), .y = std::max(mx.y, point.y), .z = std::max(mx.z, point.z)};
+    }
+    const float maxDim = std::max({mx.x - mn.x, mx.y - mn.y, mx.z - mn.z});
+    _baseScale = (maxDim > 0.0F) ? targetSize / maxDim : 1.0F;
+    _groundOffset = ::Vector3{.x = (mn.x + mx.x) * 0.5F, .y = mn.y, .z = (mn.z + mx.z) * 0.5F};
 }
 
 void Model::updateAnimation() {
@@ -111,6 +184,18 @@ void Model::updateAnimation() {
     }
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-avoid-unchecked-container-access)
     UpdateModelAnimation(_model, animations[_currentAnim], static_cast<float>(_currentFrame));
+}
+
+int Model::currentAnimationKeyframeCount() const {
+    if (_animations == nullptr) {
+        return 0;
+    }
+    const std::span<ModelAnimation> animations{_animations, static_cast<std::size_t>(_animCount)};
+    if (_currentAnim < 0 || static_cast<std::size_t>(_currentAnim) >= animations.size()) {
+        return 0;
+    }
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-avoid-unchecked-container-access)
+    return animations[_currentAnim].keyframeCount;
 }
 
 void Model::setTexture(int materialIndex, MaterialMapIndex mapIndex, ::Texture texture) {
@@ -143,6 +228,33 @@ void Model::setMeshTexture(int meshIndex, MaterialMapIndex mapIndex, ::Texture t
     const std::span<int> meshMaterial{_model.meshMaterial, static_cast<std::size_t>(_model.meshCount)};
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-avoid-unchecked-container-access)
     setTexture(meshMaterial[meshIndex], mapIndex, texture);
+}
+
+void Model::useSkinningShader(std::string_view shaderDirectory) {
+    if (!IsModelValid(_model)) {
+        throw ModelException{"Cannot set skinning shader for a model that failed to load"};
+    }
+    const std::string directory = std::format("{}/glsl{}", shaderDirectory, kGlslVersion);
+    const std::string vsPath = std::format("{}/skinning.vs", directory);
+    const std::string fsPath = std::format("{}/skinning.fs", directory);
+    if (!std::filesystem::is_regular_file(vsPath) || !std::filesystem::is_regular_file(fsPath)) {
+        throw ModelException{std::format("Skinning shader not found in: {}", directory)};
+    }
+
+    const ::Shader shader = LoadShader(vsPath.c_str(), fsPath.c_str());
+    if (!IsShaderValid(shader)) {
+        throw ModelException{std::format("Failed to load skinning shader from: {}", directory)};
+    }
+    if (_hasSkinningShader) {
+        UnloadShader(_skinningShader);
+    }
+    _skinningShader = shader;
+    _hasSkinningShader = true;
+
+    const std::span<Material> materials{_model.materials, static_cast<std::size_t>(_model.materialCount)};
+    for (auto& material : materials) {
+        material.shader = _skinningShader;
+    }
 }
 
 }  // namespace zappy::gui::render
