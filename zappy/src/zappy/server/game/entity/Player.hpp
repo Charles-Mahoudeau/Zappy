@@ -58,14 +58,6 @@ class Player : public IEntity {
     /// @brief Kill the player.
     void kill();
 
-    /// @brief Check if the player is frozen.
-    /// @return True if the player is frozen, false otherwise.
-    [[nodiscard]] bool frozen() const;
-
-    /// @brief Freeze the player.
-    /// @param time The time in seconds the player will be frozen.
-    void freeze(std::uint32_t time);
-
     /// @brief Get the player's level.
     /// @return The player's level.
     [[nodiscard]] std::uint8_t level() const;
@@ -107,7 +99,6 @@ class Player : public IEntity {
     std::uint16_t _teamId;
     std::uint32_t _lifetimeLeft{kDefaultLifetime};
     std::uint8_t _level{1};
-    std::uint32_t _freezeTime{0};
     Direction _direction{Direction::kNorth};
     Inventory _inventory;
 };

@@ -24,9 +24,6 @@ void Player::update() {
         return;
     }
     --_lifetimeLeft;
-    if (_freezeTime > 0) {
-        --_freezeTime;
-    }
 }
 
 std::uint16_t Player::teamId() const { return _teamId; }
@@ -36,10 +33,6 @@ std::uint32_t Player::lifetimeLeft() const { return _lifetimeLeft; }
 bool Player::alive() const { return _lifetimeLeft > 0; }
 
 void Player::kill() { _lifetimeLeft = 0; }
-
-bool Player::frozen() const { return _freezeTime > 0; }
-
-void Player::freeze(const std::uint32_t time) { _freezeTime = time; }
 
 std::uint8_t Player::level() const { return _level; }
 
