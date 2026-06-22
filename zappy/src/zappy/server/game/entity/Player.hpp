@@ -31,7 +31,7 @@ class Player : public IEntity {
     static constexpr std::uint8_t kTimeUnitsPerFood{126};
     static constexpr std::uint16_t kDefaultLifetime{kDefaultLifeUnits * kTimeUnitsPerFood};
 
-    Player(std::uint16_t teamId);
+    explicit Player(std::uint16_t teamId);
     ~Player() override = default;
 
     Player(const Player&) = default;
