@@ -1,6 +1,9 @@
 include(SetupRaylib)
 setup_raylib()
 
+include(SetupRaygui)
+setup_raygui()
+
 add_library(zappy_gui_objects OBJECT
         display/Window.cpp
         display/Window.hpp
@@ -34,6 +37,7 @@ add_library(zappy_gui_objects OBJECT
         render/objects/Skybox.hpp
         render/utils/Color.hpp
         render/utils/Vector3.hpp
+        ui/RaylibGuiImpl.cpp
 )
 target_include_directories(zappy_gui_objects PUBLIC
         ${CMAKE_SOURCE_DIR}/src
@@ -44,6 +48,10 @@ target_link_libraries(zappy_gui_objects PUBLIC
 
 if (TARGET raylib)
     target_link_libraries(zappy_gui_objects PUBLIC raylib)
+endif ()
+
+if (DEFINED raygui_SOURCE_DIR)
+    target_include_directories(zappy_gui_objects PUBLIC ${raygui_SOURCE_DIR}/src)
 endif ()
 
 add_executable(zappy_gui
