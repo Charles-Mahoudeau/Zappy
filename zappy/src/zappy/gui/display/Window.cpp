@@ -61,7 +61,7 @@ void Window::beginFrame() {
 void Window::endFrame() { EndDrawing(); }
 
 // NOLINTNEXTLINE
-void Window::BeginMode3D(render::Camera& camera) { ::BeginMode3D(camera); }
+void Window::BeginMode3D(render::Camera& renderCamera) { ::BeginMode3D(renderCamera); }
 
 // NOLINTNEXTLINE
 void Window::EndMode3D() { ::EndMode3D(); }
