@@ -5,7 +5,7 @@
 ** ClientSocket
 */
 
-#include "Client.hpp"
+#include "zappy/shared/network/socket/Client.hpp"
 
 #include <netinet/in.h>
 #include <sys/socket.h>

@@ -15,8 +15,11 @@
 
 #include "zappy/shared/exception/SocketError.hpp"
 #include "zappy/shared/network/Address.hpp"
+#include "zappy/shared/network/socket/Client.hpp"
 
 namespace zappy::network {
+
+BufferedClient::BufferedClient(socket::Client& client) : _client(std::move(client)) {}
 
 void BufferedClient::connect(const Address& address) const { _client.connect(address); }
 
@@ -63,5 +66,7 @@ void BufferedClient::send(std::string_view line) {
         sent += chunk;
     }
 }
+
+Address BufferedClient::addr() const { return this->_client.address(); }
 
 }  // namespace zappy::network

@@ -13,6 +13,7 @@
 #include <span>
 #include <string>
 #include <string_view>
+#include <utility>
 
 namespace zappy::gui::render {
 Model::Model(std::string_view path)
@@ -110,6 +111,38 @@ void Model::updateAnimation() {
     }
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-avoid-unchecked-container-access)
     UpdateModelAnimation(_model, animations[_currentAnim], static_cast<float>(_currentFrame));
+}
+
+void Model::setTexture(int materialIndex, MaterialMapIndex mapIndex, ::Texture texture) {
+    static constexpr std::size_t kMaterialMapCount = std::to_underlying(MaterialMapIndex::BRDF) + 1;
+
+    if (!IsModelValid(_model)) {
+        throw ModelException{"Cannot set texture for a model that failed to load"};
+    }
+    if (materialIndex < 0 || materialIndex >= _model.materialCount) {
+        throw ModelException{"Material index out of bounds"};
+    }
+    const auto map = std::to_underlying(mapIndex);
+    if (map >= kMaterialMapCount) {
+        throw ModelException{"Material map index out of bounds"};
+    }
+    const std::span<Material> materials{_model.materials, static_cast<std::size_t>(_model.materialCount)};
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-avoid-unchecked-container-access)
+    const std::span<MaterialMap> maps{materials[static_cast<std::size_t>(materialIndex)].maps, kMaterialMapCount};
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-avoid-unchecked-container-access)
+    maps[map].texture = texture;
+}
+
+void Model::setMeshTexture(int meshIndex, MaterialMapIndex mapIndex, ::Texture texture) {
+    if (!IsModelValid(_model)) {
+        throw ModelException{"Cannot set texture for a model that failed to load"};
+    }
+    if (meshIndex < 0 || meshIndex >= _model.meshCount) {
+        throw ModelException{"Mesh index out of bounds"};
+    }
+    const std::span<int> meshMaterial{_model.meshMaterial, static_cast<std::size_t>(_model.meshCount)};
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-avoid-unchecked-container-access)
+    setTexture(meshMaterial[meshIndex], mapIndex, texture);
 }
 
 }  // namespace zappy::gui::render
