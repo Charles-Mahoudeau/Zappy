@@ -110,7 +110,7 @@ class EntityDatabase {
     /// @brief Get the ID of an entity.
     /// @param entity The entity to get the ID of.
     /// @return The ID of the entity.
-    [[nodiscard]] std::optional<std::uint64_t> id(const IEntity& entity);
+    [[nodiscard]] std::optional<std::uint64_t> id(const IEntity& entity) const;
 
     /// @brief Get the entities of a given type from a list of IDs.
     /// @tparam T The type of the entities to get.

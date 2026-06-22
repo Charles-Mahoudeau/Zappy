@@ -84,7 +84,7 @@ std::vector<IEntity*> EntityDatabase::toVector() {
 
 std::uint64_t EntityDatabase::countAll() const { return _entities.size(); }
 
-std::optional<std::uint64_t> EntityDatabase::id(const IEntity& entity) {
+std::optional<std::uint64_t> EntityDatabase::id(const IEntity& entity) const {
     for (const auto& [id, entityPtr] : _entities) {
         if (entityPtr.get() == &entity) {
             return id;
