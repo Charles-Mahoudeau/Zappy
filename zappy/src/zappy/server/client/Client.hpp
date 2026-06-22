@@ -13,6 +13,7 @@
 #include <string>
 #include <string_view>
 
+#include "zappy/server/Timer.hpp"
 #include "zappy/server/net/SocketRegistry.hpp"
 #include "zappy/shared/network/Address.hpp"
 
@@ -43,8 +44,8 @@ class Client {
         kUnknown,  ///< Default unidentified client; requires a team assignment before promotion.
     };
 
-    Client(net::SocketRegistry& socketRegister, network::Address address);
-    ~Client() = default;
+    Client(net::SocketRegistry& socketRegister, network::Address address, Timer& timer);
+    ~Client();
 
     Client(const Client&) = delete;
     Client(Client&&) = delete;
@@ -113,18 +114,6 @@ class Client {
     std::optional<std::string> nextRequest();
 
     /**
-     * @brief Sets a cooldown that defers request processing for a number of ticks.
-     *
-     * @details Each call to @c nextRequest() while the timeout is positive
-     * decrements it by one and returns @c std::nullopt, effectively blocking
-     * the client's command pipeline for @p timeout ticks.
-     *
-     * @param timeout Number of ticks to wait before processing the next request.
-     *                Pass @c 0 to clear any active timeout immediately.
-     */
-    void setTimeout(int timeout);
-
-    /**
      * @brief Sends a message to this client over its registered socket.
      *
      * @details Looks up the socket in the registry and forwards the message.
@@ -138,8 +127,27 @@ class Client {
      */
     bool sendMessage(std::string_view msg);
 
+    /**
+     * @brief check if the client currently have a action running
+     * @return bool true if in timeout. false otherwise
+     */
+    [[nodiscard]] bool inTimeout() const { return this->_timeoutId != 0; }
+
+    /**
+     * @brief set a timeout to N tick
+     * @param time nb tick to timeout
+     * @return bool true if successfully timed out. false if already in timeout
+     */
+    bool setTimeout(int time);
+
+    /**
+     * @brief remove the client timeout from the Timer
+     */
+    void removeTimeout();
+
   private:
-    int _timeout = 0;
+    Timer& _timer;
+    std::uint64_t _timeoutId = 0;
     std::queue<std::string> _requests;
     Type _type = Client::Type::kUnknown;
     network::Address _addr;

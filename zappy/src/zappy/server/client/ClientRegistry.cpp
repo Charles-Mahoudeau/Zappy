@@ -7,18 +7,20 @@
 
 #include "zappy/server/client/ClientRegistry.hpp"
 
+#include <algorithm>
 #include <memory>
 #include <utility>
 #include <vector>
 
+#include "zappy/server/Timer.hpp"
 #include "zappy/server/client/Client.hpp"
 #include "zappy/server/net/SocketRegistry.hpp"
 #include "zappy/shared/network/Address.hpp"
 
 namespace zappy::server::client {
 
-void ClientRegistry::makeNewClient(net::SocketRegistry& socketRegistery, network::Address addr) {
-    auto newClient = std::make_unique<Client>(socketRegistery, addr);
+void ClientRegistry::makeNewClient(net::SocketRegistry& socketRegistery, network::Address addr, Timer& timer) {
+    auto newClient = std::make_unique<Client>(socketRegistery, addr, timer);
 
     this->_clientsPerType.at(newClient->type()).emplace_back(newClient.get());
     this->_clients.emplace_back(std::move(newClient));
@@ -66,6 +68,16 @@ void ClientRegistry::updateTypeGroup() {
         auto& src = this->_clientsPerType.at(fromType);
         std::erase_if(src, [client](const Client* InnerClient) { return client == InnerClient; });
     }
+}
+
+Client* ClientRegistry::findByAddress(const network::Address& addr) {
+    auto iter = std::ranges::find_if(
+        this->_clients, [&addr](const std::unique_ptr<Client>& client) { return client->address() == addr; });
+
+    if (iter != this->_clients.end()) {
+        return iter.base()->get();
+    }
+    return nullptr;
 }
 
 }  // namespace zappy::server::client

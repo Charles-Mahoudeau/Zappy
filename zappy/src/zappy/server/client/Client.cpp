@@ -7,11 +7,13 @@
 
 #include "zappy/server/client/Client.hpp"
 
+#include <iostream>
 #include <optional>
 #include <string>
 #include <string_view>
 #include <utility>
 
+#include "zappy/server/Timer.hpp"
 #include "zappy/server/net/SocketRegistry.hpp"
 #include "zappy/shared/exception/SocketError.hpp"
 #include "zappy/shared/network/Address.hpp"
@@ -19,8 +21,10 @@
 
 namespace zappy::server {
 
-Client::Client(net::SocketRegistry& socketRegister, network::Address address)
-    : _addr(address), _socketsRegistery(socketRegister) {}
+Client::Client(net::SocketRegistry& socketRegister, network::Address address, Timer& timer)
+    : _timer(timer), _addr(address), _socketsRegistery(socketRegister) {}
+
+Client::~Client() { this->removeTimeout(); }
 
 const network::Address& Client::address() const { return this->_addr; }
 
@@ -51,11 +55,7 @@ bool Client::update() {
 }
 
 std::optional<std::string> Client::nextRequest() {
-    if (this->_timeout > 0) {
-        this->_timeout--;
-        return std::nullopt;
-    }
-    if (this->_requests.empty()) {
+    if (this->inTimeout() || this->_requests.empty()) {
         return std::nullopt;
     }
     std::string request = this->_requests.front();
@@ -63,7 +63,22 @@ std::optional<std::string> Client::nextRequest() {
     return request;
 }
 
-void Client::setTimeout(int timeout) { this->_timeout = timeout; }
+bool Client::setTimeout(int time) {
+    if (this->inTimeout()) {
+        return false;
+    }
+
+    this->_timeoutId = this->_timer.scheduleLater(time, [this]() {
+        std::cout << "finish busy\n";
+        this->_timeoutId = 0;
+    });
+    return true;
+}
+
+void Client::removeTimeout() {
+    this->_timer.unschedule(this->_timeoutId);
+    this->_timeoutId = 0;
+}
 
 bool Client::sendMessage(std::string_view msg) {
     auto* socket = this->_socketsRegistery.findByAddress(this->_addr);
