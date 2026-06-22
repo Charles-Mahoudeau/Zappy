@@ -9,6 +9,8 @@
 
 #include <gtest/gtest.h>
 
+#include "raylib.h"
+
 namespace ui = zappy::gui::ui;
 
 TEST(RectangleTest, DefaultConstructorZeroesFields) {

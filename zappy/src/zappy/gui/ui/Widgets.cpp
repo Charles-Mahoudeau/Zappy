@@ -8,8 +8,10 @@
 #include "Widgets.hpp"
 
 #include <string>
+#include <string_view>
 
 #include "raygui.h"
+#include "raylib.h"
 #include "utils/Rectangle.hpp"
 #include "utils/Vector2.hpp"
 
