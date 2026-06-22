@@ -109,7 +109,7 @@ std::uint64_t World::countResources(const ResourceType type) const {
 }
 
 std::uint64_t World::spawnEgg(std::uint16_t teamId) {
-    const std::uint16_t eggId = _entityDatabase.insert(std::make_unique<entity::Egg>(teamId));
+    const std::uint64_t eggId = _entityDatabase.insert(std::make_unique<entity::Egg>(teamId));
     Tile& tile = randomTile();
 
     tile.addEntity(eggId);
