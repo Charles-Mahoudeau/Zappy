@@ -1,0 +1,231 @@
+/*
+** EPITECH PROJECT, 2026
+** Zappy
+** File description:
+** Renderer
+*/
+
+#include "Renderer.hpp"
+
+#include <raylib.h>
+
+#include <algorithm>
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <iterator>
+
+#include "AssetStore.hpp"
+#include "Camera.hpp"
+#include "objects/Model.hpp"
+#include "zappy/gui/display/Window.hpp"
+#include "zappy/gui/game/GameState.hpp"
+#include "zappy/gui/render/utils/Color.hpp"
+#include "zappy/gui/render/utils/Vector3.hpp"
+
+namespace zappy::gui::render {
+
+void Renderer::update(Camera& camera, game::GameState& state, AssetStore& assets) {
+    static constexpr float kSkyboxFovy = 60.0F;
+
+    camera.update();
+
+    Camera skyboxCamera{camera.position(), camera.target(), camera.up(), kSkyboxFovy,
+                        CameraProjection::CAMERA_PERSPECTIVE};
+    display::Window::BeginMode3D(skyboxCamera);
+    assets.skybox().draw(camera.position());
+    display::Window::EndMode3D();
+
+    display::Window::BeginMode3D(camera);
+    drawGrid(state);  // TODO: Implement a grid class to render a grid in the scene
+    drawPlayers(state, assets);
+    drawResources(state, assets);
+    display::Window::EndMode3D();
+}
+
+void Renderer::drawResources(const game::GameState& state, const AssetStore& assets) {
+    for (std::size_t y = 0; y < state.height(); ++y) {
+        for (std::size_t x = 0; x < state.width(); ++x) {
+            const Vector3 position(static_cast<float>(x), 0.0F, static_cast<float>(y));
+            drawTileResources(state.tile(x, y), position, assets);
+        }
+    }
+}
+
+void Renderer::drawTileResources(const game::Resources& tile, const Vector3& position, const AssetStore& assets) {
+    for (const auto& [resourceType, model] : assets.resourceModels()) {
+        drawResourceStack(model, position, resourceCount(tile, resourceType));
+    }
+}
+
+void Renderer::drawResourceStack(const Model& model, const Vector3& position, std::uint32_t count) {
+    for (std::uint32_t i = 0; i < count; ++i) {
+        const float offsetX = (static_cast<float>(i % 2) * 0.5F) - 0.25F;
+        const float offsetZ = ((static_cast<float>(i) / 2.0F) * 0.5F) - 0.25F;
+        const Vector3 resourcePosition(position.x() + offsetX, position.y(), position.z() + offsetZ);
+        model.draw(resourcePosition, kScale, Color::kWHITE);
+    }
+}
+
+std::uint32_t Renderer::resourceCount(const game::Resources& tile, game::ResourceType type) {
+    using enum game::ResourceType;
+    switch (type) {
+        case Food:
+            return tile.food;
+        case Linemate:
+            return tile.linemate;
+        case Deraumere:
+            return tile.deraumere;
+        case Sibur:
+            return tile.sibur;
+        case Mendiane:
+            return tile.mendiane;
+        case Phiras:
+            return tile.phiras;
+        case Thystame:
+            return tile.thystame;
+    }
+    return 0;
+}
+
+// TODO: real grid
+void Renderer::drawGrid(const game::GameState& state) {
+    const auto width = static_cast<int>(state.width());
+    const auto height = static_cast<int>(state.height());
+    if (width <= 0 || height <= 0) {
+        return;
+    }
+    constexpr float kOffset = 0.5F;
+    const Color color(60, 60, 60, 255);
+    const auto fWidth = static_cast<float>(width);
+    const auto fHeight = static_cast<float>(height);
+
+    for (int x = 0; x <= width; ++x) {
+        const auto fx = static_cast<float>(x) - kOffset;
+        DrawLine3D(Vector3(fx, 0.0F, -kOffset), Vector3(fx, 0.0F, fHeight - kOffset), color);
+    }
+    for (int z = 0; z <= height; ++z) {
+        const auto fz = static_cast<float>(z) - kOffset;
+        DrawLine3D(Vector3(-kOffset, 0.0F, fz), Vector3(fWidth - kOffset, 0.0F, fz), color);
+    }
+}
+
+void Renderer::drawPlayers(const game::GameState& state, AssetStore& assets) {
+    const auto& teams = state.teams();
+    const auto& players = state.players();
+    const float dt = GetFrameTime();
+    const auto width = static_cast<float>(state.width());
+    const auto height = static_cast<float>(state.height());
+
+    std::erase_if(_playerVisuals, [&players](const auto& entry) { return !players.contains(entry.first); });
+
+    for (const auto& [playerId, player] : players) {
+        const auto teamIt = std::ranges::find(teams, player.team);
+        const auto teamIndex = static_cast<std::size_t>(std::distance(teams.begin(), teamIt));
+        auto& model = assets.playerModel(teamIndex % assets.playerModelCount());
+        const float scale = kScale * static_cast<float>(player.level);
+
+        PlayerVisual& visual = _playerVisuals[playerId];
+        updatePlayerVisual(visual, player, width, height, dt, model);
+
+        model.drawEx(visual.position, Vector3(0.0F, 1.0F, 0.0F), calculAngle(player.orientation), scale, Color::kWHITE);
+    }
+}
+
+float Renderer::torusNearest(float current, float target, float size) {
+    float best = target;
+    float bestDist = std::fabs(target - current);
+    for (const float offset : {-size, size}) {
+        const float candidate = target + offset;
+        const float dist = std::fabs(candidate - current);
+        if (dist < bestDist) {
+            bestDist = dist;
+            best = candidate;
+        }
+    }
+    return best;
+}
+
+void Renderer::updatePlayerPos(PlayerVisual& visual, const game::Player& player, float width, float height, float dt) {
+    const auto logicalX = static_cast<float>(player.x);
+    const auto logicalZ = static_cast<float>(player.y);
+
+    if (!visual.initialized) {
+        visual.position = Vector3(logicalX, 0.0F, logicalZ);
+        visual.tileX = player.x;
+        visual.tileY = player.y;
+        visual.initialized = true;
+    }
+
+    if (player.x != visual.tileX || player.y != visual.tileY) {
+        visual.moveStart = visual.position;
+        visual.moveTarget = Vector3(torusNearest(visual.position.x(), logicalX, width), 0.0F,
+                                    torusNearest(visual.position.z(), logicalZ, height));
+        visual.moveProgress = 0.0F;
+        visual.moving = true;
+        visual.tileX = player.x;
+        visual.tileY = player.y;
+    }
+
+    if (visual.moving) {
+        visual.moveProgress += (kMoveDuration > 0.0F) ? dt / kMoveDuration : 1.0F;
+        if (visual.moveProgress >= 1.0F) {
+            visual.moving = false;
+            visual.position = Vector3(logicalX, 0.0F, logicalZ);
+        } else {
+            const float t = visual.moveProgress;
+            const float posX = visual.moveStart.x() + ((visual.moveTarget.x() - visual.moveStart.x()) * t);
+            const float posZ = visual.moveStart.z() + ((visual.moveTarget.z() - visual.moveStart.z()) * t);
+            visual.position = Vector3(posX, 0.0F, posZ);
+        }
+    }
+}
+
+void Renderer::updatePlayerAnimation(PlayerVisual& visual, float dt, Model& model) {
+    int desiredAnim = visual.moving ? kMoveAnim : kIdleAnim;
+    if (desiredAnim >= model.animationCount()) {
+        desiredAnim = kIdleAnim;
+    }
+    if (desiredAnim != visual.animIndex) {
+        visual.animIndex = desiredAnim;
+        visual.animFrame = 0.0F;
+    }
+    model.setCurrentAnimation(visual.animIndex);
+
+    const int keyframeCount = model.currentAnimationKeyframeCount();
+    if (keyframeCount > 0) {
+        float frame = 0.0F;
+        if (visual.moving) {
+            frame = visual.moveProgress * static_cast<float>(keyframeCount - 1) * kWalkCycles;
+        } else {
+            visual.animFrame += dt * kIdleFps;
+            frame = visual.animFrame;
+        }
+        model.setCurrentFrame(static_cast<int>(std::fmod(frame, static_cast<float>(keyframeCount))));
+    }
+    model.updateAnimation();
+}
+
+void Renderer::updatePlayerVisual(PlayerVisual& visual, const game::Player& player, float width, float height, float dt,
+                                  Model& model) {
+    updatePlayerPos(visual, player, width, height, dt);
+    updatePlayerAnimation(visual, dt, model);
+}
+
+float Renderer::calculAngle(game::Orientation orientation) {
+    using enum game::Orientation;
+    switch (orientation) {
+        case South:
+            return 0.0F;
+        case East:
+            return 90.0F;
+        case North:
+            return 180.0F;
+        case West:
+            return 270.0F;
+        default:
+            return 0.0F;
+    }
+}
+
+}  // namespace zappy::gui::render

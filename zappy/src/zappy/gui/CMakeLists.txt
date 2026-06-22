@@ -2,12 +2,14 @@ include(SetupRaylib)
 setup_raylib()
 
 add_library(zappy_gui_objects OBJECT
-        Demo.cpp
-        Demo.hpp
         display/Window.cpp
         display/Window.hpp
         game/GameState.cpp
         game/GameState.hpp
+        GUI.cpp
+        GUI.hpp
+        GuiCliParser.cpp
+        GuiCliParser.hpp
         network/CommandSender.cpp
         network/CommandSender.hpp
         network/Handshake.cpp
@@ -16,12 +18,22 @@ add_library(zappy_gui_objects OBJECT
         network/HandlerRegistry.hpp
         network/ProtocolParser.cpp
         network/ProtocolParser.hpp
+        render/AssetLoaderRegistry.cpp
+        render/AssetLoaderRegistry.hpp
+        render/AssetStore.cpp
+        render/AssetStore.hpp
+        render/Renderer.cpp
+        render/Renderer.hpp
         render/Camera.cpp
         render/Camera.hpp
         render/objects/Texture.cpp
         render/objects/Texture.hpp
         render/objects/Model.cpp
         render/objects/Model.hpp
+        render/objects/Skybox.cpp
+        render/objects/Skybox.hpp
+        render/utils/Color.hpp
+        render/utils/Vector3.hpp
 )
 target_include_directories(zappy_gui_objects PUBLIC
         ${CMAKE_SOURCE_DIR}/src

@@ -14,10 +14,10 @@
 #include <string_view>
 
 namespace zappy::gui::render {
-Texture::Texture(std::string_view path) {
+Texture::Texture(std::string_view path, bool flipVertical) {
     const std::string pathStr{path};
 
-    _texture = LoadTexture(pathStr.c_str());
+    _texture = loadTexture(pathStr.c_str(), flipVertical);
     if (!isValid()) {
         throw TextureException{"Failed to load texture from path: " + pathStr};
     }
@@ -44,14 +44,20 @@ int Texture::height() const { return _texture.height; }
 
 bool Texture::isValid() const { return IsTextureValid(_texture); }
 
-void Texture::reload(std::string_view path) {
+void Texture::reload(std::string_view path, bool flipVertical) {
     const std::string pathStr{path};
 
     UnloadTexture(_texture);
-    _texture = LoadTexture(pathStr.c_str());
+    _texture = loadTexture(pathStr.c_str(), flipVertical);
     if (!isValid()) {
         throw TextureException{"Failed to reload texture from path: " + pathStr};
     }
+}
+
+Texture2D Texture::release() noexcept {
+    const Texture2D owned = _texture;
+    _texture = {};
+    return owned;
 }
 
 void Texture::swap(Texture& other) noexcept {
@@ -61,6 +67,14 @@ void Texture::swap(Texture& other) noexcept {
     other._texture = tmp;
 }
 
-const Texture2D& Texture::texture() const { return _texture; }
-
+Texture2D Texture::loadTexture(const char* path, bool flipVertical) {
+    if (!flipVertical) {
+        return LoadTexture(path);
+    }
+    Image image = LoadImage(path);
+    ImageFlipVertical(&image);
+    const Texture2D texture = LoadTextureFromImage(image);
+    UnloadImage(image);
+    return texture;
+}
 }  // namespace zappy::gui::render

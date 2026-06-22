@@ -1,0 +1,39 @@
+/*
+** EPITECH PROJECT, 2026
+** SocketRegistery
+** File description:
+** SocketRegistery code
+*/
+
+#include "zappy/server/net/SocketRegistry.hpp"
+
+#include <utility>
+
+#include "zappy/shared/network/Address.hpp"
+#include "zappy/shared/network/BufferedClient.hpp"
+#include "zappy/shared/network/socket/Client.hpp"
+
+namespace zappy::server::net {
+
+void SocketRegistry::insert(zappy::network::socket::Client& socket) {
+    network::BufferedClient client(socket);
+
+    this->_sockets.emplace_back(std::move(client));
+}
+
+network::BufferedClient* SocketRegistry::findByAddress(const network::Address& addr) {
+    for (auto& socket : this->_sockets) {
+        if (socket == addr) {
+            return &socket;
+        }
+    }
+    return nullptr;
+}
+
+void SocketRegistry::remove(int fd) {
+    std::erase_if(this->_sockets, [fd](const network::BufferedClient& socket) { return fd == socket.fd(); });
+}
+
+void SocketRegistry::clear() { this->_sockets.clear(); }
+
+}  // namespace zappy::server::net

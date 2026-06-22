@@ -12,6 +12,7 @@
 #include <string>
 #include <string_view>
 
+#include "zappy/gui/render/Camera.hpp"
 #include "zappy/shared/exception/WindowException.hpp"
 
 namespace zappy::gui::display {
@@ -53,10 +54,16 @@ void Window::setTargetFPS(int fps) { SetTargetFPS(fps); }
 // NOLINTNEXTLINE
 void Window::beginFrame() {
     BeginDrawing();
-    ClearBackground(BLACK);
+    ClearBackground(GRAY);
 }
 
 // NOLINTNEXTLINE
 void Window::endFrame() { EndDrawing(); }
+
+// NOLINTNEXTLINE
+void Window::BeginMode3D(render::Camera& renderCamera) { ::BeginMode3D(renderCamera); }
+
+// NOLINTNEXTLINE
+void Window::EndMode3D() { ::EndMode3D(); }
 
 }  // namespace zappy::gui::display
