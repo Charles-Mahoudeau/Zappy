@@ -12,6 +12,7 @@
 #include <string_view>
 
 #include "../Camera.hpp"
+#include "Texture.hpp"
 
 namespace zappy::gui::render {
 Billboard::Billboard(std::string_view path) : Texture(path) {}
@@ -83,14 +84,14 @@ void Billboard::drawPro(const Camera& camera) const {
     const Camera3D& rlCamera{static_cast<const Camera3D&>(camera)};
     const Texture2D& billboardTexture{static_cast<const Texture2D&>(*this)};
 
-    const Rectangle source = _source.width == 0.0f || _source.height == 0.0f
+    const Rectangle source = _source.width == 0.0F || _source.height == 0.0F
                                  ? Rectangle{.x = 0.0F,
                                              .y = 0.0F,
                                              .width = static_cast<float>(width()),
                                              .height = static_cast<float>(height())}
                                  : _source;
-    const Vector2 size = _usePro ? _size : Vector2{source.width / source.height, 1.0F};
-    const Vector2 origin = _usePro ? _origin : Vector2{size.x * 0.5F, size.y * 0.5F};
+    const Vector2 size = _usePro ? _size : Vector2{.x = source.width / source.height, .y = 1.0F};
+    const Vector2 origin = _usePro ? _origin : Vector2{.x = size.x * 0.5F, .y = size.y * 0.5F};
 
     DrawBillboardPro(rlCamera, billboardTexture, source, _position, _up, size, origin, _rotation, _tint);
 }
