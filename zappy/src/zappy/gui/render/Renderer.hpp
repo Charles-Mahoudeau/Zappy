@@ -8,15 +8,11 @@
 #pragma once
 
 #include <cstdint>
-#include <initializer_list>
-#include <map>
-#include <string_view>
 #include <unordered_map>
-#include <vector>
 
+#include "AssetStore.hpp"
 #include "Camera.hpp"
 #include "objects/Model.hpp"
-#include "objects/Skybox.hpp"
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/render/utils/Vector3.hpp"
 
@@ -31,24 +27,13 @@ class Renderer {
     Renderer(Renderer&& other) noexcept = default;
     Renderer& operator=(Renderer&& other) noexcept = default;
 
-    void init();
-    void update(Camera& camera, game::GameState& state);
+    void update(Camera& camera, game::GameState& state, AssetStore& assets);
 
   private:
-    struct TextureMap {
-        Model::MaterialMapIndex mapIndex;
-        std::string_view path;
-    };
-
-    static Model createModel(std::string_view path, std::initializer_list<TextureMap> textures,
-                             bool flipVertical = false);
-    static Model createModel(std::string_view path, std::string_view animationPath,
-                             std::initializer_list<TextureMap> textures, bool flipVertical = false);
-
     static void drawGrid(const game::GameState& state);
 
-    void drawResources(const game::GameState& state);
-    void drawTileResources(const game::Resources& tile, const Vector3& position);
+    static void drawResources(const game::GameState& state, const AssetStore& assets);
+    static void drawTileResources(const game::Resources& tile, const Vector3& position, const AssetStore& assets);
     static void drawResourceStack(const Model& model, const Vector3& position, std::uint32_t count);
     static std::uint32_t resourceCount(const game::Resources& tile, game::ResourceType type);
 
@@ -65,7 +50,7 @@ class Renderer {
         bool moving{false};
     };
 
-    void drawPlayers(const game::GameState& state);
+    void drawPlayers(const game::GameState& state, AssetStore& assets);
     static void updatePlayerVisual(PlayerVisual& visual, const game::Player& player, float width, float height,
                                    float dt, Model& model);
     static float torusNearest(float current, float target, float size);
@@ -73,17 +58,13 @@ class Renderer {
     static void updatePlayerAnimation(PlayerVisual& visual, float dt, Model& model);
     static float calculAngle(game::Orientation orientation);
 
-    static constexpr int kMaxModels = 10;
     static constexpr float kScale = 0.5F;
     static constexpr float kMoveDuration = 0.8F;
     static constexpr float kIdleFps = 36.0F;
     static constexpr float kWalkCycles = 1.0F;
     static constexpr int kIdleAnim = 0;
     static constexpr int kMoveAnim = 1;
-    std::vector<Model> _playerModels;
-    std::map<game::ResourceType, Model> _resourcesModels;
     std::unordered_map<std::uint32_t, PlayerVisual> _playerVisuals;
-    Skybox _skybox;
     // Grid _grid; TODO: Implement a grid class to render a grid in the scene
 };
 }  // namespace zappy::gui::render
