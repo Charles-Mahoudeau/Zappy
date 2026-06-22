@@ -15,19 +15,20 @@
 #include <unordered_map>
 #include <vector>
 
+#include "../../../../cmake-build-debug/_deps/raylib-src/src/raylib.h"
 #include "EntityDatabase.hpp"
 #include "IEntity.hpp"
 #include "ResourceType.hpp"
 #include "Tile.hpp"
 #include "entity/Player.hpp"
 #include "zappy/shared/io/Logger.hpp"
+#include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server::game {
 class World {
   public:
     struct Config {
-        std::uint16_t width;
-        std::uint16_t height;
+        math::Vector2u size;
         std::uint16_t teamCount;
         std::uint16_t playersPerTeam;
         std::optional<io::Logger> logger;
@@ -47,13 +48,9 @@ class World {
     /// @brief Updates the world state.
     void update();
 
-    /// @brief Returns the width of the world.
-    /// @return The width of the world.
-    [[nodiscard]] std::uint16_t width() const;
-
-    /// @brief Returns the height of the world.
-    /// @return The height of the world.
-    [[nodiscard]] std::uint16_t height() const;
+    /// @brief Returns the size of the world.
+    /// @return The size of the world.
+    math::Vector2u size() const;
 
     /// @brief Returns a reference to the entity database.
     /// @return A reference to the entity database.
@@ -64,16 +61,14 @@ class World {
     [[nodiscard]] EntityDatabase& entityDatabase();
 
     /// @brief Returns a reference to the tile at the specified coordinates.
-    /// @param x The x-coordinate of the tile.
-    /// @param y The y-coordinate of the tile.
+    /// @param pos The position of the tile.
     /// @return A reference to the tile at the specified coordinates.
-    [[nodiscard]] const Tile& tile(std::uint16_t x, std::uint16_t y) const;
+    [[nodiscard]] const Tile& tile(math::Vector2u pos) const;
 
     /// @brief Returns a reference to the tile at the specified coordinates.
-    /// @param x The x-coordinate of the tile.
-    /// @param y The y-coordinate of the tile.
+    /// @param position The position of the tile.
     /// @return A reference to the tile at the specified coordinates.
-    [[nodiscard]] Tile& tile(std::uint16_t x, std::uint16_t y);
+    [[nodiscard]] Tile& tile(math::Vector2u position);
 
     /// @brief Returns a reference to the tile at the specified entity id.
     /// @param entityId The id of the entity.
@@ -127,10 +122,9 @@ class World {
     [[nodiscard]] static const std::unordered_map<ResourceType, float>& resourceDensities();
 
     /// @brief Returns true if the specified coordinates are within the bounds of the world.
-    /// @param x The x-coordinate to check.
-    /// @param y The y-coordinate to check.
+    /// @param position The position to check.
     /// @return True if the specified coordinates are within the bounds of the world, false otherwise.
-    [[nodiscard]] bool isInBounds(std::uint16_t x, std::uint16_t y) const;
+    [[nodiscard]] bool isInBounds(math::Vector2u position) const;
 
     /// @brief Spawns the initial eggs in the world.
     void spawnStartEggs();

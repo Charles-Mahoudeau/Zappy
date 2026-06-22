@@ -31,14 +31,17 @@
 
 namespace zappy::server::game {
 World::World(Config config) : _config{std::move(config)} {
-    const auto size = static_cast<std::size_t>(_config.width * _config.height);
+    const auto size = static_cast<std::size_t>(_config.size.x * _config.size.y);
 
     if (size == 0) {
         throw exception::OutOfRange{"trying to create world with 0 width or height"};
     }
     _tiles.reserve(size);
     for (std::size_t i = 0; i < size; ++i) {
-        _tiles.emplace_back(*this, i % _config.width, i / _config.width);
+        _tiles.emplace_back(*this, math::Vector2u{
+                                       static_cast<std::uint32_t>(i % _config.size.x),
+                                       static_cast<std::uint32_t>(i / _config.size.x),
+                                   });
     }
     generateResourceThresholds();
     spawnStartEggs();
@@ -56,26 +59,24 @@ void World::update() {
     _nextMajorTick = kMajorTickInterval;
 }
 
-std::uint16_t World::width() const { return _config.width; }
-
-std::uint16_t World::height() const { return _config.height; }
+math::Vector2u World::size() const { return _config.size; }
 
 const EntityDatabase& World::entityDatabase() const { return _entityDatabase; }
 
 EntityDatabase& World::entityDatabase() { return _entityDatabase; }
 
-const Tile& World::tile(const std::uint16_t x, const std::uint16_t y) const {
-    if (!isInBounds(x, y)) {
+const Tile& World::tile(const math::Vector2u pos) const {
+    if (!isInBounds(pos)) {
         throw exception::OutOfRange{"trying to access tile out of bounds"};
     }
-    return _tiles.at((y * _config.width) + x);
+    return _tiles.at((pos.y * _config.size.x) + pos.x);
 }
 
-Tile& World::tile(const std::uint16_t x, const std::uint16_t y) {
-    if (!isInBounds(x, y)) {
+Tile& World::tile(const math::Vector2u position) {
+    if (!isInBounds(position)) {
         throw exception::OutOfRange{"trying to access tile out of bounds"};
     }
-    return _tiles.at((y * _config.width) + x);
+    return _tiles.at((position.y * _config.size.x) + position.x);
 }
 
 const Tile* World::tile(const std::uint64_t entityId) const {
@@ -114,8 +115,8 @@ std::uint64_t World::spawnEgg(std::uint16_t teamId) {
 
     tile.addEntity(eggId);
     if (_config.logger) {
-        _config.logger->info(
-            std::format("Spawned egg #{} for team #{} at ({}, {})", eggId, teamId, tile.x(), tile.y()));
+        _config.logger->info(std::format("Spawned egg #{} for team #{} at ({}, {})", eggId, teamId, tile.position().x,
+                                         tile.position().y));
     }
     return eggId;
 }
@@ -183,8 +184,8 @@ const std::unordered_map<ResourceType, float>& World::resourceDensities() {
     return resourceDensities;
 }
 
-bool World::isInBounds(const std::uint16_t x, const std::uint16_t y) const {
-    return x < _config.width && y < _config.height;
+bool World::isInBounds(const math::Vector2u position) const {
+    return position.x < _config.size.x && position.y < _config.size.y;
 }
 
 void World::spawnStartEggs() {
@@ -219,7 +220,7 @@ void World::generateResourceThresholds() {
     _resourceThresholds.clear();
     for (const auto& [resourceType, density] : resourceDensities()) {
         _resourceThresholds[resourceType] =
-            static_cast<std::uint16_t>(std::ceil(static_cast<float>(_config.width * _config.height) * density));
+            static_cast<std::uint16_t>(std::ceil(static_cast<float>(_config.size.x * _config.size.y) * density));
     }
     if (_config.logger) {
         _config.logger->info("Resources thresholds generated.");

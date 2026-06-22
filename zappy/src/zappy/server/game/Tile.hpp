@@ -14,13 +14,14 @@
 
 #include "EntityDatabase.hpp"
 #include "IEntity.hpp"
+#include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server::game {
 class World;
 
 class Tile {
   public:
-    explicit Tile(World& world, std::uint16_t x, std::uint16_t y);
+    Tile(World& world, math::Vector2u position);
     ~Tile() = default;
 
     Tile(const Tile&) = default;
@@ -29,13 +30,9 @@ class Tile {
     Tile(Tile&&) = default;
     Tile& operator=(Tile&&) = default;
 
-    /// @brief Returns the x-coordinate of the tile.
-    /// @return The x-coordinate of the tile.
-    [[nodiscard]] std::uint16_t x() const;
-
-    /// @brief Returns the y-coordinate of the tile.
-    /// @return The y-coordinate of the tile.
-    [[nodiscard]] std::uint16_t y() const;
+    /// @brief Returns the position of the tile.
+    /// @return The position of the tile.
+    [[nodiscard]] math::Vector2u position() const;
 
     /// @brief Returns the number of entities in the tile.
     /// @return The number of entities in the tile.
@@ -70,8 +67,7 @@ class Tile {
     [[nodiscard]] EntityDatabase& entityDatabase();
 
     std::reference_wrapper<World> _world;
-    std::uint16_t _x;
-    std::uint16_t _y;
+    math::Vector2u _position;
     std::vector<std::uint64_t> _entities;
 };
 

@@ -30,43 +30,36 @@ class WorldTest : public testing::Test {
 
 TEST_F(WorldTest, Size) {
     const zappy::server::game::World world1{{
-        .width = 69,
-        .height = 42,
+        .size = {69, 42},
         .teamCount = 1,
         .playersPerTeam = 1,
         .logger = logger("Size"),
     }};
 
-    EXPECT_EQ(world1.width(), 69);
-    EXPECT_EQ(world1.height(), 42);
+    EXPECT_EQ(world1.size(), (zappy::math::Vector2u{69, 42}));
 
     const zappy::server::game::World world2{{
-        .width = 3,
-        .height = 10,
+        .size = {3, 10},
         .teamCount = 1,
         .playersPerTeam = 1,
     }};
 
-    EXPECT_EQ(world2.width(), 3);
-    EXPECT_EQ(world2.height(), 10);
+    EXPECT_EQ(world2.size(), (zappy::math::Vector2u{3, 10}));
 
     EXPECT_THROW((zappy::server::game::World{{
-                     .width = 0,
-                     .height = 0,
+                     .size = {0, 0},
                      .teamCount = 1,
                      .playersPerTeam = 1,
                  }}),
                  zappy::exception::OutOfRange);
     EXPECT_THROW((zappy::server::game::World{{
-                     .width = 1,
-                     .height = 0,
+                     .size = {1, 0},
                      .teamCount = 1,
                      .playersPerTeam = 1,
                  }}),
                  zappy::exception::OutOfRange);
     EXPECT_THROW((zappy::server::game::World{{
-                     .width = 0,
-                     .height = 1,
+                     .size = {0, 1},
                      .teamCount = 1,
                      .playersPerTeam = 1,
                  }}),
@@ -75,23 +68,21 @@ TEST_F(WorldTest, Size) {
 
 TEST_F(WorldTest, TileAccess) {
     zappy::server::game::World world{{
-        .width = 69,
-        .height = 42,
+        .size = {69, 42},
         .teamCount = 1,
         .playersPerTeam = 1,
         .logger = logger("TileAccess"),
     }};
 
-    EXPECT_NO_THROW(std::ignore = world.tile(0, 0));
-    EXPECT_NO_THROW(std::ignore = world.tile(68, 41));
-    EXPECT_THROW(std::ignore = world.tile(69, 41), zappy::exception::OutOfRange);
-    EXPECT_THROW(std::ignore = world.tile(68, 42), zappy::exception::OutOfRange);
+    EXPECT_NO_THROW(std::ignore = world.tile({0, 0}));
+    EXPECT_NO_THROW(std::ignore = world.tile({68, 41}));
+    EXPECT_THROW(std::ignore = world.tile({69, 41}), zappy::exception::OutOfRange);
+    EXPECT_THROW(std::ignore = world.tile({68, 42}), zappy::exception::OutOfRange);
 }
 
 TEST_F(WorldTest, ResourceCounting) {
     zappy::server::game::World world{{
-        .width = 10,
-        .height = 10,
+        .size = {10, 10},
         .teamCount = 1,
         .playersPerTeam = 1,
         .logger = logger("ResourceCounting"),
@@ -104,8 +95,7 @@ TEST_F(WorldTest, ResourceCounting) {
 
 TEST_F(WorldTest, EggSpawning) {
     zappy::server::game::World world{{
-        .width = 10,
-        .height = 10,
+        .size = {10, 10},
         .teamCount = 1,
         .playersPerTeam = 1,
         .logger = logger("EggSpawning"),
@@ -118,8 +108,7 @@ TEST_F(WorldTest, EggSpawning) {
 
 TEST_F(WorldTest, PlayerAccess) {
     zappy::server::game::World world{{
-        .width = 10,
-        .height = 10,
+        .size = {10, 10},
         .teamCount = 1,
         .playersPerTeam = 1,
         .logger = logger("PlayerAccess"),

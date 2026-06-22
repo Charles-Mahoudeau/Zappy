@@ -15,11 +15,9 @@
 #include "World.hpp"
 
 namespace zappy::server::game {
-Tile::Tile(World& world, const std::uint16_t x, const std::uint16_t y) : _world{world}, _x{x}, _y{y} {}
+Tile::Tile(World& world, const math::Vector2u position) : _world{world}, _position{position} {}
 
-std::uint16_t Tile::x() const { return _x; }
-
-std::uint16_t Tile::y() const { return _y; }
+math::Vector2u Tile::position() const { return _position; }
 
 std::uint16_t Tile::count() const { return _entities.size(); }
 
