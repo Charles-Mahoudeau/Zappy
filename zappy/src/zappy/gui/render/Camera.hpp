@@ -49,7 +49,7 @@ class Camera {
     void setProjection(CameraProjection projection);
     void setCameraMode(CameraMode mode);
 
-    void Update();
+    void update();
 
     operator Camera3D() const { return _camera; }
 
