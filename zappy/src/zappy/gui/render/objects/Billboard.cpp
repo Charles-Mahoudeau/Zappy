@@ -74,12 +74,14 @@ Color Billboard::tint() const { return _tint; }
 
 void Billboard::draw(const Camera& camera) const {
     const Camera3D& rlCamera{static_cast<const Camera3D&>(camera)};
+    const Texture2D& billboardTexture{static_cast<const Texture2D&>(*this)};
 
-    DrawBillboard(rlCamera, texture(), _position, _billboardSize, _tint);
+    DrawBillboard(rlCamera, billboardTexture, _position, _billboardSize, _tint);
 }
 
 void Billboard::drawPro(const Camera& camera) const {
     const Camera3D& rlCamera{static_cast<const Camera3D&>(camera)};
+    const Texture2D& billboardTexture{static_cast<const Texture2D&>(*this)};
 
     const Rectangle source = _source.width == 0.0f || _source.height == 0.0f
                                  ? Rectangle{.x = 0.0F,
@@ -90,7 +92,7 @@ void Billboard::drawPro(const Camera& camera) const {
     const Vector2 size = _usePro ? _size : Vector2{source.width / source.height, 1.0F};
     const Vector2 origin = _usePro ? _origin : Vector2{size.x * 0.5F, size.y * 0.5F};
 
-    DrawBillboardPro(rlCamera, texture(), source, _position, _up, size, origin, _rotation, _tint);
+    DrawBillboardPro(rlCamera, billboardTexture, source, _position, _up, size, origin, _rotation, _tint);
 }
 
 }  // namespace zappy::gui::render
