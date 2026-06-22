@@ -162,7 +162,8 @@ TEST_F(WorldTest, MoveBy) {
     const zappy::server::game::Tile* newTile = world.tile(playerId);
     ASSERT_NE(newTile, nullptr);
     EXPECT_EQ(newTile->position(), newPos);
-    EXPECT_EQ(newPos - initialPos, (zappy::math::Vector2u{1, 1}));
+    EXPECT_EQ(static_cast<zappy::math::Vector2i>(newPos) - static_cast<zappy::math::Vector2i>(initialPos),
+              (zappy::math::Vector2i{1, 1}));
 
     // Test wrapping
     // Move to (0, 0)
