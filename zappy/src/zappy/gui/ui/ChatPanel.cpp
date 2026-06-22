@@ -8,8 +8,12 @@
 #include "ChatPanel.hpp"
 
 #include <algorithm>
+#include <cstddef>
+#include <deque>
+#include <string>
 
 #include "Widgets.hpp"
+#include "utils/Rectangle.hpp"
 
 namespace zappy::gui::ui {
 

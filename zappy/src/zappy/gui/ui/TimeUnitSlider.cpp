@@ -12,8 +12,10 @@
 #include <format>
 #include <string>
 
+#include "../network/CommandSender.hpp"
 #include "Mouse.hpp"
 #include "Widgets.hpp"
+#include "utils/Rectangle.hpp"
 
 namespace zappy::gui::ui {
 

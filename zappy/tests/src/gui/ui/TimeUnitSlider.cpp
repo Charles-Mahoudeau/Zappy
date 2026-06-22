@@ -17,7 +17,7 @@ namespace ui = zappy::gui::ui;
 namespace {
 
 class TimeUnitSliderTest : public ::testing::Test {
-  protected:
+  public:
     zappy::network::BufferedClient _buffer;
     zappy::gui::network::CommandSender _sender{_buffer};
 };
