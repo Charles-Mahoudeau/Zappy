@@ -97,7 +97,7 @@ Tile* World::tile(const std::uint64_t entityId) {
 }
 
 std::uint64_t World::countResources(const ResourceType type) const {
-    const auto resources = _entityDatabase.viewAll<entity::Resource>();
+    auto resources = _entityDatabase.viewAll<entity::Resource>();
     std::uint64_t count = 0;
 
     for (const auto& resource : resources) {

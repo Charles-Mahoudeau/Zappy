@@ -8,6 +8,8 @@
 #pragma once
 
 #include <algorithm>
+#include <beman/any_view/any_view.hpp>
+#include <beman/any_view/any_view_options.hpp>
 #include <cstdint>
 #include <memory>
 #include <optional>
@@ -24,6 +26,11 @@ namespace zappy::server::game {
 /// @brief A database of entities.
 class EntityDatabase {
   public:
+    template <IsEntity T>
+    using EntityView = beman::any_view::any_view<T*, beman::any_view::any_view_options::forward, T*>;
+
+    using EntityIdView = beman::any_view::any_view<std::uint64_t>;
+
     /// @brief Insert an entity into the database.
     /// @param entity The entity to insert.
     /// @return The id of the inserted entity.
@@ -62,23 +69,23 @@ class EntityDatabase {
 
     /// @brief Get all entities from the database.
     /// @return A view of pointers to all entities in the database.
-    auto viewAll() const;
+    EntityView<const IEntity> viewAll() const;
 
     /// @brief Get all entities from the database.
     /// @return A view of pointers to all entities in the database.
-    auto viewAll();
+    EntityView<IEntity> viewAll();
 
     /// @brief Get all entities of a given type from the database.
     /// @tparam T The type of the entities to get.
     /// @return A view of pointers to all entities of the given type in the database.
     template <IsEntity T>
-    auto viewAll() const;
+    EntityView<const T> viewAll() const;
 
     /// @brief Get all entities of a given type from the database.
     /// @tparam T The type of the entities to get.
     /// @return A view of pointers to all entities of the given type in the database.
     template <IsEntity T>
-    auto viewAll();
+    EntityView<T> viewAll();
 
     /// @brief Get all entities from the database as a vector.
     /// @return A vector of pointers to all entities in the database.
@@ -110,7 +117,7 @@ class EntityDatabase {
     /// @param ids The list of IDs to get the entities from.
     /// @return A vector of all entity ids of the given type in the database.
     template <IsEntity T>
-    auto filter(std::span<std::uint64_t> ids) const;
+    EntityIdView filter(std::span<std::uint64_t> ids) const;
 
   private:
     /// @brief Generate a unique ID for a new entity.
@@ -153,33 +160,25 @@ T* EntityDatabase::query(const std::uint64_t id) {
     return static_cast<T*>(entity);
 }
 
-inline auto EntityDatabase::viewAll() const {
-    return _entities | std::views::values |
-           std::views::transform([](const std::unique_ptr<IEntity>& entity) { return entity.get(); });
-}
-
-inline auto EntityDatabase::viewAll() {
-    return _entities | std::views::values |
-           std::views::transform([](const std::unique_ptr<IEntity>& entity) { return entity.get(); });
-}
-
 template <IsEntity T>
-auto EntityDatabase::viewAll() const {
+EntityDatabase::EntityView<const T> EntityDatabase::viewAll() const {
     const auto it = _entitiesByType.find(typeid(T));
-    static const std::remove_cvref_t<decltype(it->second)> emptyMap;
-    const auto& entities = it != _entitiesByType.end() ? it->second : emptyMap;
 
-    return entities | std::views::values |
+    if (it == _entitiesByType.end()) {
+        return EntityView<T>{};
+    }
+    return it->second | std::views::values |
            std::views::transform([](IEntity* entity) { return static_cast<T*>(entity); });
 }
 
 template <IsEntity T>
-auto EntityDatabase::viewAll() {
+EntityDatabase::EntityView<T> EntityDatabase::viewAll() {
     const auto it = _entitiesByType.find(typeid(T));
-    static const std::remove_cvref_t<decltype(it->second)> emptyMap;
-    const auto& entities = it != _entitiesByType.end() ? it->second : emptyMap;
 
-    return entities | std::views::values |
+    if (it == _entitiesByType.end()) {
+        return EntityView<T>{};
+    }
+    return it->second | std::views::values |
            std::views::transform([](IEntity* entity) { return static_cast<T*>(entity); });
 }
 
@@ -202,7 +201,7 @@ std::uint64_t EntityDatabase::countAll() const {
 }
 
 template <IsEntity T>
-auto EntityDatabase::filter(std::span<std::uint64_t> ids) const {
+EntityDatabase::EntityIdView EntityDatabase::filter(std::span<std::uint64_t> ids) const {
     const auto it = _entitiesByType.find(typeid(T));
     static const std::remove_cvref_t<decltype(it->second)> emptyMap;
     const auto& entities = it != _entitiesByType.end() ? it->second : emptyMap;

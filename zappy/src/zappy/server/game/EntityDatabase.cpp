@@ -62,6 +62,16 @@ IEntity* EntityDatabase::query(const std::uint64_t id) {
     return it->second.get();
 }
 
+EntityDatabase::EntityView<const IEntity> EntityDatabase::viewAll() const {
+    return _entities | std::views::values |
+           std::views::transform([](const std::unique_ptr<IEntity>& entity) { return entity.get(); });
+}
+
+EntityDatabase::EntityView<IEntity> EntityDatabase::viewAll() {
+    return _entities | std::views::values |
+           std::views::transform([](const std::unique_ptr<IEntity>& entity) { return entity.get(); });
+}
+
 std::vector<IEntity*> EntityDatabase::toVector() {
     std::vector<IEntity*> result;
 
