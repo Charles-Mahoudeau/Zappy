@@ -11,6 +11,7 @@
 
 #include <cstdint>
 #include <iterator>
+#include <optional>
 #include <string_view>
 #include <tuple>
 
@@ -18,7 +19,6 @@
 #include "zappy/server/game/Tile.hpp"
 #include "zappy/server/game/entity/Egg.hpp"
 #include "zappy/shared/exception/InvalidArgument.hpp"
-#include "zappy/shared/exception/InvalidState.hpp"
 #include "zappy/shared/exception/OutOfRange.hpp"
 #include "zappy/shared/io/Logger.hpp"
 
@@ -162,22 +162,63 @@ TEST_F(WorldTest, MoveBy) {
     const zappy::server::game::Tile* newTile = world.tile(playerId);
     ASSERT_NE(newTile, nullptr);
     EXPECT_EQ(newTile->position(), newPos);
-    EXPECT_EQ(static_cast<zappy::math::Vector2i>(newPos) - static_cast<zappy::math::Vector2i>(initialPos),
+    EXPECT_EQ((static_cast<zappy::math::Vector2i>(newPos) - static_cast<zappy::math::Vector2i>(initialPos))
+                  .wrapped(static_cast<zappy::math::Vector2i>(world.size())),
               (zappy::math::Vector2i{1, 1}));
+}
 
-    // Test wrapping
-    // Move to (0, 0)
-    const zappy::math::Vector2u posAtOrigin =
-        world.moveBy(playerId, {0 - static_cast<int>(newPos.x), 0 - static_cast<int>(newPos.y)});
-    EXPECT_EQ(posAtOrigin, (zappy::math::Vector2u{0, 0}));
+TEST_F(WorldTest, MoveByNegativeEdge) {
+    zappy::server::game::World world{{
+        .size = {10, 10},
+        .teamCount = 1,
+        .playersPerTeam = 1,
+        .logger = logger("MoveByNegativeEdge"),
+    }};
 
-    // Move by {-1, -1}, should wrap to (9, 9)
-    const zappy::math::Vector2u wrappedPos = world.moveBy(playerId, {-1, -1});
-    EXPECT_EQ(wrappedPos, (zappy::math::Vector2u{9, 9}));
+    // Hatch an egg to create a player
+    const auto playerResult = world.hatchRandomEgg(0);
+    ASSERT_TRUE(playerResult.has_value());
+    const std::uint64_t playerId = playerResult.value();
 
-    const zappy::server::game::Tile* wrappedTile = world.tile(playerId);
-    ASSERT_NE(wrappedTile, nullptr);
-    EXPECT_EQ(wrappedTile->position(), (zappy::math::Vector2u{9, 9}));
+    // Move to (0, 0) to test edge case
+    world.moveTo(playerId, {0, 0});
+
+    // Move by {-1, -1}
+    const zappy::math::Vector2u newPos = world.moveBy(playerId, {-1, -1});
+
+    // Check that the player is actually on the new tile
+    const zappy::server::game::Tile* newTile = world.tile(playerId);
+
+    ASSERT_NE(newTile, nullptr);
+    EXPECT_EQ(newTile->position(), newPos);
+    EXPECT_EQ(newPos, (zappy::math::Vector2u{9, 9}));
+}
+
+TEST_F(WorldTest, MoveByPositiveEdge) {
+    zappy::server::game::World world{{
+        .size = {10, 10},
+        .teamCount = 1,
+        .playersPerTeam = 1,
+        .logger = logger("MoveByPositiveEdge"),
+    }};
+
+    // Hatch an egg to create a player
+    const auto playerResult = world.hatchRandomEgg(0);
+    ASSERT_TRUE(playerResult.has_value());
+    const std::uint64_t playerId = playerResult.value();
+
+    // Move to (9, 9) to test edge case
+    world.moveTo(playerId, {9, 9});
+
+    // Move by {1, 1}
+    const zappy::math::Vector2u newPos = world.moveBy(playerId, {1, 1});
+
+    // Check that the player is actually on the new tile
+    const zappy::server::game::Tile* newTile = world.tile(playerId);
+
+    ASSERT_NE(newTile, nullptr);
+    EXPECT_EQ(newTile->position(), newPos);
+    EXPECT_EQ(newPos, (zappy::math::Vector2u{0, 0}));
 }
 
 TEST_F(WorldTest, Position) {
@@ -196,7 +237,17 @@ TEST_F(WorldTest, Position) {
     ASSERT_NE(tile, nullptr);
 
     EXPECT_EQ(world.position(playerId), tile->position());
-    EXPECT_THROW(std::ignore = world.position(9999), zappy::exception::InvalidState);
+}
+
+TEST_F(WorldTest, PositionUnknownEntity) {
+    const zappy::server::game::World world{{
+        .size = {10, 10},
+        .teamCount = 1,
+        .playersPerTeam = 1,
+        .logger = logger("PositionUnknownEntity"),
+    }};
+
+    EXPECT_EQ(world.position(9999), std::nullopt);
 }
 
 TEST_F(WorldTest, MoveTo) {
