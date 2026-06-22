@@ -15,6 +15,7 @@
 #include <cstdint>
 #include <iterator>
 
+#include "AssetStore.hpp"
 #include "Camera.hpp"
 #include "objects/Model.hpp"
 #include "zappy/gui/display/Window.hpp"

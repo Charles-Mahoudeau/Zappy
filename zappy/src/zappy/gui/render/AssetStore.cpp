@@ -7,10 +7,15 @@
 
 #include "AssetStore.hpp"
 
+#include <cstddef>
+#include <initializer_list>
+#include <map>
 #include <string>
 
 #include "AssetLoaderRegistry.hpp"
+#include "objects/Model.hpp"
 #include "objects/Texture.hpp"
+#include "zappy/gui/game/GameState.hpp"
 
 namespace zappy::gui::render {
 
