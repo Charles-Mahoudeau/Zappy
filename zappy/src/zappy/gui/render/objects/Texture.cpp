@@ -41,6 +41,12 @@ void Texture::reload(const char* path) {
     _texture = LoadTexture(path);
 }
 
+Texture2D Texture::release() noexcept {
+    const Texture2D owned = _texture;
+    _texture = {};
+    return owned;
+}
+
 void Texture::swap(Texture& other) noexcept {
     const Texture2D tmp = _texture;
 

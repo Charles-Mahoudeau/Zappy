@@ -36,6 +36,7 @@ class Texture {
 
     void reload(const char* path);
     void swap(Texture& other) noexcept;
+    Texture2D release() noexcept;
     static Texture2D loadTexture(const char* path, bool flipVertical = false);
 
   private:

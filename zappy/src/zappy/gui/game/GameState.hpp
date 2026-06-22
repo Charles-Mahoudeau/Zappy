@@ -17,6 +17,16 @@
 
 namespace zappy::gui::game {
 
+enum class ResourceType : std::uint8_t {
+    Food = 0,
+    Linemate = 1,
+    Deraumere = 2,
+    Sibur = 3,
+    Mendiane = 4,
+    Phiras = 5,
+    Thystame = 6
+};
+
 struct Resources {
     std::uint32_t food{0};
     std::uint32_t linemate{0};
