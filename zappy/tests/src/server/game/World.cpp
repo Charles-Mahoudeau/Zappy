@@ -9,6 +9,7 @@
 
 #include <gtest/gtest.h>
 
+#include <iterator>
 #include <string_view>
 #include <tuple>
 
@@ -113,4 +114,32 @@ TEST_F(WorldTest, EggSpawning) {
     EXPECT_EQ(world.count<zappy::server::game::entity::Egg>(), 1);
     std::ignore = world.spawnEgg(1);
     EXPECT_EQ(world.count<zappy::server::game::entity::Egg>(), 2);
+}
+
+TEST_F(WorldTest, PlayerAccess) {
+    zappy::server::game::World world{{
+        .width = 10,
+        .height = 10,
+        .teamCount = 1,
+        .playersPerTeam = 1,
+        .logger = logger("PlayerAccess"),
+    }};
+
+    // Check that there are no players initially
+    EXPECT_EQ(std::ranges::distance(world.players(0)), 0);
+
+    // Hatch an egg to create a player
+    const auto playerResult = world.hatchRandomEgg(0);
+    ASSERT_TRUE(playerResult.has_value());
+
+    // Check that there is now a player
+    auto players = world.players(0);
+    EXPECT_EQ(std::ranges::distance(players), 1);
+    EXPECT_EQ(world.entityDatabase().id(**players.begin()), playerResult.value());
+
+    // Check const version
+    const auto& constWorld = world;
+    auto constPlayers = constWorld.players(0);
+    EXPECT_EQ(std::ranges::distance(constPlayers), 1);
+    EXPECT_EQ(constWorld.entityDatabase().id(**constPlayers.begin()), playerResult.value());
 }
