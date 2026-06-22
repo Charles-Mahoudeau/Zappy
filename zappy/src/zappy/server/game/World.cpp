@@ -27,7 +27,9 @@
 #include "entity/Egg.hpp"
 #include "entity/Player.hpp"
 #include "entity/Resource.hpp"
+#include "zappy/shared/exception/InvalidState.hpp"
 #include "zappy/shared/exception/OutOfRange.hpp"
+#include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server::game {
 World::World(Config config) : _config{std::move(config)} {
@@ -172,6 +174,25 @@ EntityDatabase::EntityView<const entity::Player> World::players(const std::uint1
 EntityDatabase::EntityView<entity::Player> World::players(const std::uint16_t teamId) {
     return _entityDatabase.viewAll<entity::Player>() |
            std::views::filter([teamId](const entity::Player* player) { return player->teamId() == teamId; });
+}
+
+math::Vector2u World::moveBy(const std::uint64_t entityId, const math::Vector2i delta) {
+    Tile* sourceTile = tile(entityId);
+
+    if (sourceTile == nullptr) {
+        throw exception::InvalidState{"entity is not on a tile"};
+    }
+    if (!sourceTile->removeEntity(entityId)) {
+        throw exception::InvalidState{"entity is not on the source tile (this should never happen)"};
+    }
+
+    const math::Vector2i newPositionRaw = static_cast<math::Vector2i>(sourceTile->position()) + delta;
+    const math::Vector2i newPositionWrapped = newPositionRaw.wrapped(static_cast<math::Vector2i>(_config.size));
+    const auto newPosition = static_cast<math::Vector2u>(newPositionWrapped);
+    Tile& destinationTile = tile(newPosition);
+
+    destinationTile.addEntity(entityId);
+    return newPosition;
 }
 
 const std::unordered_map<ResourceType, float>& World::resourceDensities() {

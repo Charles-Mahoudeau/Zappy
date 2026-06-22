@@ -116,6 +116,12 @@ class World {
     /// @return A view of all players in the specified team.
     [[nodiscard]] EntityDatabase::EntityView<entity::Player> players(std::uint16_t teamId);
 
+    /// @brief Moves the specified entity by the specified delta.
+    /// @param entityId The ID of the entity to move.
+    /// @param delta The delta to move the entity by.
+    /// @return The new position of the entity.
+    [[nodiscard]] math::Vector2u moveBy(std::uint64_t entityId, math::Vector2i delta);
+
   private:
     /// @brief Returns the resource densities for the world.
     /// @return A map of resource types to their densities.
