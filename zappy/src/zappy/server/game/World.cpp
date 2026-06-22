@@ -144,7 +144,7 @@ std::expected<std::uint16_t, std::string> World::hatchRandomEgg(const std::uint1
 
     const std::optional<std::uint64_t> eggIdOpt = _entityDatabase.id(*egg);
 
-    if (!eggIdOpt) {
+    if (!eggIdOpt.has_value()) {
         return std::unexpected{"Egg was retrieved from the database, but its id is null (this should never happen)."};
     }
 
