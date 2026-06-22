@@ -165,7 +165,7 @@ EntityDatabase::EntityView<const T> EntityDatabase::viewAll() const {
     const auto it = _entitiesByType.find(typeid(T));
 
     if (it == _entitiesByType.end()) {
-        return EntityView<T>{};
+        return {};
     }
     return it->second | std::views::values |
            std::views::transform([](IEntity* entity) { return static_cast<T*>(entity); });
@@ -176,7 +176,7 @@ EntityDatabase::EntityView<T> EntityDatabase::viewAll() {
     const auto it = _entitiesByType.find(typeid(T));
 
     if (it == _entitiesByType.end()) {
-        return EntityView<T>{};
+        return {};
     }
     return it->second | std::views::values |
            std::views::transform([](IEntity* entity) { return static_cast<T*>(entity); });
