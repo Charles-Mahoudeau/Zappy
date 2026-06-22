@@ -20,7 +20,7 @@ enum class Level : std::uint8_t { kDebug, kInfo, kWarning, kError, kFatal };
 class Logger {
   public:
     Logger(std::string_view name, const std::filesystem::path& logFile, bool duplicateToStdout = false);
-    Logger(std::string_view name);
+    explicit Logger(std::string_view name);
     ~Logger() = default;
 
     Logger(const Logger&) = default;
