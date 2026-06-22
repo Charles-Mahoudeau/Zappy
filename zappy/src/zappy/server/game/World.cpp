@@ -271,7 +271,7 @@ void World::generateResourceThresholds() {
     _resourceThresholds.clear();
     for (const auto& [resourceType, density] : resourceDensities()) {
         _resourceThresholds[resourceType] =
-            static_cast<std::uint16_t>(std::ceil(static_cast<float>(_config.size.x * _config.size.y) * density));
+            static_cast<std::uint64_t>(std::ceil(static_cast<float>(_config.size.x * _config.size.y) * density));
     }
     if (_config.logger) {
         _config.logger->info("Resources thresholds generated.");

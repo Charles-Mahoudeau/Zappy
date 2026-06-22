@@ -159,7 +159,7 @@ class World {
     Config _config;
     EntityDatabase _entityDatabase;
     std::vector<Tile> _tiles;
-    std::unordered_map<ResourceType, std::uint16_t> _resourceThresholds;
+    std::unordered_map<ResourceType, std::uint64_t> _resourceThresholds;
     std::uint16_t _nextMajorTick{kMajorTickInterval};
 };
 
