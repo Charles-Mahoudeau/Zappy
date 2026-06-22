@@ -41,7 +41,11 @@ add_library(zappy_gui_objects OBJECT
         ui/ChatPanel.hpp
         ui/GuiTheme.cpp
         ui/GuiTheme.hpp
+        ui/Mouse.cpp
+        ui/Mouse.hpp
         ui/RaylibGuiImpl.cpp
+        ui/TimeUnitSlider.cpp
+        ui/TimeUnitSlider.hpp
         ui/utils/Rectangle.hpp
         ui/utils/Vector2.hpp
         ui/Widgets.cpp
