@@ -10,10 +10,7 @@
 #include <chrono>
 #include <cstdint>
 #include <functional>
-#include <queue>
-#include <vector>
-
-#include "zappy/shared/network/Address.hpp"
+#include <list>
 
 namespace zappy::server {
 
@@ -27,6 +24,10 @@ class Timer {
     Timer& operator=(const Timer&) = delete;
     Timer& operator=(Timer&&) = delete;
 
+    void update();
+
+    void setFrequencies(int freq);
+
     /**
      * @brief set the frequencies of the timer
      * @param freq value of the frequencies
@@ -34,38 +35,52 @@ class Timer {
     void init(std::uint16_t freq);
 
     /**
-     * @brief compute the poll's timeout from the current time to the next request
+     * @brief time until the next tick. Zero if now
      * @return timeout in milliseconds
      */
-    int pollTimeOut();
+    int timeout();
 
     /**
      * @brief add a new event to the list
      * @param timeout time until the end of the event. time = (timeout / frequencies) seconds
-     * @param addr @c network::Address used to identify which client the event is related to
      * @param notifier function which will be called at the end of the timeout. Used to notify the client that the
      *                 event is finished
+     * @return id of the scheduled task
      */
-    void addEvent(int timeout, network::Address addr, std::function<void()> notifier);
+    std::uint64_t scheduleLater(int timeout, std::function<void()> notifier);
+
+    std::uint64_t scheduleEvery(int timeout, std::function<void()> notifier);
 
     /**
      * @brief remove the events related to the given Addr
      * @param addr @c network::Address to identify the related events
      */
-    void removeByAddr(network::Address& addr);
+    void unschedule(std::uint64_t id);
 
   private:
     struct Event {
-        std::chrono::steady_clock::time_point timeout;
+        int timeout;
         std::function<void()> notifier;
-        network::Address addr;
+        std::uint64_t id;
+        int repeated_timeout = -1;
 
-        bool operator>(const Event& other) const { return this->timeout > other.timeout; }
+        bool operator<(const Event& other) const {
+            if (this->timeout != other.timeout) {
+                return this->timeout < other.timeout;
+            }
+            return this < &other;
+        }
     };
-    std::uint8_t _freq = 100;
-    std::priority_queue<Event, std::vector<Event>, std::greater<>> _queue;
 
-    // Members
+    static constexpr int kTick_milli_default = 1000;
+    static constexpr std::uint8_t kDefault_Frequencies = 100;
+
+    std::uint64_t _nextId = 1;
+    std::chrono::steady_clock::time_point _previousTick = std::chrono::steady_clock::now();
+    std::list<Event> _events;
+    std::chrono::milliseconds _tickTime{};
+
+    int smallestTimeout();
 };
 
 }  // namespace zappy::server

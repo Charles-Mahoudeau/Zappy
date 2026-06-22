@@ -7,55 +7,80 @@
 
 #include "zappy/server/Timer.hpp"
 
+#include <algorithm>
 #include <chrono>
 #include <cstdint>
 #include <functional>
 #include <utility>
-#include <vector>
-
-#include "zappy/shared/network/Address.hpp"
 
 namespace zappy::server {
 
-void Timer::init(std::uint16_t freq) { this->_freq = freq; }
+void Timer::init(std::uint16_t freq) { this->_tickTime = std::chrono::milliseconds(kTick_milli_default) / freq; }
 
-int Timer::pollTimeOut() {
-    auto clock = std::chrono::steady_clock::now();
+void Timer::update() {
+    std::chrono::steady_clock::time_point const now = std::chrono::steady_clock::now();
+    const int nbTick = static_cast<int>((now - this->_previousTick).count() / this->_tickTime.count());
 
-    while (!this->_queue.empty() && this->_queue.top().timeout < clock) {
-        this->_queue.top().notifier();
-        this->_queue.pop();
-    }
-    if (this->_queue.empty()) {
-        return -1;
-    }
-    auto next = this->_queue.top();
-    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(next.timeout - clock).count();
-    return static_cast<int>(ms);
-}
+    auto it = this->_events.begin();
 
-void Timer::addEvent(int timeout, network::Address addr, std::function<void()> notifier) {
-    auto now = std::chrono::steady_clock::now();
-    const double seconds = static_cast<double>(timeout) / this->_freq;
-    auto deadline =
-        now + std::chrono::duration_cast<std::chrono::steady_clock::duration>(std::chrono::duration<double>(seconds));
-
-    this->_queue.emplace(deadline, std::move(notifier), addr);
-}
-
-void Timer::removeByAddr(network::Address& addr) {
-    std::vector<Event> temp;
-
-    while (!this->_queue.empty()) {
-        if (this->_queue.top().addr != addr) {
-            temp.emplace_back(this->_queue.top());
+    while (it != this->_events.end()) {
+        it->timeout -= nbTick;
+        if (it->timeout > 0) {
+            continue;
         }
-        this->_queue.pop();
+        it->notifier();
+        if (it->repeated_timeout != -1) {
+            it->timeout = it->repeated_timeout;
+            continue;
+        }
+        it = this->_events.erase(it);
+    }
+}
+
+void Timer::setFrequencies(int freq) { this->_tickTime = std::chrono::milliseconds(kTick_milli_default) / freq; }
+
+int Timer::timeout() {
+    std::chrono::steady_clock::time_point const now = std::chrono::steady_clock::now();
+    auto time = std::chrono::duration_cast<std::chrono::milliseconds>(now - (this->_previousTick + this->_tickTime));
+    int timeout = static_cast<int>(time.count());
+
+    if (!this->_events.empty()) {
+        const int nextTimeout = this->smallestTimeout();
+        timeout += static_cast<int>(this->_tickTime.count() * (nextTimeout - 1));
     }
 
-    for (auto& e : temp) {
-        this->_queue.push(std::move(e));
+    if (timeout < 0) {
+        return 0;
     }
+
+    return timeout;
+}
+
+int Timer::smallestTimeout() {
+    int smallest = this->_events.begin()->timeout;
+
+    for (const auto& event : this->_events) {
+        smallest = std::min(event.timeout, smallest);
+    }
+    return smallest;
+}
+
+void Timer::unschedule(std::uint64_t id) {
+    std::erase_if(this->_events, [id](const Event& event) { return event.id == id; });
+}
+
+std::uint64_t Timer::scheduleLater(int timeout, std::function<void()> notifier) {
+    std::uint64_t id = this->_nextId;
+    this->_events.emplace_back(timeout, std::move(notifier), id);
+    this->_nextId++;
+    return id;
+}
+
+std::uint64_t Timer::scheduleEvery(int timeout, std::function<void()> notifier) {
+    std::uint64_t id = this->_nextId;
+    this->_events.emplace_back(timeout, std::move(notifier), id, timeout);
+    this->_nextId++;
+    return id;
 }
 
 }  // namespace zappy::server
