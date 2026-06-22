@@ -10,10 +10,18 @@
 #include <raylib.h>
 
 #include <cstdint>
+#include <string>
+#include <string_view>
 
 namespace zappy::gui::render {
+Texture::Texture(std::string_view path, bool flipVertical) {
+    const std::string pathStr{path};
 
-Texture::Texture(const char* path, bool flipVertical) { _texture = loadTexture(path, flipVertical); }
+    _texture = loadTexture(pathStr.c_str(), flipVertical);
+    if (!isValid()) {
+        throw TextureException{"Failed to load texture from path: " + pathStr};
+    }
+}
 
 Texture::~Texture() { UnloadTexture(_texture); }
 
@@ -36,9 +44,20 @@ int Texture::height() const { return _texture.height; }
 
 bool Texture::isValid() const { return IsTextureValid(_texture); }
 
-void Texture::reload(const char* path) {
+void Texture::reload(std::string_view path, bool flipVertical) {
+    const std::string pathStr{path};
+
     UnloadTexture(_texture);
-    _texture = LoadTexture(path);
+    _texture = loadTexture(pathStr.c_str(), flipVertical);
+    if (!isValid()) {
+        throw TextureException{"Failed to reload texture from path: " + pathStr};
+    }
+}
+
+Texture2D Texture::release() noexcept {
+    const Texture2D owned = _texture;
+    _texture = {};
+    return owned;
 }
 
 void Texture::swap(Texture& other) noexcept {

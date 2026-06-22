@@ -28,9 +28,12 @@ int main(const int argc, char** argv) {
         return EXIT_SUCCESS;
     }
 
+    zappy::gui::GUI gui;
+
     try {
         const zappy::gui::GuiCliParser cli{std::span{args}.subspan(1)};
-        return zappy::gui::GUI{}.run(cli);
+        gui.init(cli);
+        return gui.run();
     } catch (const zappy::exception::InvalidArgument&) {
         std::cerr << kUsage;
         return EXIT_FAILURE;
