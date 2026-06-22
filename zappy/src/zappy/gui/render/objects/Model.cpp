@@ -14,6 +14,7 @@
 #include <array>
 #include <cstddef>
 #include <filesystem>
+#include <format>
 #include <span>
 #include <string>
 #include <string_view>
@@ -35,20 +36,20 @@ Model::Model(std::string_view path)
       _currentFrame(0),
       _animations(nullptr) {
     if (!IsModelValid(_model)) {
-        throw ModelException{"Failed to load mesh from path: " + std::string{path}};
+        throw ModelException{std::format("Failed to load mesh from path: {}", path)};
     }
 }
 
 Model::Model(std::string_view path, std::string_view animationPath)
     : _model(LoadModel(std::string(path).c_str())), _animCount(0), _currentAnim(0), _currentFrame(0) {
     if (!IsModelValid(_model)) {
-        throw ModelException{"Failed to load mesh from path: " + std::string{path}};
+        throw ModelException{std::format("Failed to load mesh from path: {}", path)};
     }
 
     try {
         _animations = LoadModelAnimations(std::string(animationPath).c_str(), &_animCount);
         if (_animations == nullptr || _animCount <= 0) {
-            throw ModelException{"Failed to load animation from path: " + std::string{animationPath}};
+            throw ModelException{std::format("Failed to load animation from path: {}", animationPath)};
         }
     } catch (const ModelException& e) {
         if (_animations != nullptr && _animCount > 0) {
@@ -233,16 +234,16 @@ void Model::useSkinningShader(std::string_view shaderDirectory) {
     if (!IsModelValid(_model)) {
         throw ModelException{"Cannot set skinning shader for a model that failed to load"};
     }
-    const std::string directory = std::string{shaderDirectory} + "/glsl" + std::to_string(kGlslVersion);
-    const std::string vsPath = directory + "/skinning.vs";
-    const std::string fsPath = directory + "/skinning.fs";
+    const std::string directory = std::format("{}/glsl{}", shaderDirectory, kGlslVersion);
+    const std::string vsPath = std::format("{}/skinning.vs", directory);
+    const std::string fsPath = std::format("{}/skinning.fs", directory);
     if (!std::filesystem::is_regular_file(vsPath) || !std::filesystem::is_regular_file(fsPath)) {
-        throw ModelException{"Skinning shader not found in: " + directory};
+        throw ModelException{std::format("Skinning shader not found in: {}", directory)};
     }
 
     const ::Shader shader = LoadShader(vsPath.c_str(), fsPath.c_str());
     if (!IsShaderValid(shader)) {
-        throw ModelException{"Failed to load skinning shader from: " + directory};
+        throw ModelException{std::format("Failed to load skinning shader from: {}", directory)};
     }
     if (_hasSkinningShader) {
         UnloadShader(_skinningShader);

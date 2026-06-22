@@ -14,7 +14,7 @@ class Color {
   public:
     Color(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
         : _color{.r = r, .g = g, .b = b, .a = a} {}
-    Color(const ::Color& color) : _color{color} {}
+    explicit Color(const ::Color& color) : _color{color} {}
     Color(const Color&) = default;
     Color& operator=(const Color&) = default;
     Color(Color&&) noexcept = default;
