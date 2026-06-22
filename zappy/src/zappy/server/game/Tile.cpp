@@ -13,6 +13,7 @@
 
 #include "EntityDatabase.hpp"
 #include "World.hpp"
+#include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server::game {
 Tile::Tile(World& world, const math::Vector2u position) : _world{world}, _position{position} {}
