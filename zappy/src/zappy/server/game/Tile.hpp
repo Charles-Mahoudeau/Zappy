@@ -36,7 +36,7 @@ class Tile {
 
     /// @brief Returns the number of entities in the tile.
     /// @return The number of entities in the tile.
-    [[nodiscard]] std::uint16_t count() const;
+    [[nodiscard]] std::uint64_t count() const;
 
     /// @brief Returns the number of entities of the specified type in the tile.
     /// @tparam T The type of entity to count.

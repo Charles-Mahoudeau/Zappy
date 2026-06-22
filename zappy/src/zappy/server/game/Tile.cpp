@@ -20,7 +20,7 @@ Tile::Tile(World& world, const math::Vector2u position) : _world{world}, _positi
 
 math::Vector2u Tile::position() const { return _position; }
 
-std::uint16_t Tile::count() const { return _entities.size(); }
+std::uint64_t Tile::count() const { return _entities.size(); }
 
 std::span<const std::uint64_t> Tile::entities() const { return _entities; }
 
