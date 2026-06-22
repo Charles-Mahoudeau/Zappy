@@ -40,6 +40,10 @@ add_library(zappy_gui_objects OBJECT
         ui/GuiTheme.cpp
         ui/GuiTheme.hpp
         ui/RaylibGuiImpl.cpp
+        ui/utils/Rectangle.hpp
+        ui/utils/Vector2.hpp
+        ui/Widgets.cpp
+        ui/Widgets.hpp
 )
 target_include_directories(zappy_gui_objects PUBLIC
         ${CMAKE_SOURCE_DIR}/src
