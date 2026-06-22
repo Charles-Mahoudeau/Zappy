@@ -14,6 +14,7 @@
 #include <array>
 #include <cstddef>
 #include <filesystem>
+#include <format>
 #include <span>
 #include <string>
 #include <string_view>
@@ -27,11 +28,11 @@ constexpr int GLSL_VERSION = 100;
 #endif
 
 std::string Skybox::shadersPath(std::string_view shadersDirectory) {
-    const std::string directory = std::string{shadersDirectory} + "/glsl" + std::to_string(GLSL_VERSION);
+    const std::string directory = std::format("{}/glsl{}", shadersDirectory, GLSL_VERSION);
 
     if (!std::filesystem::is_directory(directory)) {
-        throw SkyboxException{"Shader directory for GLSL version " + std::to_string(GLSL_VERSION) +
-                              " not found: " + directory};
+        throw SkyboxException{
+            std::format("Shader directory for GLSL version {} not found: {}", GLSL_VERSION, directory)};
     }
     return directory;
 }
@@ -39,12 +40,12 @@ std::string Skybox::shadersPath(std::string_view shadersDirectory) {
 ::TextureCubemap Skybox::loadCubemapImage(std::string_view path) {
     const Image image = LoadImage(std::string{path}.c_str());
     if (!IsImageValid(image)) {
-        throw SkyboxException{"Failed to load skybox image from: " + std::string{path}};
+        throw SkyboxException{std::format("Failed to load skybox image from: {}", path)};
     }
     const ::TextureCubemap cubemap = LoadTextureCubemap(image, CUBEMAP_LAYOUT_AUTO_DETECT);
     UnloadImage(image);
     if (!IsTextureValid(cubemap)) {
-        throw SkyboxException{"Failed to create skybox cubemap from: " + std::string{path}};
+        throw SkyboxException{std::format("Failed to create skybox cubemap from: {}", path)};
     }
     return cubemap;
 }
@@ -116,10 +117,10 @@ std::string Skybox::shadersPath(std::string_view shadersDirectory) {
 }
 
 ::TextureCubemap Skybox::loadPanoramaCubemap(std::string_view path, const std::string& shadersDirectory) {
-    const ::Shader conversion =
-        LoadShader((shadersDirectory + "/cubemap.vs").c_str(), (shadersDirectory + "/cubemap.fs").c_str());
+    const ::Shader conversion = LoadShader(std::format("{}/cubemap.vs", shadersDirectory).c_str(),
+                                           std::format("{}/cubemap.fs", shadersDirectory).c_str());
     if (!IsShaderValid(conversion)) {
-        throw SkyboxException{"Failed to load cubemap conversion shader from: " + shadersDirectory};
+        throw SkyboxException{std::format("Failed to load cubemap conversion shader from: {}", shadersDirectory)};
     }
     const int equirectangularMap = 0;
     SetShaderValue(conversion, GetShaderLocation(conversion, "equirectangularMap"), &equirectangularMap,
@@ -128,13 +129,13 @@ std::string Skybox::shadersPath(std::string_view shadersDirectory) {
     const ::Texture2D panorama = LoadTexture(std::string{path}.c_str());
     if (!IsTextureValid(panorama)) {
         UnloadShader(conversion);
-        throw SkyboxException{"Failed to load panorama from: " + std::string{path}};
+        throw SkyboxException{std::format("Failed to load panorama from: {}", path)};
     }
     const ::TextureCubemap cubemap = generateCubemap(conversion, panorama, kCubemapSize);
     UnloadTexture(panorama);
     UnloadShader(conversion);
     if (!IsTextureValid(cubemap)) {
-        throw SkyboxException{"Failed to generate cubemap from panorama: " + std::string{path}};
+        throw SkyboxException{std::format("Failed to generate cubemap from panorama: {}", path)};
     }
     return cubemap;
 }
@@ -144,10 +145,11 @@ Skybox::Skybox(std::string_view path, std::string_view shadersDirectory, bool hd
 
     _cubemap = hdr ? loadPanoramaCubemap(path, directory) : loadCubemapImage(path);
 
-    _shader = LoadShader((directory + "/skybox.vs").c_str(), (directory + "/skybox.fs").c_str());
+    _shader =
+        LoadShader(std::format("{}/skybox.vs", directory).c_str(), std::format("{}/skybox.fs", directory).c_str());
     if (!IsShaderValid(_shader)) {
         UnloadTexture(_cubemap);
-        throw SkyboxException{"Failed to load skybox shader from: " + directory};
+        throw SkyboxException{std::format("Failed to load skybox shader from: {}", directory)};
     }
 
     const int environmentMap = MATERIAL_MAP_CUBEMAP;
@@ -206,13 +208,13 @@ Skybox& Skybox::operator=(Skybox&& other) noexcept {
     return *this;
 }
 
-void Skybox::draw() const {
+void Skybox::draw(::Vector3 center) const {
     if (!IsModelValid(_model)) {
         return;
     }
     rlDisableBackfaceCulling();
     rlDisableDepthMask();
-    DrawModel(_model, Vector3{.x = 0.0F, .y = 0.0F, .z = 0.0F}, 1.0F, WHITE);
+    DrawModel(_model, center, 1.0F, WHITE);
     rlEnableBackfaceCulling();
     rlEnableDepthMask();
 }

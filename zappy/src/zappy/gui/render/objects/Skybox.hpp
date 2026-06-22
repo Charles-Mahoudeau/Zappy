@@ -32,7 +32,7 @@ class Skybox {
     Skybox(Skybox&& other) noexcept;
     Skybox& operator=(Skybox&& other) noexcept;
 
-    void draw() const;
+    void draw(::Vector3 center) const;
 
   private:
     static constexpr int kCubemapSize = 1024;
