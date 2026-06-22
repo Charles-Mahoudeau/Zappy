@@ -21,6 +21,7 @@
 #include "zappy/gui/render/Camera.hpp"
 #include "zappy/gui/render/Renderer.hpp"
 #include "zappy/gui/render/utils/Vector3.hpp"
+#include "zappy/gui/ui/Mouse.hpp"
 #include "zappy/gui/ui/utils/Rectangle.hpp"
 #include "zappy/shared/exception/InvalidState.hpp"
 namespace zappy::gui {
@@ -40,6 +41,8 @@ static constexpr float kTimeSliderHeight = 24.0F;
 static constexpr float kTimeSliderMarginTop = 8.0F;
 static constexpr float kTimeSliderMarginRight = 70.0F;
 static constexpr int kTimeSliderInitialValue = 1;
+static constexpr float kInfoPanelWidth = 320.0F;
+static constexpr float kInfoPanelMargin = 8.0F;
 
 GUI::GUI()
     : _parser{_state},
@@ -129,6 +132,11 @@ int GUI::run() {
                           kChatPanelWidth, kChatPanelHeight});
         _timeSlider.draw(
             ui::Rectangle{kTimeSliderMarginRight, kTimeSliderMarginTop, kTimeSliderWidth, kTimeSliderHeight});
+
+        _infoPanel.update(ui::Mouse::position(), ui::Mouse::isLeftButtonPressed(), _camera, _state);
+        _infoPanel.draw(_state, ui::Rectangle{static_cast<float>(kWindowWidth) - kInfoPanelWidth - kInfoPanelMargin,
+                                              kInfoPanelMargin, kInfoPanelWidth,
+                                              static_cast<float>(kWindowHeight) - (2.0F * kInfoPanelMargin)});
         _window.endFrame();
     }
     return 0;

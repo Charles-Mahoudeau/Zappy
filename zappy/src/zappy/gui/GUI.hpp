@@ -18,6 +18,7 @@
 #include "zappy/gui/render/Renderer.hpp"
 #include "zappy/gui/ui/ChatPanel.hpp"
 #include "zappy/gui/ui/GuiTheme.hpp"
+#include "zappy/gui/ui/InfoPanel.hpp"
 #include "zappy/gui/ui/TimeUnitSlider.hpp"
 #include "zappy/shared/io/Poller.hpp"
 #include "zappy/shared/network/Address.hpp"
@@ -63,6 +64,7 @@ class GUI {
     render::Renderer _renderer;
     ui::ChatPanel _chatPanel;
     ui::TimeUnitSlider _timeSlider;
+    ui::InfoPanel _infoPanel;
     int _loadingDots{0};
 };
 
