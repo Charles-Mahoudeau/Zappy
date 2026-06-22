@@ -12,10 +12,11 @@
 #include <cmath>
 
 namespace zappy::gui::render {
-Vec2D::Vec2D(float x, float y) : _vec2{x, y} {}
+Vec2D::Vec2D(float x, float y) : _vec2{.x = x, .y = y} {}
 
 Vec2D& Vec2D::operator=(const Vec2D& other) {
-    _vec2 = other._vec2;
+    _vec2.x = other._vec2.x;
+    _vec2.y = other._vec2.y;
     return *this;
 }
 
