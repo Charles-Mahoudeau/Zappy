@@ -18,6 +18,10 @@ struct Vector2 {
     T x{0};
     T y{0};
 
+    Vector2() = default;
+    Vector2(T x, T y);
+    explicit Vector2(T x);
+
     [[nodiscard]] constexpr Vector2 wrapped(const Vector2& bounds) const noexcept;
 
     template <IsArithmetic U>
@@ -47,10 +51,16 @@ struct Vector2 {
 };
 
 template <IsArithmetic T>
+Vector2<T>::Vector2(T x, T y) : x{x}, y{y} {}
+
+template <IsArithmetic T>
+Vector2<T>::Vector2(T x) : x{x}, y{x} {}
+
+template <IsArithmetic T>
 constexpr Vector2<T> Vector2<T>::wrapped(const Vector2& bounds) const noexcept {
     return {
-        .x = mod(x, bounds.x),
-        .y = mod(y, bounds.y),
+        mod(x, bounds.x),
+        mod(y, bounds.y),
     };
 }
 
