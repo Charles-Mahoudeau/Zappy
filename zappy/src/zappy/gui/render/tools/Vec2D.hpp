@@ -16,6 +16,9 @@ class Vec2D {
     Vec2D(float x, float y);
     ~Vec2D() = default;
 
+    Vec2D(const Vec2D&) = default;
+    Vec2D(Vec2D&&) noexcept = default;
+
     [[nodiscard]] Vec2D& operator=(const Vec2D&);
     [[nodiscard]] Vec2D& operator=(Vec2D&&) noexcept;
 
