@@ -72,7 +72,7 @@ bool Vec2D::operator!=(const Vec2D& other) const { return !(*this == other); }
 
 float Vec2D::length() const { return std::sqrt(lengthSquared()); }
 
-float Vec2D::lengthSquared() const { return _vec2.x * _vec2.x + _vec2.y * _vec2.y; }
+float Vec2D::lengthSquared() const { return (_vec2.x * _vec2.x) + (_vec2.y * _vec2.y); }
 
 Vec2D Vec2D::normalized() const {
     const float len = length();
