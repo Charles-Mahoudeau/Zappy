@@ -20,6 +20,7 @@
 #include <tuple>
 #include <unordered_map>
 #include <utility>
+#include <vector>
 
 #include "EntityDatabase.hpp"
 #include "ResourceType.hpp"
@@ -128,15 +129,19 @@ std::uint64_t World::spawnResource(ResourceType type) {
 }
 
 std::expected<std::uint16_t, std::string> World::hatchRandomEgg(const std::uint16_t teamId) {
-    auto eggs = _entityDatabase.viewAll<entity::Egg>() | std::views::filter([teamId](const entity::Egg* egg) {
-                    return egg != nullptr && egg->teamId() == teamId;
-                });
+    std::vector<const entity::Egg*> eggs;
 
+    for (const entity::Egg* egg : _entityDatabase.viewAll<entity::Egg>()) {
+        if (egg != nullptr && egg->teamId() == teamId) {
+            eggs.push_back(egg);
+        }
+    }
     if (eggs.empty()) {
         return std::unexpected{"No eggs available to hatch."};
     }
 
-    const entity::Egg* egg = eggs.front();
+    std::uniform_int_distribution<std::size_t> distribution{0, eggs.size() - 1};
+    const entity::Egg* egg = eggs.at(distribution(_randomEngine));
 
     if (egg == nullptr) {
         return std::unexpected{"Egg is null (this should never happen)."};
