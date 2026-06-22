@@ -80,7 +80,7 @@ void Client::removeTimeout() {
     this->_timeoutId = 0;
 }
 
-bool Client::sendMessage(std::string_view msg) {
+bool Client::sendMessage(std::string_view msg) const {
     auto* socket = this->_socketsRegistery.findByAddress(this->_addr);
 
     if (socket == nullptr) {

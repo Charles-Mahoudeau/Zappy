@@ -125,7 +125,7 @@ class Client {
      * @return @c true  if the message was sent successfully.
      * @return @c false if the socket was not found or a socket error occurred.
      */
-    bool sendMessage(std::string_view msg);
+    [[nodiscard]] bool sendMessage(std::string_view msg) const;
 
     /**
      * @brief check if the client currently have a action running

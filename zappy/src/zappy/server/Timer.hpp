@@ -24,7 +24,8 @@ class Timer {
     Timer& operator=(const Timer&) = delete;
     Timer& operator=(Timer&&) = delete;
 
-    void update();
+    // return the nb tick passed since last update
+    int update();
 
     void setFrequencies(int freq);
 
@@ -49,6 +50,13 @@ class Timer {
      */
     std::uint64_t scheduleLater(int timeout, std::function<void()> notifier);
 
+    /**
+     * @brief add a new event to the list and execute it every N tick
+     * @param timeout time until the end of the event. time = (timeout / frequencies) seconds
+     * @param notifier function which will be called at the end of the timeout. Used to notify the client that the
+     *                 event is finished
+     * @return id of the scheduled task
+     */
     std::uint64_t scheduleEvery(int timeout, std::function<void()> notifier);
 
     /**

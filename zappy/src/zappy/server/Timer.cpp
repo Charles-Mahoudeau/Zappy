@@ -15,45 +15,54 @@
 
 namespace zappy::server {
 
-void Timer::init(std::uint16_t freq) { this->_tickTime = std::chrono::milliseconds(kTick_milli_default) / freq; }
+void Timer::init(std::uint16_t freq) {
+    this->_tickTime = std::chrono::milliseconds(kTick_milli_default) / freq;
+    this->_previousTick = std::chrono::steady_clock::now() - this->_tickTime;
+}
 
-void Timer::update() {
+int Timer::update() {
     std::chrono::steady_clock::time_point const now = std::chrono::steady_clock::now();
-    const int nbTick = static_cast<int>((now - this->_previousTick).count() / this->_tickTime.count());
-
+    const int nbTick = static_cast<int>((now - this->_previousTick) / this->_tickTime);
     auto it = this->_events.begin();
+
+    if (nbTick <= 0) {
+        return 0;
+    }
+
+    //     this->_previousTick += this->_tickTime * nbTick;
+    this->_previousTick = now;
 
     while (it != this->_events.end()) {
         it->timeout -= nbTick;
         if (it->timeout > 0) {
+            it++;
             continue;
         }
         it->notifier();
         if (it->repeated_timeout != -1) {
             it->timeout = it->repeated_timeout;
+            it++;
             continue;
         }
         it = this->_events.erase(it);
     }
+    return nbTick;
 }
 
 void Timer::setFrequencies(int freq) { this->_tickTime = std::chrono::milliseconds(kTick_milli_default) / freq; }
 
 int Timer::timeout() {
-    std::chrono::steady_clock::time_point const now = std::chrono::steady_clock::now();
-    auto time = std::chrono::duration_cast<std::chrono::milliseconds>(now - (this->_previousTick + this->_tickTime));
-    int timeout = static_cast<int>(time.count());
+    auto now = std::chrono::steady_clock::now();
+    auto sinceTick = std::chrono::duration_cast<std::chrono::milliseconds>(now - this->_previousTick);
 
-    if (!this->_events.empty()) {
-        const int nextTimeout = this->smallestTimeout();
-        timeout += static_cast<int>(this->_tickTime.count() * (nextTimeout - 1));
+    if (this->_events.empty()) {
+        return -1;
     }
 
-    if (timeout < 0) {
-        return 0;
-    }
+    int const nextTicks = this->smallestTimeout();
+    int const remaining = static_cast<int>((this->_tickTime.count() * nextTicks) - sinceTick.count());
 
-    return timeout;
+    return remaining < 0 ? 0 : remaining;
 }
 
 int Timer::smallestTimeout() {
