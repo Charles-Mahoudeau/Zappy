@@ -33,9 +33,9 @@ TEST(Vector2Test, Wrapped) {
 
 TEST(Vector2Test, TypeConversion) {
     constexpr zappy::math::Vector2i v{1, 2};
-    constexpr zappy::math::Vector2f vf = static_cast<zappy::math::Vector2f>(v);
-    EXPECT_FLOAT_EQ(vf.x, 1.0f);
-    EXPECT_FLOAT_EQ(vf.y, 2.0f);
+    constexpr auto vf = static_cast<zappy::math::Vector2f>(v);
+    EXPECT_FLOAT_EQ(vf.x, 1.0F);
+    EXPECT_FLOAT_EQ(vf.y, 2.0F);
 }
 
 TEST(Vector2Test, ArithmeticOperatorsVector) {
