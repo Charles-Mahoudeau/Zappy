@@ -9,6 +9,7 @@
 
 #include <cstdint>
 
+#include "zappy/server/Timer.hpp"
 #include "zappy/server/client/ClientRegistry.hpp"
 #include "zappy/server/net/SocketRegistry.hpp"
 #include "zappy/shared/io/Poller.hpp"
@@ -26,11 +27,10 @@ class Server {
     Server& operator=(const Server&) = delete;
     Server& operator=(Server&&) = delete;
 
-    void init(std::uint16_t port, std::uint8_t freq, client::ClientRegistry& clientRegistery);
-    bool update();
+    void init(std::uint16_t port, client::ClientRegistry& clientRegistery, Timer& timer);
+    bool poll(int timeout);
 
   private:
-    std::uint8_t _freq = -1;
     zappy::network::socket::Server _servSocket{};
     SocketRegistry _sockets;
     io::Poller _poller;

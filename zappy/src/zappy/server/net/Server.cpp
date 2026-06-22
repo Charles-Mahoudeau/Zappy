@@ -12,6 +12,7 @@
 #include <iostream>
 #include <string_view>
 
+#include "zappy/server/Timer.hpp"
 #include "zappy/server/client/ClientRegistry.hpp"
 #include "zappy/shared/exception/SocketError.hpp"
 #include "zappy/shared/io/Poller.hpp"
@@ -20,34 +21,33 @@
 
 namespace zappy::server::net {
 
-void Server::init(std::uint16_t port, std::uint8_t freq, client::ClientRegistry& clientRegistery) {
+void Server::init(std::uint16_t port, client::ClientRegistry& clientRegistery, Timer& timer) {
     this->_servSocket.bind(port);
     this->_servSocket.listen();
-    this->_freq = freq;
 
-    this->_poller.add(this->_servSocket, zappy::io::Poller::kPollRead, [this, &clientRegistery](std::byte /*event*/) {
-        const network::Address addr = this->makeNewConnection();
-        clientRegistery.makeNewClient(this->_sockets, addr);
-        std::cout << addr << "\n";
-    });
+    this->_poller.add(this->_servSocket, zappy::io::Poller::kPollRead,
+                      [this, &clientRegistery, &timer](std::byte /*event*/) {
+                          const network::Address addr = this->makeNewConnection();
+                          clientRegistery.makeNewClient(this->_sockets, addr, timer);
+                          std::cout << addr << "\n";
+                      });
 }
 
-bool Server::update() {
-    this->_poller.poll(this->_freq);
-    return true;
-}
+bool Server::poll(int timeout) { return this->_poller.poll(timeout); }
 
 network::Address Server::makeNewConnection() {
     network::socket::Client newClientSocket = this->_servSocket.accept();
-    network::Address const addr = newClientSocket.address();
+    network::Address addr = newClientSocket.address();
     (void)newClientSocket.send("WELCOME\n");
 
-    this->_sockets.insert(newClientSocket);
-    auto* cli = this->_sockets.findByAddress(addr);
-
-    this->_poller.add(cli->fd(), zappy::io::Poller::kPollRead, [this, cli](std::byte event) {
+    this->_poller.add(newClientSocket.fd(), zappy::io::Poller::kPollRead, [this, addr](std::byte event) {
+        auto* cli = this->_sockets.findByAddress(addr);
         bool fail = false;
-        const int fd = cli->fd();
+
+        if (cli == nullptr) {
+            std::cerr << "failed to find client\n";
+            return;
+        }
 
         if ((event & zappy::io::Poller::kPollRead) != std::byte{0}) {
             try {
@@ -58,9 +58,11 @@ network::Address Server::makeNewConnection() {
         }
         if ((event & zappy::io::Poller::kPollError) != std::byte{0} || fail) {
             this->_sockets.remove(cli->addr());
-            this->_poller.remove(fd);
+            this->_poller.remove(cli->fd());
         }
     });
+
+    this->_sockets.insert(newClientSocket);
     return addr;
 }
 
