@@ -85,8 +85,10 @@ struct Vector2 {
         return rhs;
     }
     friend constexpr Vector2 operator/(const T scalar, Vector2 rhs) {
-        rhs /= scalar;
-        return rhs;
+        if (rhs.x == 0 || rhs.y == 0) {
+            throw exception::InvalidArgument{"division by zero"};
+        }
+        return {scalar / rhs.x, scalar / rhs.y};
     }
 };
 
