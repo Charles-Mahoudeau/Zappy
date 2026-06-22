@@ -103,7 +103,7 @@ class World {
     /// @brief Hatches a random egg for the specified team.
     /// @param teamId The ID of the team to hatch the egg for.
     /// @return The ID of the new player, or an error message if no egg could be hatched.
-    std::expected<std::uint16_t, std::string> hatchRandomEgg(std::uint16_t teamId);
+    std::expected<std::uint64_t, std::string> hatchRandomEgg(std::uint16_t teamId);
 
     /// @brief Returns a view of all players in the specified team.
     /// @param teamId The ID of the team to get the players from.

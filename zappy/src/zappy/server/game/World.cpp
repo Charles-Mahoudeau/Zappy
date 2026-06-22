@@ -128,7 +128,7 @@ std::uint64_t World::spawnResource(ResourceType type) {
     return entityId;
 }
 
-std::expected<std::uint16_t, std::string> World::hatchRandomEgg(const std::uint16_t teamId) {
+std::expected<std::uint64_t, std::string> World::hatchRandomEgg(const std::uint16_t teamId) {
     std::vector<const entity::Egg*> eggs;
 
     for (const entity::Egg* egg : _entityDatabase.viewAll<entity::Egg>()) {
