@@ -9,11 +9,13 @@
 
 #include <gtest/gtest.h>
 
+#include <cstdint>
 #include <iterator>
 #include <string_view>
 #include <tuple>
 
 #include "zappy/server/game/ResourceType.hpp"
+#include "zappy/server/game/Tile.hpp"
 #include "zappy/server/game/entity/Egg.hpp"
 #include "zappy/shared/exception/OutOfRange.hpp"
 #include "zappy/shared/io/Logger.hpp"
@@ -131,4 +133,46 @@ TEST_F(WorldTest, PlayerAccess) {
     auto constPlayers = constWorld.players(0);
     EXPECT_EQ(std::ranges::distance(constPlayers), 1);
     EXPECT_EQ(constWorld.entityDatabase().id(**constPlayers.begin()), playerResult.value());
+}
+
+TEST_F(WorldTest, MoveBy) {
+    zappy::server::game::World world{{
+        .size = {10, 10},
+        .teamCount = 1,
+        .playersPerTeam = 1,
+        .logger = logger("MoveBy"),
+    }};
+
+    // Hatch an egg to create a player
+    const auto playerResult = world.hatchRandomEgg(0);
+    ASSERT_TRUE(playerResult.has_value());
+    const std::uint64_t playerId = playerResult.value();
+
+    // Get initial position
+    const zappy::server::game::Tile* tile = world.tile(playerId);
+    ASSERT_NE(tile, nullptr);
+    const zappy::math::Vector2u initialPos = tile->position();
+
+    // Move by {1, 1}
+    const zappy::math::Vector2u newPos = world.moveBy(playerId, {1, 1});
+
+    // Check that the player is actually on the new tile
+    const zappy::server::game::Tile* newTile = world.tile(playerId);
+    ASSERT_NE(newTile, nullptr);
+    EXPECT_EQ(newTile->position(), newPos);
+    EXPECT_EQ(newPos - initialPos, (zappy::math::Vector2u{1, 1}));
+
+    // Test wrapping
+    // Move to (0, 0)
+    const zappy::math::Vector2u posAtOrigin =
+        world.moveBy(playerId, {0 - static_cast<int>(newPos.x), 0 - static_cast<int>(newPos.y)});
+    EXPECT_EQ(posAtOrigin, (zappy::math::Vector2u{0, 0}));
+
+    // Move by {-1, -1}, should wrap to (9, 9)
+    const zappy::math::Vector2u wrappedPos = world.moveBy(playerId, {-1, -1});
+    EXPECT_EQ(wrappedPos, (zappy::math::Vector2u{9, 9}));
+
+    const zappy::server::game::Tile* wrappedTile = world.tile(playerId);
+    ASSERT_NE(wrappedTile, nullptr);
+    EXPECT_EQ(wrappedTile->position(), (zappy::math::Vector2u{9, 9}));
 }
