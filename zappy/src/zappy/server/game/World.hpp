@@ -50,7 +50,7 @@ class World {
 
     /// @brief Returns the size of the world.
     /// @return The size of the world.
-    math::Vector2u size() const;
+    [[nodiscard]] math::Vector2u size() const;
 
     /// @brief Returns a reference to the entity database.
     /// @return A reference to the entity database.
@@ -109,12 +109,12 @@ class World {
     /// @brief Returns a view of all players in the specified team.
     /// @param teamId The ID of the team to get the players from.
     /// @return A view of all players in the specified team.
-    EntityDatabase::EntityView<const entity::Player> players(std::uint16_t teamId) const;
+    [[nodiscard]] EntityDatabase::EntityView<const entity::Player> players(std::uint16_t teamId) const;
 
     /// @brief Returns a view of all players in the specified team.
     /// @param teamId The ID of the team to get the players from.
     /// @return A view of all players in the specified team.
-    EntityDatabase::EntityView<entity::Player> players(std::uint16_t teamId);
+    [[nodiscard]] EntityDatabase::EntityView<entity::Player> players(std::uint16_t teamId);
 
   private:
     /// @brief Returns the resource densities for the world.
