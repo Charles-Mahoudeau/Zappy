@@ -164,10 +164,11 @@ std::expected<std::uint16_t, std::string> World::hatchRandomEgg(const std::uint1
 }
 
 const std::unordered_map<ResourceType, float>& World::resourceDensities() {
+    using enum ResourceType;
+
     static const std::unordered_map<ResourceType, float> resourceDensities = {
-        {ResourceType::kFood, 0.5F},      {ResourceType::kLinemate, 0.3F}, {ResourceType::kDeraumere, 0.15F},
-        {ResourceType::kSibur, 0.1F},     {ResourceType::kMendiane, 0.1F}, {ResourceType::kPhiras, 0.08F},
-        {ResourceType::kThystame, 0.05F},
+        {kFood, 0.5F},     {kLinemate, 0.3F}, {kDeraumere, 0.15F}, {kSibur, 0.1F},
+        {kMendiane, 0.1F}, {kPhiras, 0.08F},  {kThystame, 0.05F},
     };
     return resourceDensities;
 }
