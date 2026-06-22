@@ -15,7 +15,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include "../../../../cmake-build-debug/_deps/raylib-src/src/raylib.h"
 #include "EntityDatabase.hpp"
 #include "IEntity.hpp"
 #include "ResourceType.hpp"
