@@ -68,15 +68,17 @@ Logger::Logger(std::string prefix, std::shared_ptr<std::ofstream> file, const bo
 
 std::string Logger::levelToString(const Level level) {
     switch (level) {
-        case Level::kDebug:
+        using enum Level;
+
+        case kDebug:
             return "DEBUG";
-        case Level::kInfo:
+        case kInfo:
             return "INFO";
-        case Level::kWarning:
+        case kWarning:
             return "WARNING";
-        case Level::kError:
+        case kError:
             return "ERROR";
-        case Level::kFatal:
+        case kFatal:
             return "FATAL";
     }
     return "UNKNOWN";
