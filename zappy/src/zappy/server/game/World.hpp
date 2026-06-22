@@ -119,7 +119,7 @@ class World {
     /// @brief Returns the position of the specified entity.
     /// @param entityId The ID of the entity to get the position of.
     /// @return The position of the specified entity.
-    [[nodiscard]] math::Vector2u position(std::uint64_t entityId) const;
+    [[nodiscard]] std::optional<math::Vector2u> position(std::uint64_t entityId) const;
 
     /// @brief Moves the specified entity to the specified position.
     /// @param entityId The ID of the entity to move.

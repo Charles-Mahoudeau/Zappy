@@ -173,11 +173,11 @@ EntityDatabase::EntityView<entity::Player> World::players(const std::uint16_t te
            std::views::filter([teamId](const entity::Player* player) { return player->teamId() == teamId; });
 }
 
-math::Vector2u World::position(const std::uint64_t entityId) const {
+std::optional<math::Vector2u> World::position(const std::uint64_t entityId) const {
     const Tile* entityTile = tile(entityId);
 
     if (entityTile == nullptr) {
-        throw exception::InvalidState{"entity is not on a tile"};
+        return std::nullopt;
     }
     return entityTile->position();
 }
