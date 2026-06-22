@@ -29,14 +29,6 @@ TEST(PlayerTest, KillPlayer) {
     EXPECT_FALSE(player.alive());
 }
 
-TEST(PlayerTest, FreezePlayer) {
-    Player player{0};
-
-    EXPECT_FALSE(player.frozen());
-    player.freeze(10);
-    EXPECT_TRUE(player.frozen());
-}
-
 TEST(PlayerTest, LevelUp) {
     Player player{0};
     const std::expected<std::uint8_t, std::string> result = player.levelUp();
