@@ -42,9 +42,6 @@ class Texture {
     Texture2D release() noexcept;
     static Texture2D loadTexture(const char* path, bool flipVertical = false);
 
-  protected:
-    [[nodiscard]] const Texture2D& texture() const;
-
   private:
     Texture2D _texture{};
 };
