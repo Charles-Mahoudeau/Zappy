@@ -17,6 +17,8 @@
 #include "zappy/server/game/ResourceType.hpp"
 #include "zappy/server/game/Tile.hpp"
 #include "zappy/server/game/entity/Egg.hpp"
+#include "zappy/shared/exception/InvalidArgument.hpp"
+#include "zappy/shared/exception/InvalidState.hpp"
 #include "zappy/shared/exception/OutOfRange.hpp"
 #include "zappy/shared/io/Logger.hpp"
 
@@ -175,4 +177,42 @@ TEST_F(WorldTest, MoveBy) {
     const zappy::server::game::Tile* wrappedTile = world.tile(playerId);
     ASSERT_NE(wrappedTile, nullptr);
     EXPECT_EQ(wrappedTile->position(), (zappy::math::Vector2u{9, 9}));
+}
+
+TEST_F(WorldTest, Position) {
+    zappy::server::game::World world{{
+        .size = {10, 10},
+        .teamCount = 1,
+        .playersPerTeam = 1,
+        .logger = logger("Position"),
+    }};
+
+    const auto playerResult = world.hatchRandomEgg(0);
+    ASSERT_TRUE(playerResult.has_value());
+    const std::uint64_t playerId = playerResult.value();
+
+    const zappy::server::game::Tile* tile = world.tile(playerId);
+    ASSERT_NE(tile, nullptr);
+
+    EXPECT_EQ(world.position(playerId), tile->position());
+    EXPECT_THROW(std::ignore = world.position(9999), zappy::exception::InvalidState);
+}
+
+TEST_F(WorldTest, MoveTo) {
+    zappy::server::game::World world{{
+        .size = {10, 10},
+        .teamCount = 1,
+        .playersPerTeam = 1,
+        .logger = logger("MoveTo"),
+    }};
+
+    const auto playerResult = world.hatchRandomEgg(0);
+    ASSERT_TRUE(playerResult.has_value());
+    const std::uint64_t playerId = playerResult.value();
+
+    const zappy::math::Vector2u targetPos = {5, 5};
+    world.moveTo(playerId, targetPos);
+    EXPECT_EQ(world.position(playerId), targetPos);
+
+    EXPECT_THROW(world.moveTo(playerId, {10, 10}), zappy::exception::InvalidArgument);
 }
