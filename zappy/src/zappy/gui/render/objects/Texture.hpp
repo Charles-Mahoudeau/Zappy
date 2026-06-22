@@ -35,6 +35,9 @@ class Texture {
     void reload(std::string_view path);
     void swap(Texture& other) noexcept;
 
+  protected:
+    [[nodiscard]] const Texture2D& texture() const;
+
   private:
     Texture2D _texture{};
 };

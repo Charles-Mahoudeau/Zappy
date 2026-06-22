@@ -60,4 +60,7 @@ void Texture::swap(Texture& other) noexcept {
     _texture = other._texture;
     other._texture = tmp;
 }
+
+const Texture2D& Texture::texture() const { return _texture; }
+
 }  // namespace zappy::gui::render
