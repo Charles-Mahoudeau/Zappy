@@ -13,6 +13,7 @@ namespace zappy::gui::ui {
 
 class GuiTheme {
   public:
+    GuiTheme() = default;
     explicit GuiTheme(std::string_view styleFile);
     ~GuiTheme();
 

@@ -13,6 +13,7 @@
 #include <cstddef>
 #include <format>
 #include <string>
+#include <string_view>
 
 #include "zappy/gui/GuiCliParser.hpp"
 #include "zappy/gui/display/Window.hpp"
@@ -33,6 +34,7 @@ static constexpr int kLoadingMaxDots = 3;
 static constexpr float kChatPanelWidth = 320.0F;
 static constexpr float kChatPanelHeight = 180.0F;
 static constexpr float kChatPanelMargin = 8.0F;
+static constexpr std::string_view kStylePath = "assets/styles/style_lavanda_kyrou.rgs";
 
 GUI::GUI() : _parser{_state}, _sender{_buffer}, _handshake{_buffer, _sender, _parser, _state} {}
 
@@ -90,6 +92,7 @@ int GUI::init(const GuiCliParser& cli) {
 
     _window = display::Window{kWindowWidth, kWindowHeight, "Zappy"};
     _window.setTargetFPS(kTargetFPS);
+    _theme = ui::GuiTheme{kStylePath};
     drawLoadingFrame();
 
     setupCamera();

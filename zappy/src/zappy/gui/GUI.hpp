@@ -17,6 +17,7 @@
 #include "zappy/gui/render/Camera.hpp"
 #include "zappy/gui/render/Renderer.hpp"
 #include "zappy/gui/ui/ChatPanel.hpp"
+#include "zappy/gui/ui/GuiTheme.hpp"
 #include "zappy/shared/io/Poller.hpp"
 #include "zappy/shared/network/Address.hpp"
 #include "zappy/shared/network/BufferedClient.hpp"
@@ -55,6 +56,7 @@ class GUI {
     zappy::io::Poller _poller;
 
     display::Window _window;
+    ui::GuiTheme _theme;
     render::Camera _camera;  // May be placed in renderer ?
     render::AssetStore _assets;
     render::Renderer _renderer;
