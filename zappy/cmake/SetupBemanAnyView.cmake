@@ -13,6 +13,8 @@ macro(setup_beman_anyview)
 
         FetchContent_MakeAvailable(beman.any_view)
     else ()
-        message(WARNING "beman.any_view not available: no internet connection.")
+        message(FATAL_ERROR
+                "beman.any_view is required but could not be fetched (no internet connection). "
+                "Provide a vendored/local copy or enable network access during configure.")
     endif ()
 endmacro()
