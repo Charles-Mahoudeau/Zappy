@@ -20,6 +20,7 @@
 #include "zappy/gui/render/Camera.hpp"
 #include "zappy/gui/render/Renderer.hpp"
 #include "zappy/gui/render/utils/Vector3.hpp"
+#include "zappy/gui/ui/utils/Rectangle.hpp"
 #include "zappy/shared/exception/InvalidState.hpp"
 namespace zappy::gui {
 
@@ -29,6 +30,9 @@ static constexpr int kTargetFPS = 60;
 static constexpr int kPollTimeoutMs = 16;
 static constexpr int kLoadingFontSize = 30;
 static constexpr int kLoadingMaxDots = 3;
+static constexpr float kChatPanelWidth = 320.0F;
+static constexpr float kChatPanelHeight = 180.0F;
+static constexpr float kChatPanelMargin = 8.0F;
 
 GUI::GUI() : _parser{_state}, _sender{_buffer}, _handshake{_buffer, _sender, _parser, _state} {}
 
@@ -107,6 +111,10 @@ int GUI::run() {
         _poller.poll(kPollTimeoutMs);
         _window.beginFrame();
         _renderer.update(_camera, _state, _assets);
+        _chatPanel.draw(
+            _state.broadcasts(),
+            ui::Rectangle{kChatPanelMargin, static_cast<float>(kWindowHeight) - kChatPanelHeight - kChatPanelMargin,
+                          kChatPanelWidth, kChatPanelHeight});
         _window.endFrame();
     }
     return 0;

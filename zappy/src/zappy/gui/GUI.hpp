@@ -16,6 +16,7 @@
 #include "zappy/gui/render/AssetStore.hpp"
 #include "zappy/gui/render/Camera.hpp"
 #include "zappy/gui/render/Renderer.hpp"
+#include "zappy/gui/ui/ChatPanel.hpp"
 #include "zappy/shared/io/Poller.hpp"
 #include "zappy/shared/network/Address.hpp"
 #include "zappy/shared/network/BufferedClient.hpp"
@@ -57,6 +58,7 @@ class GUI {
     render::Camera _camera;  // May be placed in renderer ?
     render::AssetStore _assets;
     render::Renderer _renderer;
+    ui::ChatPanel _chatPanel;
     int _loadingDots{0};
 };
 

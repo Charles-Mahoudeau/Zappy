@@ -37,6 +37,8 @@ add_library(zappy_gui_objects OBJECT
         render/objects/Skybox.hpp
         render/utils/Color.hpp
         render/utils/Vector3.hpp
+        ui/ChatPanel.cpp
+        ui/ChatPanel.hpp
         ui/GuiTheme.cpp
         ui/GuiTheme.hpp
         ui/RaylibGuiImpl.cpp
