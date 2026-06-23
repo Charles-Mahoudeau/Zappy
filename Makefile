@@ -17,6 +17,7 @@ zappy_server: | cpp_build
 zappy_gui: | cpp_build
 	cmake --build build --target zappy_gui
 	cp build/src/zappy/gui/zappy_gui .
+	cp -r build/src/zappy/gui/assets/ assets/
 
 zappy_ai:
 	@printf '#!/bin/sh\nexec python3 "%s/zappia/app.py" "$$@"\n' "$$(pwd)" > zappy_ai

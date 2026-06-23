@@ -45,7 +45,7 @@ def _load_policy(device, obs_size, n_actions):
         distribution_class=MaskedCategorical,
         return_log_prob=False,
     )
-    policy.load_state_dict(torch.load(weights, map_location=device))
+    policy.load_state_dict(torch.load(weights, map_location=device, weights_only=True))
     policy.eval()
     return policy
 
