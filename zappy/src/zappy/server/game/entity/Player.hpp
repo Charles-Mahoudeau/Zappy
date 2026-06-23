@@ -31,7 +31,7 @@ class Player : public IEntity {
     static constexpr std::uint8_t kTimeUnitsPerFood{126};
     static constexpr std::uint16_t kDefaultLifetime{kDefaultLifeUnits * kTimeUnitsPerFood};
 
-    Player() = default;
+    explicit Player(std::uint16_t teamId);
     ~Player() override = default;
 
     Player(const Player&) = default;
@@ -43,6 +43,10 @@ class Player : public IEntity {
     /// @brief Update the player.
     void update() override;
 
+    /// @brief Get the player's team id.
+    /// @return The player's team id.
+    [[nodiscard]] std::uint16_t teamId() const;
+
     /// @brief Get the player's lifetime left.
     /// @return The player's lifetime left.
     [[nodiscard]] std::uint32_t lifetimeLeft() const;
@@ -53,14 +57,6 @@ class Player : public IEntity {
 
     /// @brief Kill the player.
     void kill();
-
-    /// @brief Check if the player is frozen.
-    /// @return True if the player is frozen, false otherwise.
-    [[nodiscard]] bool frozen() const;
-
-    /// @brief Freeze the player.
-    /// @param time The time in seconds the player will be frozen.
-    void freeze(std::uint32_t time);
 
     /// @brief Get the player's level.
     /// @return The player's level.
@@ -100,9 +96,9 @@ class Player : public IEntity {
     /// directions.
     [[nodiscard]] static const std::unordered_map<Direction, std::tuple<Direction, Direction>>& turnMap();
 
+    std::uint16_t _teamId;
     std::uint32_t _lifetimeLeft{kDefaultLifetime};
     std::uint8_t _level{1};
-    std::uint32_t _freezeTime{0};
     Direction _direction{Direction::kNorth};
     Inventory _inventory;
 };

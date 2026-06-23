@@ -7,16 +7,14 @@
 
 #include "Egg.hpp"
 
-#include <string>
-#include <string_view>
-#include <utility>
+#include <cstdint>
 
 namespace zappy::server::game::entity {
-Egg::Egg(std::string teamName) : _teamName{std::move(teamName)} {}
+Egg::Egg(const std::uint16_t teamId) : _teamId{teamId} {}
 
 void Egg::update() {
     // Empty
 }
 
-std::string_view Egg::teamName() const { return _teamName; }
+std::uint16_t Egg::teamId() const { return _teamId; }
 }  // namespace zappy::server::game::entity

@@ -7,15 +7,14 @@
 
 #pragma once
 
-#include <string>
-#include <string_view>
+#include <cstdint>
 
 #include "zappy/server/game/IEntity.hpp"
 
 namespace zappy::server::game::entity {
 class Egg : public IEntity {
   public:
-    explicit Egg(std::string teamName);
+    explicit Egg(std::uint16_t teamId);
     ~Egg() override = default;
 
     Egg(const Egg&) = default;
@@ -27,11 +26,11 @@ class Egg : public IEntity {
     /// @brief Update the egg.
     void update() override;
 
-    /// @brief Get the team name of the egg.
-    /// @return The team name of the egg.
-    [[nodiscard]] std::string_view teamName() const;
+    /// @brief Get the team id of the egg.
+    /// @return The team id of the egg.
+    [[nodiscard]] std::uint16_t teamId() const;
 
   private:
-    std::string _teamName;
+    std::uint16_t _teamId;
 };
 }  // namespace zappy::server::game::entity
