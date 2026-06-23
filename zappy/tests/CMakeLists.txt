@@ -12,7 +12,6 @@ add_executable(unit_tests
         src/server/net/SocketRegistry.cpp
         src/server/game/entity/Egg.cpp
         src/server/game/entity/Player.cpp
-        src/server/game/entity/Resource.cpp
         src/shared/network/BufferedClient.cpp
         src/gui/game/GameState.cpp
         src/gui/GuiCliParser.cpp
