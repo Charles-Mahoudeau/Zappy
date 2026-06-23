@@ -36,6 +36,7 @@ add_library(zappy_gui_objects OBJECT
         render/objects/Skybox.cpp
         render/objects/Skybox.hpp
         render/utils/Color.hpp
+        render/utils/Ray.hpp
         render/utils/Vector3.hpp
         ui/ChatPanel.cpp
         ui/ChatPanel.hpp
@@ -48,6 +49,8 @@ add_library(zappy_gui_objects OBJECT
         ui/Mouse.cpp
         ui/Mouse.hpp
         ui/RaylibGuiImpl.cpp
+        ui/TileInfo.cpp
+        ui/TileInfo.hpp
         ui/TimeUnitSlider.cpp
         ui/TimeUnitSlider.hpp
         ui/utils/Rectangle.hpp

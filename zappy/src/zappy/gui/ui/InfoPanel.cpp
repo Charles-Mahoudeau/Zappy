@@ -12,6 +12,7 @@
 #include <utility>
 
 #include "Leaderboard.hpp"
+#include "TileInfo.hpp"
 #include "Widgets.hpp"
 #include "utils/Rectangle.hpp"
 #include "utils/Vector2.hpp"
@@ -25,14 +26,18 @@ std::optional<std::uint32_t> InfoPanel::pickPlayer(Vector2 /*mousePos*/, const r
     return std::nullopt;
 }
 
-std::optional<std::pair<std::uint32_t, std::uint32_t>> InfoPanel::pickTile(Vector2 /*mousePos*/,
-                                                                           const render::Camera& /*camera*/,
-                                                                           const game::GameState& /*state*/) {
-    return std::nullopt;
+std::optional<std::pair<std::uint32_t, std::uint32_t>> InfoPanel::pickTile(Vector2 mousePos,
+                                                                           const render::Camera& camera,
+                                                                           const game::GameState& state) {
+    return TileInfo::pick(mousePos, camera, state);
 }
 
 void InfoPanel::update(Vector2 mousePos, bool clicked, const render::Camera& camera, const game::GameState& state) {
     using enum InfoPanelState;
+
+    if (!clicked) {
+        return;
+    }
 
     if (const auto playerId = pickPlayer(mousePos, camera, state); playerId.has_value()) {
         _selectedPlayerId = playerId;
@@ -44,9 +49,7 @@ void InfoPanel::update(Vector2 mousePos, bool clicked, const render::Camera& cam
         _state = Tile;
         return;
     }
-    if (clicked) {
-        _state = Leaderboard;
-    }
+    _state = Leaderboard;
 }
 
 InfoPanelState InfoPanel::state() const { return _state; }
@@ -63,7 +66,9 @@ void InfoPanel::draw(const game::GameState& state, Rectangle bounds) const {
             Leaderboard::draw(state, bounds);
             break;
         case Tile:
-            Widgets::panel(bounds, "Tile");
+            if (_selectedTile.has_value()) {
+                TileInfo::draw(state, _selectedTile->first, _selectedTile->second, bounds);
+            }
             break;
         case Player:
             Widgets::panel(bounds, "Player");
