@@ -25,6 +25,14 @@ struct TileInventoryEvent {
     std::reference_wrapper<const Inventory> inventory;
 };
 
+struct PlayerConnectionEvent {
+    std::uint64_t playerId{};
+    math::Vector2u position;
+    math::Direction orientation{};
+    std::uint8_t level{};
+    std::string teamName;
+};
+
 struct PlayerPositionEvent {
     std::uint64_t playerId{};
     math::Vector2u position;
@@ -79,7 +87,7 @@ struct PlayerDeathEvent {
 };
 
 struct EggLaidEvent {
-    std::optional<std::uint64_t> playerId{};
+    std::optional<std::uint64_t> playerId;
     std::uint64_t eggId{};
     math::Vector2u position;
 };
@@ -93,11 +101,12 @@ struct EggDeathEvent {
 };
 
 struct GameEndEvent {
-    std::uint16_t teamId;
+    std::string teamName;
 };
 
-using Event = std::variant<TileInventoryEvent, PlayerPositionEvent, PlayerLevelEvent, PlayerInventoryEvent,
-                           PlayerExpulsionEvent, PlayerBroadcastEvent, IncantationBeginEvent, IncantationEndEvent,
-                           PlayerEggLayingEvent, PlayerResourceDropEvent, PlayerResourceCollectEvent, PlayerDeathEvent,
-                           EggLaidEvent, EggConnectionEvent, EggDeathEvent, GameEndEvent>;
+using Event =
+    std::variant<TileInventoryEvent, PlayerConnectionEvent, PlayerPositionEvent, PlayerLevelEvent, PlayerInventoryEvent,
+                 PlayerExpulsionEvent, PlayerBroadcastEvent, IncantationBeginEvent, IncantationEndEvent,
+                 PlayerEggLayingEvent, PlayerResourceDropEvent, PlayerResourceCollectEvent, PlayerDeathEvent,
+                 EggLaidEvent, EggConnectionEvent, EggDeathEvent, GameEndEvent>;
 }  // namespace zappy::server::game
