@@ -224,10 +224,6 @@ void World::setPosition(const std::uint16_t entityId, const math::Vector2u posit
     Tile& destinationTile = tile(position);
 
     destinationTile.addEntity(entityId);
-    pushEvent(PlayerPositionEvent{
-        .playerId = entityId,
-        .position = position,
-    });
 }
 
 void World::remove(const std::uint64_t entityId) {
