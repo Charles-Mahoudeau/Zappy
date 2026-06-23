@@ -24,6 +24,8 @@
 #include "zappy/gui/render/Camera.hpp"
 #include "zappy/gui/render/utils/Ray.hpp"
 #include "zappy/gui/render/utils/Vector3.hpp"
+#include "zappy/gui/ui/utils/Rectangle.hpp"
+#include "zappy/gui/ui/utils/Vector2.hpp"
 
 namespace zappy::gui::ui {
 
