@@ -227,7 +227,10 @@ void World::setPosition(const std::uint16_t entityId, const math::Vector2u posit
 }
 
 void World::remove(const std::uint64_t entityId) {
-    // TODO: Do something, I guess?
+    if (Tile* sourceTile = tile(entityId); sourceTile != nullptr) {
+        sourceTile->removeEntity(entityId);
+    }
+    _entityDatabase.remove(entityId);
 }
 
 bool World::hasEvents() const { return !_events.empty(); }
