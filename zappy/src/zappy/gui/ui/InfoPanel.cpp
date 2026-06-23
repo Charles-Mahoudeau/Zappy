@@ -14,6 +14,8 @@
 #include "Widgets.hpp"
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/render/Camera.hpp"
+#include "zappy/gui/ui/utils/Rectangle.hpp"
+#include "zappy/gui/ui/utils/Vector2.hpp"
 
 namespace zappy::gui::ui {
 
@@ -29,7 +31,7 @@ std::optional<std::pair<std::uint32_t, std::uint32_t>> InfoPanel::pickTile(Vecto
 }
 
 void InfoPanel::update(Vector2 mousePos, bool clicked, const render::Camera& camera, const game::GameState& state) {
-    if (const auto playerId = pickPlayer(mousePos, camera, state)) {
+    if (const auto playerId = pickPlayer(mousePos, camera, state) != std::nullopt) {
         _selectedPlayerId = playerId;
         _state = InfoPanelState::Player;
         return;

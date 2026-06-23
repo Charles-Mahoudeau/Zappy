@@ -9,6 +9,8 @@
 
 #include <raylib.h>
 
+#include "zappy/gui/ui/utils/Vector2.hpp"
+
 namespace zappy::gui::ui {
 
 bool Mouse::isLeftButtonReleased() { return IsMouseButtonReleased(MOUSE_BUTTON_LEFT); }

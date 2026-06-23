@@ -18,7 +18,7 @@ namespace ui = zappy::gui::ui;
 namespace {
 
 class InfoPanelTest : public ::testing::Test {
-  protected:
+  public:
     zappy::gui::game::GameState _state;
     zappy::gui::render::Camera _camera{
         zappy::gui::render::Vector3{0.0F, 0.0F, 0.0F}, zappy::gui::render::Vector3{0.0F, 0.0F, 0.0F},
