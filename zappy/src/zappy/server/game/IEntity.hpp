@@ -8,6 +8,9 @@
 #pragma once
 
 #include <concepts>
+#include <cstdint>
+
+#include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server::game {
 /// @brief Interface for entities in the game.
@@ -29,6 +32,10 @@ class IEntity {
     /// @brief Set the entity's id.
     /// @param id The entity's id.
     virtual void setId(std::uint64_t id) = 0;
+
+    /// @brief Get the entity's position.
+    /// @return The entity's position.
+    [[nodiscard]] virtual math::Vector2u position() const = 0;
 
     /// @brief Update the entity.
     /// @note Call this once for each game tick.
