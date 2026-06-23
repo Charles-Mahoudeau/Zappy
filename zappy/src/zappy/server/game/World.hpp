@@ -99,7 +99,7 @@ class World {
     /// @brief Spawns a resource of the specified type.
     /// @param type The type of resource to spawn.
     /// @return The ID of the spawned resource.
-    [[nodiscard]] std::uint64_t spawnResource(ResourceType type);
+    void spawnResource(ResourceType type);
 
     /// @brief Hatches a random egg for the specified team.
     /// @param teamId The ID of the team to hatch the egg for.

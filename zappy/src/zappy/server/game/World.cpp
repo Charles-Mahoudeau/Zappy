@@ -28,7 +28,6 @@
 #include "WorldEvent.hpp"
 #include "entity/Egg.hpp"
 #include "entity/Player.hpp"
-#include "entity/Resource.hpp"
 #include "zappy/shared/exception/InvalidState.hpp"
 #include "zappy/shared/exception/OutOfRange.hpp"
 #include "zappy/shared/math/Vector2.hpp"
@@ -99,13 +98,10 @@ Tile* World::tile(const std::uint64_t entityId) {
 }
 
 std::uint64_t World::countResources(const ResourceType type) const {
-    auto resources = _entityDatabase.viewAll<entity::Resource>();
     std::uint64_t count = 0;
 
-    for (const auto& resource : resources) {
-        if (resource->type() == type) {
-            ++count;
-        }
+    for (const Tile& tile : _tiles) {
+        count += tile.inventory().resourceCount(type);
     }
     return count;
 }
@@ -122,11 +118,10 @@ std::uint64_t World::spawnEgg(std::uint16_t teamId) {
     return eggId;
 }
 
-std::uint64_t World::spawnResource(ResourceType type) {
-    const std::uint64_t entityId = _entityDatabase.insert(std::make_unique<entity::Resource>(type));
+void World::spawnResource(const ResourceType type) {
+    Tile& tile = randomTile();
 
-    randomTile().addEntity(entityId);
-    return entityId;
+    tile.inventory().addResource(type);
 }
 
 std::expected<std::uint64_t, std::string> World::hatchRandomEgg(const std::uint16_t teamId) {
@@ -263,7 +258,7 @@ void World::spawnStartEggs() {
 void World::spawnResources() {
     for (const auto& [resourceType, quantity] : _resourceThresholds) {
         for (std::uint64_t count = countResources(resourceType); count < quantity; ++count) {
-            std::ignore = spawnResource(resourceType);
+            spawnResource(resourceType);
         }
     }
     if (_config.logger) {
