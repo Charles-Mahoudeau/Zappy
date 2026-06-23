@@ -28,5 +28,4 @@ int main(const int argc, char** argv) {
         return 84;
     }
     core.run();
-    return 0;
 }

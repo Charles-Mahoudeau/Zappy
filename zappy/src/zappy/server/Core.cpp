@@ -9,6 +9,8 @@
 
 #include <unistd.h>
 
+#include <exception>
+#include <iostream>
 #include <span>
 #include <string_view>
 
@@ -27,8 +29,12 @@ void Core::init(std::span<std::string_view> argv) {
 
 void Core::run() {
     while (true) {
-        this->nextTick();
-        this->processCommands();
+        try {
+            this->nextTick();
+            this->processCommands();
+        } catch (const std::exception& err) {
+            std::cerr << err.what() << "\n";
+        }
     }
 }
 
