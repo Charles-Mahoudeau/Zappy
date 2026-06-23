@@ -279,10 +279,11 @@ TEST(GameStateTest, PlayersAtMaxLevelIgnoresPlayersBelowMaxLevel) {
 }
 
 TEST(GameStateTest, PlayersAtMaxLevelCountsOnlyMatchingTeam) {
+    using enum Orientation;
     GameState state;
-    state.addPlayer(1, 0, 0, Orientation::North, GameState::kMaxLevel, "alpha");
-    state.addPlayer(2, 0, 0, Orientation::North, GameState::kMaxLevel, "alpha");
-    state.addPlayer(3, 0, 0, Orientation::North, GameState::kMaxLevel, "beta");
+    state.addPlayer(1, 0, 0, North, GameState::kMaxLevel, "alpha");
+    state.addPlayer(2, 0, 0, North, GameState::kMaxLevel, "alpha");
+    state.addPlayer(3, 0, 0, North, GameState::kMaxLevel, "beta");
     EXPECT_EQ(state.playersAtMaxLevel("alpha"), 2U);
     EXPECT_EQ(state.playersAtMaxLevel("beta"), 1U);
 }

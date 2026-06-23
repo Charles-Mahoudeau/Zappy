@@ -32,18 +32,20 @@ std::optional<std::pair<std::uint32_t, std::uint32_t>> InfoPanel::pickTile(Vecto
 }
 
 void InfoPanel::update(Vector2 mousePos, bool clicked, const render::Camera& camera, const game::GameState& state) {
+    using enum InfoPanelState;
+
     if (const auto playerId = pickPlayer(mousePos, camera, state); playerId.has_value()) {
         _selectedPlayerId = playerId;
-        _state = InfoPanelState::Player;
+        _state = Player;
         return;
     }
     if (const auto tile = pickTile(mousePos, camera, state); tile.has_value()) {
         _selectedTile = tile;
-        _state = InfoPanelState::Tile;
+        _state = Tile;
         return;
     }
     if (clicked) {
-        _state = InfoPanelState::Leaderboard;
+        _state = Leaderboard;
     }
 }
 
@@ -54,14 +56,16 @@ std::optional<std::pair<std::uint32_t, std::uint32_t>> InfoPanel::selectedTile()
 std::optional<std::uint32_t> InfoPanel::selectedPlayerId() const { return _selectedPlayerId; }
 
 void InfoPanel::draw(const game::GameState& state, Rectangle bounds) const {
+    using enum InfoPanelState;
+
     switch (_state) {
-        case InfoPanelState::Leaderboard:
+        case Leaderboard:
             Leaderboard::draw(state, bounds);
             break;
-        case InfoPanelState::Tile:
+        case Tile:
             Widgets::panel(bounds, "Tile");
             break;
-        case InfoPanelState::Player:
+        case Player:
             Widgets::panel(bounds, "Player");
             break;
     }

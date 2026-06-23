@@ -34,14 +34,14 @@ TEST_F(LeaderboardTest, ComputeCountsZeroForTeamWithNoQualifyingPlayers) {
 }
 
 TEST_F(LeaderboardTest, ComputeSortsByPlayersAtMaxLevelDescending) {
-    using zappy::gui::game::Orientation;
+    using enum zappy::gui::game::Orientation;
     constexpr auto kMaxLevel = zappy::gui::game::GameState::kMaxLevel;
 
     _state.addTeam("alpha");
     _state.addTeam("beta");
-    _state.addPlayer(1, 0, 0, Orientation::North, kMaxLevel, "beta");
-    _state.addPlayer(2, 0, 0, Orientation::North, kMaxLevel, "alpha");
-    _state.addPlayer(3, 0, 0, Orientation::North, kMaxLevel, "alpha");
+    _state.addPlayer(1, 0, 0, North, kMaxLevel, "beta");
+    _state.addPlayer(2, 0, 0, North, kMaxLevel, "alpha");
+    _state.addPlayer(3, 0, 0, North, kMaxLevel, "alpha");
 
     const auto entries = ui::Leaderboard::compute(_state);
     ASSERT_EQ(entries.size(), 2U);
@@ -62,13 +62,13 @@ TEST_F(LeaderboardTest, ComputeBreaksTiesByTeamName) {
 }
 
 TEST_F(LeaderboardTest, ComputeNeededCountReachesZeroOnceMet) {
-    using zappy::gui::game::Orientation;
+    using enum zappy::gui::game::Orientation;
     constexpr auto kMaxLevel = zappy::gui::game::GameState::kMaxLevel;
     constexpr auto kNeeded = zappy::gui::game::GameState::kPlayersNeededToWin;
 
     _state.addTeam("alpha");
     for (std::uint32_t i = 0; i < kNeeded; ++i) {
-        _state.addPlayer(i, 0, 0, Orientation::North, kMaxLevel, "alpha");
+        _state.addPlayer(i, 0, 0, North, kMaxLevel, "alpha");
     }
 
     const auto entries = ui::Leaderboard::compute(_state);
