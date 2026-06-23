@@ -75,7 +75,7 @@ struct PlayerDeathEvent {
 };
 
 struct EggLaidEvent {
-    std::uint64_t playerId{};
+    std::optional<std::uint64_t> playerId{};
     std::uint64_t eggId{};
     math::Vector2u position;
 };
