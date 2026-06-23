@@ -9,6 +9,9 @@ FetchContent_Declare(
 
 set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
-set(SUPPORT_GPU_SKINNING ON CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(raylib)
+
+if (TARGET raylib)
+    target_compile_definitions(raylib PRIVATE SUPPORT_GPU_SKINNING=1)
+endif ()

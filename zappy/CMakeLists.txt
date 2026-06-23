@@ -12,9 +12,11 @@ add_subdirectory(src/zappy/shared)
 add_subdirectory(src/zappy/server)
 add_subdirectory(src/zappy/gui)
 
+include(SetupGoogleTest)
+
 include(GoogleTest)
 
-if (TARGET gtest_main)
+if (TARGET gtest_main OR TARGET GTest::gtest_main)
     enable_testing()
     add_subdirectory(tests)
 endif ()
