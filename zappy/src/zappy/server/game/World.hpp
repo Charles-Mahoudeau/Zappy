@@ -19,6 +19,7 @@
 #include "Event.hpp"
 #include "IEntity.hpp"
 #include "IEventEmitter.hpp"
+#include "IGrid.hpp"
 #include "ResourceType.hpp"
 #include "Tile.hpp"
 #include "entity/Player.hpp"
@@ -26,7 +27,7 @@
 #include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server::game {
-class World : public IEventEmitter {
+class World : public IGrid, public IEventEmitter {
   public:
     struct Config {
         math::Vector2u size;
@@ -126,18 +127,12 @@ class World : public IEventEmitter {
     /// @brief Returns the position of the specified entity.
     /// @param entityId The ID of the entity to get the position of.
     /// @return The position of the specified entity.
-    [[nodiscard]] std::optional<math::Vector2u> position(std::uint64_t entityId) const;
+    [[nodiscard]] std::optional<math::Vector2u> position(std::uint64_t entityId) const override;
 
-    /// @brief Moves the specified entity to the specified position.
-    /// @param entityId The ID of the entity to move.
-    /// @param position The position to move the entity to.
-    void moveTo(std::uint64_t entityId, math::Vector2u position);
-
-    /// @brief Moves the specified entity by the specified delta.
-    /// @param entityId The ID of the entity to move.
-    /// @param delta The delta to move the entity by.
-    /// @return The new position of the entity.
-    [[nodiscard]] math::Vector2u moveBy(std::uint64_t entityId, math::Vector2i delta);
+    /// @brief Sets the position of the specified entity.
+    /// @param entityId The ID of the entity to set the position of.
+    /// @param position The new position of the entity.
+    void setPosition(std::uint16_t entityId, math::Vector2u position) override;
 
     /// @brief Returns true if the world has any events to process.
     /// @return True if the world has events, false otherwise.
