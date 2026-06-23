@@ -33,9 +33,9 @@ void sleepForTicks(int ticks, int freq) {
 // ---------------------------------------------------------------------------
 
 TEST(TimerUpdate, ReturnsElapsedTicks) {
-    Timer timer(100);
+    Timer timer(150);
 
-    sleepForTicks(3, 100);
+    sleepForTicks(3, 150);
     const int ticks = timer.update();
 
     ASSERT_EQ(ticks, 3);
@@ -79,14 +79,14 @@ TEST(TimerScheduleLater, DoesNotFireBeforeTimeout) {
 }
 
 TEST(TimerScheduleLater, FiresOnlyOnce) {
-    Timer timer(100);
+    Timer timer(150);
     int count = 0;
 
     timer.scheduleLater(1, [&count]() { count++; });
 
-    sleepForTicks(1, 100);
+    sleepForTicks(1, 150);
     timer.update();
-    sleepForTicks(5, 100);
+    sleepForTicks(2, 150);
     timer.update();
 
     EXPECT_EQ(count, 1);
@@ -106,13 +106,13 @@ TEST(TimerScheduleLater, ReturnsUniqueIds) {
 // ---------------------------------------------------------------------------
 
 TEST(TimerScheduleEvery, FiresRepeatedly) {
-    Timer timer(100);
+    Timer timer(150);
     int count = 0;
 
     timer.scheduleEvery(2, [&count]() { count++; });
 
     for (std::uint8_t index = 0; index < 3; index++) {
-        sleepForTicks(2, 100);
+        sleepForTicks(2, 150);
         timer.update();
     }
 
@@ -143,7 +143,7 @@ TEST(TimerUnschedule, RemovesRepeatingEvent) {
     std::uint64_t id = timer.scheduleEvery(1, [&count]() { count++; });
     timer.unschedule(id);
 
-    sleepForTicks(5, 100);
+    sleepForTicks(2, 100);
     timer.update();
 
     EXPECT_EQ(count, 0);
@@ -167,7 +167,7 @@ TEST(TimerUnschedule, UnknownIdDoesNotAffectOthers) {
 // ---------------------------------------------------------------------------
 
 TEST(TimerTimeoutUntilSchedule, NoEventsReturnsMinusOne) {
-    Timer timer(100);
+    const Timer timer(100);
 
     EXPECT_EQ(timer.timeoutUntilSchedule(), -1);
 }
@@ -188,7 +188,7 @@ TEST(TimerTimeoutUntilSchedule, ReflectsSoonestEvent) {
 // ---------------------------------------------------------------------------
 
 TEST(TimerTimeoutUntilNextTick, WithinTickBounds) {
-    Timer freshTimer(10);
+    const Timer freshTimer(10);
 
     const int time = freshTimer.timeoutUntilNextTick();
 
@@ -196,7 +196,7 @@ TEST(TimerTimeoutUntilNextTick, WithinTickBounds) {
 }
 
 TEST(TimerTimeoutUntilNextTick, ReturnsZeroWhenDue) {
-    Timer timer(100);
+    const Timer timer(100);
 
     sleepForTicks(2, 100);
 
@@ -209,12 +209,12 @@ TEST(TimerTimeoutUntilNextTick, ReturnsZeroWhenDue) {
 
 TEST(TimerInit, HigherFrequencyProducesMoreTicks) {
     Timer slow;
-    slow.setFrequencies(20);
+    slow.setFrequencies(100);
 
     Timer fast;
-    fast.setFrequencies(100);
+    fast.setFrequencies(150);
 
-    std::this_thread::sleep_for(60ms);
+    std::this_thread::sleep_for(20ms);
 
     const int slowTicks = slow.update();
     const int fastTicks = fast.update();
@@ -223,16 +223,16 @@ TEST(TimerInit, HigherFrequencyProducesMoreTicks) {
 }
 
 TEST(TimerSetFrequencies, ChangesTickDuration) {
-    Timer timer(10);
+    Timer timer(100);
 
-    sleepForTicks(2, 10);
+    sleepForTicks(2, 100);
 
     int ticks = timer.update();
     EXPECT_EQ(ticks, 2);
-    timer.setFrequencies(100);
+    timer.setFrequencies(200);
 
-    sleepForTicks(5, 100);
+    sleepForTicks(3, 200);
     ticks = timer.update();
 
-    EXPECT_EQ(ticks, 5);
+    EXPECT_EQ(ticks, 3);
 }

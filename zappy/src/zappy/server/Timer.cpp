@@ -15,6 +15,8 @@
 
 namespace zappy::server {
 
+Timer::Timer() { this->setFrequencies(kDefault_Frequencies); }
+
 Timer::Timer(std::uint16_t freq) { this->setFrequencies(freq); }
 
 int Timer::update() {
@@ -26,7 +28,7 @@ int Timer::update() {
         return 0;
     }
 
-    this->_previousTick = now;
+    this->_previousTick += this->_tickTime * nbTick;
 
     while (it != this->_events.end()) {
         it->timeout -= nbTick;
