@@ -18,9 +18,9 @@
 
 #include "EntityDatabase.hpp"
 #include "Event.hpp"
+#include "Grid.hpp"
 #include "IEntity.hpp"
 #include "IEventEmitter.hpp"
-#include "IGrid.hpp"
 #include "ResourceType.hpp"
 #include "Tile.hpp"
 #include "entity/Player.hpp"
@@ -28,7 +28,7 @@
 #include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server::game {
-class World : public IGrid, public IEventEmitter {
+class World : public IEventEmitter {
   public:
     struct Config {
         math::Vector2u size;
@@ -62,26 +62,6 @@ class World : public IGrid, public IEventEmitter {
     /// @brief Returns a reference to the entity database.
     /// @return A reference to the entity database.
     [[nodiscard]] EntityDatabase& entityDatabase();
-
-    /// @brief Returns a reference to the tile at the specified coordinates.
-    /// @param pos The position of the tile.
-    /// @return A reference to the tile at the specified coordinates.
-    [[nodiscard]] const Tile& tile(math::Vector2u pos) const;
-
-    /// @brief Returns a reference to the tile at the specified coordinates.
-    /// @param position The position of the tile.
-    /// @return A reference to the tile at the specified coordinates.
-    [[nodiscard]] Tile& tile(math::Vector2u position);
-
-    /// @brief Returns a reference to the tile at the specified entity id.
-    /// @param entityId The id of the entity.
-    /// @return A reference to the tile at the specified coordinates.
-    [[nodiscard]] const Tile* tile(std::uint64_t entityId) const;
-
-    /// @brief Returns a reference to the tile at the specified entity id.
-    /// @param entityId The id of the entity.
-    /// @return A reference to the tile at the specified coordinates.
-    [[nodiscard]] Tile* tile(std::uint64_t entityId);
 
     /// @brief Returns the number of entities of type T in the world.
     /// @tparam T The type of entity to count.
@@ -125,24 +105,9 @@ class World : public IGrid, public IEventEmitter {
     /// @return A view of all players in the specified team.
     [[nodiscard]] EntityDatabase::EntityView<entity::Player> players(std::string_view teamName);
 
-    /// @brief Returns the position of the specified entity.
-    /// @param entityId The ID of the entity to get the position of.
-    /// @return The position of the specified entity.
-    /// @warning You should not call this function directly. Use the position method of the entity instead.
-    /// @see IEntity::position()
-    [[nodiscard]] std::optional<math::Vector2u> position(std::uint64_t entityId) const override;
-
-    /// @brief Sets the position of the specified entity.
-    /// @param entityId The ID of the entity to set the position of.
-    /// @param position The new position of the entity.
-    /// @warning You should not call this function directly. Use the setPosition method of the entity instead.
-    /// @see IEntity::setPosition()
-    void setPosition(std::uint16_t entityId, math::Vector2u position) override;
-
     /// @brief Removes the specified entity from the world.
     /// @param entityId The ID of the entity to remove.
-    /// @warning You should never call this function directly.
-    void remove(std::uint64_t entityId) override;
+    void remove(std::uint64_t entityId);
 
     /// @brief Returns true if the world has any events to process.
     /// @return True if the world has events, false otherwise.
@@ -161,11 +126,6 @@ class World : public IGrid, public IEventEmitter {
     /// @return A map of resource types to their densities.
     [[nodiscard]] static const std::unordered_map<ResourceType, float>& resourceDensities();
 
-    /// @brief Returns true if the specified coordinates are within the bounds of the world.
-    /// @param position The position to check.
-    /// @return True if the specified coordinates are within the bounds of the world, false otherwise.
-    [[nodiscard]] bool isInBounds(math::Vector2u position) const;
-
     /// @brief Spawns the initial eggs in the world.
     void spawnStartEggs();
 
@@ -183,7 +143,7 @@ class World : public IGrid, public IEventEmitter {
     std::mt19937 _randomEngine{_randomDevice()};
     Config _config;
     EntityDatabase _entityDatabase;
-    std::vector<Tile> _tiles;
+    Grid _grid;
     std::unordered_map<ResourceType, std::uint64_t> _resourceThresholds;
     std::uint16_t _nextMajorTick{kMajorTickInterval};
     std::vector<Event> _events;
