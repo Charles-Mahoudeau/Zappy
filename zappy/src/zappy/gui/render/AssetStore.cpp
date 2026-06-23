@@ -10,7 +10,6 @@
 #include <cstddef>
 #include <initializer_list>
 #include <map>
-#include <string>
 
 #include "AssetLoaderRegistry.hpp"
 #include "objects/Model.hpp"
@@ -36,8 +35,16 @@ void AssetStore::loadPlayerModel() {
     using enum Model::MaterialMapIndex;
 
     _playerModels.emplace_back(
-        createModel("assets/models/burpy/source/burpy.glb", "assets/models/burpy/source/burpy.glb",
-                    {{.mapIndex = ALBEDO, .path = "assets/models/burpy/textures/burpy.png"}}, true));
+        createModel("assets/models/slugs/burpy/source/burpy.glb", "assets/models/slugs/burpy/source/burpy.glb",
+                    {{.mapIndex = ALBEDO, .path = "assets/models/slugs/burpy/textures/burpy.png"}}, true));
+    _playerModels.emplace_back(createModel("assets/models/slugs/electra.glb", "assets/models/slugs/electra.glb", {}));
+    _playerModels.emplace_back(createModel("assets/models/slugs/frozy.glb", "assets/models/slugs/frozy.glb", {}));
+    _playerModels.emplace_back(createModel("assets/models/slugs/doc/doc.glb", "assets/models/slugs/doc/doc.glb",
+                                           {{.mapIndex = ALBEDO, .path = "assets/models/slugs/doc/doc.png"}}, true));
+    _playerModels.emplace_back(createModel("assets/models/slugs/bad1/bad1.glb", "assets/models/slugs/bad1/bad1.glb",
+                                           {{.mapIndex = ALBEDO, .path = "assets/models/slugs/bad1/bad1.png"}}));
+    _playerModels.emplace_back(createModel("assets/models/slugs/bad2/bad2.glb", "assets/models/slugs/bad2/bad2.glb",
+                                           {{.mapIndex = ALBEDO, .path = "assets/models/slugs/bad2/bad2.png"}}));
 }
 
 void AssetStore::loadResourceModel(game::ResourceType type) {
@@ -116,8 +123,7 @@ const std::map<game::ResourceType, Model>& AssetStore::resourceModels() const { 
 Model AssetStore::createModel(std::string_view path, std::initializer_list<TextureMap> textures, bool flipVertical) {
     Model model{path};
     for (const auto& [mapIndex, texturePath] : textures) {
-        const auto texturePathStr = std::string{texturePath};
-        Texture texture{texturePathStr.c_str(), flipVertical};
+        Texture texture{texturePath, flipVertical};
         model.setMeshTexture(0, mapIndex, texture);
         texture.release();
     }
@@ -130,8 +136,7 @@ Model AssetStore::createModel(std::string_view path, std::string_view animationP
                               std::initializer_list<TextureMap> textures, bool flipVertical) {
     Model model{path, animationPath};
     for (const auto& [mapIndex, texturePath] : textures) {
-        const auto texturePathStr = std::string{texturePath};
-        Texture texture{texturePathStr.c_str(), flipVertical};
+        Texture texture{texturePath, flipVertical};
         model.setMeshTexture(0, mapIndex, texture);
         texture.release();
     }
