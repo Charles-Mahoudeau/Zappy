@@ -13,20 +13,23 @@
 #include <expected>
 
 #include "server/game/WorldMock.hpp"
+#include "zappy/server/game/Grid.hpp"
 
 namespace zappy::server::game::entity {
 namespace {
 class PlayerTest : public testing::Test {
   public:
     [[nodiscard]] WorldMock& worldMock() { return _worldMock; }
+    [[nodiscard]] Grid& grid() { return _grid; }
 
   private:
     WorldMock _worldMock;
+    Grid _grid{{10, 10}};
 };
 }  // namespace
 
 TEST_F(PlayerTest, DefaultConstructor) {
-    const Player player{worldMock(), worldMock(), "team1"};
+    const Player player{grid(), worldMock(), "team1"};
 
     EXPECT_EQ(player.teamName(), "team1");
     EXPECT_TRUE(player.alive());
@@ -35,14 +38,14 @@ TEST_F(PlayerTest, DefaultConstructor) {
 }
 
 TEST_F(PlayerTest, KillPlayer) {
-    Player player{worldMock(), worldMock(), "team1"};
+    Player player{grid(), worldMock(), "team1"};
 
     player.kill();
     EXPECT_FALSE(player.alive());
 }
 
 TEST_F(PlayerTest, LevelUp) {
-    Player player{worldMock(), worldMock(), "team1"};
+    Player player{grid(), worldMock(), "team1"};
     const std::expected<std::uint8_t, std::string> result = player.levelUp();
 
     EXPECT_TRUE(result.has_value());
