@@ -39,7 +39,7 @@ void ProgressBar::draw() const {
 
     const int track = _width - (2 * _padding);
     const int fillHeight = _height - (2 * _padding);
-    const int fillWidth = static_cast<int>(static_cast<float>(track) * _progress);
+    const auto fillWidth = static_cast<int>(static_cast<float>(track) * _progress);
 
     DrawRectangle(_x + _padding, _y + _padding, fillWidth, fillHeight, _fill);
 }
