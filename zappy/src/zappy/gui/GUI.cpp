@@ -13,12 +13,14 @@
 #include <cstddef>
 #include <format>
 #include <string>
+#include <string_view>
 
 #include "zappy/gui/GuiCliParser.hpp"
 #include "zappy/gui/display/Window.hpp"
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/render/Camera.hpp"
 #include "zappy/gui/render/Renderer.hpp"
+#include "zappy/gui/render/utils/Color.hpp"
 #include "zappy/gui/render/utils/Vector3.hpp"
 #include "zappy/shared/exception/InvalidState.hpp"
 namespace zappy::gui {
@@ -63,15 +65,32 @@ void GUI::setupCamera() {
     _camera.setCameraMode(render::CameraMode::CAMERA_CUSTOM);
 }
 
-void GUI::drawLoadingFrame() {
+void GUI::drawLoadingFrame(std::string_view name, float progress) {
     _loadingDots = (_loadingDots % kLoadingMaxDots) + 1;
     const std::string text = std::format("Loading{}", std::string(static_cast<std::size_t>(_loadingDots), '.'));
 
-    static constexpr const char* kWidestText = "Loading...";
-    const int textX = (kWindowWidth - MeasureText(kWidestText, kLoadingFontSize)) / 2;
+    static constexpr int kBarWidth = 400;
+    static constexpr int kBarHeight = 24;
+    static constexpr int kTextSpacing = 10;
+    const int barX = (kWindowWidth - kBarWidth) / 2;
+    const int barY = (kWindowHeight - kBarHeight) / 2;
 
     _window.beginFrame();
-    DrawText(text.c_str(), textX, (kWindowHeight - kLoadingFontSize) / 2, kLoadingFontSize, WHITE);
+
+    const int loadingY = barY - kTextSpacing - kLoadingFontSize;
+    DrawText(text.c_str(), (kWindowWidth - MeasureText(text.c_str(), kLoadingFontSize)) / 2, loadingY, kLoadingFontSize,
+             render::Color::kWHITE);
+
+    _loadingBar.setPosition(barX, barY);
+    _loadingBar.setSize(kBarWidth, kBarHeight);
+    _loadingBar.update(progress);
+    _loadingBar.draw();
+
+    const std::string nameText{name};
+    const int nameY = barY + kBarHeight + kTextSpacing;
+    DrawText(nameText.c_str(), (kWindowWidth - MeasureText(nameText.c_str(), kLoadingFontSize)) / 2, nameY,
+             kLoadingFontSize, render::Color::kWHITE);
+
     _window.endFrame();
 }
 
@@ -86,11 +105,12 @@ int GUI::init(const GuiCliParser& cli) {
 
     _window = display::Window{kWindowWidth, kWindowHeight, "Zappy"};
     _window.setTargetFPS(kTargetFPS);
-    drawLoadingFrame();
+
+    drawLoadingFrame("Initializing...", 0.0F);
 
     setupCamera();
 
-    _assets.load([this]() { drawLoadingFrame(); });
+    _assets.load([this](std::string_view name, float progress) { drawLoadingFrame(name, progress); });
 
     return 0;
 }
