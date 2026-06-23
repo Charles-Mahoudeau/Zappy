@@ -65,7 +65,7 @@ void Player::setPosition(const math::Vector2u position) {
     eventEmitter().pushEvent(PlayerPositionEvent{
         .playerId = id(),
         .position = position,
-        .direction = direction(),
+        .orientation = direction(),
     });
 }
 
@@ -76,7 +76,7 @@ math::Direction Player::turnLeft() {
     eventEmitter().pushEvent(PlayerPositionEvent{
         .playerId = id(),
         .position = position(),
-        .direction = _direction,
+        .orientation = _direction,
     });
     return _direction;
 }
@@ -86,7 +86,7 @@ math::Direction Player::turnRight() {
     eventEmitter().pushEvent(PlayerPositionEvent{
         .playerId = id(),
         .position = position(),
-        .direction = _direction,
+        .orientation = _direction,
     });
     return _direction;
 }

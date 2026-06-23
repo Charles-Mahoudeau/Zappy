@@ -28,7 +28,7 @@ struct TileInventoryEvent {
 struct PlayerPositionEvent {
     std::uint64_t playerId{};
     math::Vector2u position;
-    math::Direction direction;
+    math::Direction orientation{};
 };
 
 struct PlayerLevelEvent {
