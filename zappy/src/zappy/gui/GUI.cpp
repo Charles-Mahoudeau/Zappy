@@ -19,7 +19,6 @@
 #include "zappy/gui/display/Window.hpp"
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/render/Camera.hpp"
-#include "zappy/gui/render/Renderer.hpp"
 #include "zappy/gui/render/utils/Vector3.hpp"
 #include "zappy/gui/ui/Mouse.hpp"
 #include "zappy/gui/ui/utils/Rectangle.hpp"
