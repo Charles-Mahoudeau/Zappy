@@ -32,12 +32,12 @@ std::optional<std::pair<std::uint32_t, std::uint32_t>> InfoPanel::pickTile(Vecto
 }
 
 void InfoPanel::update(Vector2 mousePos, bool clicked, const render::Camera& camera, const game::GameState& state) {
-    if (const auto playerId = pickPlayer(mousePos, camera, state)) {
+    if (const auto playerId = pickPlayer(mousePos, camera, state); playerId.has_value()) {
         _selectedPlayerId = playerId;
         _state = InfoPanelState::Player;
         return;
     }
-    if (const auto tile = pickTile(mousePos, camera, state)) {
+    if (const auto tile = pickTile(mousePos, camera, state); tile.has_value()) {
         _selectedTile = tile;
         _state = InfoPanelState::Tile;
         return;

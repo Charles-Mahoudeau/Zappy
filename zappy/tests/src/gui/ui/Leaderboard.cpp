@@ -18,7 +18,7 @@ namespace ui = zappy::gui::ui;
 namespace {
 
 class LeaderboardTest : public ::testing::Test {
-  protected:
+  public:
     zappy::gui::game::GameState _state;
 };
 
