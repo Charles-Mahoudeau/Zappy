@@ -1,6 +1,6 @@
 import math
 import secrets
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 from client import RESOURCES, STONES
 
@@ -23,14 +23,21 @@ ELEVATION_REQ = {
 }
 MAX_LEVEL = 8
 
-LOW_FOOD = 5
 CRITICAL_FOOD = 2
-FOOD_CAP = 12
-INV_REFRESH_EVERY = 5
-FORK_FOOD_MARGIN = 8
+LOW_FOOD = 6
+FOOD_CAP = 30
+INV_REFRESH_EVERY = 4
+FORK_FOOD_MARGIN = 12
+FORK_TARGET = 4
+RALLY_TIMEOUT_TICKS = 150
+CALL_EVERY = 3
+CALL_MEMORY = 5
+
+PROTO = "ZP"
+SEP = ";"
 
 
-def index_to_offset(idx: int) -> tuple:
+def index_to_offset(idx: int) -> Tuple[int, int]:
     row = int(math.isqrt(idx))
     col = idx - row * row
     return col - row, row
@@ -39,11 +46,20 @@ def index_to_offset(idx: int) -> tuple:
 class HeuristicAI:
     def __init__(self, client):
         self.c = client
+        self.id = secrets.randbelow(1 << 30)
         self.level = 1
         self.inv = {r: 0 for r in RESOURCES}
         self.look: List[List[str]] = []
         self.ticks_since_inv = 0
-        self.forked = False
+        self.tick = 0
+        self.fork_count = 0
+
+        self.committed = False
+        self.rally_age = 0
+        self.call_dir: Optional[int] = None
+        self.call_id: Optional[int] = None
+        self.call_missing: List[str] = []
+        self.call_ttl = 0
 
     def run(self) -> None:
         if not self.c.connect():
@@ -70,20 +86,44 @@ class HeuristicAI:
     def req(self) -> Dict[str, int]:
         return ELEVATION_REQ.get(self.level, {})
 
+    def req_players(self) -> int:
+        return self.req().get("players", 1)
+
+    def req_stones(self) -> Dict[str, int]:
+        req = self.req()
+        return {s: req[s] for s in STONES if req.get(s, 0) > 0}
+
+    def inv_short(self) -> Dict[str, int]:
+        """Stones still missing from my inventory to satisfy the elevation."""
+        return {
+            s: n - self.inv.get(s, 0)
+            for s, n in self.req_stones().items()
+            if n - self.inv.get(s, 0) > 0
+        }
+
+    def have_all_stones(self) -> bool:
+        return not self.inv_short()
+
     def tile0(self) -> List[str]:
         return self.look[0] if self.look else []
 
-    def tile0_has(self, resource: str) -> bool:
-        return resource in self.tile0()
+    def tile_short(self) -> Dict[str, int]:
+        """Stones still missing ON the current tile to satisfy the elevation."""
+        tile = self.tile0()
+        return {
+            s: n - tile.count(s)
+            for s, n in self.req_stones().items()
+            if n - tile.count(s) > 0
+        }
 
-    def stones_needed(self) -> Dict[str, int]:
-        req = self.req()
-        need = {}
-        for stone in STONES:
-            deficit = req.get(stone, 0) - self.inv.get(stone, 0)
-            if deficit > 0:
-                need[stone] = deficit
-        return need
+    def players_here(self) -> int:
+        return self.tile0().count("player")
+
+    def tile_ready(self) -> bool:
+        return not self.tile_short() and self.players_here() >= self.req_players()
+
+    def assembled(self) -> bool:
+        return self.players_here() >= self.req_players()
 
     def nearest_tile_with(self, resource: str) -> Optional[int]:
         best, best_d = None, None
@@ -95,74 +135,146 @@ class HeuristicAI:
                     best, best_d = idx, d
         return best
 
+    def send(self, verb: str, data: str = "") -> None:
+        self.c.broadcast(
+            SEP.join([PROTO, self.c.team, verb, str(self.level), str(self.id), data])
+        )
+
+    def _decode(self, text: str) -> Optional[dict]:
+        parts = text.split(SEP)
+        if len(parts) < 5 or parts[0] != PROTO:
+            return None
+        try:
+            level = int(parts[3])
+            sid = int(parts[4])
+        except ValueError:
+            return None
+        return {
+            "team": parts[1],
+            "verb": parts[2],
+            "level": level,
+            "id": sid,
+            "data": parts[5] if len(parts) > 5 else "",
+        }
+
+    def handle_messages(self) -> None:
+        """Pick the CALL we should rally to (lowest leader id for our level)."""
+        best_id, best_dir, best_missing = None, None, []
+        for direction, text in self.c.broadcasts:
+            msg = self._decode(text)
+            if not msg or msg["team"] != self.c.team:
+                continue
+            if (
+                msg["verb"] == "CALL"
+                and msg["level"] == self.level
+                and msg["id"] != self.id
+            ):
+                if best_id is None or msg["id"] < best_id:
+                    best_id = msg["id"]
+                    best_dir = direction
+                    best_missing = [s for s in msg["data"].split(",") if s]
+        self.c.broadcasts.clear()
+
+        if best_id is not None:
+            self.call_id = best_id
+            self.call_dir = best_dir
+            self.call_missing = best_missing
+            self.call_ttl = CALL_MEMORY
+        elif self.call_ttl > 0:
+            self.call_ttl -= 1
+        else:
+            self.call_id = None
+            self.call_dir = None
+            self.call_missing = []
+
+    def should_follow(self) -> bool:
+        if self.call_dir is None or self.call_id is None:
+            return False
+        if self.food <= CRITICAL_FOOD:
+            return False
+        return self.call_id < self.id
+
     def step(self) -> None:
+        self.tick += 1
         self.ticks_since_inv += 1
+
+        if self.c.pending_level is not None:
+            self.level = self.c.pending_level
+            self.c.pending_level = None
+            self.committed = False
+            self.refresh_all()
+
         if self.ticks_since_inv >= INV_REFRESH_EVERY:
             self.refresh_inv()
 
-        if self.food <= CRITICAL_FOOD and self.handle_food(urgent=True):
+        self.handle_messages()
+
+        if self.food <= CRITICAL_FOOD:
+            self.abort_rally()
+            self.handle_food(urgent=True)
             return
 
-        direction = self.consume_incant_call()
-        if direction is not None and self.should_join(direction):
-            self.move_for_direction(direction)
+        if self.req_players() <= 1:
+            self.do_elevate()
             return
 
-        if self.try_incantation():
+        if not self.committed and self.should_follow():
+            self.do_follow()
             return
 
-        if self.food <= LOW_FOOD and self.handle_food(urgent=False):
+        self.do_elevate()
+
+    def do_elevate(self) -> None:
+        if not self.committed:
+            if self.maybe_eat():
+                return
+            if self.food <= LOW_FOOD and self.handle_food(urgent=False):
+                return
+            if not self.have_all_stones():
+                if self.req_players() > 1 and self.tick % CALL_EVERY == 0:
+                    self.send("CALL", "")
+                    return
+                self.maybe_fork()
+                if self.gather_stones():
+                    return
+                self.explore()
+                return
+            self.committed = True
+            self.rally_age = 0
+
+        self.rally_phase()
+
+    def rally_phase(self) -> None:
+        if self.maybe_eat():
             return
-        if self.tile0_has("food") and self.food < FOOD_CAP and self.c.take("food"):
-            self.inv["food"] = self.food + 1
-            self.refresh_look()
+        if self.tile_ready():
+            self.try_incantation()
             return
 
-        if self.collect_stones():
+        if self.assembled() and self.tile_short() and self.drop_for_rally():
+            return
+        if self.tile_ready():
+            self.try_incantation()
             return
 
-        if self.prepare_incantation():
-            return
-
-        self.explore()
-
-    def handle_food(self, urgent: bool) -> bool:
-        if self.tile0_has("food") and self.c.take("food"):
-            self.inv["food"] = self.food + 1
-            self.refresh_look()
-            return True
-        idx = self.nearest_tile_with("food")
-        if idx not in (None, 0):
-            self.move_toward(idx)
-            return True
-        if urgent:
+        self.rally_age += 1
+        if self.rally_age > RALLY_TIMEOUT_TICKS:
+            self.abort_rally()
             self.explore()
-            return True
-        return False
+            return
 
-    def can_incantate_here(self) -> bool:
-        req = self.req()
-        tile = self.tile0()
-        for stone in STONES:
-            if tile.count(stone) < req.get(stone, 0):
-                return False
-        return tile.count("player") >= req.get("players", 1)
+        self.maybe_fork()
+        if self.req_players() > 1 and self.tick % CALL_EVERY == 0:
+            self.send("CALL", ",".join(self.tile_short().keys()))
+        else:
+            self.refresh_look()
 
-    def try_incantation(self) -> bool:
-        if self.level >= MAX_LEVEL or not self.can_incantate_here():
-            return False
-        new_level = self.c.incantation()
-        if new_level:
-            self.level = new_level
-        self.refresh_all()
-        return True
-
-    def collect_stones(self) -> bool:
-        need = self.stones_needed()
+    def gather_stones(self) -> bool:
+        need = self.inv_short()
         if not need:
             return False
         for stone in need:
-            if self.tile0_has(stone) and self.c.take(stone):
+            if self.tile0().count(stone) > 0 and self.c.take(stone):
                 self.inv[stone] = self.inv.get(stone, 0) + 1
                 self.refresh_look()
                 return True
@@ -179,27 +291,77 @@ class HeuristicAI:
             return True
         return False
 
-    def prepare_incantation(self) -> bool:
-        if self.stones_needed():
+    def drop_for_rally(self) -> bool:
+        for stone in self.tile_short():
+            if self.inv.get(stone, 0) > 0 and self.c.set_down(stone):
+                self.inv[stone] -= 1
+                self.refresh_look()
+                self.send("HAVE", stone)
+                return True
+        return False
+
+    def try_incantation(self) -> bool:
+        if self.level >= MAX_LEVEL or not self.tile_ready():
             return False
-        req = self.req()
-        tile = self.tile0()
-        for stone in STONES:
-            if tile.count(stone) < req.get(stone, 0) and self.inv.get(stone, 0) > 0:
-                if self.c.set_down(stone):
-                    self.inv[stone] -= 1
-                    self.refresh_look()
-                    return True
-        need_players = req.get("players", 1)
-        if need_players <= 1:
-            return self.try_incantation()
-        self.c.broadcast(f"INCANT_{self.level}")
-        if not self.forked and self.food >= FORK_FOOD_MARGIN:
-            self.c.fork()
-            self.forked = True
-        if self.tile0().count("player") >= need_players:
-            return self.try_incantation()
+        new_level = self.c.incantation()
+        if new_level:
+            self.level = new_level
+        self.committed = False
+        self.refresh_all()
         return True
+
+    def do_follow(self) -> None:
+        self.committed = False
+        if self.maybe_eat():
+            return
+        if self.food <= LOW_FOOD and self.handle_food(urgent=False):
+            return
+
+        if self.call_dir is None:
+            return
+        if self.call_dir == 0:
+            if self.assembled() and self.tile_short() and self.drop_for_rally():
+                return
+            if self.tick % CALL_EVERY == 0:
+                self.send("HERE")
+            else:
+                self.refresh_look()
+            return
+
+        self.move_for_direction(self.call_dir)
+
+    def maybe_eat(self) -> bool:
+        if (
+            self.tile0().count("food") > 0
+            and self.food < FOOD_CAP
+            and self.c.take("food")
+        ):
+            self.inv["food"] = self.food + 1
+            self.refresh_look()
+            return True
+        return False
+
+    def handle_food(self, urgent: bool) -> bool:
+        if self.maybe_eat():
+            return True
+        idx = self.nearest_tile_with("food")
+        if idx not in (None, 0):
+            self.move_toward(idx)
+            return True
+        if urgent:
+            self.explore()
+            return True
+        return False
+
+    def maybe_fork(self) -> None:
+        if self.fork_count >= FORK_TARGET or self.food < FORK_FOOD_MARGIN:
+            return
+        if self.c.fork():
+            self.fork_count += 1
+
+    def abort_rally(self) -> None:
+        self.committed = False
+        self.rally_age = 0
 
     def explore(self) -> None:
         roll = secrets.randbelow(100)
@@ -231,18 +393,3 @@ class HeuristicAI:
         elif k in (6, 7):
             self.c.right()
         self.refresh_look()
-
-    def consume_incant_call(self) -> Optional[int]:
-        chosen = None
-        for direction, text in self.c.broadcasts:
-            if text == f"INCANT_{self.level}":
-                chosen = direction
-        self.c.broadcasts.clear()
-        return chosen
-
-    def should_join(self, direction: int) -> bool:
-        if self.req().get("players", 1) <= 1:
-            return False
-        if self.food <= CRITICAL_FOOD:
-            return False
-        return direction != 0

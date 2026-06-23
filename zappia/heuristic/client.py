@@ -49,6 +49,7 @@ class ZappyClient:
         self.slots = 0
         self.broadcasts: List[tuple] = []
         self.ejected_from: Optional[int] = None
+        self.pending_level: Optional[int] = None
 
     def _die(self) -> None:
         self.alive = False
@@ -168,11 +169,24 @@ class ZappyClient:
             pass
         return True
 
+    def _record_level(self, line: str) -> None:
+        lvl = self._extract_level(line)
+        if lvl is not None:
+            self.pending_level = lvl
+
     def _command(self, cmd: str, timeout: float = DEFAULT_TIMEOUT) -> Optional[str]:
         if not self.alive:
             return None
         self._send_raw(cmd)
-        return self._next_response(timeout)
+        resp = self._next_response(timeout)
+        # Elevation triggered by another player arrives unsolicited: capture the
+        # new level and keep reading until we get this command's real response.
+        while resp is not None and (
+            resp.startswith("Current level:") or resp.startswith("Elevation underway")
+        ):
+            self._record_level(resp)
+            resp = self._next_response(timeout)
+        return resp
 
     def forward(self) -> bool:
         return self._command("Forward") == "ok"
