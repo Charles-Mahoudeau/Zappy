@@ -1,5 +1,4 @@
 include(SetupRaylib)
-setup_raylib()
 
 add_library(zappy_gui_objects OBJECT
         display/Window.cpp
@@ -61,5 +60,5 @@ target_link_libraries(zappy_gui PRIVATE
 # Copy GUI assets next to the executable so they ship with the binary
 add_custom_command(TARGET zappy_gui POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
-                ${CMAKE_CURRENT_SOURCE_DIR}/assets $<TARGET_FILE_DIR:zappy_gui>/assets
+        ${CMAKE_CURRENT_SOURCE_DIR}/assets $<TARGET_FILE_DIR:zappy_gui>/assets
 )
