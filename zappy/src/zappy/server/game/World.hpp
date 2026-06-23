@@ -19,6 +19,7 @@
 #include "IEntity.hpp"
 #include "ResourceType.hpp"
 #include "Tile.hpp"
+#include "WorldEvent.hpp"
 #include "entity/Player.hpp"
 #include "zappy/shared/io/Logger.hpp"
 #include "zappy/shared/math/Vector2.hpp"
@@ -131,6 +132,14 @@ class World {
     /// @return The new position of the entity.
     [[nodiscard]] math::Vector2u moveBy(std::uint64_t entityId, math::Vector2i delta);
 
+    /// @brief Returns true if the world has any events to process.
+    /// @return True if the world has events, false otherwise.
+    [[nodiscard]] bool hasEvents() const;
+
+    /// @brief Returns the next event in the queue.
+    /// @return The next event in the queue.
+    [[nodiscard]] WorldEvent popEvent();
+
   private:
     /// @brief Returns the resource densities for the world.
     /// @return A map of resource types to their densities.
@@ -154,6 +163,10 @@ class World {
     /// @brief Generates the resource thresholds for the world.
     void generateResourceThresholds();
 
+    /// @brief Adds an event to the queue.
+    /// @param event The event to add.
+    void addEvent(WorldEvent event);
+
     std::random_device _randomDevice;
     std::mt19937 _randomEngine{_randomDevice()};
     Config _config;
@@ -161,6 +174,7 @@ class World {
     std::vector<Tile> _tiles;
     std::unordered_map<ResourceType, std::uint64_t> _resourceThresholds;
     std::uint16_t _nextMajorTick{kMajorTickInterval};
+    std::vector<WorldEvent> _events;
 };
 
 template <IsEntity T>

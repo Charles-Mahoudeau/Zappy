@@ -25,6 +25,7 @@
 #include "EntityDatabase.hpp"
 #include "ResourceType.hpp"
 #include "Tile.hpp"
+#include "WorldEvent.hpp"
 #include "entity/Egg.hpp"
 #include "entity/Player.hpp"
 #include "entity/Resource.hpp"
@@ -225,6 +226,15 @@ math::Vector2u World::moveBy(const std::uint64_t entityId, const math::Vector2i 
     return newPosition;
 }
 
+bool World::hasEvents() const { return !_events.empty(); }
+
+WorldEvent World::popEvent() {
+    WorldEvent event{std::move(_events.back())};
+
+    _events.pop_back();
+    return event;
+}
+
 const std::unordered_map<ResourceType, float>& World::resourceDensities() {
     using enum ResourceType;
 
@@ -277,4 +287,6 @@ void World::generateResourceThresholds() {
         _config.logger->info("Resources thresholds generated.");
     }
 }
+
+void World::addEvent(WorldEvent event) { _events.push_back(std::move(event)); }
 }  // namespace zappy::server::game
