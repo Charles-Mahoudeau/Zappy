@@ -12,10 +12,14 @@
 #include <unistd.h>
 
 #include <array>
+#include <chrono>
 #include <format>
+#include <iostream>
 #include <string>
+#include <thread>
 
 #include "SocketPair.hpp"
+#include "zappy/server/Timer.hpp"
 #include "zappy/server/client/Client.hpp"
 #include "zappy/server/net/SocketRegistry.hpp"
 #include "zappy/shared/network/Address.hpp"
@@ -28,7 +32,8 @@ class ServerClientTest : public ::testing::Test {
   public:
     net::SocketRegistry socketRegistry;
     network::Address addr{"127.0.0.1", 4242};
-};
+    Timer timer;
+};  // namespace
 
 }  // namespace
 
@@ -37,19 +42,19 @@ class ServerClientTest : public ::testing::Test {
 // ---------------------------------------------------------------------------
 
 TEST_F(ServerClientTest, AddressReturnsConstructedAddress) {
-    const Client client{socketRegistry, addr};
+    const Client client{socketRegistry, addr, timer};
 
     EXPECT_EQ(client.address(), addr);
 }
 
 TEST_F(ServerClientTest, TypeDefaultsToUnknown) {
-    const Client client{socketRegistry, addr};
+    const Client client{socketRegistry, addr, timer};
 
     EXPECT_EQ(client.type(), Client::Type::kUnknown);
 }
 
 TEST_F(ServerClientTest, ChangeTypeUpdatesType) {
-    Client client{socketRegistry, addr};
+    Client client{socketRegistry, addr, timer};
 
     client.changeType(Client::Type::kPlayer);
     EXPECT_EQ(client.type(), Client::Type::kPlayer);
@@ -63,13 +68,13 @@ TEST_F(ServerClientTest, ChangeTypeUpdatesType) {
 // ---------------------------------------------------------------------------
 
 TEST_F(ServerClientTest, GetNextRequestOnEmptyReturnsNullopt) {
-    Client client{socketRegistry, addr};
+    Client client{socketRegistry, addr, timer};
 
     EXPECT_FALSE(client.nextRequest().has_value());
 }
 
 TEST_F(ServerClientTest, GetNextRequestReturnsRequestsInFifoOrder) {
-    Client client{socketRegistry, addr};
+    Client client{socketRegistry, addr, timer};
 
     client.addRequest("first");
     client.addRequest("second");
@@ -92,7 +97,7 @@ TEST_F(ServerClientTest, GetNextRequestReturnsRequestsInFifoOrder) {
 }
 
 TEST_F(ServerClientTest, AddRequestRespectsMaxRequestCap) {
-    Client client{socketRegistry, addr};
+    Client client{socketRegistry, addr, timer};
 
     for (int i = 0; i < 12; ++i) {
         client.addRequest(std::format("req{}", std::to_string(i)));
@@ -111,16 +116,17 @@ TEST_F(ServerClientTest, AddRequestRespectsMaxRequestCap) {
 // ---------------------------------------------------------------------------
 
 TEST_F(ServerClientTest, GetNextRequestBlockedWhileTimeoutPending) {
-    Client client{socketRegistry, addr};
+    Client client{socketRegistry, addr, timer};
     client.addRequest("delayed");
 
-    client.setTimeout(2);
+    timer.init(20);
 
-    if (client.nextRequest().has_value()) {
-        FAIL() << "Expect nothing on first request but got value";
-    }
-    if (client.nextRequest().has_value()) {
-        FAIL() << "Expect nothing on second request but got value";
+    client.setTimeout(3);
+
+    for (int i = 0; i < 4; i++) {
+        int const wait = timer.timeoutUntilNextTick();
+        std::this_thread::sleep_for(std::chrono::milliseconds(wait + 1));
+        timer.update();
     }
 
     auto result = client.nextRequest();
@@ -132,7 +138,7 @@ TEST_F(ServerClientTest, GetNextRequestBlockedWhileTimeoutPending) {
 }
 
 TEST_F(ServerClientTest, ZeroTimeoutDoesNotBlock) {
-    Client client{socketRegistry, addr};
+    Client client{socketRegistry, addr, timer};
     client.addRequest("immediate");
 
     client.setTimeout(0);
@@ -150,7 +156,7 @@ TEST_F(ServerClientTest, ZeroTimeoutDoesNotBlock) {
 // ---------------------------------------------------------------------------
 
 TEST_F(ServerClientTest, UpdateReturnsFalseWhenSocketNotRegistered) {
-    Client client{socketRegistry, addr};
+    Client client{socketRegistry, addr, timer};
 
     EXPECT_FALSE(client.update());
 }
@@ -160,7 +166,7 @@ TEST_F(ServerClientTest, UpdateReturnsTrueWhenSocketRegistered) {
     network::socket::Client socket{pair.local, addr};
     socketRegistry.insert(socket);
 
-    Client client{socketRegistry, addr};
+    Client client{socketRegistry, addr, timer};
 
     const std::string msg = "ping\n";
     ASSERT_EQ(::write(pair.peer, msg.data(), msg.size()), static_cast<ssize_t>(msg.size()));
@@ -181,7 +187,7 @@ TEST_F(ServerClientTest, UpdateReturnsTrueWhenSocketRegistered) {
 // ---------------------------------------------------------------------------
 
 TEST_F(ServerClientTest, SendMessageWithoutRegisteredSocketIsNoOp) {
-    Client client{socketRegistry, addr};
+    const Client client{socketRegistry, addr, timer};
 
     EXPECT_FALSE(client.sendMessage("hello"));
 }
@@ -191,7 +197,7 @@ TEST_F(ServerClientTest, SendMessageWithRegisteredSocketDoesNotThrow) {
     network::socket::Client socket{pair.local, addr};
     socketRegistry.insert(socket);
 
-    Client client{socketRegistry, addr};
+    const Client client{socketRegistry, addr, timer};
 
     ASSERT_TRUE(client.sendMessage("hello"));
 
@@ -199,6 +205,31 @@ TEST_F(ServerClientTest, SendMessageWithRegisteredSocketDoesNotThrow) {
     const ssize_t n = ::read(pair.peer, buf.data(), buf.size());
     ASSERT_GT(n, 0);
     EXPECT_EQ(std::string(buf.data(), n), "hello");
+}
+
+TEST_F(ServerClientTest, setTimeout) {
+    Client client{socketRegistry, addr, timer};
+
+    timer.init(20);
+
+    EXPECT_FALSE(client.inTimeout());
+    client.setTimeout(1);
+    EXPECT_TRUE(client.inTimeout());
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    timer.update();
+    EXPECT_FALSE(client.inTimeout());
+}
+
+TEST_F(ServerClientTest, removeTimeout) {
+    Client client{socketRegistry, addr, timer};
+
+    timer.init(10);
+
+    EXPECT_FALSE(client.inTimeout());
+    client.setTimeout(1);
+    EXPECT_TRUE(client.inTimeout());
+    client.removeTimeout();
+    EXPECT_FALSE(client.inTimeout());
 }
 
 }  // namespace zappy::server::test
