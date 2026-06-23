@@ -31,6 +31,8 @@ add_library(zappy_server_objects OBJECT
         game/AEntity.cpp
         game/AEntity.hpp
         game/IGrid.hpp
+        game/Grid.cpp
+        game/Grid.hpp
 )
 target_include_directories(zappy_server_objects PUBLIC
         ${CMAKE_SOURCE_DIR}/src
