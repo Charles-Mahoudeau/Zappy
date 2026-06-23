@@ -12,25 +12,37 @@
 #include <cstdint>
 #include <expected>
 
-namespace zappy::server::game::entity {
-TEST(PlayerTest, DefaultConstructor) {
-    const Player player{0};
+#include "server/game/WorldMock.hpp"
 
-    EXPECT_EQ(player.teamId(), 0);
+namespace zappy::server::game::entity {
+namespace {
+class PlayerTest : public testing::Test {
+  public:
+    [[nodiscard]] WorldMock& worldMock() { return _worldMock; }
+
+  private:
+    WorldMock _worldMock;
+};
+}  // namespace
+
+TEST_F(PlayerTest, DefaultConstructor) {
+    const Player player{worldMock(), worldMock(), "team1"};
+
+    EXPECT_EQ(player.teamName(), "team1");
     EXPECT_TRUE(player.alive());
     EXPECT_EQ(player.level(), 1);
     EXPECT_EQ(player.lifetimeLeft(), Player::kDefaultLifetime);
 }
 
-TEST(PlayerTest, KillPlayer) {
-    Player player{0};
+TEST_F(PlayerTest, KillPlayer) {
+    Player player{worldMock(), worldMock(), "team1"};
 
     player.kill();
     EXPECT_FALSE(player.alive());
 }
 
-TEST(PlayerTest, LevelUp) {
-    Player player{0};
+TEST_F(PlayerTest, LevelUp) {
+    Player player{worldMock(), worldMock(), "team1"};
     const std::expected<std::uint8_t, std::string> result = player.levelUp();
 
     EXPECT_TRUE(result.has_value());
