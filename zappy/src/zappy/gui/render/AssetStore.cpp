@@ -124,8 +124,7 @@ const std::map<game::ResourceType, Model>& AssetStore::resourceModels() const { 
 Model AssetStore::createModel(std::string_view path, std::initializer_list<TextureMap> textures, bool flipVertical) {
     Model model{path};
     for (const auto& [mapIndex, texturePath] : textures) {
-        const auto texturePathStr = std::string{texturePath};
-        Texture texture{texturePathStr.c_str(), flipVertical};
+        Texture texture{texturePath, flipVertical};
         model.setMeshTexture(0, mapIndex, texture);
         texture.release();
     }
@@ -138,8 +137,7 @@ Model AssetStore::createModel(std::string_view path, std::string_view animationP
                               std::initializer_list<TextureMap> textures, bool flipVertical) {
     Model model{path, animationPath};
     for (const auto& [mapIndex, texturePath] : textures) {
-        const auto texturePathStr = std::string{texturePath};
-        Texture texture{texturePathStr.c_str(), flipVertical};
+        Texture texture{texturePath, flipVertical};
         model.setMeshTexture(0, mapIndex, texture);
         texture.release();
     }
