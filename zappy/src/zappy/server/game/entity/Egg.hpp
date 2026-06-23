@@ -9,10 +9,10 @@
 
 #include <cstdint>
 
-#include "zappy/server/game/IEntity.hpp"
+#include "zappy/server/game/AEntity.hpp"
 
 namespace zappy::server::game::entity {
-class Egg : public IEntity {
+class Egg : public AEntity {
   public:
     explicit Egg(std::uint16_t teamId);
     ~Egg() override = default;

@@ -13,11 +13,11 @@
 #include <tuple>
 #include <unordered_map>
 
-#include "zappy/server/game/IEntity.hpp"
+#include "zappy/server/game/AEntity.hpp"
 #include "zappy/server/game/Inventory.hpp"
 
 namespace zappy::server::game::entity {
-class Player : public IEntity {
+class Player : public AEntity {
   public:
     enum class Direction : std::uint8_t {
         kNorth = 0,

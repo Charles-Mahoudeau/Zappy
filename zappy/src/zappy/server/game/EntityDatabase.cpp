@@ -24,10 +24,13 @@ std::uint64_t EntityDatabase::insert(std::unique_ptr<IEntity> entity) {
         throw exception::InvalidArgument{"Entity cannot be null"};
     }
 
-    auto [it, _] = _entities.emplace(generateId(), std::move(entity));
+    const std::uint64_t id = generateId();
 
-    _entitiesByType[typeIndex(*it->second)][it->first] = it->second.get();
-    return it->first;
+    entity->setId(id);
+    auto [it, _] = _entities.emplace(id, std::move(entity));
+
+    _entitiesByType[typeIndex(*it->second)][id] = it->second.get();
+    return id;
 }
 
 bool EntityDatabase::remove(const std::uint64_t id) {

@@ -28,6 +28,8 @@ add_library(zappy_server_objects OBJECT
         game/Tile.hpp
         game/WorldEvent.hpp
         game/IWorldEventEmitter.hpp
+        game/AEntity.cpp
+        game/AEntity.hpp
 )
 target_include_directories(zappy_server_objects PUBLIC
         ${CMAKE_SOURCE_DIR}/src
