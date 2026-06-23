@@ -28,6 +28,7 @@
 #include "entity/Egg.hpp"
 #include "entity/Player.hpp"
 #include "entity/Resource.hpp"
+#include "zappy/shared/exception/InvalidArgument.hpp"
 #include "zappy/shared/exception/InvalidState.hpp"
 #include "zappy/shared/exception/OutOfRange.hpp"
 #include "zappy/shared/math/Vector2.hpp"
