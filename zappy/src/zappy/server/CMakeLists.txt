@@ -30,6 +30,7 @@ add_library(zappy_server_objects OBJECT
         game/IEventEmitter.hpp
         game/AEntity.cpp
         game/AEntity.hpp
+        game/IGrid.hpp
 )
 target_include_directories(zappy_server_objects PUBLIC
         ${CMAKE_SOURCE_DIR}/src
