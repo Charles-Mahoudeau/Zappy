@@ -16,6 +16,7 @@
 
 #include "Inventory.hpp"
 #include "zappy/server/game/ResourceType.hpp"
+#include "zappy/shared/math/Direction.hpp"
 #include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server::game {
@@ -27,6 +28,7 @@ struct TileInventoryEvent {
 struct PlayerPositionEvent {
     std::uint64_t playerId{};
     math::Vector2u position;
+    math::Direction direction;
 };
 
 struct PlayerLevelEvent {

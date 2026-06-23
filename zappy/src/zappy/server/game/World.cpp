@@ -107,8 +107,9 @@ std::uint64_t World::countResources(const ResourceType type) const {
     return count;
 }
 
-std::uint64_t World::spawnEgg(std::uint64_t playerId, std::uint16_t teamId) {
-    const std::uint64_t eggId = _entityDatabase.insert(std::make_unique<entity::Egg>(teamId));
+std::uint64_t World::spawnEgg(std::uint64_t playerId, const std::string_view teamName) {
+    const std::uint64_t eggId =
+        _entityDatabase.insert(std::make_unique<entity::Egg>(*this, *this, std::string{teamName}));
     Tile& tile = randomTile();
 
     tile.addEntity(eggId);
@@ -119,15 +120,15 @@ std::uint64_t World::spawnEgg(std::uint64_t playerId, std::uint16_t teamId) {
         .position = tile.position(),
     });
     if (_config.logger) {
-        _config.logger->info(std::format("Spawned egg #{} for team #{} at ({}, {})", eggId, teamId, tile.position().x,
+        _config.logger->info(std::format("Spawned egg #{} for team #{} at ({}, {})", eggId, teamName, tile.position().x,
                                          tile.position().y));
     }
     return eggId;
 }
 
-std::uint64_t World::spawnEgg(const std::uint16_t teamId) {
+std::uint64_t World::spawnEgg(const std::string_view teamName) {
     // That's a shitty solution but it works...
-    return spawnEgg(std::numeric_limits<std::uint64_t>::max(), teamId);
+    return spawnEgg(std::numeric_limits<std::uint64_t>::max(), teamName);
 }
 
 void World::spawnResource(const ResourceType type) {
@@ -140,11 +141,11 @@ void World::spawnResource(const ResourceType type) {
     });
 }
 
-std::expected<std::uint64_t, std::string> World::hatchRandomEgg(const std::uint16_t teamId) {
+std::expected<std::uint64_t, std::string> World::hatchRandomEgg(const std::string_view teamName) {
     std::vector<const entity::Egg*> eggs;
 
     for (const entity::Egg* egg : _entityDatabase.viewAll<entity::Egg>()) {
-        if (egg != nullptr && egg->teamId() == teamId) {
+        if (egg != nullptr && egg->teamName() == teamName) {
             eggs.push_back(egg);
         }
     }
@@ -174,7 +175,8 @@ std::expected<std::uint64_t, std::string> World::hatchRandomEgg(const std::uint1
     _entityDatabase.remove(*eggIdOpt);
     parentTile->removeEntity(*eggIdOpt);
 
-    const std::uint64_t playerId = _entityDatabase.insert(std::make_unique<entity::Player>(*this, teamId));
+    const std::uint64_t playerId =
+        _entityDatabase.insert(std::make_unique<entity::Player>(*this, *this, std::string{teamName}));
 
     parentTile->addEntity(playerId);
     // TODO: Send new player event
@@ -184,14 +186,14 @@ std::expected<std::uint64_t, std::string> World::hatchRandomEgg(const std::uint1
     return playerId;
 }
 
-EntityDatabase::EntityView<const entity::Player> World::players(const std::uint16_t teamId) const {
+EntityDatabase::EntityView<const entity::Player> World::players(const std::string_view teamName) const {
     return _entityDatabase.viewAll<entity::Player>() |
-           std::views::filter([teamId](const entity::Player* player) { return player->teamId() == teamId; });
+           std::views::filter([teamName](const entity::Player* player) { return player->teamName() == teamName; });
 }
 
-EntityDatabase::EntityView<entity::Player> World::players(const std::uint16_t teamId) {
+EntityDatabase::EntityView<entity::Player> World::players(const std::string_view teamName) {
     return _entityDatabase.viewAll<entity::Player>() |
-           std::views::filter([teamId](const entity::Player* player) { return player->teamId() == teamId; });
+           std::views::filter([teamName](const entity::Player* player) { return player->teamName() == teamName; });
 }
 
 std::optional<math::Vector2u> World::position(const std::uint64_t entityId) const {
@@ -226,6 +228,10 @@ void World::setPosition(const std::uint16_t entityId, const math::Vector2u posit
     });
 }
 
+void World::remove(const std::uint64_t entityId) {
+    // TODO: Do something, I guess?
+}
+
 bool World::hasEvents() const { return !_events.empty(); }
 
 Event World::popEvent() {
@@ -254,7 +260,8 @@ bool World::isInBounds(const math::Vector2u position) const {
 void World::spawnStartEggs() {
     for (std::uint16_t teamId = 0; teamId < _config.teamCount; ++teamId) {
         for (std::uint16_t i = 0; i < _config.playersPerTeam; ++i) {
-            std::ignore = spawnEgg(teamId);
+            // TODO: Update spawn mechanic
+            std::ignore = spawnEgg("<TODO>");
         }
     }
     if (_config.logger) {

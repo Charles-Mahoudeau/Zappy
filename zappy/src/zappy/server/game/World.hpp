@@ -95,14 +95,14 @@ class World : public IGrid, public IEventEmitter {
 
     /// @brief Spawns an egg for the specified team.
     /// @param playerId The ID of the player to spawn the egg for.
-    /// @param teamId The ID of the team to spawn the egg for.
+    /// @param teamName The ID of the team to spawn the egg for.
     /// @return The ID of the spawned egg.
-    [[nodiscard]] std::uint64_t spawnEgg(std::uint64_t playerId, std::uint16_t teamId);
+    [[nodiscard]] std::uint64_t spawnEgg(std::uint64_t playerId, std::string_view teamName);
 
     /// @brief Spawns an egg for the specified team.
-    /// @param teamId The ID of the team to spawn the egg for.
+    /// @param teamName The ID of the team to spawn the egg for.
     /// @return The ID of the spawned egg.
-    [[nodiscard]] std::uint64_t spawnEgg(std::uint16_t teamId);
+    [[nodiscard]] std::uint64_t spawnEgg(std::string_view teamName);
 
     /// @brief Spawns a resource of the specified type.
     /// @param type The type of resource to spawn.
@@ -110,19 +110,19 @@ class World : public IGrid, public IEventEmitter {
     void spawnResource(ResourceType type);
 
     /// @brief Hatches a random egg for the specified team.
-    /// @param teamId The ID of the team to hatch the egg for.
+    /// @param teamName The ID of the team to hatch the egg for.
     /// @return The ID of the new player, or an error message if no egg could be hatched.
-    std::expected<std::uint64_t, std::string> hatchRandomEgg(std::uint16_t teamId);
+    std::expected<std::uint64_t, std::string> hatchRandomEgg(std::string_view teamName);
 
     /// @brief Returns a view of all players in the specified team.
-    /// @param teamId The ID of the team to get the players from.
+    /// @param teamName The ID of the team to get the players from.
     /// @return A view of all players in the specified team.
-    [[nodiscard]] EntityDatabase::EntityView<const entity::Player> players(std::uint16_t teamId) const;
+    [[nodiscard]] EntityDatabase::EntityView<const entity::Player> players(std::string_view teamName) const;
 
     /// @brief Returns a view of all players in the specified team.
-    /// @param teamId The ID of the team to get the players from.
+    /// @param teamName The ID of the team to get the players from.
     /// @return A view of all players in the specified team.
-    [[nodiscard]] EntityDatabase::EntityView<entity::Player> players(std::uint16_t teamId);
+    [[nodiscard]] EntityDatabase::EntityView<entity::Player> players(std::string_view teamName);
 
     /// @brief Returns the position of the specified entity.
     /// @param entityId The ID of the entity to get the position of.
@@ -133,6 +133,10 @@ class World : public IGrid, public IEventEmitter {
     /// @param entityId The ID of the entity to set the position of.
     /// @param position The new position of the entity.
     void setPosition(std::uint16_t entityId, math::Vector2u position) override;
+
+    /// @brief Removes the specified entity from the world.
+    /// @param entityId The ID of the entity to remove.
+    void remove(std::uint64_t entityId) override;
 
     /// @brief Returns true if the world has any events to process.
     /// @return True if the world has events, false otherwise.
