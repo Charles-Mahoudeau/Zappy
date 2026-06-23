@@ -70,18 +70,10 @@ float Billboard::rotation() const { return _rotation; }
 
 Color Billboard::tint() const { return _tint; }
 
-void Billboard::draw(const Camera& camera) const {
-    const Camera3D& rlCamera{static_cast<const Camera3D&>(camera)};
-    const Texture2D& texture2D{static_cast<const Texture2D&>(*this)};
+void Billboard::draw(Camera& camera) const { DrawBillboard(camera, *this, _position, billboardSize(), _tint); }
 
-    DrawBillboard(rlCamera, texture2D, _position, billboardSize(), _tint);
-}
-
-void Billboard::drawPro(const Camera& camera) const {
-    const Camera3D& rlCamera{static_cast<const Camera3D&>(camera)};
-    const Texture2D& texture2D{static_cast<const Texture2D&>(*this)};
-
-    DrawBillboardPro(rlCamera, texture2D, _source, _position, _up, _size, _origin, _rotation, _tint);
+void Billboard::drawPro(Camera& camera) const {
+    DrawBillboardPro(camera, *this, _source, _position, _up, _size, _origin, _rotation, _tint);
 }
 
 }  // namespace zappy::gui::render
