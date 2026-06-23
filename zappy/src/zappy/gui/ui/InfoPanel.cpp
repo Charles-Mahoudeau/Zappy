@@ -13,6 +13,8 @@
 
 #include "Leaderboard.hpp"
 #include "Widgets.hpp"
+#include "utils/Rectangle.hpp"
+#include "utils/Vector2.hpp"
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/render/Camera.hpp"
 

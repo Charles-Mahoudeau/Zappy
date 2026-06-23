@@ -14,6 +14,7 @@
 #include <vector>
 
 #include "Widgets.hpp"
+#include "utils/Rectangle.hpp"
 #include "zappy/gui/game/GameState.hpp"
 
 namespace zappy::gui::ui {
