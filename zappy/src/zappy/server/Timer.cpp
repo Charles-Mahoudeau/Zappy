@@ -11,9 +11,15 @@
 #include <chrono>
 #include <cstdint>
 #include <functional>
+#include <iostream>
 #include <utility>
 
 namespace zappy::server {
+
+Timer::Timer(int freq) {
+    this->_tickTime = std::chrono::milliseconds(kTick_milli_default) / freq;
+    this->_previousTick = std::chrono::steady_clock::now() - this->_tickTime;
+}
 
 void Timer::init(std::uint16_t freq) {
     this->_tickTime = std::chrono::milliseconds(kTick_milli_default) / freq;
@@ -29,8 +35,9 @@ int Timer::update() {
         return 0;
     }
 
-    //     this->_previousTick += this->_tickTime * nbTick;
-    this->_previousTick = now;
+    this->_previousTick += this->_tickTime * nbTick;
+
+    std::cout << nbTick << "\n";
 
     while (it != this->_events.end()) {
         it->timeout -= nbTick;
@@ -51,7 +58,7 @@ int Timer::update() {
 
 void Timer::setFrequencies(int freq) { this->_tickTime = std::chrono::milliseconds(kTick_milli_default) / freq; }
 
-int Timer::timeout() {
+int Timer::timeoutUntilSchedule() {
     auto now = std::chrono::steady_clock::now();
     auto sinceTick = std::chrono::duration_cast<std::chrono::milliseconds>(now - this->_previousTick);
 
@@ -63,6 +70,14 @@ int Timer::timeout() {
     int const remaining = static_cast<int>((this->_tickTime.count() * nextTicks) - sinceTick.count());
 
     return remaining < 0 ? 0 : remaining;
+}
+
+int Timer::timeoutUntilNextTick() {
+    auto now = std::chrono::steady_clock::now();
+    auto nextTick = this->_previousTick + this->_tickTime;
+    auto timeToWait = std::chrono::duration_cast<std::chrono::milliseconds>(nextTick - now);
+
+    return timeToWait.count() <= 0 ? 0 : static_cast<int>(timeToWait.count());
 }
 
 int Timer::smallestTimeout() {

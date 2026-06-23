@@ -17,6 +17,7 @@ namespace zappy::server {
 class Timer {
   public:
     Timer() = default;
+    explicit Timer(int freq);
     ~Timer() = default;
 
     Timer(const Timer&) = delete;
@@ -39,7 +40,9 @@ class Timer {
      * @brief time until the next tick. Zero if now
      * @return timeout in milliseconds
      */
-    int timeout();
+    int timeoutUntilSchedule();
+
+    int timeoutUntilNextTick();
 
     /**
      * @brief add a new event to the list
