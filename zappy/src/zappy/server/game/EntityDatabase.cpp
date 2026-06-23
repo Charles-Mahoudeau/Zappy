@@ -30,14 +30,22 @@ std::uint64_t EntityDatabase::insert(std::unique_ptr<IEntity> entity) {
     return it->first;
 }
 
-void EntityDatabase::remove(const std::uint64_t id) {
+bool EntityDatabase::remove(const std::uint64_t id) {
     const auto it = _entities.find(id);
 
     if (it == _entities.end()) {
-        return;
+        return false;
     }
     _entitiesByType[typeIndex(*it->second)].erase(id);
     _entities.erase(it);
+    return true;
+}
+
+bool EntityDatabase::remove(const IEntity& entity) {
+    if (const std::optional<std::uint64_t> entityId = id(entity)) {
+        return remove(*entityId);
+    }
+    return false;
 }
 
 void EntityDatabase::removeAll() {
@@ -54,6 +62,16 @@ IEntity* EntityDatabase::query(const std::uint64_t id) {
     return it->second.get();
 }
 
+EntityDatabase::EntityView<const IEntity> EntityDatabase::viewAll() const {
+    return _entities | std::views::values |
+           std::views::transform([](const std::unique_ptr<IEntity>& entity) { return entity.get(); });
+}
+
+EntityDatabase::EntityView<IEntity> EntityDatabase::viewAll() {
+    return _entities | std::views::values |
+           std::views::transform([](const std::unique_ptr<IEntity>& entity) { return entity.get(); });
+}
+
 std::vector<IEntity*> EntityDatabase::toVector() {
     std::vector<IEntity*> result;
 
@@ -66,7 +84,7 @@ std::vector<IEntity*> EntityDatabase::toVector() {
 
 std::uint64_t EntityDatabase::countAll() const { return _entities.size(); }
 
-std::optional<std::uint64_t> EntityDatabase::id(const IEntity& entity) {
+std::optional<std::uint64_t> EntityDatabase::id(const IEntity& entity) const {
     for (const auto& [id, entityPtr] : _entities) {
         if (entityPtr.get() == &entity) {
             return id;

@@ -1,20 +1,13 @@
 include(FetchContent)
-include(InternetCheck)
 
-check_internet_connection()
+FetchContent_Declare(
+        googletest
+        GIT_REPOSITORY https://github.com/google/googletest.git
+        GIT_TAG v1.17.0
+        FIND_PACKAGE_ARGS NAMES GTest CONFIG
+)
 
-macro(setup_googletest)
-    if (INTERNET_AVAILABLE)
-        FetchContent_Declare(
-                googletest
-                GIT_REPOSITORY https://github.com/google/googletest.git
-                GIT_TAG v1.17.0
-        )
+set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
-        set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
-
-        FetchContent_MakeAvailable(googletest)
-    else ()
-        message(WARNING "GoogleTest not available.")
-    endif ()
-endmacro()
+FetchContent_MakeAvailable(googletest)

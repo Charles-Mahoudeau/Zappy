@@ -15,6 +15,7 @@
 #include <system_error>
 
 #include "zappy/shared/exception/SocketError.hpp"
+#include "zappy/shared/network/Address.hpp"
 #include "zappy/shared/network/socket/Client.hpp"
 
 namespace zappy::network::socket {
