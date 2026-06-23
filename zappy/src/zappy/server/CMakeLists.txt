@@ -26,8 +26,8 @@ add_library(zappy_server_objects OBJECT
         game/World.hpp
         game/Tile.cpp
         game/Tile.hpp
-        game/WorldEvent.hpp
-        game/IWorldEventEmitter.hpp
+        game/Event.hpp
+        game/IEventEmitter.hpp
         game/AEntity.cpp
         game/AEntity.hpp
 )

@@ -16,17 +16,17 @@
 #include <vector>
 
 #include "EntityDatabase.hpp"
+#include "Event.hpp"
 #include "IEntity.hpp"
-#include "IWorldEventEmitter.hpp"
+#include "IEventEmitter.hpp"
 #include "ResourceType.hpp"
 #include "Tile.hpp"
-#include "WorldEvent.hpp"
 #include "entity/Player.hpp"
 #include "zappy/shared/io/Logger.hpp"
 #include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server::game {
-class World : public IWorldEventEmitter {
+class World : public IEventEmitter {
   public:
     struct Config {
         math::Vector2u size;
@@ -145,11 +145,11 @@ class World : public IWorldEventEmitter {
 
     /// @brief Returns the next event in the queue.
     /// @return The next event in the queue.
-    [[nodiscard]] WorldEvent popEvent();
+    [[nodiscard]] Event popEvent();
 
     /// @brief Adds an event to the queue.
     /// @param event The event to add.
-    void pushEvent(WorldEvent event) override;
+    void pushEvent(Event event) override;
 
   private:
     /// @brief Returns the resource densities for the world.
@@ -181,7 +181,7 @@ class World : public IWorldEventEmitter {
     std::vector<Tile> _tiles;
     std::unordered_map<ResourceType, std::uint64_t> _resourceThresholds;
     std::uint16_t _nextMajorTick{kMajorTickInterval};
-    std::vector<WorldEvent> _events;
+    std::vector<Event> _events;
 };
 
 template <IsEntity T>

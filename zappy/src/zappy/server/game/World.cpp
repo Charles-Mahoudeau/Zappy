@@ -24,9 +24,9 @@
 #include <vector>
 
 #include "EntityDatabase.hpp"
+#include "Event.hpp"
 #include "ResourceType.hpp"
 #include "Tile.hpp"
-#include "WorldEvent.hpp"
 #include "entity/Egg.hpp"
 #include "entity/Player.hpp"
 #include "zappy/shared/exception/InvalidState.hpp"
@@ -251,14 +251,14 @@ math::Vector2u World::moveBy(const std::uint64_t entityId, const math::Vector2i 
 
 bool World::hasEvents() const { return !_events.empty(); }
 
-WorldEvent World::popEvent() {
-    WorldEvent event{std::move(_events.back())};
+Event World::popEvent() {
+    Event event{std::move(_events.back())};
 
     _events.pop_back();
     return event;
 }
 
-void World::pushEvent(WorldEvent event) { _events.push_back(std::move(event)); }
+void World::pushEvent(Event event) { _events.push_back(std::move(event)); }
 
 const std::unordered_map<ResourceType, float>& World::resourceDensities() {
     using enum ResourceType;

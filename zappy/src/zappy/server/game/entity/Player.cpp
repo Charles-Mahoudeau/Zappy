@@ -13,13 +13,13 @@
 #include <tuple>
 #include <unordered_map>
 
-#include "zappy/server/game/IWorldEventEmitter.hpp"
+#include "zappy/server/game/Event.hpp"
+#include "zappy/server/game/IEventEmitter.hpp"
 #include "zappy/server/game/Inventory.hpp"
 #include "zappy/server/game/ResourceType.hpp"
-#include "zappy/server/game/WorldEvent.hpp"
 
 namespace zappy::server::game::entity {
-Player::Player(IWorldEventEmitter& eventEmitter, const std::uint16_t teamId)
+Player::Player(IEventEmitter& eventEmitter, const std::uint16_t teamId)
     : _eventEmitter{eventEmitter}, _teamId{teamId} {}
 
 void Player::update() {

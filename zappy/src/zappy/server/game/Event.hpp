@@ -2,14 +2,16 @@
 ** EPITECH PROJECT, 2026
 ** zappy
 ** File description:
-** WorldEvent
+** Event
 */
 
 #pragma once
 
 #include <cstdint>
 #include <functional>
+#include <optional>
 #include <string>
+#include <variant>
 #include <vector>
 
 #include "Inventory.hpp"
@@ -92,8 +94,8 @@ struct GameEndEvent {
     std::uint16_t teamId;
 };
 
-using WorldEvent = std::variant<TileInventoryEvent, PlayerPositionEvent, PlayerLevelEvent, PlayerInventoryEvent,
-                                PlayerExpulsionEvent, PlayerBroadcastEvent, IncantationBeginEvent, IncantationEndEvent,
-                                PlayerEggLayingEvent, PlayerResourceDropEvent, PlayerResourceCollectEvent,
-                                PlayerDeathEvent, EggLaidEvent, EggConnectionEvent, EggDeathEvent, GameEndEvent>;
+using Event = std::variant<TileInventoryEvent, PlayerPositionEvent, PlayerLevelEvent, PlayerInventoryEvent,
+                           PlayerExpulsionEvent, PlayerBroadcastEvent, IncantationBeginEvent, IncantationEndEvent,
+                           PlayerEggLayingEvent, PlayerResourceDropEvent, PlayerResourceCollectEvent, PlayerDeathEvent,
+                           EggLaidEvent, EggConnectionEvent, EggDeathEvent, GameEndEvent>;
 }  // namespace zappy::server::game

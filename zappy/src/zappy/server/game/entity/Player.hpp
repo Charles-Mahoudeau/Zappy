@@ -14,7 +14,7 @@
 #include <unordered_map>
 
 #include "zappy/server/game/AEntity.hpp"
-#include "zappy/server/game/IWorldEventEmitter.hpp"
+#include "zappy/server/game/IEventEmitter.hpp"
 #include "zappy/server/game/Inventory.hpp"
 
 namespace zappy::server::game::entity {
@@ -32,7 +32,7 @@ class Player : public AEntity {
     static constexpr std::uint8_t kTimeUnitsPerFood{126};
     static constexpr std::uint16_t kDefaultLifetime{kDefaultLifeUnits * kTimeUnitsPerFood};
 
-    Player(IWorldEventEmitter& eventEmitter, std::uint16_t teamId);
+    Player(IEventEmitter& eventEmitter, std::uint16_t teamId);
     ~Player() override = default;
 
     Player(const Player&) = default;
@@ -97,7 +97,7 @@ class Player : public AEntity {
     /// directions.
     [[nodiscard]] static const std::unordered_map<Direction, std::tuple<Direction, Direction>>& turnMap();
 
-    std::reference_wrapper<IWorldEventEmitter> _eventEmitter;
+    std::reference_wrapper<IEventEmitter> _eventEmitter;
     std::uint16_t _teamId;
     std::uint32_t _lifetimeLeft{kDefaultLifetime};
     std::uint8_t _level{1};
