@@ -1,3 +1,5 @@
+include(SetupBemanAnyView)
+
 add_library(zappy_server_objects OBJECT
         Core.hpp
         Core.cpp
@@ -21,14 +23,20 @@ add_library(zappy_server_objects OBJECT
         client/Client.cpp
         client/ClientRegistry.hpp
         client/ClientRegistry.cpp
+        game/World.cpp
+        game/World.hpp
+        game/Tile.cpp
+        game/Tile.hpp
 )
-
 target_include_directories(zappy_server_objects PUBLIC
         ${CMAKE_SOURCE_DIR}/src
 )
 target_link_libraries(zappy_server_objects PUBLIC
         zappy_shared
 )
+if (TARGET beman.any_view)
+    target_link_libraries(zappy_server_objects PUBLIC beman.any_view)
+endif ()
 
 add_executable(zappy_server
         main.cpp
