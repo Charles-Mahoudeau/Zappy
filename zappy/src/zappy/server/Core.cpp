@@ -7,15 +7,13 @@
 
 #include "zappy/server/Core.hpp"
 
-#include <unistd.h>
-
-#include <exception>
 #include <iostream>
 #include <span>
 #include <string_view>
 
 #include "zappy/server/CliParser.hpp"
 #include "zappy/server/client/Client.hpp"
+#include "zappy/shared/exception/Exception.hpp"
 
 namespace zappy::server {
 
@@ -32,8 +30,8 @@ void Core::run() {
         try {
             this->nextTick();
             this->processCommands();
-        } catch (const std::exception& err) {
-            std::cerr << err.what() << "\n";
+        } catch (const exception::Exception& err) {
+            std::cerr << "Error: " << err.what() << "\n";
         }
     }
 }

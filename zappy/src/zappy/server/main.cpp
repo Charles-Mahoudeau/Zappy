@@ -27,5 +27,11 @@ int main(const int argc, char** argv) {
         std::cerr << "Unknown Error: " << err.what() << "\n";
         return 84;
     }
-    core.run();
+    while (true) {
+        try {
+            core.run();
+        } catch (const std::exception& err) {
+            std::cerr << "Unexpected error: " << err.what() << "\n";
+        }
+    }
 }
