@@ -122,13 +122,15 @@ void Renderer::drawPlayers(const game::GameState& state, AssetStore& assets) {
     for (const auto& [playerId, player] : players) {
         const auto teamIt = std::ranges::find(teams, player.team);
         const auto teamIndex = static_cast<std::size_t>(std::distance(teams.begin(), teamIt));
-        auto& model = assets.playerModel(teamIndex % assets.playerModelCount());
+        const std::size_t modelCount = assets.playerModelCount();
+        auto& model = assets.playerModel(teamIndex % modelCount);
         const float scale = kScale * static_cast<float>(player.level);
+        const Color tint = Color{Color::teamTint(teamIndex, modelCount)};
 
         PlayerVisual& visual = _playerVisuals[playerId];
         updatePlayerVisual(visual, player, width, height, dt, model);
 
-        model.drawEx(visual.position, Vector3(0.0F, 1.0F, 0.0F), calculAngle(player.orientation), scale, Color::kWHITE);
+        model.drawEx(visual.position, Vector3(0.0F, 1.0F, 0.0F), calculAngle(player.orientation), scale, tint);
     }
 }
 
