@@ -30,6 +30,7 @@
 #include "Tile.hpp"
 #include "entity/Egg.hpp"
 #include "entity/Player.hpp"
+#include "zappy/shared/math/Direction.hpp"
 #include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server::game {
@@ -154,7 +155,13 @@ std::expected<std::uint64_t, std::string> World::hatchRandomEgg(const std::strin
         _entityDatabase.insert(std::make_unique<entity::Player>(_grid, *this, std::string{teamName}));
 
     parentTile->addEntity(playerId);
-    // TODO: Send new player event
+    pushEvent(PlayerConnectionEvent{
+        .playerId = playerId,
+        .position = parentTile->position(),
+        .orientation = math::Direction::kNorth,
+        .level = 0,
+        .teamName = std::string{teamName},
+    });
     pushEvent(EggConnectionEvent{
         .eggId = *eggIdOpt,
     });
