@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <string_view>
+
 #include "zappy/gui/GuiCliParser.hpp"
 #include "zappy/gui/display/Window.hpp"
 #include "zappy/gui/game/GameState.hpp"
