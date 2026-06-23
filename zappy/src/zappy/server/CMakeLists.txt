@@ -1,5 +1,4 @@
 include(SetupBemanAnyView)
-setup_beman_anyview()
 
 add_library(zappy_server_objects OBJECT
         Core.hpp
