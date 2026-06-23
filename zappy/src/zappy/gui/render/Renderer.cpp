@@ -123,6 +123,9 @@ void Renderer::drawPlayers(const game::GameState& state, AssetStore& assets) {
         const auto teamIt = std::ranges::find(teams, player.team);
         const auto teamIndex = static_cast<std::size_t>(std::distance(teams.begin(), teamIt));
         const std::size_t modelCount = assets.playerModelCount();
+        if (modelCount == 0) {
+            continue;
+        }
         auto& model = assets.playerModel(teamIndex % modelCount);
         const float scale = kScale * static_cast<float>(player.level);
         const Color tint = Color{Color::teamTint(teamIndex, modelCount)};
