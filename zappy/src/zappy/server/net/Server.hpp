@@ -8,6 +8,8 @@
 #pragma once
 
 #include <cstdint>
+#include <expected>
+#include <string>
 
 #include "zappy/server/Timer.hpp"
 #include "zappy/server/client/ClientRegistry.hpp"
@@ -35,7 +37,7 @@ class Server {
     SocketRegistry _sockets;
     io::Poller _poller;
 
-    network::Address makeNewConnection();
+    std::expected<network::Address, std::string> makeNewConnection();
 };
 
 }  // namespace zappy::server::net

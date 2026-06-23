@@ -9,7 +9,9 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <expected>
 #include <iostream>
+#include <string>
 #include <string_view>
 
 #include "zappy/server/Timer.hpp"
@@ -27,24 +29,36 @@ void Server::init(std::uint16_t port, client::ClientRegistry& clientRegistery, T
 
     this->_poller.add(this->_servSocket, zappy::io::Poller::kPollRead,
                       [this, &clientRegistery, &timer](std::byte /*event*/) {
-                          const network::Address addr = this->makeNewConnection();
-                          clientRegistery.makeNewClient(this->_sockets, addr, timer);
+                          const auto result = this->makeNewConnection();
+                          if (result.has_value()) {
+                              clientRegistery.makeNewClient(this->_sockets, result.value(), timer);
+                          } else {
+                              std::cerr << result.error() << "\n";
+                          }
                       });
 }
 
 bool Server::poll(int timeout) { return this->_poller.poll(timeout); }
 
-network::Address Server::makeNewConnection() {
+std::expected<network::Address, std::string> Server::makeNewConnection() {
     network::socket::Client newClientSocket = this->_servSocket.accept();
     network::Address addr = newClientSocket.address();
-    (void)newClientSocket.send("WELCOME\n");
+    const int fd = newClientSocket.fd();
 
-    this->_poller.add(newClientSocket.fd(), zappy::io::Poller::kPollRead, [this, addr](std::byte event) {
+    try {
+        newClientSocket.send("WELCOME\n");
+    } catch (const zappy::exception::SocketError& err) {
+        return std::unexpected("Failed to send WELCOME to " + addr.string() + ": " + err.what());
+    }
+
+    this->_sockets.insert(newClientSocket);
+
+    this->_poller.add(fd, zappy::io::Poller::kPollRead, [this, addr](std::byte event) {
         auto* cli = this->_sockets.findByAddress(addr);
         bool fail = false;
 
         if (cli == nullptr) {
-            std::cerr << "failed to find client\n";
+            std::cerr << "failed to find client for " + addr.string() + "\n";
             return;
         }
 
@@ -61,7 +75,6 @@ network::Address Server::makeNewConnection() {
         }
     });
 
-    this->_sockets.insert(newClientSocket);
     return addr;
 }
 
