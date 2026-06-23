@@ -34,9 +34,9 @@ class Timer {
      * @brief time until the next tick. Zero if now
      * @return timeout in milliseconds
      */
-    int timeoutUntilSchedule();
+    [[nodiscard]] int timeoutUntilSchedule() const;
 
-    int timeoutUntilNextTick();
+    [[nodiscard]] int timeoutUntilNextTick() const;
 
     /**
      * @brief add a new event to the list
@@ -80,7 +80,7 @@ class Timer {
     std::list<Event> _events;
     std::chrono::milliseconds _tickTime{1};
 
-    int smallestTimeout();
+    [[nodiscard]] int smallestTimeout() const;
 };
 
 }  // namespace zappy::server

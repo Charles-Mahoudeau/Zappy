@@ -28,7 +28,7 @@ class Core {
 
     void init(std::span<std::string_view> argv);
 
-    void run();
+    [[noreturn]] void run();
 
     void processCommands();
 

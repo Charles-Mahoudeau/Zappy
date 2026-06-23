@@ -19,7 +19,7 @@ Timer::Timer(std::uint16_t freq) { this->setFrequencies(freq); }
 
 int Timer::update() {
     std::chrono::steady_clock::time_point const now = std::chrono::steady_clock::now();
-    const int nbTick = static_cast<int>((now - this->_previousTick) / this->_tickTime);
+    const auto nbTick = static_cast<int>((now - this->_previousTick) / this->_tickTime);
     auto it = this->_events.begin();
 
     if (nbTick <= 0) {
@@ -56,7 +56,7 @@ void Timer::setFrequencies(std::uint16_t freq) {
     this->_previousTick = std::chrono::steady_clock::now();
 }
 
-int Timer::timeoutUntilSchedule() {
+int Timer::timeoutUntilSchedule() const {
     auto now = std::chrono::steady_clock::now();
     auto sinceTick = std::chrono::duration_cast<std::chrono::milliseconds>(now - this->_previousTick);
 
@@ -64,13 +64,13 @@ int Timer::timeoutUntilSchedule() {
         return -1;
     }
 
-    int const nextTicks = this->smallestTimeout();
-    int const remaining = static_cast<int>((this->_tickTime.count() * nextTicks) - sinceTick.count());
+    const auto nextTicks = this->smallestTimeout();
+    const auto remaining = static_cast<int>((this->_tickTime.count() * nextTicks) - sinceTick.count());
 
     return remaining < 0 ? 0 : remaining;
 }
 
-int Timer::timeoutUntilNextTick() {
+int Timer::timeoutUntilNextTick() const {
     auto now = std::chrono::steady_clock::now();
     auto nextTick = this->_previousTick + this->_tickTime;
     auto timeToWait = std::chrono::duration_cast<std::chrono::milliseconds>(nextTick - now);
@@ -78,7 +78,7 @@ int Timer::timeoutUntilNextTick() {
     return timeToWait.count() <= 0 ? 0 : static_cast<int>(timeToWait.count());
 }
 
-int Timer::smallestTimeout() {
+int Timer::smallestTimeout() const {
     if (this->_events.empty()) {
         return 0;
     }

@@ -27,7 +27,6 @@ void Core::init(std::span<std::string_view> argv) {
 }
 
 void Core::run() {
-    this->_time.scheduleEvery(10, []() { std::cout << "eat\n"; });
     while (true) {
         this->nextTick();
         this->processCommands();
@@ -54,7 +53,6 @@ void Core::processCommands() {
         if (!req.has_value()) {
             continue;
         }
-        std::cout << req.value() << "\n";
 
         // command logic
     }
