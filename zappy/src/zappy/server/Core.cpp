@@ -10,10 +10,8 @@
 #include <unistd.h>
 
 #include <iostream>
-#include <ranges>
 #include <span>
 #include <string_view>
-#include <vector>
 
 #include "zappy/server/CliParser.hpp"
 #include "zappy/server/client/Client.hpp"
@@ -61,4 +59,5 @@ void Core::processCommands() {
         // command logic
     }
 }
+
 }  // namespace zappy::server

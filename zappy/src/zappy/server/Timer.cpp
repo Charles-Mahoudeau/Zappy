@@ -11,7 +11,6 @@
 #include <chrono>
 #include <cstdint>
 #include <functional>
-#include <iostream>
 #include <utility>
 
 namespace zappy::server {
