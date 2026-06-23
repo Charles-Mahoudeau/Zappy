@@ -12,7 +12,6 @@
 #include <string>
 
 #include "zappy/server/game/AEntity.hpp"
-#include "zappy/server/game/IEventEmitter.hpp"
 #include "zappy/server/game/Inventory.hpp"
 #include "zappy/shared/math/Direction.hpp"
 
@@ -24,21 +23,10 @@ class Player : public AEntity {
     static constexpr std::uint8_t kTimeUnitsPerFood{126};
     static constexpr std::uint16_t kDefaultLifetime{kDefaultLifeUnits * kTimeUnitsPerFood};
 
-    Player(IEventEmitter& eventEmitter, std::uint16_t teamId);
-    ~Player() override = default;
-
-    Player(const Player&) = default;
-    Player& operator=(const Player&) = default;
-
-    Player(Player&&) = default;
-    Player& operator=(Player&&) = default;
+    using AEntity::AEntity;
 
     /// @brief Update the player.
     void update() override;
-
-    /// @brief Get the player's team id.
-    /// @return The player's team id.
-    [[nodiscard]] std::uint16_t teamId() const;
 
     /// @brief Get the player's lifetime left.
     /// @return The player's lifetime left.
@@ -84,8 +72,6 @@ class Player : public AEntity {
     bool eat();
 
   private:
-    std::reference_wrapper<IEventEmitter> _eventEmitter;
-    std::uint16_t _teamId;
     std::uint32_t _lifetimeLeft{kDefaultLifetime};
     std::uint8_t _level{1};
     math::Direction _direction{math::Direction::kNorth};

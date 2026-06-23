@@ -9,6 +9,7 @@
 
 #include <concepts>
 #include <cstdint>
+#include <string_view>
 
 #include "zappy/shared/math/Vector2.hpp"
 
@@ -36,6 +37,14 @@ class IEntity {
     /// @brief Get the entity's position.
     /// @return The entity's position.
     [[nodiscard]] virtual math::Vector2u position() const = 0;
+
+    /// @brief Set the entity's position.
+    /// @param position The entity's position.
+    virtual void setPosition(math::Vector2u position) = 0;
+
+    /// @brief Get the entity's team name.
+    /// @return The entity's team name.
+    [[nodiscard]] virtual std::string_view teamName() const = 0;
 
     /// @brief Update the entity.
     /// @note Call this once for each game tick.

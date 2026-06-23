@@ -7,30 +7,14 @@
 
 #pragma once
 
-#include <cstdint>
-
 #include "zappy/server/game/AEntity.hpp"
 
 namespace zappy::server::game::entity {
 class Egg : public AEntity {
   public:
-    explicit Egg(std::uint16_t teamId);
-    ~Egg() override = default;
-
-    Egg(const Egg&) = default;
-    Egg& operator=(const Egg&) = default;
-
-    Egg(Egg&&) = default;
-    Egg& operator=(Egg&&) = default;
+    using AEntity::AEntity;
 
     /// @brief Update the egg.
     void update() override;
-
-    /// @brief Get the team id of the egg.
-    /// @return The team id of the egg.
-    [[nodiscard]] std::uint16_t teamId() const;
-
-  private:
-    std::uint16_t _teamId;
 };
 }  // namespace zappy::server::game::entity

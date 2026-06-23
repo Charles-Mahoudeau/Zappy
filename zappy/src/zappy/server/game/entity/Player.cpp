@@ -13,26 +13,23 @@
 
 #include "zappy/server/game/Event.hpp"
 #include "zappy/server/game/IEventEmitter.hpp"
+#include "zappy/server/game/IGrid.hpp"
 #include "zappy/server/game/Inventory.hpp"
 #include "zappy/server/game/ResourceType.hpp"
+#include "zappy/shared/math/Direction.hpp"
 
 namespace zappy::server::game::entity {
-Player::Player(IEventEmitter& eventEmitter, const std::uint16_t teamId)
-    : _eventEmitter{eventEmitter}, _teamId{teamId} {}
-
 void Player::update() {
     if (!alive()) {
         return;
     }
     --_lifetimeLeft;
     if (_lifetimeLeft == 0) {
-        _eventEmitter.get().pushEvent(PlayerDeathEvent{
+        eventEmitter().pushEvent(PlayerDeathEvent{
             .playerId = id(),
         });
     }
 }
-
-std::uint16_t Player::teamId() const { return _teamId; }
 
 std::uint32_t Player::lifetimeLeft() const { return _lifetimeLeft; }
 
@@ -43,7 +40,7 @@ void Player::kill() {
         return;
     }
     _lifetimeLeft = 0;
-    _eventEmitter.get().pushEvent(PlayerDeathEvent{
+    eventEmitter().pushEvent(PlayerDeathEvent{
         .playerId = id(),
     });
 }
@@ -55,7 +52,7 @@ std::expected<std::uint8_t, std::string> Player::levelUp() {
         return std::unexpected{"Max level reached"};
     }
     ++_level;
-    _eventEmitter.get().pushEvent(PlayerLevelEvent{
+    eventEmitter().pushEvent(PlayerLevelEvent{
         .playerId = id(),
         .level = _level,
     });
@@ -66,13 +63,21 @@ math::Direction Player::direction() const { return _direction; }
 
 math::Direction Player::turnLeft() {
     _direction = math::direction::turnLeft(_direction);
-    // TODO: Send new position with orientation
+    eventEmitter().pushEvent(PlayerPositionEvent{
+        .playerId = id(),
+        .position = position(),
+        .direction = _direction,
+    });
     return _direction;
 }
 
 math::Direction Player::turnRight() {
     _direction = math::direction::turnRight(_direction);
-    // TODO: Send new position with orientation
+    eventEmitter().pushEvent(PlayerPositionEvent{
+        .playerId = id(),
+        .position = position(),
+        .direction = _direction,
+    });
     return _direction;
 }
 
@@ -86,7 +91,7 @@ bool Player::eat() {
     }
     _inventory.removeResource(ResourceType::kFood);
     _lifetimeLeft += kTimeUnitsPerFood;
-    _eventEmitter.get().pushEvent(PlayerInventoryEvent{
+    eventEmitter().pushEvent(PlayerInventoryEvent{
         .playerId = id(),
         .inventory = _inventory,
     });
