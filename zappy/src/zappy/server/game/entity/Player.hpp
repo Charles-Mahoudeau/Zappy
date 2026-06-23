@@ -14,6 +14,7 @@
 #include "zappy/server/game/AEntity.hpp"
 #include "zappy/server/game/Inventory.hpp"
 #include "zappy/shared/math/Direction.hpp"
+#include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server::game::entity {
 class Player : public AEntity {
