@@ -51,6 +51,7 @@ World::World(Config config) : _config{std::move(config)} {
 }
 
 void World::update() {
+    // TODO: Use timer class when ready.
     --_nextMajorTick;
     if (_nextMajorTick != 0) {
         return;
