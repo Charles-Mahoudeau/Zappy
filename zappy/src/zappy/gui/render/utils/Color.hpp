@@ -9,6 +9,10 @@
 
 #include <raylib.h>
 
+#include <cstddef>
+#include <cstdint>
+#include <random>
+
 namespace zappy::gui::render {
 class Color {
   public:
@@ -25,6 +29,20 @@ class Color {
 
     operator ::Color() const { return _color; }
     operator ::Color&() { return _color; }
+
+    Color& operator=(const ::Color& color) {
+        _color = color;
+        return *this;
+    }
+
+    [[nodiscard]] static ::Color teamTint(std::size_t teamIndex, std::size_t modelCount) {
+        if (modelCount == 0 || teamIndex < modelCount) {
+            return kWHITE;
+        }
+        std::mt19937 rng(static_cast<std::uint32_t>(teamIndex));
+        const float hue = std::uniform_real_distribution<float>(0.0F, 360.0F)(rng);
+        return ColorFromHSV(hue, 0.55F, 1.0F);
+    }
 
     static constexpr ::Color kLIGHTGRAY{.r = 200, .g = 200, .b = 200, .a = 255};  // Light Gray
     static constexpr ::Color kGRAY{.r = 130, .g = 130, .b = 130, .a = 255};       // Gray

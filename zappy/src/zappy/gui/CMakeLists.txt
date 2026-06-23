@@ -1,5 +1,4 @@
 include(SetupRaylib)
-setup_raylib()
 
 include(SetupRaygui)
 setup_raygui()
@@ -29,8 +28,12 @@ add_library(zappy_gui_objects OBJECT
         render/Renderer.hpp
         render/Camera.cpp
         render/Camera.hpp
+        render/tools/Vec2D.cpp
+        render/tools/Vec2D.hpp
         render/objects/Texture.cpp
         render/objects/Texture.hpp
+        render/objects/Billboard.cpp
+        render/objects/Billboard.hpp
         render/objects/Model.cpp
         render/objects/Model.hpp
         render/objects/Skybox.cpp
@@ -84,5 +87,5 @@ target_link_libraries(zappy_gui PRIVATE
 # Copy GUI assets next to the executable so they ship with the binary
 add_custom_command(TARGET zappy_gui POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
-                ${CMAKE_CURRENT_SOURCE_DIR}/assets $<TARGET_FILE_DIR:zappy_gui>/assets
+        ${CMAKE_CURRENT_SOURCE_DIR}/assets $<TARGET_FILE_DIR:zappy_gui>/assets
 )

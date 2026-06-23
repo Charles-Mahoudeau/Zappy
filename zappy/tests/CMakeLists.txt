@@ -1,4 +1,4 @@
-include(GoogleTest)
+include(SetupGoogleTest)
 
 set(FIXTURES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/fixtures")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
@@ -6,9 +6,9 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 add_executable(unit_tests
         src/CliParser.cpp
         src/server/game/EntityDatabase.cpp
-		src/server/client/Client.cpp
-		src/server/client/ClientRegistry.cpp
-		src/server/client/SocketPair.hpp
+        src/server/client/Client.cpp
+        src/server/client/ClientRegistry.cpp
+        src/server/client/SocketPair.hpp
         src/server/net/SocketRegistry.cpp
         src/server/game/entity/Egg.cpp
         src/server/game/entity/Player.cpp
@@ -30,6 +30,8 @@ add_executable(unit_tests
         src/gui/ui/utils/Rectangle.cpp
         src/gui/ui/utils/Vector2.cpp
         src/shared/io/Poller.cpp
+        src/server/game/World.cpp
+        src/shared/math/Vector2.cpp
 )
 target_include_directories(unit_tests PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
