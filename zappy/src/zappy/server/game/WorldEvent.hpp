@@ -17,6 +17,11 @@
 #include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server::game {
+struct TileInventoryEvent {
+    math::Vector2u position;
+    std::reference_wrapper<const Inventory> inventory;
+};
+
 struct PlayerPositionEvent {
     std::uint64_t playerId{};
     math::Vector2u position;
@@ -29,7 +34,7 @@ struct PlayerLevelEvent {
 
 struct PlayerInventoryEvent {
     std::uint64_t playerId{};
-    std::reference_wrapper<Inventory> inventory;
+    std::reference_wrapper<const Inventory> inventory;
 };
 
 struct PlayerExpulsionEvent {
@@ -87,8 +92,8 @@ struct GameEndEvent {
     std::uint16_t teamId;
 };
 
-using WorldEvent = std::variant<PlayerPositionEvent, PlayerLevelEvent, PlayerInventoryEvent, PlayerExpulsionEvent,
-                                PlayerBroadcastEvent, IncantationBeginEvent, IncantationEndEvent, PlayerEggLayingEvent,
-                                PlayerResourceDropEvent, PlayerResourceCollectEvent, PlayerDeathEvent, EggLaidEvent,
-                                EggConnectionEvent, EggDeathEvent, GameEndEvent>;
+using WorldEvent = std::variant<TileInventoryEvent, PlayerPositionEvent, PlayerLevelEvent, PlayerInventoryEvent,
+                                PlayerExpulsionEvent, PlayerBroadcastEvent, IncantationBeginEvent, IncantationEndEvent,
+                                PlayerEggLayingEvent, PlayerResourceDropEvent, PlayerResourceCollectEvent,
+                                PlayerDeathEvent, EggLaidEvent, EggConnectionEvent, EggDeathEvent, GameEndEvent>;
 }  // namespace zappy::server::game
