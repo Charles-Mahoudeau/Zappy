@@ -10,23 +10,15 @@
 #include <cstdint>
 #include <expected>
 #include <string>
-#include <tuple>
-#include <unordered_map>
 
 #include "zappy/server/game/AEntity.hpp"
 #include "zappy/server/game/IEventEmitter.hpp"
 #include "zappy/server/game/Inventory.hpp"
+#include "zappy/shared/math/Direction.hpp"
 
 namespace zappy::server::game::entity {
 class Player : public AEntity {
   public:
-    enum class Direction : std::uint8_t {
-        kNorth = 0,
-        kSouth = 1,
-        kEast = 2,
-        kWest = 3,
-    };
-
     static constexpr std::uint8_t kMaxLevel{8};
     static constexpr std::uint8_t kDefaultLifeUnits{10};
     static constexpr std::uint8_t kTimeUnitsPerFood{126};
@@ -69,15 +61,15 @@ class Player : public AEntity {
 
     /// @brief Get the player's direction.
     /// @return The player's direction.
-    [[nodiscard]] Direction direction() const;
+    [[nodiscard]] math::Direction direction() const;
 
     /// @brief Turn the player to the left.
     /// @return The new direction.
-    Direction turnLeft();
+    math::Direction turnLeft();
 
     /// @brief Turn the player to the right.
     /// @return The new direction.
-    Direction turnRight();
+    math::Direction turnRight();
 
     /// @brief Get the player's inventory.
     /// @return The player's inventory.
@@ -92,16 +84,11 @@ class Player : public AEntity {
     bool eat();
 
   private:
-    /// @brief Get the turn map.
-    /// @return The turn map. The key is the current direction, and the value is a tuple of the left and right
-    /// directions.
-    [[nodiscard]] static const std::unordered_map<Direction, std::tuple<Direction, Direction>>& turnMap();
-
     std::reference_wrapper<IEventEmitter> _eventEmitter;
     std::uint16_t _teamId;
     std::uint32_t _lifetimeLeft{kDefaultLifetime};
     std::uint8_t _level{1};
-    Direction _direction{Direction::kNorth};
+    math::Direction _direction{math::Direction::kNorth};
     Inventory _inventory;
 };
 }  // namespace zappy::server::game::entity

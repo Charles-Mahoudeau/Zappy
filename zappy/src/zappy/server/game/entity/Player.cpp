@@ -10,8 +10,6 @@
 #include <cstdint>
 #include <expected>
 #include <string>
-#include <tuple>
-#include <unordered_map>
 
 #include "zappy/server/game/Event.hpp"
 #include "zappy/server/game/IEventEmitter.hpp"
@@ -64,16 +62,16 @@ std::expected<std::uint8_t, std::string> Player::levelUp() {
     return _level;
 }
 
-Player::Direction Player::direction() const { return _direction; }
+math::Direction Player::direction() const { return _direction; }
 
-Player::Direction Player::turnLeft() {
-    _direction = std::get<0>(turnMap().at(_direction));
+math::Direction Player::turnLeft() {
+    _direction = math::direction::turnLeft(_direction);
     // TODO: Send new position with orientation
     return _direction;
 }
 
-Player::Direction Player::turnRight() {
-    _direction = std::get<1>(turnMap().at(_direction));
+math::Direction Player::turnRight() {
+    _direction = math::direction::turnRight(_direction);
     // TODO: Send new position with orientation
     return _direction;
 }
@@ -93,18 +91,5 @@ bool Player::eat() {
         .inventory = _inventory,
     });
     return true;
-}
-
-const std::unordered_map<Player::Direction, std::tuple<Player::Direction, Player::Direction>>& Player::turnMap() {
-    using enum Direction;
-
-    static const std::unordered_map<Direction, std::tuple<Direction, Direction>> turnMap{
-        {kNorth, {kWest, kEast}},
-        {kEast, {kNorth, kSouth}},
-        {kSouth, {kEast, kWest}},
-        {kWest, {kSouth, kNorth}},
-    };
-
-    return turnMap;
 }
 }  // namespace zappy::server::game::entity
