@@ -11,12 +11,13 @@
 #include <expected>
 #include <string>
 
+#include "zappy/server/game/AEntity.hpp"
 #include "zappy/server/game/Event.hpp"
 #include "zappy/server/game/IEventEmitter.hpp"
-#include "zappy/server/game/IGrid.hpp"
 #include "zappy/server/game/Inventory.hpp"
 #include "zappy/server/game/ResourceType.hpp"
 #include "zappy/shared/math/Direction.hpp"
+#include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server::game::entity {
 void Player::update() {
@@ -57,6 +58,15 @@ std::expected<std::uint8_t, std::string> Player::levelUp() {
         .level = _level,
     });
     return _level;
+}
+
+void Player::setPosition(const math::Vector2u position) {
+    AEntity::setPosition(position);
+    eventEmitter().pushEvent(PlayerPositionEvent{
+        .playerId = id(),
+        .position = position,
+        .direction = direction(),
+    });
 }
 
 math::Direction Player::direction() const { return _direction; }

@@ -47,6 +47,10 @@ class Player : public AEntity {
     /// @return The new level of the player.
     std::expected<std::uint8_t, std::string> levelUp();
 
+    /// @brief Set the player's position.
+    /// @param position The new position of the player.
+    void setPosition(math::Vector2u position) override;
+
     /// @brief Get the player's direction.
     /// @return The player's direction.
     [[nodiscard]] math::Direction direction() const;

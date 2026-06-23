@@ -12,6 +12,7 @@
 #include <optional>
 #include <random>
 #include <string>
+#include <string_view>
 #include <unordered_map>
 #include <vector>
 
@@ -127,15 +128,20 @@ class World : public IGrid, public IEventEmitter {
     /// @brief Returns the position of the specified entity.
     /// @param entityId The ID of the entity to get the position of.
     /// @return The position of the specified entity.
+    /// @warning You should not call this function directly. Use the position method of the entity instead.
+    /// @see IEntity::position()
     [[nodiscard]] std::optional<math::Vector2u> position(std::uint64_t entityId) const override;
 
     /// @brief Sets the position of the specified entity.
     /// @param entityId The ID of the entity to set the position of.
     /// @param position The new position of the entity.
+    /// @warning You should not call this function directly. Use the setPosition method of the entity instead.
+    /// @see IEntity::setPosition()
     void setPosition(std::uint16_t entityId, math::Vector2u position) override;
 
     /// @brief Removes the specified entity from the world.
     /// @param entityId The ID of the entity to remove.
+    /// @warning You should never call this function directly.
     void remove(std::uint64_t entityId) override;
 
     /// @brief Returns true if the world has any events to process.
