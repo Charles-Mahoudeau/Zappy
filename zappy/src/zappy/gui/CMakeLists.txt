@@ -43,6 +43,8 @@ add_library(zappy_gui_objects OBJECT
         ui/GuiTheme.hpp
         ui/InfoPanel.cpp
         ui/InfoPanel.hpp
+        ui/Leaderboard.cpp
+        ui/Leaderboard.hpp
         ui/Mouse.cpp
         ui/Mouse.hpp
         ui/RaylibGuiImpl.cpp

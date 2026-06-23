@@ -11,11 +11,10 @@
 #include <optional>
 #include <utility>
 
+#include "Leaderboard.hpp"
 #include "Widgets.hpp"
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/render/Camera.hpp"
-#include "zappy/gui/ui/utils/Rectangle.hpp"
-#include "zappy/gui/ui/utils/Vector2.hpp"
 
 namespace zappy::gui::ui {
 
@@ -52,10 +51,10 @@ std::optional<std::pair<std::uint32_t, std::uint32_t>> InfoPanel::selectedTile()
 
 std::optional<std::uint32_t> InfoPanel::selectedPlayerId() const { return _selectedPlayerId; }
 
-void InfoPanel::draw(const game::GameState& /*state*/, Rectangle bounds) const {
+void InfoPanel::draw(const game::GameState& state, Rectangle bounds) const {
     switch (_state) {
         case InfoPanelState::Leaderboard:
-            Widgets::panel(bounds, "Leaderboard");
+            Leaderboard::draw(state, bounds);
             break;
         case InfoPanelState::Tile:
             Widgets::panel(bounds, "Tile");
