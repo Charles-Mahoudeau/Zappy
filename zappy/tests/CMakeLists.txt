@@ -1,4 +1,4 @@
-include(GoogleTest)
+include(SetupGoogleTest)
 
 set(FIXTURES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/fixtures")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
