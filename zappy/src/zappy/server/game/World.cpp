@@ -41,7 +41,7 @@ World::World(Config config) : _config{std::move(config)} {
     }
     _tiles.reserve(size);
     for (std::uint32_t i = 0; i < size; ++i) {
-        _tiles.emplace_back(*this, math::Vector2u{i % _config.size.x, i / _config.size.x});
+        _tiles.emplace_back(math::Vector2u{i % _config.size.x, i / _config.size.x});
     }
     generateResourceThresholds();
     spawnStartEggs();
