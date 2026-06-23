@@ -17,6 +17,7 @@
 
 #include "EntityDatabase.hpp"
 #include "IEntity.hpp"
+#include "IWorldEventEmitter.hpp"
 #include "ResourceType.hpp"
 #include "Tile.hpp"
 #include "WorldEvent.hpp"
@@ -25,19 +26,19 @@
 #include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server::game {
-class World {
+class World : public IWorldEventEmitter {
   public:
     struct Config {
         math::Vector2u size;
-        std::uint16_t teamCount;
-        std::uint16_t playersPerTeam;
+        std::uint16_t teamCount{};
+        std::uint16_t playersPerTeam{};
         std::optional<io::Logger> logger;
     };
 
     static constexpr std::uint16_t kMajorTickInterval{20};
 
     explicit World(Config config);
-    ~World() = default;
+    ~World() override = default;
 
     World(const World&) = delete;
     World& operator=(const World&) = delete;
@@ -92,6 +93,12 @@ class World {
     [[nodiscard]] std::uint64_t countResources(ResourceType type) const;
 
     /// @brief Spawns an egg for the specified team.
+    /// @param playerId The ID of the player to spawn the egg for.
+    /// @param teamId The ID of the team to spawn the egg for.
+    /// @return The ID of the spawned egg.
+    [[nodiscard]] std::uint64_t spawnEgg(std::uint64_t playerId, std::uint16_t teamId);
+
+    /// @brief Spawns an egg for the specified team.
     /// @param teamId The ID of the team to spawn the egg for.
     /// @return The ID of the spawned egg.
     [[nodiscard]] std::uint64_t spawnEgg(std::uint16_t teamId);
@@ -140,6 +147,10 @@ class World {
     /// @return The next event in the queue.
     [[nodiscard]] WorldEvent popEvent();
 
+    /// @brief Adds an event to the queue.
+    /// @param event The event to add.
+    void pushEvent(WorldEvent event) override;
+
   private:
     /// @brief Returns the resource densities for the world.
     /// @return A map of resource types to their densities.
@@ -162,10 +173,6 @@ class World {
 
     /// @brief Generates the resource thresholds for the world.
     void generateResourceThresholds();
-
-    /// @brief Adds an event to the queue.
-    /// @param event The event to add.
-    void addEvent(WorldEvent event);
 
     std::random_device _randomDevice;
     std::mt19937 _randomEngine{_randomDevice()};

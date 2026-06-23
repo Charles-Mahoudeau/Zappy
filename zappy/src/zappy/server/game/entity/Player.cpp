@@ -13,17 +13,25 @@
 #include <tuple>
 #include <unordered_map>
 
+#include "zappy/server/game/IWorldEventEmitter.hpp"
 #include "zappy/server/game/Inventory.hpp"
 #include "zappy/server/game/ResourceType.hpp"
+#include "zappy/server/game/WorldEvent.hpp"
 
 namespace zappy::server::game::entity {
-Player::Player(const std::uint16_t teamId) : _teamId{teamId} {}
+Player::Player(IWorldEventEmitter& eventEmitter, const std::uint16_t teamId)
+    : _eventEmitter{eventEmitter}, _teamId{teamId} {}
 
 void Player::update() {
     if (!alive()) {
         return;
     }
     --_lifetimeLeft;
+    if (_lifetimeLeft == 0) {
+        _eventEmitter.get().pushEvent(PlayerDeathEvent{
+            .playerId = id(),
+        });
+    }
 }
 
 std::uint16_t Player::teamId() const { return _teamId; }
@@ -32,7 +40,15 @@ std::uint32_t Player::lifetimeLeft() const { return _lifetimeLeft; }
 
 bool Player::alive() const { return _lifetimeLeft > 0; }
 
-void Player::kill() { _lifetimeLeft = 0; }
+void Player::kill() {
+    if (!alive()) {
+        return;
+    }
+    _lifetimeLeft = 0;
+    _eventEmitter.get().pushEvent(PlayerDeathEvent{
+        .playerId = id(),
+    });
+}
 
 std::uint8_t Player::level() const { return _level; }
 
@@ -41,6 +57,10 @@ std::expected<std::uint8_t, std::string> Player::levelUp() {
         return std::unexpected{"Max level reached"};
     }
     ++_level;
+    _eventEmitter.get().pushEvent(PlayerLevelEvent{
+        .playerId = id(),
+        .level = _level,
+    });
     return _level;
 }
 
@@ -48,11 +68,13 @@ Player::Direction Player::direction() const { return _direction; }
 
 Player::Direction Player::turnLeft() {
     _direction = std::get<0>(turnMap().at(_direction));
+    // TODO: Send new position with orientation
     return _direction;
 }
 
 Player::Direction Player::turnRight() {
     _direction = std::get<1>(turnMap().at(_direction));
+    // TODO: Send new position with orientation
     return _direction;
 }
 
@@ -66,6 +88,10 @@ bool Player::eat() {
     }
     _inventory.removeResource(ResourceType::kFood);
     _lifetimeLeft += kTimeUnitsPerFood;
+    _eventEmitter.get().pushEvent(PlayerInventoryEvent{
+        .playerId = id(),
+        .inventory = _inventory,
+    });
     return true;
 }
 

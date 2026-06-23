@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <expected>
 #include <format>
+#include <limits>
 #include <memory>
 #include <optional>
 #include <random>
@@ -106,11 +107,17 @@ std::uint64_t World::countResources(const ResourceType type) const {
     return count;
 }
 
-std::uint64_t World::spawnEgg(std::uint16_t teamId) {
+std::uint64_t World::spawnEgg(std::uint64_t playerId, std::uint16_t teamId) {
     const std::uint64_t eggId = _entityDatabase.insert(std::make_unique<entity::Egg>(teamId));
     Tile& tile = randomTile();
 
     tile.addEntity(eggId);
+    pushEvent(EggLaidEvent{
+        .playerId =
+            playerId == std::numeric_limits<decltype(playerId)>::max() ? std::nullopt : std::make_optional(playerId),
+        .eggId = eggId,
+        .position = tile.position(),
+    });
     if (_config.logger) {
         _config.logger->info(std::format("Spawned egg #{} for team #{} at ({}, {})", eggId, teamId, tile.position().x,
                                          tile.position().y));
@@ -118,10 +125,19 @@ std::uint64_t World::spawnEgg(std::uint16_t teamId) {
     return eggId;
 }
 
+std::uint64_t World::spawnEgg(const std::uint16_t teamId) {
+    // That's a shitty solution but it works...
+    return spawnEgg(std::numeric_limits<std::uint64_t>::max(), teamId);
+}
+
 void World::spawnResource(const ResourceType type) {
     Tile& tile = randomTile();
 
     tile.inventory().addResource(type);
+    pushEvent(TileInventoryEvent{
+        .position = {},
+        .inventory = tile.inventory(),
+    });
 }
 
 std::expected<std::uint64_t, std::string> World::hatchRandomEgg(const std::uint16_t teamId) {
@@ -158,9 +174,13 @@ std::expected<std::uint64_t, std::string> World::hatchRandomEgg(const std::uint1
     _entityDatabase.remove(*eggIdOpt);
     parentTile->removeEntity(*eggIdOpt);
 
-    const std::uint64_t playerId = _entityDatabase.insert(std::make_unique<entity::Player>(teamId));
+    const std::uint64_t playerId = _entityDatabase.insert(std::make_unique<entity::Player>(*this, teamId));
 
     parentTile->addEntity(playerId);
+    // TODO: Send new player event
+    pushEvent(EggConnectionEvent{
+        .eggId = *eggIdOpt,
+    });
     return playerId;
 }
 
@@ -200,6 +220,10 @@ void World::moveTo(const std::uint64_t entityId, const math::Vector2u position) 
     Tile& destinationTile = tile(position);
 
     destinationTile.addEntity(entityId);
+    pushEvent(PlayerPositionEvent{
+        .playerId = entityId,
+        .position = position,
+    });
 }
 
 math::Vector2u World::moveBy(const std::uint64_t entityId, const math::Vector2i delta) {
@@ -218,6 +242,10 @@ math::Vector2u World::moveBy(const std::uint64_t entityId, const math::Vector2i 
     Tile& destinationTile = tile(newPosition);
 
     destinationTile.addEntity(entityId);
+    pushEvent(PlayerPositionEvent{
+        .playerId = entityId,
+        .position = newPosition,
+    });
     return newPosition;
 }
 
@@ -229,6 +257,8 @@ WorldEvent World::popEvent() {
     _events.pop_back();
     return event;
 }
+
+void World::pushEvent(WorldEvent event) { _events.push_back(std::move(event)); }
 
 const std::unordered_map<ResourceType, float>& World::resourceDensities() {
     using enum ResourceType;
@@ -282,6 +312,4 @@ void World::generateResourceThresholds() {
         _config.logger->info("Resources thresholds generated.");
     }
 }
-
-void World::addEvent(WorldEvent event) { _events.push_back(std::move(event)); }
 }  // namespace zappy::server::game
