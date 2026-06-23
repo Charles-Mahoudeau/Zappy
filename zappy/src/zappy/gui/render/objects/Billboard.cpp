@@ -9,6 +9,7 @@
 
 #include <raylib.h>
 
+#include <algorithm>
 #include <string_view>
 
 #include "../Camera.hpp"

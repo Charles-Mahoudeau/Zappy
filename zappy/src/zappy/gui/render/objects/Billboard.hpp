@@ -57,10 +57,10 @@ class Billboard : public Texture {
 
   private:
     Rectangle _source{};
-    Vector3 _position{.x = 0.0F, .y = 0.0F, .z = 0.0F};
-    Vector3 _up{.x = 0.0F, .y = 1.0F, .z = 0.0F};
-    Vector2 _size{.x = 1.0F, .y = 1.0F};
-    Vector2 _origin{.x = 0.5F, .y = 0.5F};
+    Vector3 _position{0.0F, 0.0F, 0.0F};
+    Vector3 _up{0.0F, 1.0F, 0.0F};
+    Vector2 _size{1.0F, 1.0F};
+    Vector2 _origin{0.5F, 0.5F};
     float _rotation{0.0F};
     Color _tint{WHITE};
 };
