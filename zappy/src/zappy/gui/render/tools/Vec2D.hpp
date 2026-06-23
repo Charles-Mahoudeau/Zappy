@@ -19,13 +19,13 @@ class Vec2D {
     Vec2D(const Vec2D&) = default;
     Vec2D(Vec2D&&) noexcept = default;
 
-    [[nodiscard]] Vec2D& operator=(const Vec2D&);
-    [[nodiscard]] Vec2D& operator=(Vec2D&&) noexcept;
+    Vec2D& operator=(const Vec2D&);
+    Vec2D& operator=(Vec2D&&) noexcept;
 
-    [[nodiscard]] Vec2D& operator+=(const Vec2D&);
-    [[nodiscard]] Vec2D& operator-=(const Vec2D&);
-    [[nodiscard]] Vec2D& operator*=(float);
-    [[nodiscard]] Vec2D& operator/=(float);
+    Vec2D& operator+=(const Vec2D&);
+    Vec2D& operator-=(const Vec2D&);
+    Vec2D& operator*=(float);
+    Vec2D& operator/=(float);
 
     [[nodiscard]] Vec2D operator+(const Vec2D&) const;
     [[nodiscard]] Vec2D operator-(const Vec2D&) const;
