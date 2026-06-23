@@ -43,6 +43,8 @@ void AssetStore::loadPlayerModel() {
                                            {{.mapIndex = ALBEDO, .path = "assets/models/slugs/doc/doc.png"}}, true));
     _playerModels.emplace_back(createModel("assets/models/slugs/bad1/bad1.glb", "assets/models/slugs/bad1/bad1.glb",
                                            {{.mapIndex = ALBEDO, .path = "assets/models/slugs/bad1/bad1.png"}}));
+    _playerModels.emplace_back(createModel("assets/models/slugs/bad2/bad2.glb", "assets/models/slugs/bad2/bad2.glb",
+                                           {{.mapIndex = ALBEDO, .path = "assets/models/slugs/bad2/bad2.png"}}));
 }
 
 void AssetStore::loadResourceModel(game::ResourceType type) {
