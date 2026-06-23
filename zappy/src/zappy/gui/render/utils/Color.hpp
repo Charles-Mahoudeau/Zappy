@@ -20,6 +20,7 @@ class Color {
         : _color{.r = r, .g = g, .b = b, .a = a} {}
     explicit Color(const ::Color& color) : _color{color} {}
     Color(const Color&) = default;
+    Color& operator=(const Color&) = default;
     Color(Color&&) noexcept = default;
     Color& operator=(Color&&) noexcept = default;
     ~Color() = default;
@@ -31,11 +32,6 @@ class Color {
 
     Color& operator=(const ::Color& color) {
         _color = color;
-        return *this;
-    }
-
-    Color& operator=(const Color& color) {
-        _color = color._color;
         return *this;
     }
 
