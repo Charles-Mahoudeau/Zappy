@@ -11,8 +11,6 @@
 #include <cstdint>
 #include <span>
 
-#include "EntityDatabase.hpp"
-#include "World.hpp"
 #include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server::game {

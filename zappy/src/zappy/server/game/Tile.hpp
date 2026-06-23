@@ -8,12 +8,9 @@
 #pragma once
 
 #include <cstdint>
-#include <functional>
 #include <span>
 #include <vector>
 
-#include "EntityDatabase.hpp"
-#include "IEntity.hpp"
 #include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server::game {
