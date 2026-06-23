@@ -52,7 +52,7 @@ class Billboard : public Texture {
     [[nodiscard]] float rotation() const;
     [[nodiscard]] Color tint() const;
 
-    void draw(Camera& camera) const; // Depreciated, only for very simple billboards, use drawPro for more control
+    void draw(Camera& camera) const;  // Depreciated, only for very simple billboards, use drawPro for more control
     void drawPro(Camera& camera) const;
 
   private:
