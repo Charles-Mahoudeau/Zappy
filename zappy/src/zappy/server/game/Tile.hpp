@@ -8,12 +8,9 @@
 #pragma once
 
 #include <cstdint>
-#include <functional>
 #include <span>
 #include <vector>
 
-#include "EntityDatabase.hpp"
-#include "IEntity.hpp"
 #include "Inventory.hpp"
 #include "zappy/shared/math/Vector2.hpp"
 
@@ -22,7 +19,7 @@ class World;
 
 class Tile {
   public:
-    Tile(World& world, math::Vector2u position);
+    explicit Tile(math::Vector2u position);
     ~Tile() = default;
 
     Tile(const Tile&) = default;
@@ -37,12 +34,6 @@ class Tile {
 
     /// @brief Returns the number of entities in the tile.
     /// @return The number of entities in the tile.
-    [[nodiscard]] std::uint64_t count() const;
-
-    /// @brief Returns the number of entities of the specified type in the tile.
-    /// @tparam T The type of entity to count.
-    /// @return The number of entities of the specified type in the tile.
-    template <IsEntity T>
     [[nodiscard]] std::uint64_t count() const;
 
     /// @brief Returns the entities in the tile.
@@ -72,17 +63,8 @@ class Tile {
     Inventory& inventory();
 
   private:
-    [[nodiscard]] const EntityDatabase& entityDatabase() const;
-    [[nodiscard]] EntityDatabase& entityDatabase();
-
-    std::reference_wrapper<World> _world;
     math::Vector2u _position;
     std::vector<std::uint64_t> _entities;
     Inventory _inventory;
 };
-
-template <IsEntity T>
-std::uint64_t Tile::count() const {
-    return entityDatabase().filter<T>(_entities).size();
-}
 }  // namespace zappy::server::game

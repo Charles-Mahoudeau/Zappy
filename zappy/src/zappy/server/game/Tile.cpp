@@ -11,12 +11,10 @@
 #include <cstdint>
 #include <span>
 
-#include "EntityDatabase.hpp"
-#include "World.hpp"
 #include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server::game {
-Tile::Tile(World& world, const math::Vector2u position) : _world{world}, _position{position} {}
+Tile::Tile(const math::Vector2u position) : _position{position} {}
 
 math::Vector2u Tile::position() const { return _position; }
 
@@ -37,12 +35,7 @@ bool Tile::removeEntity(const std::uint64_t entityId) {
     }
     return false;
 }
-
 const Inventory& Tile::inventory() const { return _inventory; }
 
 Inventory& Tile::inventory() { return _inventory; }
-
-const EntityDatabase& Tile::entityDatabase() const { return _world.get().entityDatabase(); }
-
-EntityDatabase& Tile::entityDatabase() { return _world.get().entityDatabase(); }
 }  // namespace zappy::server::game

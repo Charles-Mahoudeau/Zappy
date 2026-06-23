@@ -29,6 +29,7 @@
 #include "Tile.hpp"
 #include "entity/Egg.hpp"
 #include "entity/Player.hpp"
+#include "zappy/shared/exception/InvalidArgument.hpp"
 #include "zappy/shared/exception/InvalidState.hpp"
 #include "zappy/shared/exception/OutOfRange.hpp"
 #include "zappy/shared/math/Vector2.hpp"
@@ -42,7 +43,7 @@ World::World(Config config) : _config{std::move(config)} {
     }
     _tiles.reserve(size);
     for (std::uint32_t i = 0; i < size; ++i) {
-        _tiles.emplace_back(*this, math::Vector2u{i % _config.size.x, i / _config.size.x});
+        _tiles.emplace_back(math::Vector2u{i % _config.size.x, i / _config.size.x});
     }
     generateResourceThresholds();
     spawnStartEggs();
@@ -52,6 +53,7 @@ World::World(Config config) : _config{std::move(config)} {
 }
 
 void World::update() {
+    // TODO: Use timer class when ready.
     --_nextMajorTick;
     if (_nextMajorTick != 0) {
         return;
