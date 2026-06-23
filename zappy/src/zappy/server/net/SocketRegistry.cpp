@@ -36,6 +36,4 @@ void SocketRegistry::remove(const network::Address& addr) {
 
 void SocketRegistry::clear() { this->_sockets.clear(); }
 
-int SocketRegistry::size() { return this->_sockets.size(); }
-
 }  // namespace zappy::server::net

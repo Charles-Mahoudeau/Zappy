@@ -71,10 +71,9 @@ void ClientRegistry::updateTypeGroup() {
 }
 
 Client* ClientRegistry::findByAddress(const network::Address& addr) {
-    auto iter = std::ranges::find_if(
-        this->_clients, [&addr](const std::unique_ptr<Client>& client) { return client->address() == addr; });
-
-    if (iter != this->_clients.end()) {
+    if (auto iter = std::ranges::find_if(
+            this->_clients, [&addr](const std::unique_ptr<Client>& client) { return client->address() == addr; });
+        iter != this->_clients.end()) {
         return iter.base()->get();
     }
     return nullptr;

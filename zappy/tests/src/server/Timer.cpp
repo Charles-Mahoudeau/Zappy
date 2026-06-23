@@ -95,8 +95,8 @@ TEST(TimerScheduleLater, FiresOnlyOnce) {
 TEST(TimerScheduleLater, ReturnsUniqueIds) {
     Timer timer(100);
 
-    std::uint64_t id1 = timer.scheduleLater(1, []() {});
-    std::uint64_t id2 = timer.scheduleLater(1, []() {});
+    std::uint64_t id1 = timer.scheduleLater(1, []() { /* need no logic */ });
+    std::uint64_t id2 = timer.scheduleLater(1, []() { /* need no logic */ });
 
     EXPECT_NE(id1, id2);
 }
@@ -175,8 +175,8 @@ TEST(TimerTimeoutUntilSchedule, NoEventsReturnsMinusOne) {
 TEST(TimerTimeoutUntilSchedule, ReflectsSoonestEvent) {
     Timer timer(100);
 
-    timer.scheduleLater(10, []() {});
-    timer.scheduleLater(2, []() {});
+    timer.scheduleLater(10, []() { /* need no logic */ });
+    timer.scheduleLater(2, []() { /* need no logic */ });
 
     const int remaining = timer.timeoutUntilSchedule();
 

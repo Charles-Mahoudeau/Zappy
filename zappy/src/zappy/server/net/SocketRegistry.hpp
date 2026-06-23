@@ -42,8 +42,6 @@ class SocketRegistry {
      */
     void clear();
 
-    int size();
-
     /**
      * @brief use a address to get the socket related to it
      * @param addr address of the socket
