@@ -33,11 +33,10 @@
 #include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server::game {
-World::World(Config config) : _config{std::move(config)}, _grid{_config.size} {
+World::World(const math::Vector2u size, std::optional<io::Logger> logger) : _grid{size}, _logger{std::move(logger)} {
     generateResourceThresholds();
-    spawnStartEggs();
-    if (_config.logger) {
-        _config.logger->info("World initialized.");
+    if (_logger.has_value()) {
+        _logger->info("World initialized.");
     }
 }
 
@@ -78,9 +77,9 @@ std::uint64_t World::spawnEgg(std::uint64_t playerId, const std::string_view tea
         .eggId = eggId,
         .position = tile.position(),
     });
-    if (_config.logger) {
-        _config.logger->info(std::format("Spawned egg #{} for team #{} at ({}, {})", eggId, teamName, tile.position().x,
-                                         tile.position().y));
+    if (_logger.has_value()) {
+        _logger->info(std::format("Spawned egg #{} for team #{} at ({}, {})", eggId, teamName, tile.position().x,
+                                  tile.position().y));
     }
     return eggId;
 }
@@ -98,6 +97,23 @@ void World::spawnResource(const ResourceType type) {
         .position = {},
         .inventory = tile.inventory(),
     });
+}
+
+void World::spawnStartEggs(const std::span<std::string_view> teams, const std::uint8_t playersPerTeam) {
+    for (const std::string_view teamName : teams) {
+        for (std::uint16_t i = 0; i < playersPerTeam; ++i) {
+            std::ignore = spawnEgg(teamName);
+        }
+    }
+    if (_logger.has_value()) {
+        _logger->info("Start eggs spawned.");
+    }
+}
+
+void World::spawnStartEggs(std::span<const std::string> teams, const std::uint8_t playersPerTeam) {
+    std::vector<std::string_view> views{teams.begin(), teams.end()};
+
+    spawnStartEggs(views, playersPerTeam);
 }
 
 std::expected<std::uint64_t, std::string> World::hatchRandomEgg(const std::string_view teamName) {
@@ -181,26 +197,14 @@ const std::unordered_map<ResourceType, float>& World::resourceDensities() {
     return resourceDensities;
 }
 
-void World::spawnStartEggs() {
-    for (std::uint16_t teamId = 0; teamId < _config.teamCount; ++teamId) {
-        for (std::uint16_t i = 0; i < _config.playersPerTeam; ++i) {
-            // TODO: Update spawn mechanic
-            std::ignore = spawnEgg("<TODO>");
-        }
-    }
-    if (_config.logger) {
-        _config.logger->info("Start eggs spawned.");
-    }
-}
-
 void World::spawnResources() {
     for (const auto& [resourceType, quantity] : _resourceThresholds) {
         for (std::uint64_t count = countResources(resourceType); count < quantity; ++count) {
             spawnResource(resourceType);
         }
     }
-    if (_config.logger) {
-        _config.logger->info("Resources spawned.");
+    if (_logger.has_value()) {
+        _logger->info("Resources spawned.");
     }
 }
 
@@ -215,10 +219,10 @@ void World::generateResourceThresholds() {
     _resourceThresholds.clear();
     for (const auto& [resourceType, density] : resourceDensities()) {
         _resourceThresholds[resourceType] =
-            static_cast<std::uint64_t>(std::ceil(static_cast<float>(_config.size.x * _config.size.y) * density));
+            static_cast<std::uint64_t>(std::ceil(static_cast<float>(_grid.size().x * _grid.size().y) * density));
     }
-    if (_config.logger) {
-        _config.logger->info("Resources thresholds generated.");
+    if (_logger.has_value()) {
+        _logger->info("Resources thresholds generated.");
     }
 }
 }  // namespace zappy::server::game

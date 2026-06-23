@@ -11,6 +11,7 @@
 #include <expected>
 #include <optional>
 #include <random>
+#include <span>
 #include <string>
 #include <string_view>
 #include <unordered_map>
@@ -30,16 +31,9 @@
 namespace zappy::server::game {
 class World : public IEventEmitter {
   public:
-    struct Config {
-        math::Vector2u size;
-        std::uint16_t teamCount{};
-        std::uint16_t playersPerTeam{};
-        std::optional<io::Logger> logger;
-    };
-
     static constexpr std::uint16_t kMajorTickInterval{20};
 
-    explicit World(Config config);
+    World(math::Vector2u size, std::optional<io::Logger> logger);
     ~World() override = default;
 
     World(const World&) = delete;
@@ -90,6 +84,12 @@ class World : public IEventEmitter {
     /// @return The ID of the spawned resource.
     void spawnResource(ResourceType type);
 
+    /// @brief Spawns the initial eggs in the world.
+    void spawnStartEggs(std::span<std::string_view> teams, std::uint8_t playersPerTeam);
+
+    /// @brief Spawns the initial eggs in the world.
+    void spawnStartEggs(std::span<const std::string> teams, std::uint8_t playersPerTeam);
+
     /// @brief Hatches a random egg for the specified team.
     /// @param teamName The ID of the team to hatch the egg for.
     /// @return The ID of the new player, or an error message if no egg could be hatched.
@@ -126,9 +126,6 @@ class World : public IEventEmitter {
     /// @return A map of resource types to their densities.
     [[nodiscard]] static const std::unordered_map<ResourceType, float>& resourceDensities();
 
-    /// @brief Spawns the initial eggs in the world.
-    void spawnStartEggs();
-
     /// @brief Spawns resources in the world to meet the threshold.
     void spawnResources();
 
@@ -141,9 +138,9 @@ class World : public IEventEmitter {
 
     std::random_device _randomDevice;
     std::mt19937 _randomEngine{_randomDevice()};
-    Config _config;
     EntityDatabase _entityDatabase;
     Grid _grid;
+    std::optional<io::Logger> _logger;
     std::unordered_map<ResourceType, std::uint64_t> _resourceThresholds;
     std::uint16_t _nextMajorTick{kMajorTickInterval};
     std::vector<Event> _events;
