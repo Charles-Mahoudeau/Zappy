@@ -9,6 +9,7 @@
 
 #include <cstdint>
 #include <string>
+#include <string_view>
 #include <utility>
 
 #include "IEventEmitter.hpp"
@@ -18,8 +19,6 @@
 namespace zappy::server::game {
 AEntity::AEntity(IGrid& grid, IEventEmitter& eventEmitter, std::string teamName)
     : _grid{grid}, _eventEmitter{eventEmitter}, _teamName{std::move(teamName)} {}
-
-AEntity::~AEntity() { _grid.get().remove(_id); }
 
 std::uint64_t AEntity::id() const { return _id; }
 

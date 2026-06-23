@@ -21,7 +21,7 @@ namespace zappy::server::game {
 class AEntity : public IEntity {
   public:
     AEntity(IGrid& grid, IEventEmitter& eventEmitter, std::string teamName);
-    ~AEntity() override;
+    ~AEntity() override = default;
 
     AEntity(const AEntity&) = default;
     AEntity& operator=(const AEntity&) = default;
