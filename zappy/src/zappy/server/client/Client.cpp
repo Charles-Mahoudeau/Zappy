@@ -7,7 +7,6 @@
 
 #include "zappy/server/client/Client.hpp"
 
-#include <iostream>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -68,10 +67,7 @@ bool Client::setTimeout(int time) {
         return false;
     }
 
-    this->_timeoutId = this->_timer.scheduleLater(time, [this]() {
-        std::cout << "finish busy\n";
-        this->_timeoutId = 0;
-    });
+    this->_timeoutId = this->_timer.scheduleLater(time, [this]() { this->_timeoutId = 0; });
     return true;
 }
 

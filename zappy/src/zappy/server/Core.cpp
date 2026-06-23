@@ -10,8 +10,10 @@
 #include <unistd.h>
 
 #include <iostream>
+#include <ranges>
 #include <span>
 #include <string_view>
+#include <vector>
 
 #include "zappy/server/CliParser.hpp"
 #include "zappy/server/client/Client.hpp"
@@ -23,7 +25,7 @@ void Core::init(std::span<std::string_view> argv) {
     const CliParser::CliParameters& parameters = parser.parameters();
 
     this->_serv.init(parameters.port, this->_clientRegistry, this->_time);
-    this->_time.init(parameters.frequencies);
+    this->_time.setFrequencies(parameters.frequencies);
 }
 
 void Core::run() {

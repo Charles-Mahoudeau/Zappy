@@ -16,15 +16,7 @@
 
 namespace zappy::server {
 
-Timer::Timer(int freq) {
-    this->_tickTime = std::chrono::milliseconds(kTick_milli_default) / freq;
-    this->_previousTick = std::chrono::steady_clock::now() - this->_tickTime;
-}
-
-void Timer::init(std::uint16_t freq) {
-    this->_tickTime = std::chrono::milliseconds(kTick_milli_default) / freq;
-    this->_previousTick = std::chrono::steady_clock::now() - this->_tickTime;
-}
+Timer::Timer(std::uint16_t freq) { this->setFrequencies(freq); }
 
 int Timer::update() {
     std::chrono::steady_clock::time_point const now = std::chrono::steady_clock::now();
@@ -35,9 +27,7 @@ int Timer::update() {
         return 0;
     }
 
-    this->_previousTick += this->_tickTime * nbTick;
-
-    std::cout << nbTick << "\n";
+    this->_previousTick = now;
 
     while (it != this->_events.end()) {
         it->timeout -= nbTick;
@@ -56,7 +46,16 @@ int Timer::update() {
     return nbTick;
 }
 
-void Timer::setFrequencies(int freq) { this->_tickTime = std::chrono::milliseconds(kTick_milli_default) / freq; }
+void Timer::setFrequencies(std::uint16_t freq) {
+    if (freq < kMinFrequency) {
+        freq = kMinFrequency;
+    } else if (freq > kMaxFrequency) {
+        freq = kMaxFrequency;
+    }
+
+    this->_tickTime = std::chrono::milliseconds(kTick_milli_default) / freq;
+    this->_previousTick = std::chrono::steady_clock::now();
+}
 
 int Timer::timeoutUntilSchedule() {
     auto now = std::chrono::steady_clock::now();
@@ -81,12 +80,16 @@ int Timer::timeoutUntilNextTick() {
 }
 
 int Timer::smallestTimeout() {
+    if (this->_events.empty()) {
+        return 0;
+    }
+
     int smallest = this->_events.begin()->timeout;
 
     for (const auto& event : this->_events) {
         smallest = std::min(event.timeout, smallest);
     }
-    return smallest;
+    return smallest > 0 ? smallest : 0;
 }
 
 void Timer::unschedule(std::uint64_t id) {

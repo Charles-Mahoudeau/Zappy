@@ -14,7 +14,6 @@
 #include <array>
 #include <chrono>
 #include <format>
-#include <iostream>
 #include <string>
 #include <thread>
 
@@ -119,11 +118,13 @@ TEST_F(ServerClientTest, GetNextRequestBlockedWhileTimeoutPending) {
     Client client{socketRegistry, addr, timer};
     client.addRequest("delayed");
 
-    timer.init(20);
+    timer.setFrequencies(50);
 
     client.setTimeout(3);
 
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 3; i++) {
+        ASSERT_FALSE(client.nextRequest().has_value()) << "Expect not nothing but got something at " << i << " loop";
+
         int const wait = timer.timeoutUntilNextTick();
         std::this_thread::sleep_for(std::chrono::milliseconds(wait + 1));
         timer.update();
@@ -207,15 +208,15 @@ TEST_F(ServerClientTest, SendMessageWithRegisteredSocketDoesNotThrow) {
     EXPECT_EQ(std::string(buf.data(), n), "hello");
 }
 
-TEST_F(ServerClientTest, setTimeout) {
+TEST_F(ServerClientTest, setTimeoutTest) {
     Client client{socketRegistry, addr, timer};
 
-    timer.init(20);
+    timer.setFrequencies(100);
 
     EXPECT_FALSE(client.inTimeout());
     client.setTimeout(1);
     EXPECT_TRUE(client.inTimeout());
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for(std::chrono::milliseconds(timer.timeoutUntilNextTick() + 1));
     timer.update();
     EXPECT_FALSE(client.inTimeout());
 }
@@ -223,7 +224,7 @@ TEST_F(ServerClientTest, setTimeout) {
 TEST_F(ServerClientTest, removeTimeout) {
     Client client{socketRegistry, addr, timer};
 
-    timer.init(10);
+    timer.setFrequencies(10);
 
     EXPECT_FALSE(client.inTimeout());
     client.setTimeout(1);

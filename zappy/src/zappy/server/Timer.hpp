@@ -17,7 +17,7 @@ namespace zappy::server {
 class Timer {
   public:
     Timer() = default;
-    explicit Timer(int freq);
+    explicit Timer(std::uint16_t freq);
     ~Timer() = default;
 
     Timer(const Timer&) = delete;
@@ -28,13 +28,7 @@ class Timer {
     // return the nb tick passed since last update
     int update();
 
-    void setFrequencies(int freq);
-
-    /**
-     * @brief set the frequencies of the timer
-     * @param freq value of the frequencies
-     */
-    void init(std::uint16_t freq);
+    void setFrequencies(std::uint16_t freq);
 
     /**
      * @brief time until the next tick. Zero if now
@@ -74,22 +68,17 @@ class Timer {
         std::function<void()> notifier;
         std::uint64_t id;
         int repeated_timeout = -1;
-
-        bool operator<(const Event& other) const {
-            if (this->timeout != other.timeout) {
-                return this->timeout < other.timeout;
-            }
-            return this < &other;
-        }
     };
 
     static constexpr int kTick_milli_default = 1000;
-    static constexpr std::uint8_t kDefault_Frequencies = 100;
+    static constexpr std::uint16_t kMinFrequency = 1;
+    static constexpr std::uint8_t kMaxFrequency = 100;
+    static constexpr std::uint16_t kDefault_Frequencies = 100;
 
     std::uint64_t _nextId = 1;
     std::chrono::steady_clock::time_point _previousTick = std::chrono::steady_clock::now();
     std::list<Event> _events;
-    std::chrono::milliseconds _tickTime{};
+    std::chrono::milliseconds _tickTime{1};
 
     int smallestTimeout();
 };
