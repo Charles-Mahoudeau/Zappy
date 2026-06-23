@@ -10,7 +10,6 @@
 #include <cstddef>
 #include <initializer_list>
 #include <map>
-#include <string>
 
 #include "AssetLoaderRegistry.hpp"
 #include "objects/Model.hpp"
