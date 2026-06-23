@@ -64,7 +64,7 @@ std::optional<std::string> Client::nextRequest() {
 }
 
 bool Client::setTimeout(int time) {
-    if (this->inTimeout()) {
+    if (this->inTimeout() || time <= 0) {
         return false;
     }
 

@@ -29,7 +29,6 @@ void Server::init(std::uint16_t port, client::ClientRegistry& clientRegistery, T
                       [this, &clientRegistery, &timer](std::byte /*event*/) {
                           const network::Address addr = this->makeNewConnection();
                           clientRegistery.makeNewClient(this->_sockets, addr, timer);
-                          std::cout << addr << "\n";
                       });
 }
 
