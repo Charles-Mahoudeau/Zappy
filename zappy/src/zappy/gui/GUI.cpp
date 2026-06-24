@@ -21,8 +21,10 @@
 #include "zappy/gui/render/Camera.hpp"
 #include "zappy/gui/render/utils/Vector3.hpp"
 #include "zappy/gui/ui/Mouse.hpp"
+#include "zappy/gui/ui/VictoryScreen.hpp"
 #include "zappy/gui/ui/utils/Rectangle.hpp"
 #include "zappy/shared/exception/InvalidState.hpp"
+
 namespace zappy::gui {
 
 static constexpr int kWindowWidth = 1600;
@@ -137,6 +139,14 @@ int GUI::run() {
         const float infoPanelHeight = std::min(_infoPanel.contentHeight(_state), infoPanelMaxHeight);
         _infoPanel.draw(_state, ui::Rectangle{static_cast<float>(kWindowWidth) - kInfoPanelWidth - kInfoPanelMargin,
                                               kInfoPanelMargin, kInfoPanelWidth, infoPanelHeight});
+
+        if (_state.isGameOver() && !_victoryDismissed) {
+            const ui::Rectangle screenBounds{0.0F, 0.0F, static_cast<float>(kWindowWidth),
+                                             static_cast<float>(kWindowHeight)};
+            if (ui::VictoryScreen::draw(_state.winner().value(), screenBounds)) {
+                _victoryDismissed = true;
+            }
+        }
         _window.endFrame();
     }
     return 0;

@@ -58,6 +58,8 @@ add_library(zappy_gui_objects OBJECT
         ui/TileInfo.hpp
         ui/TimeUnitSlider.cpp
         ui/TimeUnitSlider.hpp
+        ui/VictoryScreen.cpp
+        ui/VictoryScreen.hpp
         ui/utils/Rectangle.hpp
         ui/utils/Vector2.hpp
         ui/Widgets.cpp

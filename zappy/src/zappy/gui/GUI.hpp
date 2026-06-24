@@ -66,6 +66,7 @@ class GUI {
     ui::TimeUnitSlider _timeSlider;
     ui::InfoPanel _infoPanel;
     int _loadingDots{0};
+    bool _victoryDismissed{false};
 };
 
 }  // namespace zappy::gui
