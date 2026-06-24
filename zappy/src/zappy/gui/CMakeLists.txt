@@ -38,8 +38,6 @@ add_library(zappy_gui_objects OBJECT
         render/objects/Model.hpp
         render/objects/Skybox.cpp
         render/objects/Skybox.hpp
-        render/objects/ProgressBar.cpp
-        render/objects/ProgressBar.hpp
         render/utils/Color.hpp
         render/utils/Ray.hpp
         render/utils/Vector3.hpp
