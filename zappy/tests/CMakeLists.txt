@@ -22,6 +22,7 @@ add_executable(unit_tests
         src/gui/network/ProtocolParser.cpp
         src/gui/network/GuiFunctional.cpp
         src/shared/io/Poller.cpp
+        src/server/game/EventHelper.cpp
         src/server/game/World.cpp
         src/shared/math/Vector2.cpp
         src/server/game/WorldMock.hpp
