@@ -6,6 +6,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 add_executable(unit_tests
         src/CliParser.cpp
         src/server/game/EntityDatabase.cpp
+        src/server/Timer.cpp
         src/server/client/Client.cpp
         src/server/client/ClientRegistry.cpp
         src/server/client/SocketPair.hpp
