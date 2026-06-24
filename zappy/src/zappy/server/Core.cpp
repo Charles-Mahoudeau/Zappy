@@ -70,7 +70,7 @@ void Core::processCommandGroup() {
         }
 
         if (auto iter = this->_cmdGroups.find(client->type()); iter != this->_cmdGroups.end()) {
-            auto& commands = iter->second;
+            const auto& commands = iter->second;
             commands->execute(client, req.value());
         }
     }

@@ -32,6 +32,8 @@ class PlayerCommands : public ACommandGroup {
 
   private:
     std::unordered_map<std::string_view, CommandInvoker> _commands;
+
+    static bool ignore(Client* client, CommandData& params);
 };
 
 }  // namespace zappy::server::command

@@ -30,7 +30,7 @@ void ACommandGroup::operator()(Client* client, std::string_view cmd) { this->exe
 
 ICommandGroup::CommandData ACommandGroup::extractCommand(std::string_view msg) {
     CommandData cmd;
-    std::istringstream iss((std::string(msg)));
+    std::istringstream iss{std::string(msg)};
 
     iss >> cmd.name;
     cmd.params =

@@ -15,25 +15,26 @@
 #include "zappy/server/client/ClientRegistry.hpp"
 #include "zappy/server/commands/ACommandGroup.hpp"
 #include "zappy/server/commands/ICommandGroup.hpp"
+
 namespace zappy::server::command {
 
-GuiCommands::GuiCommands(Timer& timer, client::ClientRegistry& clients) : ACommandGroup(timer, clients) {
-    this->_commands = {
-        {"msz", [](auto* client, auto params) {return false; }},
-        {"bct", [](auto* client, auto params) {return false; }},
-        {"mct", [](auto* client, auto params) {return false; }},
-        {"tna", [](auto* client, auto params) {return false; }},
-        {"ppo", [](auto* client, auto params) {return false; }},
-        {"plv", [](auto* client, auto params) {return false; }},
-        {"pin", [](auto* client, auto params) {return false; }},
-        {"sgt", [](auto* client, auto params) {return false; }},
-        {"sst", [](auto* client, auto params) {return false; }},
+GuiCommands::GuiCommands(Timer& timer, client::ClientRegistry& clients)
+    : ACommandGroup(timer, clients),
+      _commands({
+          {"msz", [](auto* client, auto& params) { return GuiCommands::ignore(client, params); }},
+          {"bct", [](auto* client, auto& params) { return GuiCommands::ignore(client, params); }},
+          {"mct", [](auto* client, auto& params) { return GuiCommands::ignore(client, params); }},
+          {"tna", [](auto* client, auto& params) { return GuiCommands::ignore(client, params); }},
+          {"ppo", [](auto* client, auto& params) { return GuiCommands::ignore(client, params); }},
+          {"plv", [](auto* client, auto& params) { return GuiCommands::ignore(client, params); }},
+          {"pin", [](auto* client, auto& params) { return GuiCommands::ignore(client, params); }},
+          {"sgt", [](auto* client, auto& params) { return GuiCommands::ignore(client, params); }},
+          {"sst", [](auto* client, auto& params) { return GuiCommands::ignore(client, params); }},
 
-    };
-}
+      }) {}
 
 void GuiCommands::execute(Client* client, std::string_view msg) {
-    const CommandData cmd = this->extractCommand(msg);
+    CommandData cmd = this->extractCommand(msg);
 
     if (auto iter = this->_commands.find(cmd.name); iter != this->_commands.end()) {
         if (!iter->second(client, cmd)) {
@@ -42,6 +43,12 @@ void GuiCommands::execute(Client* client, std::string_view msg) {
     } else {
         std::ignore = client->sendMessage("suc\n");
     }
+}
+
+bool GuiCommands::ignore(Client* client, CommandData& params) {
+    (void)client;
+    (void)params;
+    return false;
 }
 
 }  // namespace zappy::server::command

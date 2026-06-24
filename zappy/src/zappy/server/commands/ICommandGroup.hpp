@@ -38,7 +38,7 @@ class ICommandGroup {
         std::vector<std::string> params;
     };
 
-    using CommandInvoker = std::function<bool(Client* client, CommandData)>;
+    using CommandInvoker = std::function<bool(Client* client, CommandData&)>;
 
     virtual Timer& timer() = 0;
     virtual client::ClientRegistry& clients() = 0;
