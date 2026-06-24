@@ -33,7 +33,7 @@ class World : public IEventEmitter {
   public:
     static constexpr std::uint16_t kMajorTickInterval{20};
 
-    World(math::Vector2u size, std::optional<io::Logger> logger);
+    explicit World(math::Vector2u size, std::optional<io::Logger> logger = std::nullopt);
     ~World() override = default;
 
     World(const World&) = delete;
