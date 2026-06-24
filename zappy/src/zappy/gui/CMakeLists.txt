@@ -26,6 +26,8 @@ add_library(zappy_gui_objects OBJECT
         render/AssetStore.hpp
         render/Renderer.cpp
         render/Renderer.hpp
+        render/Grid.cpp
+        render/Grid.hpp
         render/Camera.cpp
         render/Camera.hpp
         render/tools/Vec2D.cpp
