@@ -7,7 +7,6 @@
 
 #include "zappy/server/game/EntityDatabase.hpp"
 
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include <cstdint>
@@ -19,7 +18,6 @@
 #include <vector>
 
 #include "EntityMock.hpp"
-#include "zappy/server/game/IEntity.hpp"
 
 namespace zappy::server::game {
 namespace {
