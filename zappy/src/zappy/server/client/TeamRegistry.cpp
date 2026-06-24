@@ -12,7 +12,6 @@
 #include <ranges>
 #include <string>
 #include <string_view>
-#include <utility>
 
 #include "Team.hpp"
 #include "zappy/shared/exception/InvalidArgument.hpp"
@@ -21,7 +20,7 @@
 namespace zappy::server::client {
 beman::any_view::any_view<const Team> TeamRegistry::teams() const { return _teams | std::views::values; }
 
-const Team* TeamRegistry::team(const std::string& name) const {
+const Team* TeamRegistry::team(const std::string_view name) const {
     if (const auto it = _teams.find(name); it != _teams.end()) {
         return &it->second;
     }
@@ -47,7 +46,7 @@ Team& TeamRegistry::createTeam(const std::string_view name) {
     throw exception::InvalidArgument{"team name already in use"};
 }
 
-void TeamRegistry::addToTeam(const std::string& teamName, const network::Address& address) {
+void TeamRegistry::addToTeam(const std::string_view teamName, const network::Address& address) {
     const auto it = _teams.find(teamName);
 
     if (it == _teams.end()) {
