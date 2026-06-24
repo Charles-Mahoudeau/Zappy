@@ -42,7 +42,7 @@ std::string EventHelper::toWire(const Event& event) {
                 return std::format("pin #{} {} {} {}", e.playerId, e.position.x, e.position.y, e.inventory.string());
             },
             [](const PlayerExpulsionEvent& e) { return std::format("pex #{}", e.playerId); },
-            [](const PlayerBroadcastEvent& e) { return std::format("pex #{} {}", e.playerId, e.message); },
+            [](const PlayerBroadcastEvent& e) { return std::format("pbc #{} {}", e.playerId, e.message); },
             [](const IncantationBeginEvent& e) {
                 std::stringstream playersStringStream;
 
