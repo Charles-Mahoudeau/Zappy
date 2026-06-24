@@ -39,6 +39,11 @@ float Widgets::slider(Rectangle bounds, std::string_view textLeft, std::string_v
     return value;
 }
 
+void Widgets::progressBar(Rectangle bounds, std::string_view textLeft, std::string_view textRight, float progress) {
+    float value = progress;
+    GuiProgressBar(bounds, std::string{textLeft}.c_str(), std::string{textRight}.c_str(), &value, 0.0F, 1.0F);
+}
+
 void Widgets::beginScissor(Rectangle area) {
     BeginScissorMode(static_cast<int>(area.x()), static_cast<int>(area.y()), static_cast<int>(area.width()),
                      static_cast<int>(area.height()));

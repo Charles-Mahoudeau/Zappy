@@ -19,9 +19,11 @@
 #include "zappy/gui/display/Window.hpp"
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/render/Camera.hpp"
+#include "zappy/gui/render/utils/Color.hpp"
 #include "zappy/gui/render/utils/Vector3.hpp"
 #include "zappy/gui/ui/Mouse.hpp"
 #include "zappy/gui/ui/VictoryScreen.hpp"
+#include "zappy/gui/ui/Widgets.hpp"
 #include "zappy/gui/ui/utils/Rectangle.hpp"
 #include "zappy/shared/exception/InvalidState.hpp"
 
@@ -82,15 +84,31 @@ void GUI::setupCamera() {
     _camera.setCameraMode(render::CameraMode::CAMERA_CUSTOM);
 }
 
-void GUI::drawLoadingFrame() {
+void GUI::drawLoadingFrame(std::string_view name, float progress) {
     _loadingDots = (_loadingDots % kLoadingMaxDots) + 1;
     const std::string text = std::format("Loading{}", std::string(static_cast<std::size_t>(_loadingDots), '.'));
 
-    static constexpr const char* kWidestText = "Loading...";
-    const int textX = (kWindowWidth - MeasureText(kWidestText, kLoadingFontSize)) / 2;
+    static constexpr int kBarWidth = 400;
+    static constexpr int kBarHeight = 24;
+    static constexpr int kTextSpacing = 10;
+    static constexpr const char* kWidestLoadingText = "Loading...";
+    const int barX = (kWindowWidth - kBarWidth) / 2;
+    const int barY = (kWindowHeight - kBarHeight) / 2;
+    const int loadingTextX = (kWindowWidth - MeasureText(kWidestLoadingText, kLoadingFontSize)) / 2;
 
     _window.beginFrame();
-    DrawText(text.c_str(), textX, (kWindowHeight - kLoadingFontSize) / 2, kLoadingFontSize, WHITE);
+
+    const int loadingY = barY - kTextSpacing - kLoadingFontSize;
+    DrawText(text.c_str(), loadingTextX, loadingY, kLoadingFontSize, render::Color::kWHITE);
+
+    ui::Widgets::progressBar(ui::Rectangle{static_cast<float>(barX), static_cast<float>(barY),
+                                           static_cast<float>(kBarWidth), static_cast<float>(kBarHeight)},
+                             "", "", progress);
+
+    const std::string nameText{name};
+    const int nameY = barY + kBarHeight + kTextSpacing;
+    DrawText(nameText.c_str(), barX, nameY, kLoadingFontSize, render::Color::kWHITE);
+
     _window.endFrame();
 }
 
@@ -106,11 +124,11 @@ int GUI::init(const GuiCliParser& cli) {
     _window = display::Window{kWindowWidth, kWindowHeight, "Zappy"};
     _window.setTargetFPS(kTargetFPS);
     _theme = ui::GuiTheme{kStylePath};
-    drawLoadingFrame();
+    drawLoadingFrame("", 0.0F);
 
     setupCamera();
 
-    _assets.load([this]() { drawLoadingFrame(); });
+    _assets.load([this](std::string_view name, float progress) { drawLoadingFrame(name, progress); });
 
     return 0;
 }

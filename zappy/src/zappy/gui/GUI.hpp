@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <string_view>
+
 #include "zappy/gui/GuiCliParser.hpp"
 #include "zappy/gui/display/Window.hpp"
 #include "zappy/gui/game/GameState.hpp"
@@ -47,7 +49,7 @@ class GUI {
 
   private:
     void setupCamera();
-    void drawLoadingFrame();
+    void drawLoadingFrame(std::string_view name, float progress);
 
     zappy::network::Address _address;
     zappy::network::BufferedClient _buffer;

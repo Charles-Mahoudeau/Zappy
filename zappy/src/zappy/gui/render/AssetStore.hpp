@@ -22,7 +22,7 @@ namespace zappy::gui::render {
 
 class AssetStore {
   public:
-    using ProgressCallback = std::function<void()>;
+    using ProgressCallback = std::function<void(std::string_view name, float progress)>;
 
     AssetStore() = default;
     ~AssetStore() = default;
@@ -55,7 +55,7 @@ class AssetStore {
     static Model createModel(std::string_view path, std::string_view animationPath,
                              std::initializer_list<TextureMap> textures, bool flipVertical = false);
 
-    static constexpr int kMaxModels = 10;
+    static constexpr int kMaxModels = 6;
 
     Skybox _skybox;
     std::vector<Model> _playerModels;
