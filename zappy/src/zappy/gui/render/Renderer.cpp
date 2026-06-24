@@ -70,10 +70,8 @@ void Renderer::drawResourceStack(const Model& model, const Vector3& position, st
 
 void Renderer::drawEggs(const game::GameState& state, const AssetStore& assets) {
     const auto& eggs = state.eggs();
-    printf("Drawing %zu eggs\n", eggs.size());
     for (const auto& [eggId, egg] : eggs) {
         const Vector3 position(static_cast<float>(egg.x), 0.0F, static_cast<float>(egg.y));
-        printf("Drawing egg %u at position (%.2f, %.2f, %.2f)\n", eggId, position.x(), position.y(), position.z());
         assets.eggModel().draw(position, kScale, Color::kWHITE);
     }
 }
