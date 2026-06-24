@@ -31,10 +31,10 @@ class Renderer {
     void update(Camera& camera, game::GameState& state, AssetStore& assets);
 
   private:
-    void drawResources(const game::GameState& state, const AssetStore& assets) const;
+    static void drawResources(const game::GameState& state, const AssetStore& assets);
     static void drawTileResources(const game::Resources& tile, const Vector3& position, const AssetStore& assets);
     static void drawResourceStack(const Model& model, const Vector3& position, std::uint32_t count);
-    void drawEggs(const game::GameState& state, const AssetStore& assets) const;
+    static void drawEggs(const game::GameState& state, const AssetStore& assets);
     static std::uint32_t resourceCount(const game::Resources& tile, game::ResourceType type);
 
     struct PlayerVisual {

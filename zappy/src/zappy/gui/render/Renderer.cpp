@@ -46,7 +46,7 @@ void Renderer::update(Camera& camera, game::GameState& state, AssetStore& assets
     display::Window::EndMode3D();
 }
 
-void Renderer::drawResources(const game::GameState& state, const AssetStore& assets) const {
+void Renderer::drawResources(const game::GameState& state, const AssetStore& assets) {
     for (std::size_t y = 0; y < state.height(); ++y) {
         for (std::size_t x = 0; x < state.width(); ++x) {
             const Vector3 position = render::Grid::tileToWorld(static_cast<float>(x), static_cast<float>(y));
@@ -70,7 +70,7 @@ void Renderer::drawResourceStack(const Model& model, const Vector3& position, st
     }
 }
 
-void Renderer::drawEggs(const game::GameState& state, const AssetStore& assets) const {
+void Renderer::drawEggs(const game::GameState& state, const AssetStore& assets) {
     const auto& eggs = state.eggs();
     for (const auto& [eggId, egg] : eggs) {
         const Vector3 position = render::Grid::tileToWorld(static_cast<float>(egg.x), static_cast<float>(egg.y));
