@@ -9,6 +9,7 @@
 
 #include <beman/any_view/any_view.hpp>
 #include <string>
+#include <string_view>
 #include <unordered_map>
 
 #include "Team.hpp"
@@ -47,7 +48,7 @@ class TeamRegistry {
     /// @brief Creates a new team with the given name.
     /// @param name The name of the team to create.
     /// @return A reference to the newly created team.
-    Team& createTeam(std::string name);
+    Team& createTeam(std::string_view name);
 
     /// @brief Add a client address to the team.
     /// @param teamName

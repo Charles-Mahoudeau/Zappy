@@ -11,6 +11,7 @@
 #include <beman/any_view/any_view.hpp>
 #include <ranges>
 #include <string>
+#include <string_view>
 #include <utility>
 
 #include "Team.hpp"
@@ -39,10 +40,8 @@ const Team* TeamRegistry::team(const network::Address& address) const {
 
 beman::any_view::any_view<const std::string> TeamRegistry::teamNames() const { return _teams | std::views::keys; }
 
-Team& TeamRegistry::createTeam(std::string name) {
-    std::string key = name;
-
-    if (auto [it, inserted] = _teams.try_emplace(std::move(key), Team{std::move(name)}); inserted) {
+Team& TeamRegistry::createTeam(const std::string_view name) {
+    if (auto [it, inserted] = _teams.try_emplace(std::string{name}, std::string{name}); inserted) {
         return it->second;
     }
     throw exception::InvalidArgument{"team name already in use"};
