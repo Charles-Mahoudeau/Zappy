@@ -7,6 +7,12 @@
 
 #pragma once
 
+#include <cstdint>
+#include <string_view>
+
+#include "zappy/server/game/IEntity.hpp"
+#include "zappy/shared/math/Vector2.hpp"
+
 namespace zappy::server::game {
 class EntityMock : public IEntity {
   public:
