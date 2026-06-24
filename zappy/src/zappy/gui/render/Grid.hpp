@@ -44,7 +44,6 @@ class Grid {
     static constexpr float kBridgeScale = 1.0F;
 
     static constexpr float kYOffset = -0.4F;
-    static constexpr float kBridgeYOffset = 0.5F;
 
     std::size_t _width{0};
     std::size_t _height{0};
