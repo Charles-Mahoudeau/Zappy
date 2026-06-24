@@ -154,4 +154,8 @@ Model AssetStore::createModel(std::string_view path, std::string_view animationP
     return model;
 }
 
+const std::map<std::string_view, ParticleEmitter>& AssetStore::vfxs() const { return _vfxs; }
+
+std::map<std::string_view, ParticleEmitter>& AssetStore::vfxs() { return _vfxs; }
+
 }  // namespace zappy::gui::render

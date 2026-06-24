@@ -44,6 +44,8 @@ class AssetStore {
     [[nodiscard]] Model& playerModel(std::size_t index);
     [[nodiscard]] std::size_t playerModelCount() const;
     [[nodiscard]] const std::map<game::ResourceType, Model>& resourceModels() const;
+    [[nodiscard]] const std::map<std::string_view, ParticleEmitter>& vfxs() const;
+    [[nodiscard]] std::map<std::string_view, ParticleEmitter>& vfxs();
 
   private:
     struct TextureMap {
