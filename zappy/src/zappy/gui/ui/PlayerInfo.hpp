@@ -36,7 +36,19 @@ class PlayerInfo {
     [[nodiscard]] static std::optional<std::uint32_t> pick(Vector2 mousePos, const render::Camera& camera,
                                                            const game::GameState& state);
 
+    [[nodiscard]] static float height();
+
     static void draw(const game::GameState& state, std::uint32_t playerId, Rectangle bounds);
+
+  private:
+    static constexpr float kRowHeight = 24.0F;
+    static constexpr float kTextMarginTop = 4.0F;
+    static constexpr float kSectionGap = 8.0F;
+    static constexpr int kPlacementRowCount = 2;
+    static constexpr int kStateRowCount = 2;
+    static constexpr int kInventoryRowCount = 7;
+
+    [[nodiscard]] static float sectionHeight(int rowCount);
 };
 
 }  // namespace zappy::gui::ui

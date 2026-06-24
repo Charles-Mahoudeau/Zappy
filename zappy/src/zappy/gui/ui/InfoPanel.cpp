@@ -63,6 +63,20 @@ std::optional<std::pair<std::uint32_t, std::uint32_t>> InfoPanel::selectedTile()
 
 std::optional<std::uint32_t> InfoPanel::selectedPlayerId() const { return _selectedPlayerId; }
 
+float InfoPanel::contentHeight(const game::GameState& state) const {
+    using enum InfoPanelState;
+
+    switch (_state) {
+        case Leaderboard:
+            return Leaderboard::height(state);
+        case Tile:
+            return TileInfo::height();
+        case Player:
+            return PlayerInfo::height();
+    }
+    return 0.0F;
+}
+
 void InfoPanel::draw(const game::GameState& state, Rectangle bounds) const {
     using enum InfoPanelState;
 

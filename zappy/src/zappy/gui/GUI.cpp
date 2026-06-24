@@ -133,9 +133,10 @@ int GUI::run() {
             ui::Rectangle{kTimeSliderMarginRight, kTimeSliderMarginTop, kTimeSliderWidth, kTimeSliderHeight});
 
         _infoPanel.update(ui::Mouse::position(), ui::Mouse::isLeftButtonPressed(), _camera, _state);
+        const float infoPanelMaxHeight = static_cast<float>(kWindowHeight) - (2.0F * kInfoPanelMargin);
+        const float infoPanelHeight = std::min(_infoPanel.contentHeight(_state), infoPanelMaxHeight);
         _infoPanel.draw(_state, ui::Rectangle{static_cast<float>(kWindowWidth) - kInfoPanelWidth - kInfoPanelMargin,
-                                              kInfoPanelMargin, kInfoPanelWidth,
-                                              static_cast<float>(kWindowHeight) - (2.0F * kInfoPanelMargin)});
+                                              kInfoPanelMargin, kInfoPanelWidth, infoPanelHeight});
         _window.endFrame();
     }
     return 0;

@@ -74,11 +74,17 @@ std::optional<std::uint32_t> PlayerInfo::pick(Vector2 mousePos, const render::Ca
     return std::nullopt;
 }
 
+float PlayerInfo::sectionHeight(int rowCount) {
+    return Widgets::kPanelHeaderHeight + kTextMarginTop + (static_cast<float>(rowCount) * kRowHeight);
+}
+
+float PlayerInfo::height() {
+    return Widgets::kPanelHeaderHeight + kTextMarginTop + sectionHeight(kPlacementRowCount) + kSectionGap +
+           sectionHeight(kStateRowCount) + kSectionGap + sectionHeight(kInventoryRowCount) + kSectionGap;
+}
+
 void PlayerInfo::draw(const game::GameState& state, std::uint32_t playerId, Rectangle bounds) {
-    static constexpr float kRowHeight = 24.0F;
     static constexpr float kTextMarginLeft = 8.0F;
-    static constexpr float kTextMarginTop = 4.0F;
-    static constexpr float kSectionGap = 8.0F;
     static constexpr float kSectionMargin = 8.0F;
 
     const auto it = state.players().find(playerId);
@@ -94,9 +100,8 @@ void PlayerInfo::draw(const game::GameState& state, std::uint32_t playerId, Rect
     const float sectionWidth = bounds.width() - (2.0F * kSectionMargin);
 
     const auto drawSection = [&](std::string_view title, std::initializer_list<std::string> lines) {
-        const float sectionHeight =
-            Widgets::kPanelHeaderHeight + kTextMarginTop + (static_cast<float>(lines.size()) * kRowHeight);
-        const Rectangle sectionBounds{sectionX, y, sectionWidth, sectionHeight};
+        const float boxHeight = sectionHeight(static_cast<int>(lines.size()));
+        const Rectangle sectionBounds{sectionX, y, sectionWidth, boxHeight};
         Widgets::panel(sectionBounds, title);
 
         float rowY = sectionBounds.y() + Widgets::kPanelHeaderHeight + kTextMarginTop;
@@ -106,7 +111,7 @@ void PlayerInfo::draw(const game::GameState& state, std::uint32_t playerId, Rect
                            line);
             rowY += kRowHeight;
         }
-        y += sectionHeight + kSectionGap;
+        y += boxHeight + kSectionGap;
     };
 
     drawSection("Placement", {

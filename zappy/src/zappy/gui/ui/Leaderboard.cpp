@@ -40,11 +40,11 @@ std::vector<LeaderboardEntry> Leaderboard::compute(const game::GameState& state)
     return entries;
 }
 
-void Leaderboard::draw(const game::GameState& state, Rectangle bounds) {
-    static constexpr float kRowHeight = 24.0F;
-    static constexpr float kTextMarginLeft = 8.0F;
-    static constexpr float kTextMarginTop = 4.0F;
+float Leaderboard::height(const game::GameState& state) {
+    return Widgets::kPanelHeaderHeight + kTextMarginTop + (static_cast<float>(state.teams().size()) * kRowHeight);
+}
 
+void Leaderboard::draw(const game::GameState& state, Rectangle bounds) {
     Widgets::panel(bounds, "Leaderboard");
     const auto entries = compute(state);
     for (std::size_t i = 0; i < entries.size(); ++i) {

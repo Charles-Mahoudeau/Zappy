@@ -37,7 +37,15 @@ class TileInfo {
                                                                                      const render::Camera& camera,
                                                                                      const game::GameState& state);
 
+    [[nodiscard]] static float height();
+
     static void draw(const game::GameState& state, std::uint32_t x, std::uint32_t y, Rectangle bounds);
+
+  private:
+    static constexpr float kRowHeight = 24.0F;
+    static constexpr float kTextMarginLeft = 8.0F;
+    static constexpr float kTextMarginTop = 4.0F;
+    static constexpr std::size_t kRowCount = 7;
 };
 
 }  // namespace zappy::gui::ui

@@ -31,7 +31,14 @@ class Leaderboard {
 
     [[nodiscard]] static std::vector<LeaderboardEntry> compute(const game::GameState& state);
 
+    [[nodiscard]] static float height(const game::GameState& state);
+
     static void draw(const game::GameState& state, Rectangle bounds);
+
+  private:
+    static constexpr float kRowHeight = 24.0F;
+    static constexpr float kTextMarginLeft = 8.0F;
+    static constexpr float kTextMarginTop = 4.0F;
 };
 
 }  // namespace zappy::gui::ui

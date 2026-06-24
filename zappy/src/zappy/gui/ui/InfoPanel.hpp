@@ -40,6 +40,8 @@ class InfoPanel {
     void update(Vector2 mousePos, bool clicked, const render::Camera& camera, const game::GameState& state);
     void draw(const game::GameState& state, Rectangle bounds) const;
 
+    [[nodiscard]] float contentHeight(const game::GameState& state) const;
+
     [[nodiscard]] InfoPanelState state() const;
     [[nodiscard]] std::optional<std::pair<std::uint32_t, std::uint32_t>> selectedTile() const;
     [[nodiscard]] std::optional<std::uint32_t> selectedPlayerId() const;

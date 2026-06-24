@@ -72,11 +72,11 @@ std::optional<std::pair<std::uint32_t, std::uint32_t>> TileInfo::pick(Vector2 mo
     return intersectGroundPlane(ray, state.width(), state.height());
 }
 
-void TileInfo::draw(const game::GameState& state, std::uint32_t x, std::uint32_t y, Rectangle bounds) {
-    static constexpr float kRowHeight = 24.0F;
-    static constexpr float kTextMarginLeft = 8.0F;
-    static constexpr float kTextMarginTop = 4.0F;
+float TileInfo::height() {
+    return Widgets::kPanelHeaderHeight + kTextMarginTop + (static_cast<float>(kRowCount) * kRowHeight);
+}
 
+void TileInfo::draw(const game::GameState& state, std::uint32_t x, std::uint32_t y, Rectangle bounds) {
     Widgets::panel(bounds, std::format("Tile ({}, {})", x, y));
 
     const game::Resources& resources = state.tile(x, y);
