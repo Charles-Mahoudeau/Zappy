@@ -49,7 +49,7 @@ void Renderer::update(Camera& camera, game::GameState& state, AssetStore& assets
 void Renderer::drawResources(const game::GameState& state, const AssetStore& assets) const {
     for (std::size_t y = 0; y < state.height(); ++y) {
         for (std::size_t x = 0; x < state.width(); ++x) {
-            const Vector3 position = _grid.tileToWorld(static_cast<float>(x), static_cast<float>(y));
+            const Vector3 position = render::Grid::tileToWorld(static_cast<float>(x), static_cast<float>(y));
             drawTileResources(state.tile(x, y), position, assets);
         }
     }
@@ -73,7 +73,7 @@ void Renderer::drawResourceStack(const Model& model, const Vector3& position, st
 void Renderer::drawEggs(const game::GameState& state, const AssetStore& assets) const {
     const auto& eggs = state.eggs();
     for (const auto& [eggId, egg] : eggs) {
-        const Vector3 position = _grid.tileToWorld(static_cast<float>(egg.x), static_cast<float>(egg.y));
+        const Vector3 position = render::Grid::tileToWorld(static_cast<float>(egg.x), static_cast<float>(egg.y));
         assets.eggModel().draw(position, kScale, Color::kWHITE);
     }
 }
@@ -139,7 +139,7 @@ float Renderer::torusNearest(float current, float target, float size) {
 }
 
 void Renderer::updatePlayerPos(PlayerVisual& visual, const game::Player& player, float dt) const {
-    const Vector3 target = _grid.tileToWorld(static_cast<float>(player.x), static_cast<float>(player.y));
+    const Vector3 target = render::Grid::tileToWorld(static_cast<float>(player.x), static_cast<float>(player.y));
     const float worldWidth = _grid.worldWidth();
     const float worldHeight = _grid.worldHeight();
 
