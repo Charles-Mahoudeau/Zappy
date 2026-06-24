@@ -54,6 +54,11 @@ class Inventory {
     [[nodiscard]] std::string string() const;
 
   private:
+    /// @brief Check if a resource type is valid.
+    /// @param type The type of resource to check.
+    /// @return True if the resource type is valid, false otherwise.
+    [[nodiscard]] static bool isValidResourceType(ResourceType type);
+
     std::unordered_map<ResourceType, std::uint16_t> _resources;
 };
 }  // namespace zappy::server::game
