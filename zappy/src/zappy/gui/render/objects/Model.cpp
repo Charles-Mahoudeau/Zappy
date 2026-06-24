@@ -179,7 +179,7 @@ void Model::updateAnimation() {
         return;
     }
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-avoid-unchecked-container-access)
-    if (_currentFrame < 0 || _currentFrame >= animations[_currentAnim].frameCount) {
+    if (_currentFrame < 0 || _currentFrame >= animations[_currentAnim].keyframeCount) {
         _currentFrame = 0;
     }
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-avoid-unchecked-container-access)
@@ -195,7 +195,7 @@ int Model::currentAnimationKeyframeCount() const {
         return 0;
     }
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-avoid-unchecked-container-access)
-    return animations[_currentAnim].frameCount;
+    return animations[_currentAnim].keyframeCount;
 }
 
 void Model::setTexture(int materialIndex, MaterialMapIndex mapIndex, ::Texture texture) {
