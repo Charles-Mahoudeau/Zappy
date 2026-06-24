@@ -62,5 +62,6 @@ class Camera {
   private:
     Camera3D _camera{};
     CameraMode _cameraMode{CameraMode::CAMERA_CUSTOM};
+    float _maxFovy{500.0F};
 };
 }  // namespace zappy::gui::render

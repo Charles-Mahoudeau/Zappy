@@ -18,13 +18,12 @@ namespace zappy::gui::render {
 
 Camera::Camera(const Vector3 position, const Vector3 target, const Vector3 up, const float fovy,
                const CameraProjection projection)
-    : _camera{.position = position,
-              .target = target,
-              .up = up,
-              .fovy = fovy,
-              .projection = std::to_underlying(projection)} {}
+    : _camera{
+          .position = position, .target = target, .up = up, .fovy = fovy, .projection = std::to_underlying(projection)},
+      _maxFovy{fovy} {}
 
-Camera::Camera(Camera&& other) noexcept : _camera(other._camera), _cameraMode(other._cameraMode) {
+Camera::Camera(Camera&& other) noexcept
+    : _camera(other._camera), _cameraMode(other._cameraMode), _maxFovy(other._maxFovy) {
     other._camera = {};
     other._cameraMode = CameraMode::CAMERA_CUSTOM;
 }
@@ -33,6 +32,7 @@ Camera& Camera::operator=(Camera&& other) noexcept {
     if (this != &other) {
         _camera = other._camera;
         _cameraMode = other._cameraMode;
+        _maxFovy = other._maxFovy;
         other._camera = {};
         other._cameraMode = CameraMode::CAMERA_CUSTOM;
     }
@@ -66,8 +66,7 @@ void Camera::setCameraMode(CameraMode mode) { _cameraMode = mode; }
 void Camera::zoom(float delta) {
     static constexpr float kZoomSpeed = 2.0F;
     static constexpr float kMinFovy = 5.0F;
-    static constexpr float kMaxFovy = 500.0F;
-    _camera.fovy = std::clamp(_camera.fovy - (delta * kZoomSpeed), kMinFovy, kMaxFovy);
+    _camera.fovy = std::clamp(_camera.fovy - (delta * kZoomSpeed), kMinFovy, _maxFovy);
 }
 
 void Camera::applyManualZoomInput() {
