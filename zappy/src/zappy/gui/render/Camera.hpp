@@ -48,6 +48,7 @@ class Camera {
     void setFovy(float fovy);
     void setProjection(CameraProjection projection);
     void setCameraMode(CameraMode mode);
+    void zoom(float delta);
 
     void update();
 

@@ -9,6 +9,7 @@
 
 #include <raylib.h>
 
+#include <algorithm>
 #include <utility>
 
 namespace zappy::gui::render {
@@ -59,6 +60,13 @@ void Camera::setFovy(float fovy) { _camera.fovy = fovy; }
 void Camera::setProjection(CameraProjection projection) { _camera.projection = std::to_underlying(projection); }
 
 void Camera::setCameraMode(CameraMode mode) { _cameraMode = mode; }
+
+void Camera::zoom(float delta) {
+    static constexpr float kZoomSpeed = 2.0F;
+    static constexpr float kMinFovy = 5.0F;
+    static constexpr float kMaxFovy = 500.0F;
+    _camera.fovy = std::clamp(_camera.fovy - (delta * kZoomSpeed), kMinFovy, kMaxFovy);
+}
 
 void Camera::update() { UpdateCamera(&_camera, std::to_underlying(_cameraMode)); }
 
