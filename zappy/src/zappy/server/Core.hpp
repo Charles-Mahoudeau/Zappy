@@ -7,11 +7,15 @@
 
 #pragma once
 
+#include <memory>
 #include <span>
 #include <string_view>
+#include <unordered_map>
 
 #include "zappy/server/Timer.hpp"
+#include "zappy/server/client/Client.hpp"
 #include "zappy/server/client/ClientRegistry.hpp"
+#include "zappy/server/commands/ICommandGroup.hpp"
 #include "zappy/server/net/Server.hpp"
 
 namespace zappy::server {
@@ -30,7 +34,7 @@ class Core {
 
     [[noreturn]] void run();
 
-    void processCommands();
+    void processCommandGroup();
 
     void nextTick();
 
@@ -38,6 +42,7 @@ class Core {
     net::Server _serv;
     Timer _time;
     client::ClientRegistry _clientRegistry;
+    std::unordered_map<Client::Type, std::unique_ptr<command::ICommandGroup>> _cmdGroups;
 };
 
 }  // namespace zappy::server

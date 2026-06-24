@@ -7,6 +7,7 @@
 
 #include "zappy/server/commands/GuiCommands.hpp"
 
+#include <iostream>
 #include <string_view>
 
 #include "zappy/server/Timer.hpp"
@@ -18,26 +19,26 @@ namespace zappy::server::command {
 
 GuiCommands::GuiCommands(Timer& timer, client::ClientRegistry& clients) : ACommandGroup(timer, clients) {
     this->_commands = {
-        {"msz", [](auto* client, auto params) { return CommandState::kInvalidParam; }},
-        {"bct", [](auto* client, auto params) { return CommandState::kInvalidParam; }},
-        {"mct", [](auto* client, auto params) { return CommandState::kInvalidParam; }},
-        {"tna", [](auto* client, auto params) { return CommandState::kInvalidParam; }},
-        {"ppo", [](auto* client, auto params) { return CommandState::kInvalidParam; }},
-        {"plv", [](auto* client, auto params) { return CommandState::kInvalidParam; }},
-        {"pin", [](auto* client, auto params) { return CommandState::kInvalidParam; }},
-        {"sgt", [](auto* client, auto params) { return CommandState::kInvalidParam; }},
-        {"sst", [](auto* client, auto params) { return CommandState::kInvalidParam; }},
+        {"msz", [](auto* client, auto params) {}}, {"bct", [](auto* client, auto params) {}},
+        {"mct", [](auto* client, auto params) {}}, {"tna", [](auto* client, auto params) {}},
+        {"ppo", [](auto* client, auto params) {}}, {"plv", [](auto* client, auto params) {}},
+        {"pin", [](auto* client, auto params) {}}, {"sgt", [](auto* client, auto params) {}},
+        {"sst", [](auto* client, auto params) {}},
 
     };
 }
 
-CommandState GuiCommands::execute(Client* client, std::string_view msg) {
+void GuiCommands::execute(Client* client, std::string_view msg) {
     const CommandData cmd = this->extractCommand(msg);
 
     if (auto iter = this->_commands.find(cmd.name); iter != this->_commands.end()) {
-        return iter->second(client, cmd);
+        iter->second(client, cmd);
+        return;
     }
-    return CommandState::kInvalidCommand;
+
+    if (!client->sendMessage("suc\n")) {
+        std::cerr << "Fail to notice fail command on " << client->address() << "\n";
+    }
 }
 
 }  // namespace zappy::server::command

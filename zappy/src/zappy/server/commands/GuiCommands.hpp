@@ -29,10 +29,10 @@ class GuiCommands : public ACommandGroup {
     GuiCommands& operator=(const GuiCommands&) = delete;
     GuiCommands& operator=(GuiCommands&&) = delete;
 
-    CommandState execute(Client* client, std::string_view msg) override;
+    void execute(Client* client, std::string_view msg) override;
 
   private:
-    using CommandInvoker = std::function<CommandState(Client* client, CommandData)>;
+    using CommandInvoker = std::function<void(Client* client, CommandData)>;
 
     std::unordered_map<std::string_view, CommandInvoker> _commands;
 };

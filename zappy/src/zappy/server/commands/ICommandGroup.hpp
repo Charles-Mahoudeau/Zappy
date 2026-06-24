@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include <cstdint>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -17,13 +16,6 @@
 #include "zappy/server/client/ClientRegistry.hpp"
 
 namespace zappy::server::command {
-
-enum class CommandState : std::uint8_t {
-    kSuccess,
-    kInvalidCommand,
-    kInvalidParam
-
-};
 
 class ICommandGroup {
   public:
@@ -35,7 +27,7 @@ class ICommandGroup {
     ICommandGroup& operator=(const ICommandGroup&) = default;
     ICommandGroup& operator=(ICommandGroup&&) = delete;
 
-    virtual CommandState execute(Client* client, std::string_view cmd) = 0;
+    virtual void execute(Client* client, std::string_view cmd) = 0;
 
     virtual void operator()(Client* client, std::string_view cmd) = 0;
 

@@ -5,8 +5,8 @@ add_library(zappy_server_objects OBJECT
         Core.cpp
         CliParser.hpp
         CliParser.cpp
-		Timer.hpp
-		Timer.cpp
+        Timer.hpp
+        Timer.cpp
         game/EntityDatabase.cpp
         game/EntityDatabase.hpp
         game/IEntity.hpp
@@ -19,8 +19,8 @@ add_library(zappy_server_objects OBJECT
         game/entity/Egg.hpp
         game/entity/Resource.cpp
         game/entity/Resource.hpp
-		net/Server.hpp
-		net/Server.cpp
+        net/Server.hpp
+        net/Server.cpp
         net/SocketRegistry.hpp
         net/SocketRegistry.cpp
         client/Client.hpp
@@ -31,6 +31,15 @@ add_library(zappy_server_objects OBJECT
         game/World.hpp
         game/Tile.cpp
         game/Tile.hpp
+        commands/ICommandGroup.hpp
+        commands/ACommandGroup.hpp
+        commands/ACommandGroup.cpp
+        commands/UnknownCommands.hpp
+        commands/UnknownCommands.cpp
+        commands/GuiCommands.hpp
+        commands/GuiCommands.cpp
+        commands/PlayerCommands.hpp
+        commands/PlayerCommands.cpp
 )
 target_include_directories(zappy_server_objects PUBLIC
         ${CMAKE_SOURCE_DIR}/src
