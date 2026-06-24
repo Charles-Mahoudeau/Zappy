@@ -31,6 +31,7 @@ class ACommandGroup : public ICommandGroup {
   protected:
     Timer& timer() override;
     client::ClientRegistry& clients() override;
+    CommandData extractCommand(std::string_view msg) override;
 
   private:
     Timer& _timer;
