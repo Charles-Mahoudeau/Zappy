@@ -30,50 +30,30 @@ class WorldTest : public testing::Test {
 }  // namespace
 
 TEST_F(WorldTest, Size) {
-    const zappy::server::game::World world1{{
-        .size = {69, 42},
-        .teamCount = 1,
-        .playersPerTeam = 1,
-        .logger = logger("Size"),
-    }};
+    const zappy::server::game::World world1{
+        {69, 42},
+        logger("Size"),
+    };
 
     EXPECT_EQ(world1.size(), (zappy::math::Vector2u{69, 42}));
 
-    const zappy::server::game::World world2{{
-        .size = {3, 10},
-        .teamCount = 1,
-        .playersPerTeam = 1,
-    }};
+    const zappy::server::game::World world2{
+        {3, 10},
+        logger("Size"),
+    };
 
     EXPECT_EQ(world2.size(), (zappy::math::Vector2u{3, 10}));
 
-    EXPECT_THROW((zappy::server::game::World{{
-                     .size = {0, 0},
-                     .teamCount = 1,
-                     .playersPerTeam = 1,
-                 }}),
-                 zappy::exception::OutOfRange);
-    EXPECT_THROW((zappy::server::game::World{{
-                     .size = {1, 0},
-                     .teamCount = 1,
-                     .playersPerTeam = 1,
-                 }}),
-                 zappy::exception::OutOfRange);
-    EXPECT_THROW((zappy::server::game::World{{
-                     .size = {0, 1},
-                     .teamCount = 1,
-                     .playersPerTeam = 1,
-                 }}),
-                 zappy::exception::OutOfRange);
+    EXPECT_THROW((zappy::server::game::World{{0, 0}}), zappy::exception::OutOfRange);
+    EXPECT_THROW((zappy::server::game::World{{1, 0}}), zappy::exception::OutOfRange);
+    EXPECT_THROW((zappy::server::game::World{{0, 1}}), zappy::exception::OutOfRange);
 }
 
 TEST_F(WorldTest, ResourceCounting) {
-    zappy::server::game::World world{{
-        .size = {10, 10},
-        .teamCount = 1,
-        .playersPerTeam = 1,
-        .logger = logger("ResourceCounting"),
-    }};
+    zappy::server::game::World world{
+        {10, 10},
+        logger("ResourceCounting"),
+    };
 
     EXPECT_EQ(world.countResources(zappy::server::game::ResourceType::kFood), 0);
     world.spawnResource(zappy::server::game::ResourceType::kFood);
@@ -81,30 +61,27 @@ TEST_F(WorldTest, ResourceCounting) {
 }
 
 TEST_F(WorldTest, EggSpawning) {
-    zappy::server::game::World world{{
-        .size = {10, 10},
-        .teamCount = 1,
-        .playersPerTeam = 1,
-        .logger = logger("EggSpawning"),
-    }};
+    zappy::server::game::World world{
+        {10, 10},
+        logger("EggSpawning"),
+    };
 
-    EXPECT_EQ(world.count<zappy::server::game::entity::Egg>(), 1);
+    EXPECT_EQ(world.count<zappy::server::game::entity::Egg>(), 0);
     std::ignore = world.spawnEgg("team1");
-    EXPECT_EQ(world.count<zappy::server::game::entity::Egg>(), 2);
+    EXPECT_EQ(world.count<zappy::server::game::entity::Egg>(), 1);
 }
 
 TEST_F(WorldTest, PlayerAccess) {
-    zappy::server::game::World world{{
-        .size = {10, 10},
-        .teamCount = 1,
-        .playersPerTeam = 1,
-        .logger = logger("PlayerAccess"),
-    }};
+    zappy::server::game::World world{
+        {10, 10},
+        logger("PlayerAccess"),
+    };
 
     // Check that there are no players initially
     EXPECT_EQ(std::ranges::distance(world.players("team1")), 0);
 
     // Hatch an egg to create a player
+    std::ignore = world.spawnEgg("team1");
     const auto playerResult = world.hatchRandomEgg("team1");
     ASSERT_TRUE(playerResult.has_value());
 
