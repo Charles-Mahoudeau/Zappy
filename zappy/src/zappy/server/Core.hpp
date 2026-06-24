@@ -10,9 +10,11 @@
 #include <span>
 #include <string_view>
 
+#include "client/TeamRegistry.hpp"
 #include "zappy/server/Timer.hpp"
 #include "zappy/server/client/ClientRegistry.hpp"
 #include "zappy/server/net/Server.hpp"
+#include "zappy/shared/io/Logger.hpp"
 
 namespace zappy::server {
 
@@ -35,9 +37,11 @@ class Core {
     void nextTick();
 
   private:
+    io::Logger _logger{"Server", "server.log", true};
     net::Server _serv;
     Timer _time;
     client::ClientRegistry _clientRegistry;
+    client::TeamRegistry _teamRegistry;
 };
 
 }  // namespace zappy::server

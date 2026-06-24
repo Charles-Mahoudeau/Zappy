@@ -17,11 +17,29 @@
 
 namespace zappy::server {
 void Core::init(const std::span<std::string_view> argv) {
+    _logger.info("Begin initialization");
+
     CliParser parser{argv};
     const CliParser::CliParameters& parameters = parser.parameters();
 
+    _logger.info("Initializing teams");
+    try {
+        for (std::string_view teamName : parameters.teamsName) {
+            _logger.info(std::format("Creating team '{}'", teamName));
+            _teamRegistry.createTeam(std::string{teamName});
+        }
+    } catch (const std::exception& e) {
+        _logger.fatal(std::format("Failed to initialize teams: {}", e.what()));
+        throw;
+    }
+
+    _logger.info("Initializing network layer");
     this->_serv.init(parameters.port, this->_clientRegistry, this->_time);
+
+    _logger.info("Initializing timer");
     this->_time.setFrequencies(parameters.frequencies);
+
+    _logger.info("Initialization done!");
 }
 
 void Core::run() {
