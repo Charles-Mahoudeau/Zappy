@@ -27,7 +27,6 @@ class Grid {
 
     [[nodiscard]] std::size_t width() const { return _width; }
     [[nodiscard]] std::size_t height() const { return _height; }
-    [[nodiscard]] float spacing() const { return kSpacing; }
     [[nodiscard]] float worldWidth() const { return static_cast<float>(_width) * kSpacing; }
     [[nodiscard]] float worldHeight() const { return static_cast<float>(_height) * kSpacing; }
     [[nodiscard]] Vector3 tileToWorld(float tileX, float tileY, float elevation = 0.0F) const;
