@@ -22,7 +22,7 @@
 namespace zappy::server::game {
 struct TileInventoryEvent {
     math::Vector2u position;
-    std::reference_wrapper<const Inventory> inventory;
+    Inventory inventory;
 };
 
 struct PlayerConnectionEvent {
@@ -47,7 +47,7 @@ struct PlayerLevelEvent {
 struct PlayerInventoryEvent {
     std::uint64_t playerId{};
     math::Vector2u position;
-    std::reference_wrapper<const Inventory> inventory;
+    Inventory inventory;
 };
 
 struct PlayerExpulsionEvent {

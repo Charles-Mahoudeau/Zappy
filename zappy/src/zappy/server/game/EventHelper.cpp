@@ -27,7 +27,7 @@ std::string EventHelper::toWire(const Event& event) {
     return std::visit(
         overloads{
             [](const TileInventoryEvent& e) {
-                return std::format("bct {} {} {}", e.position.x, e.position.y, e.inventory.get().string());
+                return std::format("bct {} {} {}", e.position.x, e.position.y, e.inventory.string());
             },
             [](const PlayerConnectionEvent& e) {
                 return std::format("pnw #{} {} {} {} {} {}", e.playerId, e.position.x, e.position.y,
@@ -39,8 +39,7 @@ std::string EventHelper::toWire(const Event& event) {
             },
             [](const PlayerLevelEvent& e) { return std::format("plv #{} {}", e.playerId, e.level); },
             [](const PlayerInventoryEvent& e) {
-                return std::format("pin #{} {} {} {}", e.playerId, e.position.x, e.position.y,
-                                   e.inventory.get().string());
+                return std::format("pin #{} {} {} {}", e.playerId, e.position.x, e.position.y, e.inventory.string());
             },
             [](const PlayerExpulsionEvent& e) { return std::format("pex #{}", e.playerId); },
             [](const PlayerBroadcastEvent& e) { return std::format("pex #{} {}", e.playerId, e.message); },
