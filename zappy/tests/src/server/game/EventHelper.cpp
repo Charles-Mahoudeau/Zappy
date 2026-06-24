@@ -12,7 +12,6 @@
 #include <cstdint>
 #include <optional>
 #include <string>
-#include <vector>
 
 #include "zappy/server/game/Event.hpp"
 #include "zappy/server/game/Inventory.hpp"
