@@ -37,10 +37,12 @@ TEST(EventHelperToWire, TileInventoryEmptyInventory) {
 }
 
 TEST(EventHelperToWire, TileInventoryWithResources) {
+    using enum ResourceType;
+
     Inventory inventory;
-    inventory.addResource(ResourceType::kFood, 5);
-    inventory.addResource(ResourceType::kLinemate, 2);
-    inventory.addResource(ResourceType::kThystame, 1);
+    inventory.addResource(kFood, 5);
+    inventory.addResource(kLinemate, 2);
+    inventory.addResource(kThystame, 1);
 
     const zappy::server::game::Event event = zappy::server::game::TileInventoryEvent{
         .position = {0, 0},
