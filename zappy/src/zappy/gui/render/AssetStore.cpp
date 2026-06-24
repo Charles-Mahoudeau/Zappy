@@ -10,6 +10,7 @@
 #include <cstddef>
 #include <initializer_list>
 #include <map>
+#include <memory>
 #include <utility>
 
 #include "AssetLoaderRegistry.hpp"
@@ -112,6 +113,12 @@ void AssetStore::loadResourceModel(game::ResourceType type) {
                              {.mapIndex = OCCLUSION, .path = "assets/models/resources/textures/occlusionB.png"}}));
             return;
     }
+}
+
+void AssetStore::loadEggModel() {
+    _eggModel = std::make_unique<Model>(
+        createModel("assets/egg/source/EGG.glb",
+                    {{.mapIndex = Model::MaterialMapIndex::ALBEDO, .path = "assets/egg/textures/egg_0.png"}}));
 }
 
 const Skybox& AssetStore::skybox() const { return _skybox; }
