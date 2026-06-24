@@ -16,7 +16,9 @@
 #include "zappy/server/client/Client.hpp"
 #include "zappy/server/client/ClientRegistry.hpp"
 #include "zappy/server/commands/ICommandGroup.hpp"
+#include "zappy/server/game/World.hpp"
 #include "zappy/server/net/Server.hpp"
+#include "zappy/shared/io/Logger.hpp"
 
 namespace zappy::server {
 
@@ -42,6 +44,8 @@ class Core {
     net::Server _serv;
     Timer _time;
     client::ClientRegistry _clientRegistry;
+    std::unique_ptr<game::World> _world;
+    io::Logger _logger{"Zappy Server"};
     std::unordered_map<Client::Type, std::unique_ptr<command::ICommandGroup>> _cmdGroups;
 };
 

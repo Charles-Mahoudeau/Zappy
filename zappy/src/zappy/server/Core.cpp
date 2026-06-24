@@ -18,7 +18,10 @@
 #include "zappy/server/commands/ICommandGroup.hpp"
 #include "zappy/server/commands/PlayerCommands.hpp"
 #include "zappy/server/commands/UnknownCommands.hpp"
+#include "zappy/server/game/World.hpp"
 #include "zappy/shared/exception/Exception.hpp"
+#include "zappy/shared/exception/InvalidArgument.hpp"
+#include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server {
 
@@ -27,18 +30,21 @@ void Core::init(std::span<std::string_view> argv) {
     const CliParser::CliParameters& parameters = parser.parameters();
 
     this->_serv.init(parameters.port, this->_clientRegistry, this->_time);
-    this->_time.setFrequencies(parameters.frequencies);
 
     if (parameters.frequencies != 0) {
         this->_time.setFrequencies(parameters.frequencies);
     }
 
-    using enum Client::Type;
+    this->_world =
+        std::make_unique<game::World>(math::Vector2u(parameters.mapWidth, parameters.mapHeight), this->_logger);
+    if (this->_world == nullptr) {
+        throw exception::InvalidArgument("Failed to init world map");
+    }
 
-    const auto makeGroup = [this]<typename T> {
+    using enum Client::Type;
+    const auto makeGroup = [this]<typename T>() {
         return std::make_unique<T>(this->_time, this->_clientRegistry, *this->_world, this->_logger);
     };
-
     this->_cmdGroups.emplace(kPlayer, makeGroup.operator()<command::PlayerCommands>());
     this->_cmdGroups.emplace(kGui, makeGroup.operator()<command::GuiCommands>());
     this->_cmdGroups.emplace(kUnknown, makeGroup.operator()<command::UnknownCommands>());
