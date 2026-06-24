@@ -10,14 +10,19 @@
 #include <raylib.h>
 
 #include <cmath>
+#include <cstdint>
 #include <format>
 #include <initializer_list>
+#include <optional>
 #include <string>
 #include <string_view>
 
 #include "Widgets.hpp"
+#include "utils/Rectangle.hpp"
+#include "utils/Vector2.hpp"
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/render/Camera.hpp"
+#include "zappy/gui/render/utils/Ray.hpp"
 #include "zappy/gui/render/utils/Vector3.hpp"
 
 namespace zappy::gui::ui {
