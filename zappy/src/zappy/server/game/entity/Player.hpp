@@ -64,14 +64,6 @@ class Player : public AEntity {
     /// @return The new direction.
     math::Direction turnRight();
 
-    /// @brief Get the player's inventory.
-    /// @return The player's inventory.
-    [[nodiscard]] Inventory& inventory();
-
-    /// @brief Get the player's inventory.
-    /// @return The player's inventory.
-    [[nodiscard]] const Inventory& inventory() const;
-
     /// @brief Eat one unit of food.
     /// @return True if the player ate food, false otherwise.
     bool eat();

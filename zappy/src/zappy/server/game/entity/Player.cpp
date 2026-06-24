@@ -91,10 +91,6 @@ math::Direction Player::turnRight() {
     return _direction;
 }
 
-Inventory& Player::inventory() { return _inventory; }
-
-const Inventory& Player::inventory() const { return _inventory; }
-
 bool Player::eat() {
     if (_inventory.resourceCount(ResourceType::kFood) == 0) {
         return false;
