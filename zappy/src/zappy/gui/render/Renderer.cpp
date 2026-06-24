@@ -62,9 +62,6 @@ void Renderer::drawTileResources(const game::Resources& tile, const Vector3& pos
 
 void Renderer::drawResourceStack(const Model& model, const Vector3& position, std::uint32_t count,
                                  game::ResourceType type) {
-    // Each type sits at its own fixed point on a circle around the tile
-    // center, so no two types ever start at the same spot; extra items of
-    // the same type spread further outward along that same direction.
     static constexpr float kTypeCount = 7.0F;
     static constexpr float kBaseRadius = 0.32F;
     static constexpr float kItemSpacing = 0.16F;
