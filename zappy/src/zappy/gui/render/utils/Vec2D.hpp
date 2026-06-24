@@ -43,6 +43,10 @@ class Vec2D {
     [[nodiscard]] float x() const;
     [[nodiscard]] float y() const;
 
+    [[nodiscard]] ::Vector2 get() const;
+    [[nodiscard]] operator ::Vector2() const;
+    [[nodiscard]] operator ::Vector2&();
+
   private:
     Vector2 _vec2{};
 };

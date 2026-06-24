@@ -85,4 +85,11 @@ Vec2D Vec2D::normalized() const {
 float Vec2D::x() const { return _vec2.x; }
 
 float Vec2D::y() const { return _vec2.y; }
+
+::Vector2 Vec2D::get() const { return _vec2; }
+
+Vec2D::operator ::Vector2() const { return _vec2; }
+
+Vec2D::operator ::Vector2&() { return _vec2; }
+
 }  // namespace zappy::gui::render
