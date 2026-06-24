@@ -30,10 +30,6 @@ class TeamRegistry {
     /// @return A view of all teams.
     [[nodiscard]] beman::any_view::any_view<const Team> teams() const;
 
-    /// @brief Returns a view of all teams.
-    /// @return A view of all teams.
-    [[nodiscard]] beman::any_view::any_view<Team> teams();
-
     /// @brief Returns a team with the given name.
     /// @param name The name of the team to return.
     /// @return A pointer to the team with the given name, or nullptr if no such team exists.
@@ -52,6 +48,11 @@ class TeamRegistry {
     /// @param name The name of the team to create.
     /// @return A reference to the newly created team.
     Team& createTeam(std::string name);
+
+    /// @brief Add a client address to the team.
+    /// @param teamName
+    /// @param address The address of the client to add.
+    void addToTeam(const std::string& teamName, const network::Address& address);
 
   private:
     std::unordered_map<std::string, Team> _teams;

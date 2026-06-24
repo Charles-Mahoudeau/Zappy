@@ -20,8 +20,6 @@
 namespace zappy::server::client {
 beman::any_view::any_view<const Team> TeamRegistry::teams() const { return _teams | std::views::values; }
 
-beman::any_view::any_view<Team> TeamRegistry::teams() { return _teams | std::views::values; }
-
 const Team* TeamRegistry::team(const std::string& name) const {
     if (const auto it = _teams.find(name); it != _teams.end()) {
         return &it->second;
@@ -31,7 +29,7 @@ const Team* TeamRegistry::team(const std::string& name) const {
 
 const Team* TeamRegistry::team(const network::Address& address) const {
     auto teams = _teams | std::views::values;
-    const auto it = std::ranges::find_if(teams, [address](const Team& team) { return team.hasClientAddress(address); });
+    const auto it = std::ranges::find_if(teams, [address](const Team& team) { return team.hasMember(address); });
 
     if (it == teams.end()) {
         return nullptr;
@@ -48,5 +46,14 @@ Team& TeamRegistry::createTeam(std::string name) {
         return it->second;
     }
     throw exception::InvalidArgument{"team name already in use"};
+}
+
+void TeamRegistry::addToTeam(const std::string& teamName, const network::Address& address) {
+    const auto it = _teams.find(teamName);
+
+    if (it == _teams.end()) {
+        throw exception::InvalidArgument{"team does not exist"};
+    }
+    it->second.addMember(address);
 }
 }  // namespace zappy::server::client
