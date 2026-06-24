@@ -38,6 +38,8 @@ add_library(zappy_server_objects OBJECT
         game/Grid.hpp
         game/EventHelper.cpp
         game/EventHelper.hpp
+        client/Team.cpp
+        client/Team.hpp
 )
 target_include_directories(zappy_server_objects PUBLIC
         ${CMAKE_SOURCE_DIR}/src
