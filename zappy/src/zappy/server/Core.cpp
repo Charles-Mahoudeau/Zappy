@@ -56,9 +56,6 @@ void Core::init(const std::span<std::string_view> argv) {
 
     this->_world = std::make_unique<game::World>(math::Vector2u(parameters.mapWidth, parameters.mapHeight),
                                                  this->_logger.derive("World"));
-    if (this->_world == nullptr) {
-        throw exception::InvalidArgument("Failed to init world map");
-    }
     _logger.info("World initialized.");
 
     using enum Client::Type;
