@@ -10,14 +10,17 @@
 #include <gtest/gtest.h>
 
 #include <memory>
+#include <optional>
 #include <string_view>
 
 #include "zappy/server/Timer.hpp"
 #include "zappy/server/client/Client.hpp"
 #include "zappy/server/client/ClientRegistry.hpp"
 #include "zappy/server/commands/ACommandGroup.hpp"
+#include "zappy/server/game/World.hpp"
 #include "zappy/server/net/SocketRegistry.hpp"
-#include "zappy/shared/network/Address.hpp"
+#include "zappy/shared/io/Logger.hpp"
+#include "zappy/shared/math/Vector2.hpp"
 
 namespace {
 
@@ -57,13 +60,23 @@ class TestICommandGroup : public ::testing::Test {
     zappy::server::net::SocketRegistry socketRegistry;
     std::unique_ptr<MockedCommand> mockCmd;
     std::unique_ptr<zappy::server::Client> client;
+    std::unique_ptr<zappy::server::game::World> world;
+    std::optional<zappy::io::Logger> logger;
 
   protected:
     void SetUp() override {
-        mockCmd = std::make_unique<MockedCommand>(timer, clients);
-        client = std::make_unique<zappy::server::Client>(socketRegistry, zappy::network::Address{}, timer);
+        logger.emplace("TestLogger");
+        world = std::make_unique<zappy::server::game::World>(zappy::math::Vector2u{10, 10}, logger);
+        mockCmd = std::make_unique<MockedCommand>(timer, clients, *world, logger.value());
+    }
+
+    void TearDown() override {
+        mockCmd.reset();
+        world.reset();
+        logger.reset();
     }
 };
+
 }  // namespace
 
 // ── NormalBehavior ────────────────────────────────────────────────────────────
@@ -74,7 +87,7 @@ TEST_F(TestICommandGroup, NormalBehavior) {
     EXPECT_TRUE(mockCmd->validParam());
 }
 
-// ── Missing ────────────────────────────────────────────────────────────
+// ── Missing ───────────────────────────────────────────────────────────────────
 
 TEST_F(TestICommandGroup, emptyMsg) {
     mockCmd->execute(client.get(), "");
@@ -88,7 +101,7 @@ TEST_F(TestICommandGroup, noParam) {
     EXPECT_FALSE(mockCmd->validParam());
 }
 
-// ── InvalidData ────────────────────────────────────────────────────────────
+// ── InvalidData ───────────────────────────────────────────────────────────────
 
 TEST_F(TestICommandGroup, InvalidCmd) {
     mockCmd->execute(client.get(), "valid invalid");

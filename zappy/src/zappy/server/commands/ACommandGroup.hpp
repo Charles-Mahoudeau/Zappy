@@ -13,12 +13,14 @@
 #include "zappy/server/client/Client.hpp"
 #include "zappy/server/client/ClientRegistry.hpp"
 #include "zappy/server/commands/ICommandGroup.hpp"
+#include "zappy/server/game/World.hpp"
+#include "zappy/shared/io/Logger.hpp"
 
 namespace zappy::server::command {
 
 class ACommandGroup : public ICommandGroup {
   public:
-    ACommandGroup(Timer& timer, client::ClientRegistry& clients);
+    ACommandGroup(Timer& timer, client::ClientRegistry& clients, game::World& world, io::Logger& logger);
     ~ACommandGroup() override = default;
 
     ACommandGroup(const ACommandGroup&) = delete;
@@ -29,14 +31,11 @@ class ACommandGroup : public ICommandGroup {
     void operator()(Client* client, std::string_view cmd) override;
 
   protected:
-    Timer& timer() override;
-    client::ClientRegistry& clients() override;
+    CommandCtx& commandCtx() override;
     CommandData extractCommand(std::string_view msg) override;
 
   private:
-    Timer& _timer;
-    client::ClientRegistry& _clients;
-    // Members
+    CommandCtx _ctx;
 };
 
 }  // namespace zappy::server::command

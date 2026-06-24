@@ -15,6 +15,8 @@
 #include "zappy/server/Timer.hpp"
 #include "zappy/server/client/Client.hpp"
 #include "zappy/server/client/ClientRegistry.hpp"
+#include "zappy/server/game/World.hpp"
+#include "zappy/shared/io/Logger.hpp"
 
 namespace zappy::server::command {
 
@@ -38,10 +40,18 @@ class ICommandGroup {
         std::vector<std::string> params;
     };
 
-    using CommandInvoker = std::function<bool(Client* client, CommandData&)>;
+    struct CommandCtx {
+        std::reference_wrapper<Timer> timer;
+        std::reference_wrapper<client::ClientRegistry> clientRegistry;
+        std::reference_wrapper<game::World> world;
+        std::reference_wrapper<io::Logger> logger;
+        CommandData data{};
+        Client* client = nullptr;
+    };
 
-    virtual Timer& timer() = 0;
-    virtual client::ClientRegistry& clients() = 0;
+    using CommandInvoker = std::function<bool(CommandCtx&)>;
+
+    virtual CommandCtx& commandCtx() = 0;
     virtual CommandData extractCommand(std::string_view msg) = 0;
 };
 

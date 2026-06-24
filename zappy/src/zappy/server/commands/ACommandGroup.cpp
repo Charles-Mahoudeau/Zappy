@@ -17,14 +17,19 @@
 #include "zappy/server/client/Client.hpp"
 #include "zappy/server/client/ClientRegistry.hpp"
 #include "zappy/server/commands/ICommandGroup.hpp"
+#include "zappy/server/game/World.hpp"
+#include "zappy/shared/io/Logger.hpp"
 
 namespace zappy::server::command {
 
-ACommandGroup::ACommandGroup(Timer& timer, client::ClientRegistry& clients) : _timer(timer), _clients(clients) {}
+ACommandGroup::ACommandGroup(Timer& timer, client::ClientRegistry& clients, game::World& world, io::Logger& logger)
+    : _ctx{.timer = timer, .clientRegistry = clients, .world = world, .logger = logger} {}
 
-Timer& ACommandGroup::timer() { return this->_timer; }
-
-client::ClientRegistry& ACommandGroup::clients() { return this->_clients; }
+ICommandGroup::CommandCtx& ACommandGroup::commandCtx() {
+    this->_ctx.data.name.clear();
+    this->_ctx.data.params.clear();
+    return this->_ctx;
+}
 
 void ACommandGroup::operator()(Client* client, std::string_view cmd) { this->execute(client, cmd); }
 
