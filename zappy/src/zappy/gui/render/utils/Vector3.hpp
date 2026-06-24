@@ -21,6 +21,68 @@ class Vector3 {
     Vector3& operator=(Vector3&&) noexcept = default;
     ~Vector3() = default;
 
+    [[nodiscard]] Vector3 operator+(const Vector3& other) const {
+        return Vector3{_vector.x + other._vector.x, _vector.y + other._vector.y, _vector.z + other._vector.z};
+    }
+    [[nodiscard]] Vector3 operator-(const Vector3& other) const {
+        return Vector3{_vector.x - other._vector.x, _vector.y - other._vector.y, _vector.z - other._vector.z};
+    }
+    [[nodiscard]] Vector3 operator*(float scalar) const {
+        return Vector3{_vector.x * scalar, _vector.y * scalar, _vector.z * scalar};
+    }
+    [[nodiscard]] Vector3 operator/(float scalar) const {
+        if (scalar == 0.0F) {
+            return *this;
+        }
+        return Vector3{_vector.x / scalar, _vector.y / scalar, _vector.z / scalar};
+    }
+
+    [[nodiscard]] Vector3& operator+=(const Vector3& other) {
+        _vector.x += other._vector.x;
+        _vector.y += other._vector.y;
+        _vector.z += other._vector.z;
+        return *this;
+    }
+    [[nodiscard]] Vector3& operator-=(const Vector3& other) {
+        _vector.x -= other._vector.x;
+        _vector.y -= other._vector.y;
+        _vector.z -= other._vector.z;
+        return *this;
+    }
+    [[nodiscard]] Vector3& operator*=(float scalar) {
+        _vector.x *= scalar;
+        _vector.y *= scalar;
+        _vector.z *= scalar;
+        return *this;
+    }
+    [[nodiscard]] Vector3& operator/=(float scalar) {
+        if (scalar == 0.0F) {
+            return *this;
+        }
+        _vector.x /= scalar;
+        _vector.y /= scalar;
+        _vector.z /= scalar;
+        return *this;
+    }
+
+    [[nodiscard]] bool operator==(const Vector3& other) const {
+        return (_vector.x == other._vector.x && _vector.y == other._vector.y && _vector.z == other._vector.z);
+    }
+    [[nodiscard]] bool operator!=(const Vector3& other) const { return !(*this == other); }
+
+    [[nodiscard]] float length() const {
+        return std::sqrt(_vector.x * _vector.x + _vector.y * _vector.y + _vector.z * _vector.z);
+    }
+    [[nodiscard]] float lengthSquared() const {
+        return (_vector.x * _vector.x + _vector.y * _vector.y + _vector.z * _vector.z);
+    }
+    [[nodiscard]] Vector3 normalized() const {
+        float len = length();
+        if (len == 0.0F) {
+            return *this;
+        }
+        return (*this / len);
+    }
     [[nodiscard]] ::Vector3 get() const { return _vector; }
 
     operator ::Vector3() const { return _vector; }
