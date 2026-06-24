@@ -44,6 +44,14 @@ class Particle : public Billboard {
     void setRotation(float rotation, float increment);
     void setTint(Color tint, Color increment);
 
+    void update(float dt) {
+        _position.update(dt);
+        _size.update(dt);
+        _speed.update(dt);
+        _rotation.update(dt);
+        _tint.update(dt);
+    }
+
   private:
     float _lifetime{1.0F};
     TimeValue<Vector3> _position{Vector3{0.0F, 0.0F, 0.0F}, Vector3{0.0F, 0.0F, 0.0F}};

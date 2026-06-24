@@ -27,7 +27,7 @@ class TimeValue {
         return *this;
     }
 
-    [[nodiscard]] T operator() const { return _value; }
+    [[nodiscard]] operator T() const { return _value; }
     [[nodiscard]] T get() const { return _value; }
     [[nodiscard]] T increment() const { return _increment; }
 
