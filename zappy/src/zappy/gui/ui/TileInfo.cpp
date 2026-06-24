@@ -22,6 +22,7 @@
 #include "Widgets.hpp"
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/render/Camera.hpp"
+#include "zappy/gui/render/Grid.hpp"
 #include "zappy/gui/render/utils/Ray.hpp"
 #include "zappy/gui/render/utils/Vector3.hpp"
 #include "zappy/gui/ui/utils/Rectangle.hpp"
@@ -51,8 +52,8 @@ std::optional<std::pair<std::uint32_t, std::uint32_t>> TileInfo::intersectGround
     const float hitX = rayOrigin.x() + (t * rayDirection.x());
     const float hitZ = rayOrigin.z() + (t * rayDirection.z());
 
-    const float tileXf = std::floor(hitX + 0.5F);
-    const float tileZf = std::floor(hitZ + 0.5F);
+    const float tileXf = std::floor((hitX / render::Grid::kSpacing) + 0.5F);
+    const float tileZf = std::floor((hitZ / render::Grid::kSpacing) + 0.5F);
     if (tileXf < 0.0F || tileZf < 0.0F) {
         return std::nullopt;
     }

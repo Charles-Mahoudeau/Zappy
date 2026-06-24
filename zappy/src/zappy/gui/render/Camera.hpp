@@ -48,6 +48,9 @@ class Camera {
     void setFovy(float fovy);
     void setProjection(CameraProjection projection);
     void setCameraMode(CameraMode mode);
+    void zoom(float delta);
+
+    void applyManualZoomInput();
 
     void update();
 
@@ -59,5 +62,6 @@ class Camera {
   private:
     Camera3D _camera{};
     CameraMode _cameraMode{CameraMode::CAMERA_CUSTOM};
+    float _maxFovy{500.0F};
 };
 }  // namespace zappy::gui::render
