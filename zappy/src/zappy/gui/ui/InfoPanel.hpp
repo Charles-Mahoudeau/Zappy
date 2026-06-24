@@ -38,7 +38,8 @@ class InfoPanel {
     InfoPanel(InfoPanel&&) noexcept = default;
     InfoPanel& operator=(InfoPanel&&) noexcept = default;
 
-    void update(Vector2 mousePos, bool clicked, const render::Camera& camera, const game::GameState& state);
+    void update(Vector2 mousePos, bool clicked, const render::Camera& camera, const game::GameState& state,
+                Rectangle panelBounds = Rectangle{});
     void draw(const game::GameState& state, Rectangle bounds);
 
     [[nodiscard]] float contentHeight(const game::GameState& state) const;

@@ -18,6 +18,8 @@ class Draggable {
 
     [[nodiscard]] Rectangle apply(Rectangle bounds, float headerHeight);
 
+    [[nodiscard]] bool isOverHeader(Vector2 mouse, Rectangle bounds, float headerHeight) const;
+
   private:
     Vector2 _offset;
     Vector2 _dragStartMouse;

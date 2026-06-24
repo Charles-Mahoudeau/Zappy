@@ -33,7 +33,8 @@ std::optional<std::pair<std::uint32_t, std::uint32_t>> InfoPanel::pickTile(Vecto
     return TileInfo::pick(mousePos, camera, state);
 }
 
-void InfoPanel::update(Vector2 mousePos, bool clicked, const render::Camera& camera, const game::GameState& state) {
+void InfoPanel::update(Vector2 mousePos, bool clicked, const render::Camera& camera, const game::GameState& state,
+                       Rectangle panelBounds) {
     using enum InfoPanelState;
 
     if (_state == Player && _selectedPlayerId.has_value() && !state.players().contains(*_selectedPlayerId)) {
@@ -42,6 +43,9 @@ void InfoPanel::update(Vector2 mousePos, bool clicked, const render::Camera& cam
     }
 
     if (!clicked) {
+        return;
+    }
+    if (_drag.isOverHeader(mousePos, panelBounds, Widgets::kPanelHeaderHeight)) {
         return;
     }
 

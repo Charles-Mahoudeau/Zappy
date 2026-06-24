@@ -37,4 +37,9 @@ Rectangle Draggable::apply(Rectangle bounds, float headerHeight) {
     return Rectangle{bounds.x() + _offset.x(), bounds.y() + _offset.y(), bounds.width(), bounds.height()};
 }
 
+bool Draggable::isOverHeader(Vector2 mouse, Rectangle bounds, float headerHeight) const {
+    const Rectangle header{bounds.x() + _offset.x(), bounds.y() + _offset.y(), bounds.width(), headerHeight};
+    return CheckCollisionPointRec(mouse, header);
+}
+
 }  // namespace zappy::gui::ui

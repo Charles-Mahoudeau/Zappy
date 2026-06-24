@@ -34,7 +34,8 @@ void ChatPanel::draw(const std::deque<std::string>& broadcasts, Rectangle bounds
 
     if (consumeAutoScrollReset(broadcasts.size())) {
         const float fullHeight = static_cast<float>(broadcasts.size()) * kLineHeight;
-        _scroll = Vector2{0.0F, -std::max(0.0F, fullHeight - bounds.height())};
+        const float viewportHeight = bounds.height() - Widgets::kPanelHeaderHeight;
+        _scroll = Vector2{0.0F, -std::max(0.0F, fullHeight - viewportHeight)};
     }
 
     const Rectangle content = contentRect(bounds, broadcasts.size());

@@ -33,7 +33,7 @@ GuiTheme::GuiTheme(GuiTheme&& other) noexcept : _loaded(other._loaded) { other._
 
 GuiTheme& GuiTheme::operator=(GuiTheme&& other) noexcept {
     if (this != &other) {
-        if (_loaded) {
+        if (_loaded && !other._loaded) {
             GuiLoadStyleDefault();
         }
         _loaded = other._loaded;

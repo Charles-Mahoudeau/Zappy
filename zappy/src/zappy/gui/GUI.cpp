@@ -134,13 +134,20 @@ int GUI::run() {
         _timeSlider.draw(
             ui::Rectangle{kTimeSliderMarginRight, kTimeSliderMarginTop, kTimeSliderWidth, kTimeSliderHeight});
 
-        _infoPanel.update(ui::Mouse::position(), ui::Mouse::isLeftButtonPressed(), _camera, _state);
+        const auto& winner = _state.winner();
+        const bool victoryActive = winner.has_value() && !_victoryDismissed;
+        const float infoPanelX = static_cast<float>(kWindowWidth) - kInfoPanelWidth - kInfoPanelMargin;
+
+        if (!victoryActive) {
+            const ui::Rectangle infoPanelHeaderProbe{infoPanelX, kInfoPanelMargin, kInfoPanelWidth, 0.0F};
+            _infoPanel.update(ui::Mouse::position(), ui::Mouse::isLeftButtonPressed(), _camera, _state,
+                              infoPanelHeaderProbe);
+        }
         const float infoPanelMaxHeight = static_cast<float>(kWindowHeight) - (2.0F * kInfoPanelMargin);
         const float infoPanelHeight = std::min(_infoPanel.contentHeight(_state), infoPanelMaxHeight);
-        _infoPanel.draw(_state, ui::Rectangle{static_cast<float>(kWindowWidth) - kInfoPanelWidth - kInfoPanelMargin,
-                                              kInfoPanelMargin, kInfoPanelWidth, infoPanelHeight});
+        _infoPanel.draw(_state, ui::Rectangle{infoPanelX, kInfoPanelMargin, kInfoPanelWidth, infoPanelHeight});
 
-        if (const auto& winner = _state.winner(); winner.has_value() && !_victoryDismissed) {
+        if (victoryActive) {
             const ui::Rectangle screenBounds{0.0F, 0.0F, static_cast<float>(kWindowWidth),
                                              static_cast<float>(kWindowHeight)};
             if (ui::VictoryScreen::draw(winner.value(), screenBounds)) {
