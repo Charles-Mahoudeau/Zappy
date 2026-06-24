@@ -31,6 +31,15 @@ void Hud::update(const render::Camera& camera, const game::GameState& state) {
 }
 
 void Hud::draw(const game::GameState& state) {
+    const auto& winner = state.winner();
+    if (winner.has_value() && !_victoryDismissed) {
+        const Rectangle screenBounds{0.0F, 0.0F, static_cast<float>(_windowWidth), static_cast<float>(_windowHeight)};
+        if (VictoryScreen::draw(winner.value(), screenBounds)) {
+            _victoryDismissed = true;
+        }
+        return;
+    }
+
     _chatPanel.draw(state.broadcasts(),
                     Rectangle{kChatPanelMargin, static_cast<float>(_windowHeight) - kChatPanelHeight - kChatPanelMargin,
                               kChatPanelWidth, kChatPanelHeight});
@@ -40,14 +49,6 @@ void Hud::draw(const game::GameState& state) {
     const float infoPanelMaxHeight = static_cast<float>(_windowHeight) - (2.0F * kInfoPanelMargin);
     const float infoPanelHeight = std::min(_infoPanel.contentHeight(state), infoPanelMaxHeight);
     _infoPanel.draw(state, Rectangle{infoPanelX, kInfoPanelMargin, kInfoPanelWidth, infoPanelHeight});
-
-    const auto& winner = state.winner();
-    if (winner.has_value() && !_victoryDismissed) {
-        const Rectangle screenBounds{0.0F, 0.0F, static_cast<float>(_windowWidth), static_cast<float>(_windowHeight)};
-        if (VictoryScreen::draw(winner.value(), screenBounds)) {
-            _victoryDismissed = true;
-        }
-    }
 }
 
 }  // namespace zappy::gui::ui

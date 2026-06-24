@@ -14,6 +14,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
+#include <numbers>
 #include <utility>
 
 #include "AssetStore.hpp"
@@ -58,18 +59,22 @@ void Renderer::drawResources(const game::GameState& state, const AssetStore& ass
 
 void Renderer::drawTileResources(const game::Resources& tile, const Vector3& position, const AssetStore& assets) {
     for (const auto& [resourceType, model] : assets.resourceModels()) {
-        drawResourceStack(model, position, resourceCount(tile, resourceType), resourceType);
+        const std::uint32_t count = resourceCount(tile, resourceType);
+        if (count == 0) {
+            continue;
+        }
+        drawResourceStack(model, position, count, resourceType);
     }
 }
 
 void Renderer::drawResourceStack(const Model& model, const Vector3& position, std::uint32_t count,
                                  game::ResourceType type) {
-    static constexpr float kTypeCount = 7.0F;
+    static constexpr auto kTypeCount = static_cast<float>(std::to_underlying(game::ResourceType::Thystame) + 1);
     static constexpr float kBaseRadius = 0.32F;
     static constexpr float kItemSpacing = 0.16F;
-    static constexpr float kTwoPi = 6.28318530718F;
 
-    const float angle = (static_cast<float>(std::to_underlying(type)) / kTypeCount) * kTwoPi;
+    const float angle =
+        (static_cast<float>(std::to_underlying(type)) / kTypeCount) * (2.0F * std::numbers::pi_v<float>);
     const float dirX = std::cos(angle);
     const float dirZ = std::sin(angle);
 
