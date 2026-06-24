@@ -27,8 +27,7 @@ void AssetStore::load(const ProgressCallback& onProgress) {
         loadStep();
         if (onProgress) {
             onProgress(name, (_playerModels.size() + _resourcesModels.size() + 3.0F) /
-                                 static_cast<float>(kMaxModels + std::to_underlying(game::ResourceType::Thystame) +
-                                                    1.0F + 3.0F));
+                                 (kMaxModels + std::to_underlying(game::ResourceType::Thystame) + 1.0F + 3.0F));
         }
     }
 }
