@@ -20,7 +20,7 @@ disown $SERVER_PID
 sleep 3
 
 if ! kill -0 "$SERVER_PID" 2>/dev/null; then
-  echo "::error::zappy_server failed to start"
+  echo "::error::zappy_server failed to start" >&2
   tail -30 "$SERVER_LOG" || true
   exit 1
 fi
@@ -52,7 +52,7 @@ disown $TRAIN_PID
 sleep 15
 
 if ! kill -0 "$TRAIN_PID" 2>/dev/null; then
-  echo "::error::Training failed to start"
+  echo "::error::Training failed to start" >&2
   tail -40 "$TRAIN_LOG" || true
   exit 1
 fi
