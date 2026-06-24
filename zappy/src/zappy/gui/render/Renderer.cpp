@@ -38,9 +38,9 @@ void Renderer::update(Camera& camera, game::GameState& state, AssetStore& assets
 
     display::Window::BeginMode3D(camera);
     drawGrid(state);  // TODO: Implement a grid class to render a grid in the scene
-    drawPlayers(state, assets);
     drawResources(state, assets);
     drawEggs(state, assets);
+    drawPlayers(state, assets);
     display::Window::EndMode3D();
 }
 
@@ -122,7 +122,7 @@ void Renderer::drawGrid(const game::GameState& state) {
 void Renderer::drawPlayers(const game::GameState& state, AssetStore& assets) {
     const auto& teams = state.teams();
     const auto& players = state.players();
-    const float dt = GetFrameTime();
+    const float dt = GetFrameTime() * static_cast<float>(state.timeUnit());
     const auto width = static_cast<float>(state.width());
     const auto height = static_cast<float>(state.height());
 
