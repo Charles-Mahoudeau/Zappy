@@ -18,5 +18,6 @@ enum class ResourceType : std::uint8_t {
     kMendiane,
     kPhiras,
     kThystame,
+    kCount,
 };
 }  // namespace zappy::server::game

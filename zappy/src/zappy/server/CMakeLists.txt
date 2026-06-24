@@ -17,8 +17,6 @@ add_library(zappy_server_objects OBJECT
         game/entity/Player.hpp
         game/entity/Egg.cpp
         game/entity/Egg.hpp
-        game/entity/Resource.cpp
-        game/entity/Resource.hpp
         net/Server.hpp
         net/Server.cpp
         net/SocketRegistry.hpp
@@ -31,6 +29,15 @@ add_library(zappy_server_objects OBJECT
         game/World.hpp
         game/Tile.cpp
         game/Tile.hpp
+        game/Event.hpp
+        game/IEventEmitter.hpp
+        game/AEntity.cpp
+        game/AEntity.hpp
+        game/IGrid.hpp
+        game/Grid.cpp
+        game/Grid.hpp
+        game/EventHelper.cpp
+        game/EventHelper.hpp
         commands/ICommandGroup.hpp
         commands/ACommandGroup.hpp
         commands/ACommandGroup.cpp

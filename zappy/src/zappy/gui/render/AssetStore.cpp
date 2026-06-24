@@ -10,6 +10,7 @@
 #include <cstddef>
 #include <initializer_list>
 #include <map>
+#include <utility>
 
 #include "AssetLoaderRegistry.hpp"
 #include "objects/Model.hpp"
@@ -24,7 +25,8 @@ void AssetStore::load(const ProgressCallback& onProgress) {
     for (const auto& [name, loadStep] : AssetLoaderRegistry::create(*this)) {
         loadStep();
         if (onProgress) {
-            onProgress();
+            onProgress(name, static_cast<float>(_playerModels.size() + _resourcesModels.size()) /
+                                 static_cast<float>(kMaxModels + std::to_underlying(game::ResourceType::Thystame) + 1));
         }
     }
 }

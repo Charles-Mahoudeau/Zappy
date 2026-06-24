@@ -12,42 +12,34 @@
 #include <cstdint>
 #include <expected>
 #include <format>
+#include <limits>
 #include <memory>
 #include <optional>
 #include <random>
 #include <ranges>
+#include <span>
 #include <string>
+#include <string_view>
 #include <tuple>
 #include <unordered_map>
 #include <utility>
 #include <vector>
 
 #include "EntityDatabase.hpp"
+#include "Event.hpp"
 #include "ResourceType.hpp"
 #include "Tile.hpp"
 #include "entity/Egg.hpp"
 #include "entity/Player.hpp"
-#include "entity/Resource.hpp"
-#include "zappy/shared/exception/InvalidArgument.hpp"
-#include "zappy/shared/exception/InvalidState.hpp"
-#include "zappy/shared/exception/OutOfRange.hpp"
+#include "zappy/shared/io/Logger.hpp"
+#include "zappy/shared/math/Direction.hpp"
 #include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server::game {
-World::World(Config config) : _config{std::move(config)} {
-    const std::uint32_t size = _config.size.x * _config.size.y;
-
-    if (size == 0) {
-        throw exception::OutOfRange{"trying to create world with 0 width or height"};
-    }
-    _tiles.reserve(size);
-    for (std::uint32_t i = 0; i < size; ++i) {
-        _tiles.emplace_back(math::Vector2u{i % _config.size.x, i / _config.size.x});
-    }
+World::World(const math::Vector2u size, std::optional<io::Logger> logger) : _grid{size}, _logger{std::move(logger)} {
     generateResourceThresholds();
-    spawnStartEggs();
-    if (_config.logger) {
-        _config.logger->info("World initialized.");
+    if (_logger.has_value()) {
+        _logger->info("World initialized.");
     }
 }
 
@@ -61,80 +53,78 @@ void World::update() {
     _nextMajorTick = kMajorTickInterval;
 }
 
-math::Vector2u World::size() const { return _config.size; }
+math::Vector2u World::size() const { return _grid.size(); }
 
 const EntityDatabase& World::entityDatabase() const { return _entityDatabase; }
 
 EntityDatabase& World::entityDatabase() { return _entityDatabase; }
 
-const Tile& World::tile(const math::Vector2u pos) const {
-    if (!isInBounds(pos)) {
-        throw exception::OutOfRange{"trying to access tile out of bounds"};
-    }
-    return _tiles.at((pos.y * _config.size.x) + pos.x);
-}
-
-Tile& World::tile(const math::Vector2u position) {
-    if (!isInBounds(position)) {
-        throw exception::OutOfRange{"trying to access tile out of bounds"};
-    }
-    return _tiles.at((position.y * _config.size.x) + position.x);
-}
-
-const Tile* World::tile(const std::uint64_t entityId) const {
-    for (const auto& tile : _tiles) {
-        if (tile.hasEntity(entityId)) {
-            return &tile;
-        }
-    }
-    return nullptr;
-}
-
-Tile* World::tile(const std::uint64_t entityId) {
-    for (auto& tile : _tiles) {
-        if (tile.hasEntity(entityId)) {
-            return &tile;
-        }
-    }
-    return nullptr;
-}
-
 std::uint64_t World::countResources(const ResourceType type) const {
-    auto resources = _entityDatabase.viewAll<entity::Resource>();
     std::uint64_t count = 0;
 
-    for (const auto& resource : resources) {
-        if (resource->type() == type) {
-            ++count;
-        }
+    for (const Tile& tile : _grid.tiles()) {
+        count += tile.inventory().resourceCount(type);
     }
     return count;
 }
 
-std::uint64_t World::spawnEgg(std::uint16_t teamId) {
-    const std::uint64_t eggId = _entityDatabase.insert(std::make_unique<entity::Egg>(teamId));
+std::uint64_t World::spawnEgg(std::uint64_t playerId, const std::string_view teamName) {
+    const std::uint64_t eggId =
+        _entityDatabase.insert(std::make_unique<entity::Egg>(_grid, *this, std::string{teamName}));
     Tile& tile = randomTile();
 
     tile.addEntity(eggId);
-    if (_config.logger) {
-        _config.logger->info(std::format("Spawned egg #{} for team #{} at ({}, {})", eggId, teamId, tile.position().x,
-                                         tile.position().y));
+    pushEvent(EggLaidEvent{
+        .playerId =
+            playerId == std::numeric_limits<decltype(playerId)>::max() ? std::nullopt : std::make_optional(playerId),
+        .eggId = eggId,
+        .position = tile.position(),
+    });
+    if (_logger.has_value()) {
+        _logger->info(std::format("Spawned egg #{} for team #{} at ({}, {})", eggId, teamName, tile.position().x,
+                                  tile.position().y));
     }
     return eggId;
 }
 
-std::uint64_t World::spawnResource(ResourceType type) {
-    const std::uint64_t entityId = _entityDatabase.insert(std::make_unique<entity::Resource>(type));
-
-    randomTile().addEntity(entityId);
-    return entityId;
+std::uint64_t World::spawnEgg(const std::string_view teamName) {
+    // That's a shitty solution but it works...
+    return spawnEgg(std::numeric_limits<std::uint64_t>::max(), teamName);
 }
 
-std::expected<std::uint64_t, std::string> World::hatchRandomEgg(const std::uint16_t teamId) {
+void World::spawnResource(const ResourceType type) {
+    // FIXME: "resources should be evenly spread across the map." instead of random
+    Tile& tile = randomTile();
+
+    tile.inventory().addResource(type);
+    pushEvent(TileInventoryEvent{
+        .position = tile.position(),
+        .inventory = tile.inventory(),
+    });
+}
+
+void World::spawnStartEggs(const std::span<std::string_view> teams, const std::uint8_t playersPerTeam) {
+    for (const std::string_view teamName : teams) {
+        for (std::uint16_t i = 0; i < playersPerTeam; ++i) {
+            std::ignore = spawnEgg(teamName);
+        }
+    }
+    if (_logger.has_value()) {
+        _logger->info("Start eggs spawned.");
+    }
+}
+
+void World::spawnStartEggs(std::span<const std::string> teams, const std::uint8_t playersPerTeam) {
+    std::vector<std::string_view> views{teams.begin(), teams.end()};
+
+    spawnStartEggs(views, playersPerTeam);
+}
+
+std::expected<std::uint64_t, std::string> World::hatchRandomEgg(const std::string_view teamName) {
     std::vector<const entity::Egg*> eggs;
 
     for (const entity::Egg* egg : _entityDatabase.viewAll<entity::Egg>()) {
-        if (egg != nullptr && egg->teamId() == teamId) {
+        if (egg != nullptr && egg->teamName() == teamName) {
             eggs.push_back(egg);
         }
     }
@@ -155,7 +145,7 @@ std::expected<std::uint64_t, std::string> World::hatchRandomEgg(const std::uint1
         return std::unexpected{"Egg was retrieved from the database, but its id is null (this should never happen)."};
     }
 
-    Tile* parentTile = tile(*eggIdOpt);
+    Tile* parentTile = _grid.tile(*eggIdOpt);
 
     if (parentTile == nullptr) {
         return std::unexpected{"Egg is not on a tile."};
@@ -164,68 +154,48 @@ std::expected<std::uint64_t, std::string> World::hatchRandomEgg(const std::uint1
     _entityDatabase.remove(*eggIdOpt);
     parentTile->removeEntity(*eggIdOpt);
 
-    const std::uint64_t playerId = _entityDatabase.insert(std::make_unique<entity::Player>(teamId));
+    const std::uint64_t playerId =
+        _entityDatabase.insert(std::make_unique<entity::Player>(_grid, *this, std::string{teamName}));
 
     parentTile->addEntity(playerId);
+    pushEvent(PlayerConnectionEvent{
+        .playerId = playerId,
+        .position = parentTile->position(),
+        .orientation = math::Direction::kNorth,
+        .level = 0,
+        .teamName = std::string{teamName},
+    });
+    pushEvent(EggConnectionEvent{
+        .eggId = *eggIdOpt,
+    });
     return playerId;
 }
 
-EntityDatabase::EntityView<const entity::Player> World::players(const std::uint16_t teamId) const {
+EntityDatabase::EntityView<const entity::Player> World::players(const std::string_view teamName) const {
     return _entityDatabase.viewAll<entity::Player>() |
-           std::views::filter([teamId](const entity::Player* player) { return player->teamId() == teamId; });
+           std::views::filter([teamName](const entity::Player* player) { return player->teamName() == teamName; });
 }
 
-EntityDatabase::EntityView<entity::Player> World::players(const std::uint16_t teamId) {
+EntityDatabase::EntityView<entity::Player> World::players(const std::string_view teamName) {
     return _entityDatabase.viewAll<entity::Player>() |
-           std::views::filter([teamId](const entity::Player* player) { return player->teamId() == teamId; });
+           std::views::filter([teamName](const entity::Player* player) { return player->teamName() == teamName; });
 }
 
-std::optional<math::Vector2u> World::position(const std::uint64_t entityId) const {
-    const Tile* entityTile = tile(entityId);
-
-    if (entityTile == nullptr) {
-        return std::nullopt;
-    }
-    return entityTile->position();
+void World::remove(const std::uint64_t entityId) {
+    _grid.remove(entityId);
+    _entityDatabase.remove(entityId);
 }
 
-void World::moveTo(const std::uint64_t entityId, const math::Vector2u position) {
-    if (!isInBounds(position)) {
-        throw exception::InvalidArgument{"position is out of bounds"};
-    }
+bool World::hasEvents() const { return !_events.empty(); }
 
-    Tile* sourceTile = tile(entityId);
+Event World::popEvent() {
+    Event event{std::move(_events.back())};
 
-    if (sourceTile == nullptr) {
-        throw exception::InvalidState{"entity is not on a tile"};
-    }
-    if (!sourceTile->removeEntity(entityId)) {
-        throw exception::InvalidState{"entity is not on the source tile (this should never happen)"};
-    }
-
-    Tile& destinationTile = tile(position);
-
-    destinationTile.addEntity(entityId);
+    _events.pop_front();
+    return event;
 }
 
-math::Vector2u World::moveBy(const std::uint64_t entityId, const math::Vector2i delta) {
-    Tile* sourceTile = tile(entityId);
-
-    if (sourceTile == nullptr) {
-        throw exception::InvalidState{"entity is not on a tile"};
-    }
-    if (!sourceTile->removeEntity(entityId)) {
-        throw exception::InvalidState{"entity is not on the source tile (this should never happen)"};
-    }
-
-    const math::Vector2i newPositionRaw = static_cast<math::Vector2i>(sourceTile->position()) + delta;
-    const math::Vector2i newPositionWrapped = newPositionRaw.wrapped(static_cast<math::Vector2i>(_config.size));
-    const auto newPosition = static_cast<math::Vector2u>(newPositionWrapped);
-    Tile& destinationTile = tile(newPosition);
-
-    destinationTile.addEntity(entityId);
-    return newPosition;
-}
+void World::pushEvent(Event event) { _events.push_back(std::move(event)); }
 
 const std::unordered_map<ResourceType, float>& World::resourceDensities() {
     using enum ResourceType;
@@ -237,46 +207,32 @@ const std::unordered_map<ResourceType, float>& World::resourceDensities() {
     return resourceDensities;
 }
 
-bool World::isInBounds(const math::Vector2u position) const {
-    return position.x < _config.size.x && position.y < _config.size.y;
-}
-
-void World::spawnStartEggs() {
-    for (std::uint16_t teamId = 0; teamId < _config.teamCount; ++teamId) {
-        for (std::uint16_t i = 0; i < _config.playersPerTeam; ++i) {
-            std::ignore = spawnEgg(teamId);
-        }
-    }
-    if (_config.logger) {
-        _config.logger->info("Start eggs spawned.");
-    }
-}
-
 void World::spawnResources() {
     for (const auto& [resourceType, quantity] : _resourceThresholds) {
         for (std::uint64_t count = countResources(resourceType); count < quantity; ++count) {
-            std::ignore = spawnResource(resourceType);
+            spawnResource(resourceType);
         }
     }
-    if (_config.logger) {
-        _config.logger->info("Resources spawned.");
+    if (_logger.has_value()) {
+        _logger->info("Resources spawned.");
     }
 }
 
 Tile& World::randomTile() {
-    std::uniform_int_distribution<std::size_t> distribution{0, _tiles.size() - 1};
+    const std::span<Tile> tiles = _grid.tiles();
+    std::uniform_int_distribution<std::size_t> distribution{0, tiles.size() - 1};
 
-    return _tiles.at(distribution(_randomEngine));
+    return tiles[distribution(_randomEngine)];  // NOLINT(*-pro-bounds-avoid-unchecked-container-access)
 }
 
 void World::generateResourceThresholds() {
     _resourceThresholds.clear();
     for (const auto& [resourceType, density] : resourceDensities()) {
         _resourceThresholds[resourceType] =
-            static_cast<std::uint64_t>(std::ceil(static_cast<float>(_config.size.x * _config.size.y) * density));
+            static_cast<std::uint64_t>(std::ceil(static_cast<float>(_grid.size().x * _grid.size().y) * density));
     }
-    if (_config.logger) {
-        _config.logger->info("Resources thresholds generated.");
+    if (_logger.has_value()) {
+        _logger->info("Resources thresholds generated.");
     }
 }
 }  // namespace zappy::server::game

@@ -7,7 +7,6 @@
 
 #include "zappy/server/game/EntityDatabase.hpp"
 
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include <cstdint>
@@ -18,21 +17,14 @@
 #include <utility>
 #include <vector>
 
-#include "zappy/server/game/IEntity.hpp"
+#include "EntityMock.hpp"
 
+namespace zappy::server::game {
 namespace {
-class EntityA : public zappy::server::game::IEntity {
-  public:
-    MOCK_METHOD(void, update, (), (override));
-};
+class EntityA : public EntityMock {};
 
-class EntityB : public zappy::server::game::IEntity {
-  public:
-    MOCK_METHOD(void, update, (), (override));
-};
+class EntityB : public EntityMock {};
 }  // namespace
-
-using namespace zappy::server::game;
 
 TEST(EntityDatabase, InsertAndQuery) {
     EntityDatabase db;
@@ -205,3 +197,4 @@ TEST(EntityDatabase, IdLookup) {
 
     EXPECT_EQ(db.id(other), std::nullopt);
 }
+}  // namespace zappy::server::game

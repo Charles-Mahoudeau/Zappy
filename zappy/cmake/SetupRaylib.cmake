@@ -11,4 +11,6 @@ set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 
 FetchContent_MakeAvailable(raylib)
 
-target_compile_definitions(raylib PRIVATE SUPPORT_GPU_SKINNING=1)
+if (TARGET raylib)
+    target_compile_definitions(raylib PRIVATE SUPPORT_GPU_SKINNING=1)
+endif ()

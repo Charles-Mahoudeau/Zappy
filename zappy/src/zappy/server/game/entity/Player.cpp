@@ -10,29 +10,41 @@
 #include <cstdint>
 #include <expected>
 #include <string>
-#include <tuple>
-#include <unordered_map>
 
+#include "zappy/server/game/AEntity.hpp"
+#include "zappy/server/game/Event.hpp"
+#include "zappy/server/game/IEventEmitter.hpp"
 #include "zappy/server/game/Inventory.hpp"
 #include "zappy/server/game/ResourceType.hpp"
+#include "zappy/shared/math/Direction.hpp"
+#include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server::game::entity {
-Player::Player(const std::uint16_t teamId) : _teamId{teamId} {}
-
 void Player::update() {
     if (!alive()) {
         return;
     }
     --_lifetimeLeft;
+    if (_lifetimeLeft == 0) {
+        eventEmitter().pushEvent(PlayerDeathEvent{
+            .playerId = id(),
+        });
+    }
 }
-
-std::uint16_t Player::teamId() const { return _teamId; }
 
 std::uint32_t Player::lifetimeLeft() const { return _lifetimeLeft; }
 
 bool Player::alive() const { return _lifetimeLeft > 0; }
 
-void Player::kill() { _lifetimeLeft = 0; }
+void Player::kill() {
+    if (!alive()) {
+        return;
+    }
+    _lifetimeLeft = 0;
+    eventEmitter().pushEvent(PlayerDeathEvent{
+        .playerId = id(),
+    });
+}
 
 std::uint8_t Player::level() const { return _level; }
 
@@ -41,24 +53,43 @@ std::expected<std::uint8_t, std::string> Player::levelUp() {
         return std::unexpected{"Max level reached"};
     }
     ++_level;
+    eventEmitter().pushEvent(PlayerLevelEvent{
+        .playerId = id(),
+        .level = _level,
+    });
     return _level;
 }
 
-Player::Direction Player::direction() const { return _direction; }
+void Player::setPosition(const math::Vector2u position) {
+    AEntity::setPosition(position);
+    eventEmitter().pushEvent(PlayerPositionEvent{
+        .playerId = id(),
+        .position = position,
+        .orientation = direction(),
+    });
+}
 
-Player::Direction Player::turnLeft() {
-    _direction = std::get<0>(turnMap().at(_direction));
+math::Direction Player::direction() const { return _direction; }
+
+math::Direction Player::turnLeft() {
+    _direction = math::direction::turnLeft(_direction);
+    eventEmitter().pushEvent(PlayerPositionEvent{
+        .playerId = id(),
+        .position = position(),
+        .orientation = _direction,
+    });
     return _direction;
 }
 
-Player::Direction Player::turnRight() {
-    _direction = std::get<1>(turnMap().at(_direction));
+math::Direction Player::turnRight() {
+    _direction = math::direction::turnRight(_direction);
+    eventEmitter().pushEvent(PlayerPositionEvent{
+        .playerId = id(),
+        .position = position(),
+        .orientation = _direction,
+    });
     return _direction;
 }
-
-Inventory& Player::inventory() { return _inventory; }
-
-const Inventory& Player::inventory() const { return _inventory; }
 
 bool Player::eat() {
     if (_inventory.resourceCount(ResourceType::kFood) == 0) {
@@ -66,19 +97,11 @@ bool Player::eat() {
     }
     _inventory.removeResource(ResourceType::kFood);
     _lifetimeLeft += kTimeUnitsPerFood;
+    eventEmitter().pushEvent(PlayerInventoryEvent{
+        .playerId = id(),
+        .position = position(),
+        .inventory = _inventory,
+    });
     return true;
-}
-
-const std::unordered_map<Player::Direction, std::tuple<Player::Direction, Player::Direction>>& Player::turnMap() {
-    using enum Direction;
-
-    static const std::unordered_map<Direction, std::tuple<Direction, Direction>> turnMap{
-        {kNorth, {kWest, kEast}},
-        {kEast, {kNorth, kSouth}},
-        {kSouth, {kEast, kWest}},
-        {kWest, {kSouth, kNorth}},
-    };
-
-    return turnMap;
 }
 }  // namespace zappy::server::game::entity

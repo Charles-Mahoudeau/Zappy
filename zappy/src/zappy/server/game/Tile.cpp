@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <span>
 
+#include "Inventory.hpp"
 #include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server::game {
@@ -35,4 +36,7 @@ bool Tile::removeEntity(const std::uint64_t entityId) {
     }
     return false;
 }
+const Inventory& Tile::inventory() const { return _inventory; }
+
+Inventory& Tile::inventory() { return _inventory; }
 }  // namespace zappy::server::game

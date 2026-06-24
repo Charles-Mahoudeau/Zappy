@@ -267,4 +267,25 @@ TEST(GameStateTest, AddBroadcastCapsAtTen) {
     EXPECT_EQ(state.broadcasts().back(), "msg11");
 }
 
+TEST(GameStateTest, PlayersAtMaxLevelIsZeroForUnknownTeam) {
+    GameState state;
+    EXPECT_EQ(state.playersAtMaxLevel("alpha"), 0U);
+}
+
+TEST(GameStateTest, PlayersAtMaxLevelIgnoresPlayersBelowMaxLevel) {
+    GameState state;
+    state.addPlayer(1, 0, 0, Orientation::North, GameState::kMaxLevel - 1, "alpha");
+    EXPECT_EQ(state.playersAtMaxLevel("alpha"), 0U);
+}
+
+TEST(GameStateTest, PlayersAtMaxLevelCountsOnlyMatchingTeam) {
+    using enum Orientation;
+    GameState state;
+    state.addPlayer(1, 0, 0, North, GameState::kMaxLevel, "alpha");
+    state.addPlayer(2, 0, 0, North, GameState::kMaxLevel, "alpha");
+    state.addPlayer(3, 0, 0, North, GameState::kMaxLevel, "beta");
+    EXPECT_EQ(state.playersAtMaxLevel("alpha"), 2U);
+    EXPECT_EQ(state.playersAtMaxLevel("beta"), 1U);
+}
+
 }  // namespace
