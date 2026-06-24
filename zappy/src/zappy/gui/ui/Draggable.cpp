@@ -10,6 +10,7 @@
 #include <raylib.h>
 
 #include "Mouse.hpp"
+#include "utils/Rectangle.hpp"
 
 namespace zappy::gui::ui {
 
