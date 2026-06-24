@@ -26,8 +26,6 @@ void sleepForTicks(int ticks, int freq) {
     std::this_thread::sleep_for(perTick * ticks);
 }
 
-}  // namespace
-
 // ---------------------------------------------------------------------------
 // update() / tick counting
 // ---------------------------------------------------------------------------
@@ -236,3 +234,5 @@ TEST(TimerSetFrequencies, ChangesTickDuration) {
 
     EXPECT_EQ(ticks, 3);
 }
+
+}  // namespace
