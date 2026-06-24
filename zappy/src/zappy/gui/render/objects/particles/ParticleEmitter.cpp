@@ -49,13 +49,11 @@ void ParticleEmitter::update(float dt) {
 }
 
 uint16_t ParticleEmitter::draw(Camera& camera) {
-    uint16_t drawnParticles = 0;
     for (auto& particle : _particles) {
         if (particle.lifetime() > 0.0F) {
             particle.draw(camera, _texture);
-            drawnParticles++;
         }
     }
-    return drawnParticles;
+    return _particles.size();
 }
 }  // namespace zappy::gui::render
