@@ -14,6 +14,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
+#include <utility>
 
 #include "AssetStore.hpp"
 #include "Camera.hpp"
@@ -54,15 +55,27 @@ void Renderer::drawResources(const game::GameState& state, const AssetStore& ass
 
 void Renderer::drawTileResources(const game::Resources& tile, const Vector3& position, const AssetStore& assets) {
     for (const auto& [resourceType, model] : assets.resourceModels()) {
-        drawResourceStack(model, position, resourceCount(tile, resourceType));
+        drawResourceStack(model, position, resourceCount(tile, resourceType), resourceType);
     }
 }
 
-void Renderer::drawResourceStack(const Model& model, const Vector3& position, std::uint32_t count) {
+void Renderer::drawResourceStack(const Model& model, const Vector3& position, std::uint32_t count,
+                                 game::ResourceType type) {
+    // Each type sits at its own fixed point on a circle around the tile
+    // center, so no two types ever start at the same spot; extra items of
+    // the same type spread further outward along that same direction.
+    static constexpr float kTypeCount = 7.0F;
+    static constexpr float kBaseRadius = 0.32F;
+    static constexpr float kItemSpacing = 0.16F;
+    static constexpr float kTwoPi = 6.28318530718F;
+
+    const float angle = (static_cast<float>(std::to_underlying(type)) / kTypeCount) * kTwoPi;
+    const float dirX = std::cos(angle);
+    const float dirZ = std::sin(angle);
+
     for (std::uint32_t i = 0; i < count; ++i) {
-        const float offsetX = (static_cast<float>(i % 2) * 0.5F) - 0.25F;
-        const float offsetZ = ((static_cast<float>(i) / 2.0F) * 0.5F) - 0.25F;
-        const Vector3 resourcePosition(position.x() + offsetX, position.y(), position.z() + offsetZ);
+        const float radius = kBaseRadius + (static_cast<float>(i) * kItemSpacing);
+        const Vector3 resourcePosition(position.x() + (dirX * radius), position.y(), position.z() + (dirZ * radius));
         model.draw(resourcePosition, kScale, Color::kWHITE);
     }
 }
