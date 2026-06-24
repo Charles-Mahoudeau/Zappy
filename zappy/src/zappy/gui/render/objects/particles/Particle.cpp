@@ -58,7 +58,7 @@ void Particle::update(float dt) {
     _tint.update(dt);
 }
 
-void Particle::draw(Camera& camera, Texture texture) {
+void Particle::draw(Camera& camera, Texture& texture) {
     const Rectangle source{.x = 0.0F,
                            .y = 0.0F,
                            .width = static_cast<float>(texture.width()),

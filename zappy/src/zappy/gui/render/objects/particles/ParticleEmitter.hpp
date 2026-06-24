@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2026
 ** Zappy
 ** File description:
-** Billboard
+** ParticleEmitter
 */
 
 #pragma once
@@ -11,9 +11,9 @@
 
 #include <string_view>
 
-#include "Billboard.hpp"
 #include "Color.hpp"
 #include "Particle.hpp"
+#include "Texture.hpp"
 #include "TimeValue.hpp"
 #include "Vector3.hpp"
 #include "vector"
@@ -44,9 +44,10 @@ class ParticleEmitter {
     void set(Vector3 origin, Vector3 volume, float spread, float rate, float lifetime);
 
     void update(float dt);
+    uint16_t draw(Camera& camera);
 
   private:
-    Billboard _billboard;
+    Texture _texture;
     std::vector<Particle> _particles;
     Vector3 _origin{0.0F, 0.0F, 0.0F};
     Vector3 _volume{1.0F, 1.0F, 1.0F};
@@ -60,8 +61,4 @@ class ParticleEmitter {
     TimeValue<Color> _tint{WHITE, WHITE};
 };
 
-class BillboardException : public std::runtime_error {
-  public:
-    explicit BillboardException(const std::string& message) : std::runtime_error(message) {}
-};
 }  // namespace zappy::gui::render

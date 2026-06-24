@@ -46,7 +46,7 @@ class Particle {
 
     void update(float dt);
 
-    void draw(Camera& camera, Texture texture);
+    void draw(Camera& camera, Texture& texture);
 
   private:
     float _lifetime{1.0F};

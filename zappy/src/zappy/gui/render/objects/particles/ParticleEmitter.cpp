@@ -17,7 +17,7 @@
 #include "Vector3.hpp"
 
 namespace zappy::gui::render {
-ParticleEmitter::ParticleEmitter(std::string_view path) : _billboard(path) {}
+ParticleEmitter::ParticleEmitter(std::string_view path) : _texture(path) {}
 
 void ParticleEmitter::setOrigin(Vector3 origin) { _origin = origin; }
 void ParticleEmitter::setVolume(Vector3 volume) { _volume = volume; }
@@ -48,4 +48,14 @@ void ParticleEmitter::update(float dt) {
     }
 }
 
+uint16_t ParticleEmitter::draw(Camera& camera) {
+    uint16_t drawnParticles = 0;
+    for (auto& particle : _particles) {
+        if (particle.lifetime() > 0.0F) {
+            particle.draw(camera, _texture);
+            drawnParticles++;
+        }
+    }
+    return drawnParticles;
+}
 }  // namespace zappy::gui::render
