@@ -1,0 +1,53 @@
+/*
+** EPITECH PROJECT, 2026
+** Zappy
+** File description:
+** ChatPanel
+*/
+
+#include "ChatPanel.hpp"
+
+#include <algorithm>
+#include <cstddef>
+#include <deque>
+#include <string>
+
+#include "Widgets.hpp"
+#include "utils/Rectangle.hpp"
+
+namespace zappy::gui::ui {
+
+Rectangle ChatPanel::contentRect(Rectangle bounds, std::size_t messageCount) {
+    return Rectangle{0.0F, 0.0F, bounds.width(), static_cast<float>(messageCount) * kLineHeight};
+}
+
+bool ChatPanel::consumeAutoScrollReset(std::size_t messageCount) {
+    if (messageCount == _lastMessageCount) {
+        return false;
+    }
+    _lastMessageCount = messageCount;
+    return true;
+}
+
+void ChatPanel::draw(const std::deque<std::string>& broadcasts, Rectangle bounds) {
+    bounds = _drag.apply(bounds, Widgets::kPanelHeaderHeight);
+
+    if (consumeAutoScrollReset(broadcasts.size())) {
+        const float fullHeight = static_cast<float>(broadcasts.size()) * kLineHeight;
+        const float viewportHeight = bounds.height() - Widgets::kPanelHeaderHeight;
+        _scroll = Vector2{0.0F, -std::max(0.0F, fullHeight - viewportHeight)};
+    }
+
+    const Rectangle content = contentRect(bounds, broadcasts.size());
+    const Rectangle view = Widgets::scrollPanel(bounds, "Chat", content, _scroll);
+
+    Widgets::beginScissor(view);
+    float y = view.y() + _scroll.y();
+    for (const auto& message : broadcasts) {
+        Widgets::label(Rectangle{view.x(), y, content.width(), kLineHeight}, message);
+        y += kLineHeight;
+    }
+    Widgets::endScissor();
+}
+
+}  // namespace zappy::gui::ui

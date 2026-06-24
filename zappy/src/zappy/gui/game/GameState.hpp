@@ -82,12 +82,16 @@ class GameState {
     void addBroadcast(std::string message);
     void setPlayerIncanting(std::uint32_t id, bool incanting);
 
+    static constexpr std::uint32_t kMaxLevel = 8;
+    static constexpr std::size_t kPlayersNeededToWin = 6;
+
     [[nodiscard]] std::size_t width() const;
     [[nodiscard]] std::size_t height() const;
     [[nodiscard]] const std::vector<Resources>& tiles() const;
     [[nodiscard]] const Resources& tile(std::size_t x, std::size_t y) const;
     [[nodiscard]] const std::unordered_map<std::uint32_t, Player>& players() const;
     [[nodiscard]] const std::vector<std::string>& teams() const;
+    [[nodiscard]] std::size_t playersAtMaxLevel(const std::string& team) const;
     [[nodiscard]] const std::unordered_map<std::uint32_t, Egg>& eggs() const;
     [[nodiscard]] std::uint32_t timeUnit() const;
     [[nodiscard]] bool isGameOver() const;

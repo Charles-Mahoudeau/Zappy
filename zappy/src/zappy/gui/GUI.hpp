@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <string_view>
+
 #include "zappy/gui/GuiCliParser.hpp"
 #include "zappy/gui/display/Window.hpp"
 #include "zappy/gui/game/GameState.hpp"
@@ -16,6 +18,10 @@
 #include "zappy/gui/render/AssetStore.hpp"
 #include "zappy/gui/render/Camera.hpp"
 #include "zappy/gui/render/Renderer.hpp"
+#include "zappy/gui/ui/ChatPanel.hpp"
+#include "zappy/gui/ui/GuiTheme.hpp"
+#include "zappy/gui/ui/InfoPanel.hpp"
+#include "zappy/gui/ui/TimeUnitSlider.hpp"
 #include "zappy/shared/io/Poller.hpp"
 #include "zappy/shared/network/Address.hpp"
 #include "zappy/shared/network/BufferedClient.hpp"
@@ -43,7 +49,7 @@ class GUI {
 
   private:
     void setupCamera();
-    void drawLoadingFrame();
+    void drawLoadingFrame(std::string_view name, float progress);
 
     zappy::network::Address _address;
     zappy::network::BufferedClient _buffer;
@@ -54,10 +60,15 @@ class GUI {
     zappy::io::Poller _poller;
 
     display::Window _window;
+    ui::GuiTheme _theme;
     render::Camera _camera;  // May be placed in renderer ?
     render::AssetStore _assets;
     render::Renderer _renderer;
+    ui::ChatPanel _chatPanel;
+    ui::TimeUnitSlider _timeSlider;
+    ui::InfoPanel _infoPanel;
     int _loadingDots{0};
+    bool _victoryDismissed{false};
 };
 
 }  // namespace zappy::gui
