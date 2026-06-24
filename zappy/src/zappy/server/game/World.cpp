@@ -92,6 +92,7 @@ std::uint64_t World::spawnEgg(const std::string_view teamName) {
 }
 
 void World::spawnResource(const ResourceType type) {
+    // FIXME: "resources should be evenly spread across the map." instead of random
     Tile& tile = randomTile();
 
     tile.inventory().addResource(type);
