@@ -28,7 +28,7 @@ class PlayerInfo {
   public:
     PlayerInfo() = delete;
 
-    static constexpr float kPickRadius = 0.5F;
+    static constexpr float kPickRadius = 0.9F;
     static constexpr float kPickHeight = 0.5F;
 
     [[nodiscard]] static bool intersectsPlayer(const render::Ray& ray, float playerX, float playerY, float radius);
