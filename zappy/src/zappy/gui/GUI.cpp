@@ -91,23 +91,23 @@ void GUI::drawLoadingFrame(std::string_view name, float progress) {
     static constexpr int kBarWidth = 400;
     static constexpr int kBarHeight = 24;
     static constexpr int kTextSpacing = 10;
+    static constexpr const char* kWidestLoadingText = "Loading...";
     const int barX = (kWindowWidth - kBarWidth) / 2;
     const int barY = (kWindowHeight - kBarHeight) / 2;
+    const int loadingTextX = (kWindowWidth - MeasureText(kWidestLoadingText, kLoadingFontSize)) / 2;
 
     _window.beginFrame();
 
     const int loadingY = barY - kTextSpacing - kLoadingFontSize;
-    DrawText(text.c_str(), (kWindowWidth - MeasureText(text.c_str(), kLoadingFontSize)) / 2, loadingY, kLoadingFontSize,
-             render::Color::kWHITE);
+    DrawText(text.c_str(), loadingTextX, loadingY, kLoadingFontSize, render::Color::kWHITE);
 
     ui::Widgets::progressBar(ui::Rectangle{static_cast<float>(barX), static_cast<float>(barY),
                                            static_cast<float>(kBarWidth), static_cast<float>(kBarHeight)},
-                             progress);
+                             "", "", progress);
 
     const std::string nameText{name};
     const int nameY = barY + kBarHeight + kTextSpacing;
-    DrawText(nameText.c_str(), (kWindowWidth - MeasureText(nameText.c_str(), kLoadingFontSize)) / 2, nameY,
-             kLoadingFontSize, render::Color::kWHITE);
+    DrawText(nameText.c_str(), barX, nameY, kLoadingFontSize, render::Color::kWHITE);
 
     _window.endFrame();
 }

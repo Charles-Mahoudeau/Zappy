@@ -26,7 +26,7 @@ class Widgets {
     static Rectangle scrollPanel(Rectangle bounds, std::string_view title, Rectangle content, Vector2& scroll);
     static float slider(Rectangle bounds, std::string_view textLeft, std::string_view textRight, float current,
                         float min, float max);
-    static void progressBar(Rectangle bounds, float progress);
+    static void progressBar(Rectangle bounds, std::string_view textLeft, std::string_view textRight, float progress);
     static void beginScissor(Rectangle area);
     static void endScissor();
     static void overlay(Rectangle bounds);

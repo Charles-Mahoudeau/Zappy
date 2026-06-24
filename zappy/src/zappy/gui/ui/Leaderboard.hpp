@@ -39,6 +39,9 @@ class Leaderboard {
     static constexpr float kRowHeight = 24.0F;
     static constexpr float kTextMarginLeft = 8.0F;
     static constexpr float kTextMarginTop = 4.0F;
+    static constexpr float kBarMarginLeft = 90.0F;
+    static constexpr float kBarMarginRight = 44.0F;
+    static constexpr float kBarHeight = 16.0F;
 };
 
 }  // namespace zappy::gui::ui
