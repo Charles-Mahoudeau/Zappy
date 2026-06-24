@@ -24,7 +24,7 @@ std::uint64_t AEntity::id() const { return _id; }
 
 void AEntity::setId(const std::uint64_t id) { _id = id; }
 
-math::Vector2u AEntity::position() const { return _grid.get().position(_id).value_or({}); }
+math::Vector2u AEntity::position() const { return _grid.get().position(_id).value_or(math::Vector2u{}); }
 
 void AEntity::setPosition(const math::Vector2u position) { _grid.get().setPosition(_id, position); }
 
