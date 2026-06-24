@@ -71,7 +71,7 @@ class Player : public AEntity {
   private:
     std::uint32_t _lifetimeLeft{kDefaultLifetime};
     std::uint8_t _level{1};
-    math::Direction _direction{math::Direction::kNorth};
+    math::Direction _direction{math::direction::random()};
     Inventory _inventory;
 };
 }  // namespace zappy::server::game::entity
