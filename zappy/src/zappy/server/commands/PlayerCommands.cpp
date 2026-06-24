@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <string_view>
+#include <tuple>
 
 #include "zappy/server/Timer.hpp"
 #include "zappy/server/client/Client.hpp"
@@ -19,12 +20,17 @@ namespace zappy::server::command {
 
 PlayerCommands::PlayerCommands(Timer& timer, client::ClientRegistry& clients) : ACommandGroup(timer, clients) {
     this->_commands = {
-        {"Forward", [](auto* client, auto params) {}},     {"Right", [](auto* client, auto params) {}},
-        {"Left", [](auto* client, auto params) {}},        {"Look", [](auto* client, auto params) {}},
-        {"Inventory", [](auto* client, auto params) {}},   {"Broadcast", [](auto* client, auto params) {}},
-        {"Connect_nbr", [](auto* client, auto params) {}}, {"Eject", [](auto* client, auto params) {}},
-        {"Take", [](auto* client, auto params) {}},        {"Set", [](auto* client, auto params) {}},
-        {"Incantation", [](auto* client, auto params) {}},
+        {"Forward", [](auto* client, auto params) { return false; }},
+        {"Right", [](auto* client, auto params) { return false; }},
+        {"Left", [](auto* client, auto params) { return false; }},
+        {"Look", [](auto* client, auto params) { return false; }},
+        {"Inventory", [](auto* client, auto params) { return false; }},
+        {"Broadcast", [](auto* client, auto params) { return false; }},
+        {"Connect_nbr", [](auto* client, auto params) { return false; }},
+        {"Eject", [](auto* client, auto params) { return false; }},
+        {"Take", [](auto* client, auto params) { return false; }},
+        {"Set", [](auto* client, auto params) { return false; }},
+        {"Incantation", [](auto* client, auto params) { return false; }},
 
     };
 }
@@ -33,12 +39,11 @@ void PlayerCommands::execute(Client* client, std::string_view msg) {
     const CommandData cmd = this->extractCommand(msg);
 
     if (auto iter = this->_commands.find(cmd.name); iter != this->_commands.end()) {
-        iter->second(client, cmd);
-        return;
-    }
-
-    if (!client->sendMessage("suc\n")) {
-        std::cerr << "Fail to notice fail command on " << client->address() << "\n";
+        if (!iter->second(client, cmd)) {
+            std::ignore = client->sendMessage("ko\n");
+        }
+    } else {
+        std::ignore = client->sendMessage("ko\n");
     }
 }
 

@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <functional>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -36,6 +37,8 @@ class ICommandGroup {
         std::string name;
         std::vector<std::string> params;
     };
+
+    using CommandInvoker = std::function<bool(Client* client, CommandData)>;
 
     virtual Timer& timer() = 0;
     virtual client::ClientRegistry& clients() = 0;

@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include <functional>
 #include <string_view>
 #include <unordered_map>
 
@@ -32,8 +31,6 @@ class GuiCommands : public ACommandGroup {
     void execute(Client* client, std::string_view msg) override;
 
   private:
-    using CommandInvoker = std::function<void(Client* client, CommandData)>;
-
     std::unordered_map<std::string_view, CommandInvoker> _commands;
 };
 
