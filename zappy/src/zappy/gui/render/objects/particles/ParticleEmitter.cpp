@@ -66,4 +66,12 @@ void ParticleEmitter::particle() {
     newParticle.setLifetime(_lifetime);
     _particles.push_back(std::move(newParticle));
 }
+
+void ParticleEmitter::emit(uint16_t count) {
+    for (float i = 0.0F; i < count; i += 1.0F) {
+        particle();
+    }
+}
+
+void ParticleEmitter::emitRate() { emit(static_cast<uint16_t>(_rate)); }
 }  // namespace zappy::gui::render

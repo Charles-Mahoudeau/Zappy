@@ -47,6 +47,8 @@ class ParticleEmitter {
     uint16_t draw(Camera& camera);
 
     void particle();
+    void emit(uint16_t count);
+    void emitRate();
 
   private:
     Texture _texture;
