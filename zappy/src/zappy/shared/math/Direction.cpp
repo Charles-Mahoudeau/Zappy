@@ -7,10 +7,12 @@
 
 #include "Direction.hpp"
 
+#include <tuple>
 #include <unordered_map>
 
 namespace zappy::math::direction {
-[[nodiscard]] static const std::unordered_map<Direction, std::tuple<Direction, Direction>>& turnMap() {
+namespace {
+[[nodiscard]] const std::unordered_map<Direction, std::tuple<Direction, Direction>>& turnMap() {
     using enum Direction;
 
     static const std::unordered_map<Direction, std::tuple<Direction, Direction>> turnMap{
@@ -22,6 +24,7 @@ namespace zappy::math::direction {
 
     return turnMap;
 }
+}  // namespace
 
 Direction turnLeft(const Direction direction) { return std::get<0>(turnMap().at(direction)); }
 
