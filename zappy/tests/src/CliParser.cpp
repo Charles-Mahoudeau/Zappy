@@ -170,3 +170,8 @@ TEST(CliParser, validity_reject_height_below_10) {
     auto argv = makeFullArgv("4242", "10", "5");
     ASSERT_THROW(build(argv), InvalidArg);
 }
+
+TEST(CliParser, validity_reject_GRAPHIC_TeamName) {
+    auto argv = makeFullArgv("4242", "10", "10", std::vector<std::string_view>{"GRAPHIC"});
+    ASSERT_THROW(build(argv), InvalidArg);
+}
