@@ -38,6 +38,8 @@ add_library(zappy_server_objects OBJECT
         game/Grid.hpp
         game/EventHelper.cpp
         game/EventHelper.hpp
+        client/TeamRegistry.cpp
+        client/TeamRegistry.hpp
         client/Team.cpp
         client/Team.hpp
 )
