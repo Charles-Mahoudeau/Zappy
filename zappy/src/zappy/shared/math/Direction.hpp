@@ -11,9 +11,10 @@
 
 namespace zappy::math {
 enum class Direction : std::uint8_t {
+    // Please don't touch the order, you'll break so many things...
     kNorth = 0,
-    kSouth = 1,
-    kEast = 2,
+    kEast = 1,
+    kSouth = 2,
     kWest = 3,
 };
 
