@@ -68,7 +68,7 @@ class Renderer {
     std::unordered_map<std::uint32_t, PlayerVisual> _playerVisuals;
 
     void drawVFXs(Camera& camera, AssetStore& assets);
-    static constexpr uint16_t kMaxParticles = 2000;
+    static constexpr uint16_t kParticlesCeiling = 1500;
     // Grid _grid; TODO: Implement a grid class to render a grid in the scene
 };
 }  // namespace zappy::gui::render

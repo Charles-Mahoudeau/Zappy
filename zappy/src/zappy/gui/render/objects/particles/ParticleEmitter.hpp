@@ -46,6 +46,8 @@ class ParticleEmitter {
     void update(float dt);
     uint16_t draw(Camera& camera);
 
+    void particle();
+
   private:
     Texture _texture;
     std::vector<Particle> _particles;

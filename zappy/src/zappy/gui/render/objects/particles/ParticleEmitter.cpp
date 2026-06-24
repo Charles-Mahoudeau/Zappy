@@ -56,4 +56,14 @@ uint16_t ParticleEmitter::draw(Camera& camera) {
     }
     return _particles.size();
 }
+
+void ParticleEmitter::particle() {
+    Particle newParticle;
+    newParticle.setInitValues(_position.get(), Vec2D{_size.get(), _size.get()}, _speed.get(), _rotation.get(),
+                              _tint.get());
+    newParticle.setIncrementValues(_position.increment(), Vec2D{_size.increment(), _size.increment()},
+                                   _speed.increment(), _rotation.increment(), _tint.increment());
+    newParticle.setLifetime(_lifetime);
+    _particles.push_back(std::move(newParticle));
+}
 }  // namespace zappy::gui::render
