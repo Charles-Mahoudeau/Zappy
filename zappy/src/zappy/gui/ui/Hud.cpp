@@ -41,9 +41,10 @@ void Hud::draw(const game::GameState& state) {
     const float infoPanelHeight = std::min(_infoPanel.contentHeight(state), infoPanelMaxHeight);
     _infoPanel.draw(state, Rectangle{infoPanelX, kInfoPanelMargin, kInfoPanelWidth, infoPanelHeight});
 
-    if (victoryActive(state)) {
+    const auto& winner = state.winner();
+    if (winner.has_value() && !_victoryDismissed) {
         const Rectangle screenBounds{0.0F, 0.0F, static_cast<float>(_windowWidth), static_cast<float>(_windowHeight)};
-        if (VictoryScreen::draw(state.winner().value(), screenBounds)) {
+        if (VictoryScreen::draw(winner.value(), screenBounds)) {
             _victoryDismissed = true;
         }
     }
