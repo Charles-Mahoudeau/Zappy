@@ -46,6 +46,7 @@ struct PlayerLevelEvent {
 
 struct PlayerInventoryEvent {
     std::uint64_t playerId{};
+    math::Vector2u position;
     std::reference_wrapper<const Inventory> inventory;
 };
 

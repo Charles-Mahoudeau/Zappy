@@ -99,6 +99,7 @@ bool Player::eat() {
     _lifetimeLeft += kTimeUnitsPerFood;
     eventEmitter().pushEvent(PlayerInventoryEvent{
         .playerId = id(),
+        .position = position(),
         .inventory = _inventory,
     });
     return true;
