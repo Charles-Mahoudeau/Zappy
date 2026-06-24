@@ -8,6 +8,7 @@
 #pragma once
 
 #include <cstdint>
+#include <optional>
 
 #include "zappy/shared/math/Vector2.hpp"
 
