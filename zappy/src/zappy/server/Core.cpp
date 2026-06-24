@@ -7,6 +7,8 @@
 
 #include "zappy/server/Core.hpp"
 
+#include <exception>
+#include <format>
 #include <iostream>
 #include <span>
 #include <string_view>

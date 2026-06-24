@@ -7,6 +7,7 @@
 
 #include "TeamRegistry.hpp"
 
+#include <algorithm>
 #include <beman/any_view/any_view.hpp>
 #include <ranges>
 #include <string>
@@ -14,6 +15,7 @@
 
 #include "Team.hpp"
 #include "zappy/shared/exception/InvalidArgument.hpp"
+#include "zappy/shared/network/Address.hpp"
 
 namespace zappy::server::client {
 beman::any_view::any_view<const Team> TeamRegistry::teams() const { return _teams | std::views::values; }

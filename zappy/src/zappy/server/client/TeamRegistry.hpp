@@ -12,6 +12,7 @@
 #include <unordered_map>
 
 #include "Team.hpp"
+#include "zappy/shared/network/Address.hpp"
 
 namespace zappy::server::client {
 class TeamRegistry {
