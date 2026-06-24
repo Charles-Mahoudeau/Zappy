@@ -40,6 +40,7 @@ void Renderer::update(Camera& camera, game::GameState& state, AssetStore& assets
     drawGrid(state);  // TODO: Implement a grid class to render a grid in the scene
     drawPlayers(state, assets);
     drawResources(state, assets);
+    drawEggs(state, assets);
     display::Window::EndMode3D();
 }
 
@@ -64,6 +65,16 @@ void Renderer::drawResourceStack(const Model& model, const Vector3& position, st
         const float offsetZ = ((static_cast<float>(i) / 2.0F) * 0.5F) - 0.25F;
         const Vector3 resourcePosition(position.x() + offsetX, position.y(), position.z() + offsetZ);
         model.draw(resourcePosition, kScale, Color::kWHITE);
+    }
+}
+
+void Renderer::drawEggs(const game::GameState& state, const AssetStore& assets) {
+    const auto& eggs = state.eggs();
+    printf("Drawing %zu eggs\n", eggs.size());
+    for (const auto& [eggId, egg] : eggs) {
+        const Vector3 position(static_cast<float>(egg.x), 0.0F, static_cast<float>(egg.y));
+        printf("Drawing egg %u at position (%.2f, %.2f, %.2f)\n", eggId, position.x(), position.y(), position.z());
+        assets.eggModel().draw(position, kScale, Color::kWHITE);
     }
 }
 

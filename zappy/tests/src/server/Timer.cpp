@@ -7,7 +7,6 @@
 
 #include "zappy/server/Timer.hpp"
 
-#include <bits/chrono.h>
 #include <gtest/gtest.h>
 
 #include <chrono>
