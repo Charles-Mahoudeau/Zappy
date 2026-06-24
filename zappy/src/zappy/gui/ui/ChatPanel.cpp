@@ -30,6 +30,8 @@ bool ChatPanel::consumeAutoScrollReset(std::size_t messageCount) {
 }
 
 void ChatPanel::draw(const std::deque<std::string>& broadcasts, Rectangle bounds) {
+    bounds = _drag.apply(bounds, Widgets::kPanelHeaderHeight);
+
     if (consumeAutoScrollReset(broadcasts.size())) {
         const float fullHeight = static_cast<float>(broadcasts.size()) * kLineHeight;
         _scroll = Vector2{0.0F, -std::max(0.0F, fullHeight - bounds.height())};

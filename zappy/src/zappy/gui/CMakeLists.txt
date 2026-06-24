@@ -43,6 +43,8 @@ add_library(zappy_gui_objects OBJECT
         render/utils/Vector3.hpp
         ui/ChatPanel.cpp
         ui/ChatPanel.hpp
+        ui/Draggable.cpp
+        ui/Draggable.hpp
         ui/GuiTheme.cpp
         ui/GuiTheme.hpp
         ui/InfoPanel.cpp

@@ -11,6 +11,7 @@
 #include <optional>
 #include <utility>
 
+#include "Draggable.hpp"
 #include "utils/Rectangle.hpp"
 #include "utils/Vector2.hpp"
 
@@ -38,7 +39,7 @@ class InfoPanel {
     InfoPanel& operator=(InfoPanel&&) noexcept = default;
 
     void update(Vector2 mousePos, bool clicked, const render::Camera& camera, const game::GameState& state);
-    void draw(const game::GameState& state, Rectangle bounds) const;
+    void draw(const game::GameState& state, Rectangle bounds);
 
     [[nodiscard]] float contentHeight(const game::GameState& state) const;
 
@@ -56,6 +57,7 @@ class InfoPanel {
     InfoPanelState _state{InfoPanelState::Leaderboard};
     std::optional<std::pair<std::uint32_t, std::uint32_t>> _selectedTile;
     std::optional<std::uint32_t> _selectedPlayerId;
+    Draggable _drag;
 };
 
 }  // namespace zappy::gui::ui

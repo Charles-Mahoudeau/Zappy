@@ -14,6 +14,7 @@
 #include "Leaderboard.hpp"
 #include "PlayerInfo.hpp"
 #include "TileInfo.hpp"
+#include "Widgets.hpp"
 #include "utils/Rectangle.hpp"
 #include "utils/Vector2.hpp"
 #include "zappy/gui/game/GameState.hpp"
@@ -77,8 +78,10 @@ float InfoPanel::contentHeight(const game::GameState& state) const {
     return 0.0F;
 }
 
-void InfoPanel::draw(const game::GameState& state, Rectangle bounds) const {
+void InfoPanel::draw(const game::GameState& state, Rectangle bounds) {
     using enum InfoPanelState;
+
+    bounds = _drag.apply(bounds, Widgets::kPanelHeaderHeight);
 
     switch (_state) {
         case Leaderboard:

@@ -11,6 +11,7 @@
 #include <deque>
 #include <string>
 
+#include "Draggable.hpp"
 #include "utils/Rectangle.hpp"
 #include "utils/Vector2.hpp"
 
@@ -38,6 +39,7 @@ class ChatPanel {
 
     std::size_t _lastMessageCount{0};
     Vector2 _scroll;
+    Draggable _drag;
 };
 
 }  // namespace zappy::gui::ui
