@@ -211,7 +211,7 @@ TEST(TimerInit, HigherFrequencyProducesMoreTicks) {
     Timer fast;
     fast.setFrequencies(150);
 
-    std::this_thread::sleep_for(20ms);
+    std::this_thread::sleep_for(std::chrono::milliseconds(20));
 
     const int slowTicks = slow.update();
     const int fastTicks = fast.update();
