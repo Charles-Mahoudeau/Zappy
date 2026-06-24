@@ -40,7 +40,9 @@ const Team* TeamRegistry::team(const network::Address& address) const {
 beman::any_view::any_view<const std::string> TeamRegistry::teamNames() const { return _teams | std::views::keys; }
 
 Team& TeamRegistry::createTeam(std::string name) {
-    if (auto [it, inserted] = _teams.try_emplace(name, Team{std::move(name)}); inserted) {
+    std::string key = name;
+
+    if (auto [it, inserted] = _teams.try_emplace(std::move(key), Team{std::move(name)}); inserted) {
         return it->second;
     }
     throw exception::InvalidArgument{"team name already in use"};
