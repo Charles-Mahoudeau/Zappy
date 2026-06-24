@@ -8,6 +8,7 @@
 #pragma once
 
 #include <cstdint>
+#include <deque>
 #include <expected>
 #include <optional>
 #include <random>
@@ -15,7 +16,6 @@
 #include <string>
 #include <string_view>
 #include <unordered_map>
-#include <vector>
 
 #include "EntityDatabase.hpp"
 #include "Event.hpp"
@@ -143,7 +143,7 @@ class World : public IEventEmitter {
     std::optional<io::Logger> _logger;
     std::unordered_map<ResourceType, std::uint64_t> _resourceThresholds;
     std::uint16_t _nextMajorTick{kMajorTickInterval};
-    std::vector<Event> _events;
+    std::deque<Event> _events;
 };
 
 template <IsEntity T>
