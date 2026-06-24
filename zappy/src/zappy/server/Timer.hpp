@@ -72,7 +72,7 @@ class Timer {
 
     static constexpr int kTick_milli_default = 1000;
     static constexpr std::uint16_t kMinFrequency = 1;
-    static constexpr std::uint8_t kMaxFrequency = 200;
+    static constexpr std::uint16_t kMaxFrequency = 1000;
     static constexpr std::uint16_t kDefault_Frequencies = 100;
 
     std::uint64_t _nextId = 1;

@@ -7,6 +7,8 @@
 
 #include "zappy/server/CliParser.hpp"
 
+#include <algorithm>
+#include <cctype>
 #include <cstddef>
 #include <cstdint>
 #include <format>
@@ -113,15 +115,20 @@ void CliParser::handleFlag(std::string_view flag, const std::vector<std::string_
 void CliParser::ensureValidArguments() const {
     const std::vector<std::pair<bool, std::string_view>> conditions = {
         {this->_parameters.port == 0, "port"},
-        {this->_parameters.mapWidth == 0, "mapWidth"},
-        {this->_parameters.mapHeight == 0, "mapHeight"},
-        {this->_parameters.teamsName.size() < 2, "teamsName"},
+        {this->_parameters.mapWidth < 10, "mapWidth"},
+        {this->_parameters.mapHeight < 10, "mapHeight"},
+        {this->_parameters.teamsName.empty(), "teamsName"},
         {this->_parameters.nbInitialClient == 0, "nbInitialClient"},
-        {this->_parameters.frequencies == 0, "frequencies"}};
+        {this->_parameters.frequencies > 10000, "frequencies"}};
 
     for (const auto& [failed, name] : conditions) {
         if (failed) {
             throw exception::InvalidArgument(std::format("Missing/Invalid required CLI argument: {}", name));
+        }
+    }
+    for (const auto& teamName : this->_parameters.teamsName) {
+        if (std::ranges::any_of(teamName, [](unsigned char ch) { return std::isspace(ch); })) {
+            throw exception::InvalidArgument(std::format("Team space cannot contain spaces: {}", teamName));
         }
     }
 }
