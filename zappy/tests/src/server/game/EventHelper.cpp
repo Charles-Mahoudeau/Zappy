@@ -195,7 +195,7 @@ TEST(EventHelperToWire, PlayerBroadcast) {
     };
 
     // NOTE: the implementation currently formats this as "pex #id message"
-    EXPECT_EQ(EventHelper::toWire(event), "pex #8 hello world");
+    EXPECT_EQ(EventHelper::toWire(event), "pbc #8 hello world");
 }
 
 TEST(EventHelperToWire, PlayerBroadcastEmptyMessage) {
@@ -204,7 +204,7 @@ TEST(EventHelperToWire, PlayerBroadcastEmptyMessage) {
         .message = "",
     };
 
-    EXPECT_EQ(EventHelper::toWire(event), "pex #0 ");
+    EXPECT_EQ(EventHelper::toWire(event), "pbc #0 ");
 }
 
 // ─── IncantationBeginEvent ───────────────────────────────────────────────────
