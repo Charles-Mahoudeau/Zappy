@@ -7,6 +7,8 @@
 
 #include "zappy/server/CliParser.hpp"
 
+#include <algorithm>
+#include <cctype>
 #include <cstddef>
 #include <cstdint>
 #include <format>
@@ -125,7 +127,7 @@ void CliParser::ensureValidArguments() const {
         }
     }
     for (const auto& teamName : this->_parameters.teamsName) {
-        if (teamName.contains(" ")) {
+        if (std::ranges::any_of(teamName, [](unsigned char ch) { return std::isspace(ch); })) {
             throw exception::InvalidArgument(std::format("Team space cannot contain spaces: {}", teamName));
         }
     }
