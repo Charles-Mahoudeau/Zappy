@@ -11,6 +11,9 @@
 #include <cstdint>
 #include <limits>
 #include <numeric>
+#include <sstream>
+#include <string>
+#include <utility>
 
 #include "ResourceType.hpp"
 
@@ -49,4 +52,20 @@ std::uint16_t Inventory::removeResource(const ResourceType type, std::uint16_t a
 }
 
 void Inventory::clear() { _resources.clear(); }
+
+std::string Inventory::string() const {
+    std::stringstream stringStream;
+
+    for (std::uint8_t i = 0; i < std::to_underlying(ResourceType::kCount); ++i) {
+        if (i > 0) {
+            stringStream << " ";
+        }
+        if (const auto it = _resources.find(ResourceType{i}); it != _resources.end()) {
+            stringStream << it->second;
+        } else {
+            stringStream << 0;
+        }
+    }
+    return stringStream.str();
+}
 }  // namespace zappy::server::game

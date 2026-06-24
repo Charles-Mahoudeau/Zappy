@@ -8,6 +8,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 #include <unordered_map>
 
 #include "ResourceType.hpp"
@@ -47,6 +48,10 @@ class Inventory {
 
     /// @brief Clear the inventory.
     void clear();
+
+    /// @brief Get the string representation of the inventory.
+    /// @return The string representation of the inventory.
+    [[nodiscard]] std::string string() const;
 
   private:
     std::unordered_map<ResourceType, std::uint16_t> _resources;
