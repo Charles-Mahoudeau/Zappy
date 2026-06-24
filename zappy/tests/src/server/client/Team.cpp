@@ -9,6 +9,8 @@
 
 #include <gtest/gtest.h>
 
+#include <utility>
+
 #include "zappy/shared/exception/InvalidArgument.hpp"
 
 using namespace zappy::server::client;
@@ -159,7 +161,7 @@ TEST(TeamCopySemantics, CopiesTeamCorrectly) {
     original.addMember(Address{"127.0.0.1", 6000});
     original.addMember(Address{"127.0.0.2", 6001});
 
-    Team copy = original;
+    const Team copy = original;
 
     EXPECT_EQ(copy.name(), original.name());
     EXPECT_EQ(copy.members().size(), original.members().size());
@@ -172,7 +174,7 @@ TEST(TeamMoveSemantics, MovesTeamCorrectly) {
     original.addMember(Address{"127.0.0.1", 7000});
     original.addMember(Address{"127.0.0.2", 7001});
 
-    Team moved = std::move(original);
+    const Team moved = std::move(original);
 
     EXPECT_EQ(moved.name(), "Quebec");
     EXPECT_EQ(moved.members().size(), 2);
