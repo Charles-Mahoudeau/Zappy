@@ -27,6 +27,7 @@ PlayerCommands::PlayerCommands(Timer& timer, client::ClientRegistry& clients)
           {"Inventory", [](auto* client, auto& params) { return PlayerCommands::ignore(client, params); }},
           {"Broadcast", [](auto* client, auto& params) { return PlayerCommands::ignore(client, params); }},
           {"Connect_nbr", [](auto* client, auto& params) { return PlayerCommands::ignore(client, params); }},
+          {"Fork", [](auto* client, auto& params) { return PlayerCommands::ignore(client, params); }},
           {"Eject", [](auto* client, auto& params) { return PlayerCommands::ignore(client, params); }},
           {"Take", [](auto* client, auto& params) { return PlayerCommands::ignore(client, params); }},
           {"Set", [](auto* client, auto& params) { return PlayerCommands::ignore(client, params); }},
