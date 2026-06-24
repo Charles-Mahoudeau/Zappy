@@ -74,6 +74,8 @@ std::optional<std::pair<std::uint32_t, std::uint32_t>> TileInfo::pick(Vector2 mo
 
 void TileInfo::draw(const game::GameState& state, std::uint32_t x, std::uint32_t y, Rectangle bounds) {
     static constexpr float kRowHeight = 24.0F;
+    static constexpr float kTextMarginLeft = 8.0F;
+    static constexpr float kTextMarginTop = 4.0F;
 
     Widgets::panel(bounds, std::format("Tile ({}, {})", x, y));
 
@@ -91,8 +93,10 @@ void TileInfo::draw(const game::GameState& state, std::uint32_t x, std::uint32_t
     for (std::size_t i = 0; i < rows.size(); ++i) {
         const auto& [label, count] = rows.at(i);
         const std::string text = std::format("{}: {}", label, count);
-        const Rectangle rowBounds{bounds.x(), bounds.y() + (static_cast<float>(i + 1) * kRowHeight), bounds.width(),
-                                  kRowHeight};
+        const Rectangle rowBounds{
+            bounds.x() + kTextMarginLeft,
+            bounds.y() + Widgets::kPanelHeaderHeight + kTextMarginTop + (static_cast<float>(i) * kRowHeight),
+            bounds.width(), kRowHeight};
         Widgets::label(rowBounds, text);
     }
 }

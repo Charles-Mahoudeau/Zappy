@@ -51,8 +51,10 @@ void Leaderboard::draw(const game::GameState& state, Rectangle bounds) {
         const auto& entry = entries.at(i);
         const std::string text =
             std::format("{}. {} - {}/{}", i + 1, entry.team, entry.playersAtMaxLevel, entry.playersNeeded);
-        const Rectangle rowBounds{bounds.x() + kTextMarginLeft, bounds.y() + (static_cast<float>(i + 1) * kRowHeight),
-                                  bounds.width(), kRowHeight};
+        const Rectangle rowBounds{
+            bounds.x() + kTextMarginLeft,
+            bounds.y() + Widgets::kPanelHeaderHeight + kTextMarginTop + (static_cast<float>(i) * kRowHeight),
+            bounds.width(), kRowHeight};
         Widgets::label(rowBounds, text);
     }
 }

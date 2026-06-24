@@ -9,13 +9,11 @@
 
 #include <raylib.h>
 
-#include <array>
 #include <cmath>
-#include <cstddef>
 #include <format>
+#include <initializer_list>
 #include <string>
 #include <string_view>
-#include <utility>
 
 #include "Widgets.hpp"
 #include "zappy/gui/game/GameState.hpp"
@@ -78,6 +76,10 @@ std::optional<std::uint32_t> PlayerInfo::pick(Vector2 mousePos, const render::Ca
 
 void PlayerInfo::draw(const game::GameState& state, std::uint32_t playerId, Rectangle bounds) {
     static constexpr float kRowHeight = 24.0F;
+    static constexpr float kTextMarginLeft = 8.0F;
+    static constexpr float kTextMarginTop = 4.0F;
+    static constexpr float kSectionGap = 8.0F;
+    static constexpr float kSectionMargin = 8.0F;
 
     const auto it = state.players().find(playerId);
     if (it == state.players().end()) {
@@ -87,38 +89,45 @@ void PlayerInfo::draw(const game::GameState& state, std::uint32_t playerId, Rect
 
     Widgets::panel(bounds, std::format("Player #{} ({})", playerId, player.team));
 
-    const std::array<std::string, 4> infoRows{
-        std::format("Position: ({}, {})", player.x, player.y),
-        std::format("Orientation: {}", orientationName(player.orientation)),
-        std::format("Level: {}", player.level),
-        std::format("Incanting: {}", player.isIncanting ? "yes" : "no"),
+    float y = bounds.y() + Widgets::kPanelHeaderHeight + kTextMarginTop;
+    const float sectionX = bounds.x() + kSectionMargin;
+    const float sectionWidth = bounds.width() - (2.0F * kSectionMargin);
+
+    const auto drawSection = [&](std::string_view title, std::initializer_list<std::string> lines) {
+        const float sectionHeight =
+            Widgets::kPanelHeaderHeight + kTextMarginTop + (static_cast<float>(lines.size()) * kRowHeight);
+        const Rectangle sectionBounds{sectionX, y, sectionWidth, sectionHeight};
+        Widgets::panel(sectionBounds, title);
+
+        float rowY = sectionBounds.y() + Widgets::kPanelHeaderHeight + kTextMarginTop;
+        for (const auto& line : lines) {
+            Widgets::label(Rectangle{sectionBounds.x() + kTextMarginLeft, rowY,
+                                     sectionBounds.width() - (2.0F * kTextMarginLeft), kRowHeight},
+                           line);
+            rowY += kRowHeight;
+        }
+        y += sectionHeight + kSectionGap;
     };
 
-    const std::array<std::pair<std::string_view, std::uint32_t>, 7> inventoryRows{{
-        {"Food", player.inventory.food},
-        {"Linemate", player.inventory.linemate},
-        {"Deraumere", player.inventory.deraumere},
-        {"Sibur", player.inventory.sibur},
-        {"Mendiane", player.inventory.mendiane},
-        {"Phiras", player.inventory.phiras},
-        {"Thystame", player.inventory.thystame},
-    }};
+    drawSection("Placement", {
+                                 std::format("Position: ({}, {})", player.x, player.y),
+                                 std::format("Orientation: {}", orientationName(player.orientation)),
+                             });
 
-    std::size_t row = 0;
-    for (const auto& text : infoRows) {
-        ++row;
-        const Rectangle rowBounds{bounds.x(), bounds.y() + (static_cast<float>(row) * kRowHeight), bounds.width(),
-                                  kRowHeight};
-        Widgets::label(rowBounds, text);
-    }
+    drawSection("State", {
+                             std::format("Level: {}", player.level),
+                             std::format("Incanting: {}", player.isIncanting ? "yes" : "no"),
+                         });
 
-    for (const auto& [label, count] : inventoryRows) {
-        ++row;
-        const std::string text = std::format("{}: {}", label, count);
-        const Rectangle rowBounds{bounds.x(), bounds.y() + (static_cast<float>(row) * kRowHeight), bounds.width(),
-                                  kRowHeight};
-        Widgets::label(rowBounds, text);
-    }
+    drawSection("Inventory", {
+                                 std::format("Food: {}", player.inventory.food),
+                                 std::format("Linemate: {}", player.inventory.linemate),
+                                 std::format("Deraumere: {}", player.inventory.deraumere),
+                                 std::format("Sibur: {}", player.inventory.sibur),
+                                 std::format("Mendiane: {}", player.inventory.mendiane),
+                                 std::format("Phiras: {}", player.inventory.phiras),
+                                 std::format("Thystame: {}", player.inventory.thystame),
+                             });
 }
 
 }  // namespace zappy::gui::ui

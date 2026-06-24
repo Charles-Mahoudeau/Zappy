@@ -38,12 +38,13 @@ void ChatPanel::draw(const std::deque<std::string>& broadcasts, Rectangle bounds
     const Rectangle content = contentRect(bounds, broadcasts.size());
     const Rectangle view = Widgets::scrollPanel(bounds, "Chat", content, _scroll);
 
-    float y = bounds.y() + _scroll.y();
+    Widgets::beginScissor(view);
+    float y = view.y() + _scroll.y();
     for (const auto& message : broadcasts) {
-        Widgets::label(Rectangle{bounds.x(), y, content.width(), kLineHeight}, message);
+        Widgets::label(Rectangle{view.x(), y, content.width(), kLineHeight}, message);
         y += kLineHeight;
     }
-    static_cast<void>(view);
+    Widgets::endScissor();
 }
 
 }  // namespace zappy::gui::ui
