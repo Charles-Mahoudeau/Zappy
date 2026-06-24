@@ -10,6 +10,7 @@
 #include <gtest/gtest.h>
 
 #include <cstdint>
+#include <functional>
 #include <optional>
 #include <string>
 
@@ -108,7 +109,7 @@ TEST(EventHelperToWire, PlayerConnectionWest) {
 // ─── PlayerPositionEvent ─────────────────────────────────────────────────────
 
 TEST(EventHelperToWire, PlayerPosition) {
-    const zappy::server::game::Event event = zappy::server::game::PlayerPositionEvent{
+    constexpr zappy::server::game::Event event = zappy::server::game::PlayerPositionEvent{
         .playerId = 5,
         .position = {8, 3},
         .orientation = Direction::kSouth,
@@ -119,7 +120,7 @@ TEST(EventHelperToWire, PlayerPosition) {
 }
 
 TEST(EventHelperToWire, PlayerPositionOriginNorth) {
-    const zappy::server::game::Event event = zappy::server::game::PlayerPositionEvent{
+    constexpr zappy::server::game::Event event = zappy::server::game::PlayerPositionEvent{
         .playerId = 0,
         .position = {0, 0},
         .orientation = Direction::kNorth,
@@ -131,7 +132,7 @@ TEST(EventHelperToWire, PlayerPositionOriginNorth) {
 // ─── PlayerLevelEvent ────────────────────────────────────────────────────────
 
 TEST(EventHelperToWire, PlayerLevel) {
-    const zappy::server::game::Event event = zappy::server::game::PlayerLevelEvent{
+    constexpr zappy::server::game::Event event = zappy::server::game::PlayerLevelEvent{
         .playerId = 12,
         .level = 4,
     };
@@ -140,7 +141,7 @@ TEST(EventHelperToWire, PlayerLevel) {
 }
 
 TEST(EventHelperToWire, PlayerLevelMax) {
-    const zappy::server::game::Event event = zappy::server::game::PlayerLevelEvent{
+    constexpr zappy::server::game::Event event = zappy::server::game::PlayerLevelEvent{
         .playerId = 0,
         .level = 8,
     };
@@ -178,7 +179,7 @@ TEST(EventHelperToWire, PlayerInventoryWithResources) {
 // ─── PlayerExpulsionEvent ────────────────────────────────────────────────────
 
 TEST(EventHelperToWire, PlayerExpulsion) {
-    const zappy::server::game::Event event = zappy::server::game::PlayerExpulsionEvent{
+    constexpr zappy::server::game::Event event = zappy::server::game::PlayerExpulsionEvent{
         .playerId = 21,
     };
 
@@ -229,7 +230,7 @@ TEST(EventHelperToWire, IncantationBeginMultiplePlayers) {
 }
 
 TEST(EventHelperToWire, IncantationBeginNoPlayers) {
-    const zappy::server::game::Event event = zappy::server::game::IncantationBeginEvent{
+    constexpr zappy::server::game::Event event = zappy::server::game::IncantationBeginEvent{
         .position = {0, 0},
         .level = 1,
         .playerIds = {},
@@ -241,7 +242,7 @@ TEST(EventHelperToWire, IncantationBeginNoPlayers) {
 // ─── IncantationEndEvent ─────────────────────────────────────────────────────
 
 TEST(EventHelperToWire, IncantationEndSuccess) {
-    const zappy::server::game::Event event = zappy::server::game::IncantationEndEvent{
+    constexpr zappy::server::game::Event event = zappy::server::game::IncantationEndEvent{
         .position = {6, 3},
         .success = true,
     };
@@ -250,7 +251,7 @@ TEST(EventHelperToWire, IncantationEndSuccess) {
 }
 
 TEST(EventHelperToWire, IncantationEndFailure) {
-    const zappy::server::game::Event event = zappy::server::game::IncantationEndEvent{
+    constexpr zappy::server::game::Event event = zappy::server::game::IncantationEndEvent{
         .position = {0, 0},
         .success = false,
     };
@@ -261,7 +262,7 @@ TEST(EventHelperToWire, IncantationEndFailure) {
 // ─── PlayerEggLayingEvent ────────────────────────────────────────────────────
 
 TEST(EventHelperToWire, PlayerEggLaying) {
-    const zappy::server::game::Event event = zappy::server::game::PlayerEggLayingEvent{
+    constexpr zappy::server::game::Event event = zappy::server::game::PlayerEggLayingEvent{
         .playerId = 55,
     };
 
@@ -271,7 +272,7 @@ TEST(EventHelperToWire, PlayerEggLaying) {
 // ─── PlayerResourceDropEvent ─────────────────────────────────────────────────
 
 TEST(EventHelperToWire, PlayerResourceDropFood) {
-    const zappy::server::game::Event event = zappy::server::game::PlayerResourceDropEvent{
+    constexpr zappy::server::game::Event event = zappy::server::game::PlayerResourceDropEvent{
         .playerId = 2,
         .resourceType = ResourceType::kFood,
     };
@@ -281,7 +282,7 @@ TEST(EventHelperToWire, PlayerResourceDropFood) {
 }
 
 TEST(EventHelperToWire, PlayerResourceDropThystame) {
-    const zappy::server::game::Event event = zappy::server::game::PlayerResourceDropEvent{
+    constexpr zappy::server::game::Event event = zappy::server::game::PlayerResourceDropEvent{
         .playerId = 9,
         .resourceType = ResourceType::kThystame,
     };
@@ -293,7 +294,7 @@ TEST(EventHelperToWire, PlayerResourceDropThystame) {
 // ─── PlayerResourceCollectEvent ──────────────────────────────────────────────
 
 TEST(EventHelperToWire, PlayerResourceCollectLinemate) {
-    const zappy::server::game::Event event = zappy::server::game::PlayerResourceCollectEvent{
+    constexpr zappy::server::game::Event event = zappy::server::game::PlayerResourceCollectEvent{
         .playerId = 14,
         .resourceType = ResourceType::kLinemate,
     };
@@ -303,7 +304,7 @@ TEST(EventHelperToWire, PlayerResourceCollectLinemate) {
 }
 
 TEST(EventHelperToWire, PlayerResourceCollectPhiras) {
-    const zappy::server::game::Event event = zappy::server::game::PlayerResourceCollectEvent{
+    constexpr zappy::server::game::Event event = zappy::server::game::PlayerResourceCollectEvent{
         .playerId = 0,
         .resourceType = ResourceType::kPhiras,
     };
@@ -315,7 +316,7 @@ TEST(EventHelperToWire, PlayerResourceCollectPhiras) {
 // ─── PlayerDeathEvent ────────────────────────────────────────────────────────
 
 TEST(EventHelperToWire, PlayerDeath) {
-    const zappy::server::game::Event event = zappy::server::game::PlayerDeathEvent{
+    constexpr zappy::server::game::Event event = zappy::server::game::PlayerDeathEvent{
         .playerId = 33,
     };
 
@@ -325,7 +326,7 @@ TEST(EventHelperToWire, PlayerDeath) {
 // ─── EggLaidEvent ────────────────────────────────────────────────────────────
 
 TEST(EventHelperToWire, EggLaidWithPlayer) {
-    const zappy::server::game::Event event = zappy::server::game::EggLaidEvent{
+    constexpr zappy::server::game::Event event = zappy::server::game::EggLaidEvent{
         .playerId = std::optional<std::uint64_t>{4},
         .eggId = 100,
         .position = {2, 8},
@@ -335,7 +336,7 @@ TEST(EventHelperToWire, EggLaidWithPlayer) {
 }
 
 TEST(EventHelperToWire, EggLaidWithoutPlayer) {
-    const zappy::server::game::Event event = zappy::server::game::EggLaidEvent{
+    constexpr zappy::server::game::Event event = zappy::server::game::EggLaidEvent{
         .playerId = std::nullopt,
         .eggId = 200,
         .position = {0, 0},
@@ -348,7 +349,7 @@ TEST(EventHelperToWire, EggLaidWithoutPlayer) {
 // ─── EggConnectionEvent ──────────────────────────────────────────────────────
 
 TEST(EventHelperToWire, EggConnection) {
-    const zappy::server::game::Event event = zappy::server::game::EggConnectionEvent{
+    constexpr zappy::server::game::Event event = zappy::server::game::EggConnectionEvent{
         .eggId = 77,
     };
 
@@ -358,7 +359,7 @@ TEST(EventHelperToWire, EggConnection) {
 // ─── EggDeathEvent ───────────────────────────────────────────────────────────
 
 TEST(EventHelperToWire, EggDeath) {
-    const zappy::server::game::Event event = zappy::server::game::EggDeathEvent{
+    constexpr zappy::server::game::Event event = zappy::server::game::EggDeathEvent{
         .eggId = 88,
     };
 
