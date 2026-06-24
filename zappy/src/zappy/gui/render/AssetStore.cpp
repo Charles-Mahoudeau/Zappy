@@ -15,6 +15,8 @@
 #include "AssetLoaderRegistry.hpp"
 #include "objects/Model.hpp"
 #include "objects/Texture.hpp"
+#include "objects/particles/Particle.hpp"
+#include "objects/particles/ParticleEmitter.hpp"
 #include "zappy/gui/game/GameState.hpp"
 
 namespace zappy::gui::render {
@@ -112,6 +114,10 @@ void AssetStore::loadResourceModel(game::ResourceType type) {
                              {.mapIndex = OCCLUSION, .path = "assets/models/resources/textures/occlusionB.png"}}));
             return;
     }
+}
+
+void AssetStore::loadVFXs() {
+    _vfxs.emplace("test", ParticleEmitter("assets/models/resources/textures/thystameBase.png"));
 }
 
 const Skybox& AssetStore::skybox() const { return _skybox; }

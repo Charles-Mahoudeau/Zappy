@@ -16,6 +16,7 @@
 
 #include "objects/Model.hpp"
 #include "objects/Skybox.hpp"
+#include "objects/particles/Particle.hpp"
 #include "zappy/gui/game/GameState.hpp"
 
 namespace zappy::gui::render {
@@ -38,7 +39,7 @@ class AssetStore {
     void loadSkybox();
     void loadPlayerModel();
     void loadResourceModel(game::ResourceType type);
-
+    void loadVFXs();
     [[nodiscard]] const Skybox& skybox() const;
     [[nodiscard]] Model& playerModel(std::size_t index);
     [[nodiscard]] std::size_t playerModelCount() const;
@@ -54,12 +55,12 @@ class AssetStore {
                              bool flipVertical = false);
     static Model createModel(std::string_view path, std::string_view animationPath,
                              std::initializer_list<TextureMap> textures, bool flipVertical = false);
-
     static constexpr int kMaxModels = 6;
 
     Skybox _skybox;
     std::vector<Model> _playerModels;
     std::map<game::ResourceType, Model> _resourcesModels;
+    std::map<std::string_view, ParticleEmitter> _vfxs;
 };
 
 }  // namespace zappy::gui::render
