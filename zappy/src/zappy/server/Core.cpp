@@ -22,7 +22,10 @@ void Core::init(std::span<std::string_view> argv) {
     const CliParser::CliParameters& parameters = parser.parameters();
 
     this->_serv.init(parameters.port, this->_clientRegistry, this->_time);
-    this->_time.setFrequencies(parameters.frequencies);
+
+    if (parameters.frequencies != 0) {
+        this->_time.setFrequencies(parameters.frequencies);
+    }
 }
 
 void Core::run() {
