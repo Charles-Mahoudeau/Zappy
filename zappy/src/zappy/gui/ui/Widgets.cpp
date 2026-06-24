@@ -21,6 +21,10 @@ void Widgets::panel(Rectangle bounds, std::string_view title) { GuiPanel(bounds,
 
 void Widgets::label(Rectangle bounds, std::string_view text) { GuiLabel(bounds, std::string{text}.c_str()); }
 
+bool Widgets::button(Rectangle bounds, std::string_view text) {
+    return GuiButton(bounds, std::string{text}.c_str()) != 0;
+}
+
 Rectangle Widgets::scrollPanel(Rectangle bounds, std::string_view title, Rectangle content, Vector2& scroll) {
     ::Rectangle view{};
     auto& nativeScroll = static_cast<::Vector2&>(scroll);
@@ -41,5 +45,11 @@ void Widgets::beginScissor(Rectangle area) {
 }
 
 void Widgets::endScissor() { EndScissorMode(); }
+
+void Widgets::overlay(Rectangle bounds) {
+    static constexpr float kOverlayAlpha = 0.6F;
+    DrawRectangle(static_cast<int>(bounds.x()), static_cast<int>(bounds.y()), static_cast<int>(bounds.width()),
+                  static_cast<int>(bounds.height()), Fade(BLACK, kOverlayAlpha));
+}
 
 }  // namespace zappy::gui::ui
