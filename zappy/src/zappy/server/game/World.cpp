@@ -96,7 +96,7 @@ void World::spawnResource(const ResourceType type) {
 
     tile.inventory().addResource(type);
     pushEvent(TileInventoryEvent{
-        .position = {},
+        .position = tile.position(),
         .inventory = tile.inventory(),
     });
 }
