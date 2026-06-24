@@ -7,8 +7,6 @@
 
 #include "Egg.hpp"
 
-#include <cstdint>
-
 namespace zappy::server::game::entity {
 void Egg::update() {
     // Empty
