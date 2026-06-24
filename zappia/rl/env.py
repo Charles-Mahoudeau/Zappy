@@ -1,6 +1,6 @@
 import socket
 import time
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 import numpy as np
 import torch
@@ -34,6 +34,8 @@ COMMANDS = [
     "Incantation",
     "Eject",
 ]
+
+LEVELTEXT = "Current level:"
 
 COMMAND_TIME = [
     7,
@@ -110,6 +112,15 @@ ELEVATION_REQ = {
     },
 }
 
+# Actions that should trigger a follow-up Look / Inventory refresh.
+NEEDS_LOOK_ACTIONS = frozenset(
+    {0, 1, 2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 22}
+)
+NEEDS_INV_ACTIONS = frozenset({6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21})
+REFRESH_INTERVAL = 8
+KO_STREAK_LIMIT = 10
+ACTION_HISTORY_LIMIT = 20
+
 
 class ZappyEnv(EnvBase):
     def __init__(self, host="localhost", port=4242, team="team1", freq=100, **kwargs):
@@ -119,7 +130,7 @@ class ZappyEnv(EnvBase):
         self.sock: Optional[socket.socket] = None
         self._recv_buf = ""
         self.level = 1
-        self.inventory: dict = {r: 0 for r in RESOURCES}
+        self.inventory: dict = dict.fromkeys(RESOURCES, 0)
         self.last_look: List[List[str]] = []
         self.action_history: List[int] = []
         self.command_history: List[str] = []
@@ -131,7 +142,7 @@ class ZappyEnv(EnvBase):
         self._steps_since_refresh = 0
         self._ko_streak = 0
         self._is_dead = False
-        self._stone_high = {r: 0 for r in RESOURCES}
+        self._stone_high = dict.fromkeys(RESOURCES, 0)
 
         self.observation_spec = Composite(
             observation=Unbounded(
@@ -181,7 +192,7 @@ class ZappyEnv(EnvBase):
             return
         try:
             self.sock.sendall((msg + "\n").encode())
-        except (BrokenPipeError, OSError):
+        except OSError:
             self.sock.close()
             self.sock = None
 
@@ -210,7 +221,7 @@ class ZappyEnv(EnvBase):
                     break
         except socket.timeout:
             pass
-        except (OSError, BrokenPipeError):
+        except OSError:
             self.sock = None
 
     def _pop_line(self) -> Optional[str]:
@@ -234,28 +245,36 @@ class ZappyEnv(EnvBase):
         deadline = time.time() + timeout
         while time.time() < deadline:
             line = self._pop_line()
-            if line is not None:
-                if line.startswith("message "):
-                    self._handle_broadcast(line)
-                    continue
-                if line.startswith("eject:"):
-                    continue
-                if line == "dead":
-                    if self.sock:
-                        self.sock.close()
-                        self.sock = None
-                    self._is_dead = True
-                    continue
-                if line:
-                    return line
+            if line is None:
+                remaining = deadline - time.time()
+                if self.sock is None or remaining <= 0:
+                    break
+                self._fill_buffer(min(0.5, remaining))
                 continue
-            if self.sock is None:
-                break
-            remaining = deadline - time.time()
-            if remaining <= 0:
-                break
-            self._fill_buffer(min(0.5, remaining))
+            response = self._consume_line(line)
+            if response:
+                return response
         return ""
+
+    def _consume_line(self, line: str) -> str:
+        """Process one received line; return it if it's a command response, else ''.
+
+        Spontaneous messages are intercepted: broadcasts are buffered, eject is
+        silently consumed, and 'dead' closes the socket and sets _is_dead while
+        still returning '' so reading continues.
+        """
+        if line.startswith("message "):
+            self._handle_broadcast(line)
+            return ""
+        if line.startswith("eject:"):
+            return ""
+        if line == "dead":
+            if self.sock:
+                self.sock.close()
+                self.sock = None
+            self._is_dead = True
+            return ""
+        return line
 
     def _handle_broadcast(self, line: str) -> None:
         """Parse 'message K, INCANT_N' and push (direction, text, sender_level) into buffer."""
@@ -363,12 +382,12 @@ class ZappyEnv(EnvBase):
         self._ko_streak = 0
         self._is_dead = False
         self.level = 1
-        self.inventory = {r: 0 for r in RESOURCES}
+        self.inventory = dict.fromkeys(RESOURCES, 0)
         self.last_look = []
         self.action_history = []
         self.broadcast_buffer = []
         self._steps_since_refresh = 0
-        self._stone_high = {r: 0 for r in RESOURCES}
+        self._stone_high = dict.fromkeys(RESOURCES, 0)
 
         for _ in range(30):
             try:
@@ -402,103 +421,20 @@ class ZappyEnv(EnvBase):
         cmd = COMMANDS[action_idx]
         prev_inv = self.inventory.copy()
 
-        self.last_command_sent = cmd
-        self.sent_command_history.append(cmd)
-        self.action_history.append(action_idx)
-        if len(self.action_history) > 20:
-            self.action_history.pop(0)
-
+        self._record_action(action_idx, cmd)
         cmd_to_send = f"Broadcast INCANT_{self.level}" if action_idx == 5 else cmd
         self._send(cmd_to_send)
 
-        needs_look = action_idx in (
-            0,
-            1,
-            2,
-            6,
-            7,
-            8,
-            9,
-            10,
-            11,
-            12,
-            13,
-            14,
-            15,
-            16,
-            17,
-            18,
-            19,
-            21,
-            22,
-        )
-        needs_inv = action_idx in (
-            6,
-            7,
-            8,
-            9,
-            10,
-            11,
-            12,
-            13,
-            14,
-            15,
-            16,
-            17,
-            18,
-            19,
-            21,
-        )
-        if self._steps_since_refresh >= 8:
-            needs_look = needs_inv = True
-            self._steps_since_refresh = 0
-        else:
-            self._steps_since_refresh += 1
-
+        needs_look, needs_inv = self._plan_refresh(action_idx)
         if needs_look:
             self._send("Look")
         if needs_inv:
             self._send("Inventory")
 
-        action_resp = self._recv_response()
-        if action_resp == "Elevation underway":
-            incant_timeout = 310.0 / max(self.freq, 1) + 2.0
-            second = self._recv_response(timeout=incant_timeout)
-            action_resp = f"Elevation underway\n{second}"
-
-        if action_idx == 3 and action_resp.startswith("["):
-            self.last_look = self._parse_look(action_resp)
-        if action_idx == 4 and action_resp.startswith("["):
-            self.inventory = self._parse_inventory(action_resp)
-
-        if needs_look:
-            look_raw = self._recv_response()
-            if look_raw.startswith("["):
-                self.last_look = self._parse_look(look_raw)
-        if needs_inv:
-            inv_raw = self._recv_response()
-            if inv_raw.startswith("["):
-                self.inventory = self._parse_inventory(inv_raw)
-
-        if "Current level:" in action_resp:
-            try:
-                self.level = int(action_resp.split("Current level:")[-1].strip())
-            except ValueError:
-                pass
-
-        if action_resp.strip() == "ko":
-            self._ko_streak += 1
-        else:
-            self._ko_streak = 0
-        if self._ko_streak >= 10:
-            action_resp = "dead"
-            if self.sock:
-                self.sock.close()
-                self.sock = None
-
-        if self._is_dead:
-            action_resp = "dead"
-            self._is_dead = False
+        action_resp = self._read_action_response(action_idx)
+        self._read_refresh_responses(needs_look, needs_inv)
+        self._update_level(action_resp)
+        action_resp = self._apply_death(action_resp)
 
         done = "dead" in action_resp.lower() or self.sock is None
         reward = self._compute_reward(action_idx, action_resp, prev_inv)
@@ -511,12 +447,72 @@ class ZappyEnv(EnvBase):
 
         return self._build_tensordict(obs, done, reward, server_response=resp_code)
 
+    def _record_action(self, action_idx: int, cmd: str) -> None:
+        self.last_command_sent = cmd
+        self.sent_command_history.append(cmd)
+        self.action_history.append(action_idx)
+        if len(self.action_history) > ACTION_HISTORY_LIMIT:
+            self.action_history.pop(0)
+
+    def _plan_refresh(self, action_idx: int) -> Tuple[bool, bool]:
+        """Decide whether this step needs a follow-up Look / Inventory.
+
+        A full refresh is forced every REFRESH_INTERVAL steps.
+        """
+        if self._steps_since_refresh >= REFRESH_INTERVAL:
+            self._steps_since_refresh = 0
+            return True, True
+        self._steps_since_refresh += 1
+        return action_idx in NEEDS_LOOK_ACTIONS, action_idx in NEEDS_INV_ACTIONS
+
+    def _read_action_response(self, action_idx: int) -> str:
+        action_resp = self._recv_response()
+        if action_resp == "Elevation underway":
+            incant_timeout = 310.0 / max(self.freq, 1) + 2.0
+            second = self._recv_response(timeout=incant_timeout)
+            action_resp = f"Elevation underway\n{second}"
+        if action_idx == 3 and action_resp.startswith("["):
+            self.last_look = self._parse_look(action_resp)
+        if action_idx == 4 and action_resp.startswith("["):
+            self.inventory = self._parse_inventory(action_resp)
+        return action_resp
+
+    def _read_refresh_responses(self, needs_look: bool, needs_inv: bool) -> None:
+        if needs_look:
+            look_raw = self._recv_response()
+            if look_raw.startswith("["):
+                self.last_look = self._parse_look(look_raw)
+        if needs_inv:
+            inv_raw = self._recv_response()
+            if inv_raw.startswith("["):
+                self.inventory = self._parse_inventory(inv_raw)
+
+    def _update_level(self, action_resp: str) -> None:
+        if LEVELTEXT not in action_resp:
+            return
+        try:
+            self.level = int(action_resp.split(LEVELTEXT)[-1].strip())
+        except ValueError:
+            pass
+
+    def _apply_death(self, action_resp: str) -> str:
+        self._ko_streak = self._ko_streak + 1 if action_resp.strip() == "ko" else 0
+        if self._ko_streak >= KO_STREAK_LIMIT:
+            action_resp = "dead"
+            if self.sock:
+                self.sock.close()
+                self.sock = None
+        if self._is_dead:
+            action_resp = "dead"
+            self._is_dead = False
+        return action_resp
+
     def _parse_look(self, raw: str) -> List[List[str]]:
         raw = raw.strip().lstrip("[").rstrip("]")
         return [t.strip().split() for t in raw.split(",")]
 
     def _parse_inventory(self, raw: str) -> dict:
-        inv = {r: 0 for r in RESOURCES}
+        inv = dict.fromkeys(RESOURCES, 0)
         if not raw.startswith("["):
             return inv
         raw = raw.strip().lstrip("[").rstrip("]")
@@ -554,47 +550,47 @@ class ZappyEnv(EnvBase):
 
         if "dead" in resp.lower():
             return -10.0
-
-        if "Current level:" in resp:
+        if LEVELTEXT in resp:
             return 100.0 * self.level
 
-        r = 0.0
         food = self.inventory.get("food", 0)
-        prev_food = prev_inv.get("food", 0)
-        req = ELEVATION_REQ.get(self.level, {})
-
-        r += 0.2 * min(food / 10.0, 1.0)
-
-        time_cost = COMMAND_TIME[action_idx]
-        if action_idx == 21 and resp == "ko":
-            time_cost = 7
-        r -= time_cost / 126.0
-
-        if action_idx == 6:  # Take food
-            if resp == "ok":
-                r += 10.0 if prev_food < 5 else 3.0  # eating, big when hungry
-
-        elif 7 <= action_idx <= 12:  # Take a stone
-            if resp == "ok":
-                resource = RESOURCES[action_idx - 6]
-                needed = req.get(resource, 0)
-                have = self.inventory.get(resource, 0)
-                if needed > 0 and have <= needed and have > self._stone_high[resource]:
-                    self._stone_high[resource] = have
-                    r += 8.0
-
-        elif action_idx == 21:  # Incantation
-            if resp == "ko":
-                r -= 2.0
-
-        elif action_idx == 22:  # Eject — useless / harmful at low level
-            r -= 1.0
-
-        elif action_idx == 5:  # Broadcast — minor cost (not needed solo at lvl 1)
-            r -= 0.1
-
-        # Moves, Look, Inventory: neutral — free to explore and observe.
+        r = 0.2 * min(food / 10.0, 1.0)
+        r -= self._time_cost(action_idx, resp) / 126.0
+        r += self._action_reward(action_idx, resp, prev_inv.get("food", 0))
         return r
+
+    @staticmethod
+    def _time_cost(action_idx: int, resp: str) -> int:
+        if action_idx == 21 and resp == "ko":
+            return 7
+        return COMMAND_TIME[action_idx]
+
+    def _action_reward(self, action_idx: int, resp: str, prev_food: int) -> float:
+        if action_idx == 6:  # Take food (eating)
+            if resp != "ok":
+                return 0.0
+            return 10.0 if prev_food < 5 else 3.0
+        if 7 <= action_idx <= 12:  # Take a stone
+            return self._stone_reward(action_idx, resp)
+        if action_idx == 21:  # Incantation
+            return -2.0 if resp == "ko" else 0.0
+        if action_idx == 22:  # Eject
+            return -1.0
+        if action_idx == 5:  # Broadcast
+            return 0.5 if resp == "ok" else 0.0
+        return 0.0
+
+    def _stone_reward(self, action_idx: int, resp: str) -> float:
+        if resp != "ok":
+            return 0.0
+        req = ELEVATION_REQ.get(self.level, {})
+        resource = RESOURCES[action_idx - 6]
+        needed = req.get(resource, 0)
+        have = self.inventory.get(resource, 0)
+        if needed > 0 and have <= needed and have > self._stone_high[resource]:
+            self._stone_high[resource] = have
+            return 8.0
+        return 0.0
 
     def get_action_mask(self) -> List[bool]:
         mask = [True] * len(COMMANDS)
@@ -625,7 +621,6 @@ class ZappyEnv(EnvBase):
         can_incantate = has_res and has_plrs
 
         if can_incantate:
-            # Force incantation: conditions are met, no reason to do anything else.
             return [False] * 21 + [True] + [False]
         else:
             mask[21] = False
@@ -653,7 +648,7 @@ class ZappyEnv(EnvBase):
             return 2
         if "dead" in resp.lower():
             return 3
-        if "Current level:" in resp or "Elevation underway" in resp:
+        if LEVELTEXT in resp or "Elevation underway" in resp:
             return 4
         if resp.startswith("["):
             return 5

@@ -9,6 +9,8 @@ DEFAULT_TIMEOUT = 15.0
 FORK_TIMEOUT = 30.0
 INCANT_TIMEOUT = 60.0
 
+LEVEL_TEXT = "Current level:"
+
 
 def parse_look(raw: str) -> List[List[str]]:
     raw = raw.strip()
@@ -20,7 +22,7 @@ def parse_look(raw: str) -> List[List[str]]:
 
 
 def parse_inventory(raw: str) -> Dict[str, int]:
-    inv = {r: 0 for r in RESOURCES}
+    inv = dict.fromkeys(RESOURCES, 0)
     raw = raw.strip()
     if raw.startswith("["):
         raw = raw[1:]
@@ -179,10 +181,8 @@ class ZappyClient:
             return None
         self._send_raw(cmd)
         resp = self._next_response(timeout)
-        # Elevation triggered by another player arrives unsolicited: capture the
-        # new level and keep reading until we get this command's real response.
         while resp is not None and (
-            resp.startswith("Current level:") or resp.startswith("Elevation underway")
+            resp.startswith((LEVEL_TEXT, "Elevation underway"))
         ):
             self._record_level(resp)
             resp = self._next_response(timeout)
@@ -221,7 +221,7 @@ class ZappyClient:
         return (
             parse_inventory(resp)
             if resp and resp.startswith("[")
-            else {r: 0 for r in RESOURCES}
+            else dict.fromkeys(RESOURCES, 0)
         )
 
     def connect_nbr(self) -> int:
@@ -240,10 +240,10 @@ class ZappyClient:
             return None
         if "ko" in first.lower() and "underway" not in first.lower():
             return None
-        if "Current level:" in first:
+        if LEVEL_TEXT in first:
             return self._extract_level(first)
         result = self._next_response(INCANT_TIMEOUT)
-        if result and "Current level:" in result:
+        if result and LEVEL_TEXT in result:
             return self._extract_level(result)
         return None
 

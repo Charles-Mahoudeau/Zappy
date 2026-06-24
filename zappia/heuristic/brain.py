@@ -48,7 +48,7 @@ class HeuristicAI:
         self.c = client
         self.id = secrets.randbelow(1 << 30)
         self.level = 1
-        self.inv = {r: 0 for r in RESOURCES}
+        self.inv = dict.fromkeys(RESOURCES, 0)
         self.look: List[List[str]] = []
         self.ticks_since_inv = 0
         self.tick = 0
@@ -168,11 +168,11 @@ class HeuristicAI:
                 msg["verb"] == "CALL"
                 and msg["level"] == self.level
                 and msg["id"] != self.id
+                and (best_id is None or msg["id"] < best_id)
             ):
-                if best_id is None or msg["id"] < best_id:
-                    best_id = msg["id"]
-                    best_dir = direction
-                    best_missing = [s for s in msg["data"].split(",") if s]
+                best_id = msg["id"]
+                best_dir = direction
+                best_missing = [s for s in msg["data"].split(",") if s]
         self.c.broadcasts.clear()
 
         if best_id is not None:
