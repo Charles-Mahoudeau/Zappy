@@ -9,6 +9,7 @@
 
 #include <raylib.h>
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <random>
@@ -35,13 +36,35 @@ class Color {
         return *this;
     }
 
-    [[nodiscard]] static ::Color teamTint(std::size_t teamIndex, std::size_t modelCount) {
-        if (modelCount == 0 || teamIndex < modelCount) {
-            return kWHITE;
+    [[nodiscard]] ::Color operator+(const Color& other) const {
+        return ::Color{static_cast<unsigned char>(std::min(255, _color.r + other._color.r)),
+                       static_cast<unsigned char>(std::min(255, _color.g + other._color.g)),
+                       static_cast<unsigned char>(std::min(255, _color.b + other._color.b)),
+                       static_cast<unsigned char>(std::min(255, _color.a + other._color.a))};
+    }
+
+    [[nodiscard]] ::Color operator-(const Color& other) const {
+        return ::Color{static_cast<unsigned char>(std::max(0, _color.r - other._color.r)),
+                       static_cast<unsigned char>(std::max(0, _color.g - other._color.g)),
+                       static_cast<unsigned char>(std::max(0, _color.b - other._color.b)),
+                       static_cast<unsigned char>(std::max(0, _color.a - other._color.a))};
+    }
+
+    [[nodiscard]] ::Color operator*(float scalar) const {
+        return ::Color{static_cast<unsigned char>(std::clamp(static_cast<int>(_color.r * scalar), 0, 255)),
+                       static_cast<unsigned char>(std::clamp(static_cast<int>(_color.g * scalar), 0, 255)),
+                       static_cast<unsigned char>(std::clamp(static_cast<int>(_color.b * scalar), 0, 255)),
+                       static_cast<unsigned char>(std::clamp(static_cast<int>(_color.a * scalar), 0, 255))};
+    }
+
+    [[nodiscard]] ::Color operator/(float scalar) const {
+        if (scalar == 0.0F) {
+            return *this;
         }
-        std::mt19937 rng(static_cast<std::uint32_t>(teamIndex));
-        const float hue = std::uniform_real_distribution<float>(0.0F, 360.0F)(rng);
-        return ColorFromHSV(hue, 0.55F, 1.0F);
+        return ::Color{static_cast<unsigned char>(std::clamp(static_cast<int>(_color.r / scalar), 0, 255)),
+                       static_cast<unsigned char>(std::clamp(static_cast<int>(_color.g / scalar), 0, 255)),
+                       static_cast<unsigned char>(std::clamp(static_cast<int>(_color.b / scalar), 0, 255)),
+                       static_cast<unsigned char>(std::clamp(static_cast<int>(_color.a / scalar), 0, 255))};
     }
 
     static constexpr ::Color kLIGHTGRAY{.r = 200, .g = 200, .b = 200, .a = 255};  // Light Gray
