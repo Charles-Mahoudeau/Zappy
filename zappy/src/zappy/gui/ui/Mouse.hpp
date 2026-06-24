@@ -18,6 +18,7 @@ class Mouse {
     static bool isLeftButtonReleased();
     static bool isLeftButtonPressed();
     static Vector2 position();
+    static float scrollDelta();
 };
 
 }  // namespace zappy::gui::ui
