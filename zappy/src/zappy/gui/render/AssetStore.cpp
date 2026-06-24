@@ -26,8 +26,10 @@ void AssetStore::load(const ProgressCallback& onProgress) {
     for (const auto& [name, loadStep] : AssetLoaderRegistry::create(*this)) {
         loadStep();
         if (onProgress) {
-            onProgress(name, (_playerModels.size() + _resourcesModels.size() + 3.0F) /
-                                 (kMaxModels + std::to_underlying(game::ResourceType::Thystame) + 1.0F + 3.0F));
+            onProgress(name,
+                       (static_cast<float>(_playerModels.size()) + static_cast<float>(_resourcesModels.size()) + 3.0F) /
+                           (static_cast<float>(kMaxModels) +
+                            static_cast<float>(std::to_underlying(game::ResourceType::Thystame)) + 1.0F + 3.0F));
         }
     }
 }
