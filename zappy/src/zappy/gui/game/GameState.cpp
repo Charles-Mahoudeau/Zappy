@@ -7,6 +7,7 @@
 
 #include "GameState.hpp"
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <deque>
@@ -119,6 +120,11 @@ const Resources& GameState::tile(std::size_t x, std::size_t y) const {
 const std::unordered_map<std::uint32_t, Player>& GameState::players() const { return _players; }
 
 const std::vector<std::string>& GameState::teams() const { return _teams; }
+
+std::size_t GameState::playersAtMaxLevel(const std::string& team) const {
+    return static_cast<std::size_t>(std::ranges::count_if(
+        _players, [&team](const auto& entry) { return entry.second.team == team && entry.second.level == kMaxLevel; }));
+}
 
 const std::unordered_map<std::uint32_t, Egg>& GameState::eggs() const { return _eggs; }
 

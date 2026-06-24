@@ -6,6 +6,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 add_executable(unit_tests
         src/CliParser.cpp
         src/server/game/EntityDatabase.cpp
+        src/server/Timer.cpp
         src/server/client/Client.cpp
         src/server/client/ClientRegistry.cpp
         src/server/client/SocketPair.hpp
@@ -21,6 +22,15 @@ add_executable(unit_tests
         src/gui/network/HandlerRegistry.cpp
         src/gui/network/ProtocolParser.cpp
         src/gui/network/GuiFunctional.cpp
+        src/gui/ui/ChatPanel.cpp
+        src/gui/ui/GuiTheme.cpp
+        src/gui/ui/InfoPanel.cpp
+        src/gui/ui/Leaderboard.cpp
+        src/gui/ui/PlayerInfo.cpp
+        src/gui/ui/TileInfo.cpp
+        src/gui/ui/TimeUnitSlider.cpp
+        src/gui/ui/utils/Rectangle.cpp
+        src/gui/ui/utils/Vector2.cpp
         src/shared/io/Poller.cpp
         src/server/game/World.cpp
         src/shared/math/Vector2.cpp

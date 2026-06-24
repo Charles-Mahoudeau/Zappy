@@ -3,6 +3,8 @@ name = "Zappy-IA"
 version = "0.0.1"
 dependencies = [
     "torch",
+    "torchrl",
+    "tqdm",
     "pytest",
     "numpy",
     "scipy",
@@ -11,8 +13,10 @@ dependencies = [
     "scikit-learn",
     "seaborn",
     "jupyterlab",
+    "papermill",
     "ruff",
-    "flake8",
+    "ipywidgets",
+    "tensorboard",
 ]
 requires-python = ">= 3.9"
 authors = [
@@ -21,6 +25,10 @@ authors = [
 ]
 description = "Reinforcement learning project for the Zappy"
 readme = { file = "README.md", content-type = "text/markdown" }
+
+[tool.setuptools]
+py-modules = []
+
 [build-system]
 requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"

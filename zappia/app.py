@@ -1,60 +1,38 @@
-##
-## EPITECH PROJECT, 2026
-## Zappy
-## File description:
-## app
-##
-
-import yaml
 import os
 import sys
-import socket
 
-def get_args(arg_name):
-    for i in range(len(sys.argv)):
-        if sys.argv[i] == arg_name:
-            if i + 1 < len(sys.argv) and not sys.argv[i + 1].startswith("-"):
-                return sys.argv[i + 1]
-            return None
+BASE = os.path.dirname(os.path.abspath(__file__))
+
+
+def get_arg(name):
+    for i, a in enumerate(sys.argv):
+        if a == name and i + 1 < len(sys.argv) and not sys.argv[i + 1].startswith("-"):
+            return sys.argv[i + 1]
     return None
 
 
-def connect_to_server(host, port, name):
-    print(f"Connecting to server at {host}:{port} with name {name}")
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.settimeout(5)
+def usage(code=84):
+    print("USAGE: ./zappy_ai -p port -n name -h machine [--rl]")
+    sys.exit(code)
+
+
+def main():
+    port = get_arg("-p")
+    name = get_arg("-n")
+    host = get_arg("-h") or "localhost"
+    if port is None or name is None:
+        usage()
     try:
-        s.connect((host, port))
-        s.sendall(f"{name}\n".encode())
-        return s
-    except OSError as exc:
-        s.close()
-        raise ConnectionError(f"Unable to connect to {host}:{port}") from exc
+        port = int(port)
+    except ValueError:
+        usage()
 
+    folder = "rl" if "--rl" in sys.argv else "heuristic"
+    sys.path.insert(0, os.path.join(BASE, folder))
+    import runner
 
-def printUsage():
-    print("USAGE: ./zappy_ai -p port -n name -h machine")
-    sys.exit(-1)
+    runner.run(host, port, name)
+
 
 if __name__ == "__main__":
-    if len(sys.argv) != 7:
-        printUsage()
-    port = get_args("-p")
-    if port is None:
-        printUsage()
-    name = get_args("-n")
-    if name is None:
-        printUsage()
-    host = get_args("-h")
-    if host is None:
-        printUsage()
-    if not os.path.exists("zappia/configs/model.yml"):
-        print("Model config file not found")
-        sys.exit(-1)
-    with open("zappia/configs/model.yml", "r") as f:
-        config = yaml.safe_load(f)
-    PATH = config["PATH"]
-
-    s = connect_to_server(host, port, name)
-    s.close()
-    model = PPOAgent()
+    main()

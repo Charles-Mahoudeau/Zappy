@@ -1,5 +1,8 @@
 include(SetupRaylib)
 
+include(SetupRaygui)
+setup_raygui()
+
 add_library(zappy_gui_objects OBJECT
         display/Window.cpp
         display/Window.hpp
@@ -38,7 +41,33 @@ add_library(zappy_gui_objects OBJECT
         render/objects/ProgressBar.cpp
         render/objects/ProgressBar.hpp
         render/utils/Color.hpp
+        render/utils/Ray.hpp
         render/utils/Vector3.hpp
+        ui/ChatPanel.cpp
+        ui/ChatPanel.hpp
+        ui/Draggable.cpp
+        ui/Draggable.hpp
+        ui/GuiTheme.cpp
+        ui/GuiTheme.hpp
+        ui/InfoPanel.cpp
+        ui/InfoPanel.hpp
+        ui/Leaderboard.cpp
+        ui/Leaderboard.hpp
+        ui/Mouse.cpp
+        ui/Mouse.hpp
+        ui/PlayerInfo.cpp
+        ui/PlayerInfo.hpp
+        ui/RaylibGuiImpl.cpp
+        ui/TileInfo.cpp
+        ui/TileInfo.hpp
+        ui/TimeUnitSlider.cpp
+        ui/TimeUnitSlider.hpp
+        ui/VictoryScreen.cpp
+        ui/VictoryScreen.hpp
+        ui/utils/Rectangle.hpp
+        ui/utils/Vector2.hpp
+        ui/Widgets.cpp
+        ui/Widgets.hpp
 )
 target_include_directories(zappy_gui_objects PUBLIC
         ${CMAKE_SOURCE_DIR}/src
@@ -49,6 +78,10 @@ target_link_libraries(zappy_gui_objects PUBLIC
 
 if (TARGET raylib)
     target_link_libraries(zappy_gui_objects PUBLIC raylib)
+endif ()
+
+if (DEFINED raygui_SOURCE_DIR)
+    target_include_directories(zappy_gui_objects PUBLIC ${raygui_SOURCE_DIR}/src)
 endif ()
 
 add_executable(zappy_gui
