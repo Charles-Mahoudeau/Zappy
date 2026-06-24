@@ -9,8 +9,10 @@
 
 #include <format>
 #include <string>
+#include <string_view>
 
 #include "Widgets.hpp"
+#include "zappy/gui/ui/utils/Rectangle.hpp"
 
 namespace zappy::gui::ui {
 

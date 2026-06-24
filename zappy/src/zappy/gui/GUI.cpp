@@ -140,10 +140,10 @@ int GUI::run() {
         _infoPanel.draw(_state, ui::Rectangle{static_cast<float>(kWindowWidth) - kInfoPanelWidth - kInfoPanelMargin,
                                               kInfoPanelMargin, kInfoPanelWidth, infoPanelHeight});
 
-        if (_state.isGameOver() && !_victoryDismissed) {
+        if (const auto& winner = _state.winner(); winner.has_value() && !_victoryDismissed) {
             const ui::Rectangle screenBounds{0.0F, 0.0F, static_cast<float>(kWindowWidth),
                                              static_cast<float>(kWindowHeight)};
-            if (ui::VictoryScreen::draw(_state.winner().value(), screenBounds)) {
+            if (ui::VictoryScreen::draw(winner.value(), screenBounds)) {
                 _victoryDismissed = true;
             }
         }
