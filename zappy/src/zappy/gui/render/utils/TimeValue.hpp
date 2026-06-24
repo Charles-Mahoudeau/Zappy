@@ -16,8 +16,16 @@ template <typename T>
 class TimeValue {
   public:
     TimeValue(T init, T inc, float speed = 1.0f) : _value{init}, _increment{inc}, _speed{speed} {}
+    TimeValue(const TimeValue<T>& other) : _value{other._value}, _increment{other._increment}, _speed{other._speed} {}
     TimeValue() = default;
     ~TimeValue() = default;
+
+    [[nodiscard]] TimeValue<T>& operator=(const TimeValue<T>& other) {
+        _value = other._value;
+        _increment = other._increment;
+        _speed = other._speed;
+        return *this;
+    }
 
     [[nodiscard]] T operator() const { return _value; }
     [[nodiscard]] T get() const { return _value; }
