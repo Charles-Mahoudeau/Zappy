@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <span>
 
+#include "Inventory.hpp"
 #include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server::game {
