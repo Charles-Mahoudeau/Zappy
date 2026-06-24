@@ -36,6 +36,7 @@ add_executable(unit_tests
         src/shared/math/Vector2.cpp
         src/server/game/WorldMock.hpp
         src/server/game/EntityMock.hpp
+        src/server/client/TeamRegistry.cpp
 )
 target_include_directories(unit_tests PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
