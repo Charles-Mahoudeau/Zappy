@@ -121,6 +121,14 @@ void AssetStore::loadEggModel() {
                     {{.mapIndex = Model::MaterialMapIndex::ALBEDO, .path = "assets/egg/textures/egg_0.png"}}));
 }
 
+void AssetStore::loadIslandModel() {
+    _islandModel = std::make_unique<Model>(createModel("assets/models/grid/island.glb", {}));
+}
+
+void AssetStore::loadBridgeModel() {
+    _bridgeModel = std::make_unique<Model>(createModel("assets/models/grid/bridge.glb", {}));
+}
+
 const Skybox& AssetStore::skybox() const { return _skybox; }
 
 Model& AssetStore::playerModel(std::size_t index) { return _playerModels.at(index); }
