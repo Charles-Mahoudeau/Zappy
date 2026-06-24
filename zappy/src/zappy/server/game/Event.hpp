@@ -60,8 +60,9 @@ struct PlayerBroadcastEvent {
 };
 
 struct IncantationBeginEvent {
-    std::vector<std::uint64_t> playerIds;
     math::Vector2u position;
+    std::uint8_t level{};
+    std::vector<std::uint64_t> playerIds;
 };
 
 struct IncantationEndEvent {
