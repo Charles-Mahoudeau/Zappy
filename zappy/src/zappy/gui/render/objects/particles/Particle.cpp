@@ -12,6 +12,9 @@
 #include <string_view>
 
 #include "Billboard.hpp"
+#include "Color.hpp"
+#include "TimeValue.hpp"
+#include "Vector3.hpp"
 
 namespace zappy::gui::render {
 Particle::Particle(std::string_view path) : Billboard(path) {}
