@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <gmock/gmock.h>
+
 #include <cstdint>
 #include <string_view>
 
