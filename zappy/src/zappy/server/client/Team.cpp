@@ -17,7 +17,11 @@
 #include "zappy/shared/network/Address.hpp"
 
 namespace zappy::server::client {
-Team::Team(std::string name) : _name{std::move(name)} {}
+Team::Team(std::string name) : _name{std::move(name)} {
+    if (_name.empty()) {
+        throw exception::InvalidArgument{"empty name"};
+    }
+}
 
 std::string_view Team::name() const { return _name; }
 
