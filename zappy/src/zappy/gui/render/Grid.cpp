@@ -7,6 +7,8 @@
 
 #include "Grid.hpp"
 
+#include <cstddef>
+
 #include "AssetStore.hpp"
 #include "objects/Model.hpp"
 #include "zappy/gui/render/utils/Color.hpp"
@@ -19,8 +21,8 @@ void Grid::resize(std::size_t width, std::size_t height) {
     _height = height;
 }
 
-Vector3 Grid::tileToWorld(float tileX, float tileY, float elevation) const {
-    return Vector3(tileX * kSpacing, elevation, tileY * kSpacing);
+Vector3 Grid::tileToWorld(float tileX, float tileY, float elevation) {
+    return {tileX * kSpacing, elevation, tileY * kSpacing};
 }
 
 void Grid::draw(const AssetStore& assets) const {
