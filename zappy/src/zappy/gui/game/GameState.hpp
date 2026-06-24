@@ -50,7 +50,7 @@ struct Player {
 };
 
 struct Egg {
-    std::uint32_t playerId{0};
+    std::int32_t playerId{0};
     std::uint32_t x{0};
     std::uint32_t y{0};
 };
@@ -75,7 +75,7 @@ class GameState {
     void setPlayerLevel(std::uint32_t id, std::uint32_t level);
     void setPlayerInventory(std::uint32_t id, std::uint32_t x, std::uint32_t y, const Resources& inventory);
     void removePlayer(std::uint32_t id);
-    void addEgg(std::uint32_t eggId, std::uint32_t playerId, std::uint32_t x, std::uint32_t y);
+    void addEgg(std::uint32_t eggId, std::int32_t playerId, std::uint32_t x, std::uint32_t y);
     void removeEgg(std::uint32_t eggId);
     void setTimeUnit(std::uint32_t timeUnit);
     void setWinner(std::string team);
