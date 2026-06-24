@@ -17,7 +17,7 @@ TEST(TileInfoTest, IntersectsValidTileDirectlyBelow) {
     const zappy::gui::render::Ray ray{{2.0F, 5.0F, 3.0F}, {0.0F, -1.0F, 0.0F}};
     const auto hit = ui::TileInfo::intersectGroundPlane(ray, 10, 10);
     ASSERT_TRUE(hit.has_value());
-    const auto [tileX, tileY] = hit.value();
+    const auto [tileX, tileY] = hit.value();  // NOLINT
     EXPECT_EQ(tileX, 2U);
     EXPECT_EQ(tileY, 3U);
 }
@@ -46,7 +46,7 @@ TEST(TileInfoTest, AcceptsHitOnTileZeroZero) {
     const zappy::gui::render::Ray ray{{0.0F, 5.0F, 0.0F}, {0.0F, -1.0F, 0.0F}};
     const auto hit = ui::TileInfo::intersectGroundPlane(ray, 10, 10);
     ASSERT_TRUE(hit.has_value());
-    const auto [tileX, tileY] = hit.value();
+    const auto [tileX, tileY] = hit.value();  // NOLINT
     EXPECT_EQ(tileX, 0U);
     EXPECT_EQ(tileY, 0U);
 }
