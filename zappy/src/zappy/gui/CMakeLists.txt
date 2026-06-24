@@ -28,8 +28,6 @@ add_library(zappy_gui_objects OBJECT
         render/Renderer.hpp
         render/Camera.cpp
         render/Camera.hpp
-        render/tools/Vec2D.cpp
-        render/tools/Vec2D.hpp
         render/objects/Texture.cpp
         render/objects/Texture.hpp
         render/objects/Billboard.cpp
@@ -38,6 +36,8 @@ add_library(zappy_gui_objects OBJECT
         render/objects/Model.hpp
         render/objects/Skybox.cpp
         render/objects/Skybox.hpp
+        render/utils/Vec2D.cpp
+        render/utils/Vec2D.hpp
         render/utils/Color.hpp
         render/utils/Ray.hpp
         render/utils/Vector3.hpp
