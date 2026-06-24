@@ -23,9 +23,9 @@ class ICommandGroup {
     ICommandGroup() = default;
     virtual ~ICommandGroup() = default;
 
-    ICommandGroup(const ICommandGroup&) = default;
+    ICommandGroup(const ICommandGroup&) = delete;
     ICommandGroup(ICommandGroup&&) = delete;
-    ICommandGroup& operator=(const ICommandGroup&) = default;
+    ICommandGroup& operator=(const ICommandGroup&) = delete;
     ICommandGroup& operator=(ICommandGroup&&) = delete;
 
     virtual void execute(Client* client, std::string_view cmd) = 0;

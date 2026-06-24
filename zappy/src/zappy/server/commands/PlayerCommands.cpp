@@ -46,7 +46,7 @@ void PlayerCommands::execute(Client* client, std::string_view msg) {
     }
 }
 
-bool PlayerCommands::ignore(Client* client, CommandData& params) {
+bool PlayerCommands::ignore(const Client* client, const CommandData& params) {
     (void)client;
     (void)params;
     return false;

@@ -29,11 +29,12 @@ void Core::init(std::span<std::string_view> argv) {
     this->_serv.init(parameters.port, this->_clientRegistry, this->_time);
     this->_time.setFrequencies(parameters.frequencies);
 
-    this->_cmdGroups.emplace(Client::Type::kPlayer,
+    using CType = Client::Type;
+
+    this->_cmdGroups.emplace(CType::kPlayer,
                              std::make_unique<command::PlayerCommands>(this->_time, this->_clientRegistry));
-    this->_cmdGroups.emplace(Client::Type::kGui,
-                             std::make_unique<command::GuiCommands>(this->_time, this->_clientRegistry));
-    this->_cmdGroups.emplace(Client::Type::kUnknown,
+    this->_cmdGroups.emplace(CType::kGui, std::make_unique<command::GuiCommands>(this->_time, this->_clientRegistry));
+    this->_cmdGroups.emplace(CType::kUnknown,
                              std::make_unique<command::UnknownCommands>(this->_time, this->_clientRegistry));
 }
 

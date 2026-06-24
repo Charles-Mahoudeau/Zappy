@@ -45,7 +45,7 @@ void GuiCommands::execute(Client* client, std::string_view msg) {
     }
 }
 
-bool GuiCommands::ignore(Client* client, CommandData& params) {
+bool GuiCommands::ignore(const Client* client, const CommandData& params) {
     (void)client;
     (void)params;
     return false;
