@@ -49,6 +49,8 @@ add_library(zappy_gui_objects OBJECT
         ui/Draggable.hpp
         ui/GuiTheme.cpp
         ui/GuiTheme.hpp
+        ui/Hud.cpp
+        ui/Hud.hpp
         ui/InfoPanel.cpp
         ui/InfoPanel.hpp
         ui/Leaderboard.cpp
