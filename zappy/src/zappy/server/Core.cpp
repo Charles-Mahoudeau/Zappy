@@ -28,7 +28,7 @@ void Core::init(const std::span<std::string_view> argv) {
     try {
         for (std::string_view teamName : parameters.teamsName) {
             _logger.info(std::format("Creating team '{}'", teamName));
-            _teamRegistry.createTeam(std::string{teamName});
+            _teamRegistry.createTeam(teamName);
         }
     } catch (const std::exception& e) {
         _logger.fatal(std::format("Failed to initialize teams: {}", e.what()));
