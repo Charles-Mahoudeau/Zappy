@@ -84,7 +84,7 @@ void GameState::setPlayerInventory(std::uint32_t id, std::uint32_t x, std::uint3
 
 void GameState::removePlayer(std::uint32_t id) { _players.erase(id); }
 
-void GameState::addEgg(std::uint32_t eggId, std::uint32_t playerId, std::uint32_t x, std::uint32_t y) {
+void GameState::addEgg(std::uint32_t eggId, std::int32_t playerId, std::uint32_t x, std::uint32_t y) {
     _eggs.emplace(eggId, Egg{.playerId = playerId, .x = x, .y = y});
 }
 

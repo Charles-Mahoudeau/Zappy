@@ -19,16 +19,16 @@
 
 namespace zappy::gui::network::handlers {
 
-inline std::uint32_t parseId(std::string_view token) {
+inline std::int32_t parseId(std::string_view token) {
     if (token.size() < 2 || token.at(0) != '#') {
         throw exception::ParseException{"expected #-prefixed id"};
     }
     try {
-        const unsigned long value = std::stoul(std::string{token.substr(1)});
-        if (value > std::numeric_limits<std::uint32_t>::max()) {
-            throw exception::ParseException{"id value out of uint32 range"};
+        const long value = std::stol(std::string{token.substr(1)});
+        if (value > std::numeric_limits<std::int32_t>::max()) {
+            throw exception::ParseException{"id value out of int32 range"};
         }
-        return static_cast<std::uint32_t>(value);
+        return static_cast<std::int32_t>(value);
     } catch (const exception::ParseException&) {
         throw;
     } catch (const std::exception&) {
@@ -36,7 +36,7 @@ inline std::uint32_t parseId(std::string_view token) {
     }
 }
 
-inline game::Orientation parseOrientation(std::uint32_t value) {
+inline game::Orientation parseOrientation(std::int32_t value) {
     if (value < 1 || value > 4) {
         throw exception::ParseException{"orientation must be between 1 and 4"};
     }
