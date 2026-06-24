@@ -9,6 +9,8 @@
 
 #include <raylib.h>
 
+#include <cmath>
+
 namespace zappy::gui::render {
 class Vector3 {
   public:
