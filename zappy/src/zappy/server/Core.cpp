@@ -7,7 +7,6 @@
 
 #include "zappy/server/Core.hpp"
 
-#include <exception>
 #include <format>
 #include <iostream>
 #include <memory>
