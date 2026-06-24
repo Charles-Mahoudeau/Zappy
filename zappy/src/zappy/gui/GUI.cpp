@@ -71,9 +71,9 @@ void GUI::pump() {
 }
 
 void GUI::setupCamera() {
-    const auto width = static_cast<float>(_state.width()) + render::Grid::kSpacing;
-    const auto height = static_cast<float>(_state.height()) + render::Grid::kSpacing;
-    const float span = std::max({width + render::Grid::kSpacing, height + render::Grid::kSpacing, 1.0F});
+    const float width = static_cast<float>(_state.width()) * render::Grid::kSpacing;
+    const float height = static_cast<float>(_state.height()) * render::Grid::kSpacing;
+    const float span = std::max({width, height, 1.0F});
     const float centerX = width / 2.0F;
     const float centerZ = height / 2.0F;
     const float offset = span;
