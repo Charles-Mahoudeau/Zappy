@@ -9,16 +9,20 @@
 
 #include <raylib.h>
 
+#include <string_view>
+
 #include "Billboard.hpp"
 #include "Color.hpp"
+#include "Particle.hpp"
 #include "TimeValue.hpp"
 #include "Vector3.hpp"
+#include "vector"
 
 namespace zappy::gui::render {
 
 class ParticleEmitter {
   public:
-    explicit ParticleEmitter(Billboard& billboard);
+    explicit ParticleEmitter(std::string_view path);
     ~ParticleEmitter() = default;
 
     ParticleEmitter(const ParticleEmitter&) = delete;
@@ -39,8 +43,11 @@ class ParticleEmitter {
 
     void set(Vector3 origin, Vector3 volume, float spread, float rate, float lifetime);
 
+    void update(float dt);
+
   private:
-    Billboard& _billboard;
+    Billboard _billboard;
+    std::vector<Particle> _particles;
     Vector3 _origin{0.0F, 0.0F, 0.0F};
     Vector3 _volume{1.0F, 1.0F, 1.0F};
     float _spread{0.0F};
