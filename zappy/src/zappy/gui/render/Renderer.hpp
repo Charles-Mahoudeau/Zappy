@@ -33,7 +33,8 @@ class Renderer {
   private:
     static void drawResources(const game::GameState& state, const AssetStore& assets);
     static void drawTileResources(const game::Resources& tile, const Vector3& position, const AssetStore& assets);
-    static void drawResourceStack(const Model& model, const Vector3& position, std::uint32_t count);
+    static void drawResourceStack(const Model& model, const Vector3& position, std::uint32_t count,
+                                  game::ResourceType type);
     static void drawEggs(const game::GameState& state, const AssetStore& assets);
     static std::uint32_t resourceCount(const game::Resources& tile, game::ResourceType type);
 

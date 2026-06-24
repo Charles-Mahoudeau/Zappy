@@ -14,6 +14,8 @@
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
+#include <numbers>
+#include <utility>
 
 #include "AssetStore.hpp"
 #include "Camera.hpp"
@@ -57,15 +59,28 @@ void Renderer::drawResources(const game::GameState& state, const AssetStore& ass
 
 void Renderer::drawTileResources(const game::Resources& tile, const Vector3& position, const AssetStore& assets) {
     for (const auto& [resourceType, model] : assets.resourceModels()) {
-        drawResourceStack(model, position, resourceCount(tile, resourceType));
+        const std::uint32_t count = resourceCount(tile, resourceType);
+        if (count == 0) {
+            continue;
+        }
+        drawResourceStack(model, position, count, resourceType);
     }
 }
 
-void Renderer::drawResourceStack(const Model& model, const Vector3& position, std::uint32_t count) {
+void Renderer::drawResourceStack(const Model& model, const Vector3& position, std::uint32_t count,
+                                 game::ResourceType type) {
+    static constexpr auto kTypeCount = static_cast<float>(std::to_underlying(game::ResourceType::Thystame) + 1);
+    static constexpr float kBaseRadius = 0.32F;
+    static constexpr float kItemSpacing = 0.16F;
+
+    const float angle =
+        (static_cast<float>(std::to_underlying(type)) / kTypeCount) * (2.0F * std::numbers::pi_v<float>);
+    const float dirX = std::cos(angle);
+    const float dirZ = std::sin(angle);
+
     for (std::uint32_t i = 0; i < count; ++i) {
-        const float offsetX = (static_cast<float>(i % 2) * 0.5F) - 0.25F;
-        const float offsetZ = ((static_cast<float>(i) / 2.0F) * 0.5F) - 0.25F;
-        const Vector3 resourcePosition(position.x() + offsetX, position.y(), position.z() + offsetZ);
+        const float radius = kBaseRadius + (static_cast<float>(i) * kItemSpacing);
+        const Vector3 resourcePosition(position.x() + (dirX * radius), position.y(), position.z() + (dirZ * radius));
         model.draw(resourcePosition, kScale, Color::kWHITE);
     }
 }
