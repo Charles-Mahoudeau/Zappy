@@ -10,7 +10,9 @@
 #include <span>
 #include <string_view>
 
-#include "zappy/shared/network/socket/Server.hpp"
+#include "zappy/server/Timer.hpp"
+#include "zappy/server/client/ClientRegistry.hpp"
+#include "zappy/server/net/Server.hpp"
 
 namespace zappy::server {
 
@@ -26,8 +28,16 @@ class Core {
 
     void init(std::span<std::string_view> argv);
 
+    [[noreturn]] void run();
+
+    void processCommands();
+
+    void nextTick();
+
   private:
-    network::socket::Server _serv{};
+    net::Server _serv;
+    Timer _time;
+    client::ClientRegistry _clientRegistry;
 };
 
 }  // namespace zappy::server

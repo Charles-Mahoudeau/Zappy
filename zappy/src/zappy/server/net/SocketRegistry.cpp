@@ -30,8 +30,8 @@ network::BufferedClient* SocketRegistry::findByAddress(const network::Address& a
     return nullptr;
 }
 
-void SocketRegistry::remove(int fd) {
-    std::erase_if(this->_sockets, [fd](const network::BufferedClient& socket) { return fd == socket.fd(); });
+void SocketRegistry::remove(const network::Address& addr) {
+    std::erase_if(this->_sockets, [&addr](const network::BufferedClient& socket) { return addr == socket; });
 }
 
 void SocketRegistry::clear() { this->_sockets.clear(); }

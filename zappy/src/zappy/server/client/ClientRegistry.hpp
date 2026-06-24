@@ -12,6 +12,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "zappy/server/Timer.hpp"
 #include "zappy/server/client/Client.hpp"
 #include "zappy/server/net/SocketRegistry.hpp"
 #include "zappy/shared/network/Address.hpp"
@@ -28,7 +29,7 @@ class ClientRegistry {
     ClientRegistry& operator=(const ClientRegistry&) = delete;
     ClientRegistry& operator=(ClientRegistry&&) = delete;
 
-    void makeNewClient(net::SocketRegistry& socketRegistery, network::Address addr);
+    void makeNewClient(net::SocketRegistry& socketRegistery, network::Address addr, Timer& timer);
 
     /**
      * @brief Update all managed clients and remove any that are no longer alive.
@@ -73,6 +74,8 @@ class ClientRegistry {
      *         the specified type.
      */
     auto viewAll(Client::Type type);
+
+    Client* findByAddress(const network::Address& addr);
 
   private:
     std::vector<const Client*> _toRemove;
