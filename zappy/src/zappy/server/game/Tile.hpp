@@ -11,6 +11,7 @@
 #include <span>
 #include <vector>
 
+#include "Inventory.hpp"
 #include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server::game {
@@ -53,8 +54,17 @@ class Tile {
     /// @return True if the entity was removed, false otherwise.
     bool removeEntity(std::uint64_t entityId);
 
+    /// @brief Returns the inventory of the tile.
+    /// @return The inventory of the tile.
+    [[nodiscard]] const Inventory& inventory() const;
+
+    /// @brief Returns a reference to the inventory of the tile.
+    /// @return A reference to the inventory of the tile.
+    Inventory& inventory();
+
   private:
     math::Vector2u _position;
     std::vector<std::uint64_t> _entities;
+    Inventory _inventory;
 };
 }  // namespace zappy::server::game

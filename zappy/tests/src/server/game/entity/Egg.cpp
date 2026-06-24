@@ -9,17 +9,32 @@
 
 #include <gtest/gtest.h>
 
-namespace zappy::server::game::entity {
-TEST(EggTest, ConstructorAndTeamName) {
-    const Egg egg0{0};
-    const Egg egg1{1};
+#include "server/game/WorldMock.hpp"
+#include "zappy/server/game/Grid.hpp"
 
-    EXPECT_EQ(egg0.teamId(), 0);
-    EXPECT_EQ(egg1.teamId(), 1);
+namespace zappy::server::game::entity {
+namespace {
+class EggTest : public testing::Test {
+  public:
+    [[nodiscard]] WorldMock& worldMock() { return _worldMock; }
+    [[nodiscard]] Grid& grid() { return _grid; }
+
+  private:
+    WorldMock _worldMock;
+    Grid _grid{{10, 10}};
+};
+}  // namespace
+
+TEST_F(EggTest, ConstructorAndTeamName) {
+    const Egg egg0{grid(), worldMock(), "team1"};
+    const Egg egg1{grid(), worldMock(), "team2"};
+
+    EXPECT_EQ(egg0.teamName(), "team1");
+    EXPECT_EQ(egg1.teamName(), "team2");
 }
 
-TEST(EggTest, UpdateDoesNotCrash) {
-    Egg egg{0};
+TEST_F(EggTest, UpdateDoesNotCrash) {
+    Egg egg{grid(), worldMock(), "team1"};
 
     EXPECT_NO_THROW(egg.update());
 }

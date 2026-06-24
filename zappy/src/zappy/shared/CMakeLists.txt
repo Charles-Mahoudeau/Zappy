@@ -24,6 +24,8 @@ add_library(zappy_shared OBJECT
         io/Logger.hpp
         math/Vector2.hpp
         math/helper.hpp
+        math/Direction.cpp
+        math/Direction.hpp
 )
 target_include_directories(zappy_shared PUBLIC
         ${CMAKE_SOURCE_DIR}/src

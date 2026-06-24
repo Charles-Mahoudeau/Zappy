@@ -13,7 +13,6 @@ add_executable(unit_tests
         src/server/net/SocketRegistry.cpp
         src/server/game/entity/Egg.cpp
         src/server/game/entity/Player.cpp
-        src/server/game/entity/Resource.cpp
         src/shared/network/BufferedClient.cpp
         src/gui/game/GameState.cpp
         src/gui/GuiCliParser.cpp
@@ -32,8 +31,11 @@ add_executable(unit_tests
         src/gui/ui/utils/Rectangle.cpp
         src/gui/ui/utils/Vector2.cpp
         src/shared/io/Poller.cpp
+        src/server/game/EventHelper.cpp
         src/server/game/World.cpp
         src/shared/math/Vector2.cpp
+        src/server/game/WorldMock.hpp
+        src/server/game/EntityMock.hpp
 )
 target_include_directories(unit_tests PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src

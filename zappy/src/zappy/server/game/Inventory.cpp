@@ -11,8 +11,12 @@
 #include <cstdint>
 #include <limits>
 #include <numeric>
+#include <sstream>
+#include <string>
+#include <utility>
 
 #include "ResourceType.hpp"
+#include "zappy/shared/exception/InvalidArgument.hpp"
 
 namespace zappy::server::game {
 std::uint32_t Inventory::resourceCount() const {
@@ -21,6 +25,10 @@ std::uint32_t Inventory::resourceCount() const {
 }
 
 std::uint16_t Inventory::resourceCount(const ResourceType type) const {
+    if (!isValidResourceType(type)) {
+        throw exception::InvalidArgument{"invalid resource type"};
+    }
+
     const auto it = _resources.find(type);
 
     if (it == _resources.end()) {
@@ -30,6 +38,10 @@ std::uint16_t Inventory::resourceCount(const ResourceType type) const {
 }
 
 std::uint16_t Inventory::addResource(const ResourceType type, const std::uint16_t amount) {
+    if (!isValidResourceType(type)) {
+        throw exception::InvalidArgument{"invalid resource type"};
+    }
+
     std::uint16_t& resourceAmount = _resources[type];
 
     if (constexpr std::uint16_t maxValue = std::numeric_limits<std::uint16_t>::max();
@@ -41,7 +53,11 @@ std::uint16_t Inventory::addResource(const ResourceType type, const std::uint16_
     return resourceAmount;
 }
 
-std::uint16_t Inventory::removeResource(const ResourceType type, std::uint16_t amount) {
+std::uint16_t Inventory::removeResource(const ResourceType type, const std::uint16_t amount) {
+    if (!isValidResourceType(type)) {
+        throw exception::InvalidArgument{"invalid resource type"};
+    }
+
     std::uint16_t& resourceAmount = _resources[type];
 
     resourceAmount -= std::min(resourceAmount, amount);
@@ -49,4 +65,24 @@ std::uint16_t Inventory::removeResource(const ResourceType type, std::uint16_t a
 }
 
 void Inventory::clear() { _resources.clear(); }
+
+std::string Inventory::string() const {
+    std::stringstream stringStream;
+
+    for (std::uint8_t i = 0; i < std::to_underlying(ResourceType::kCount); ++i) {
+        if (i > 0) {
+            stringStream << " ";
+        }
+        if (const auto it = _resources.find(ResourceType{i}); it != _resources.end()) {
+            stringStream << it->second;
+        } else {
+            stringStream << 0;
+        }
+    }
+    return stringStream.str();
+}
+
+bool Inventory::isValidResourceType(const ResourceType type) {
+    return std::to_underlying(type) < std::to_underlying(ResourceType::kCount);
+}
 }  // namespace zappy::server::game
