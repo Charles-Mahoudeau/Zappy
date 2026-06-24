@@ -33,19 +33,17 @@ void Core::init(const std::span<std::string_view> argv) {
     const CliParser::CliParameters& parameters = parser.parameters();
     _logger.info("Parsed command line arguments.");
 
-    try {
-        for (std::string_view teamName : parameters.teamsName) {
-            try {
-                _teamRegistry.createTeam(teamName);
-            } catch (const std::exception& e) {
-                _logger.error(std::format("Failed to create team '{}': {}", teamName, e.what()));
-            }
-            _logger.info(std::format("Created team '{}'", teamName));
+    for (std::string_view teamName : parameters.teamsName) {
+        try {
+            _teamRegistry.createTeam(teamName);
+        } catch (const exception::InvalidArgument& e) {
+            _logger.error(std::format("Failed to create team '{}': {}", teamName, e.what()));
+            _logger.fatal("Error while teams initialization.");
+            throw;
         }
-    } catch (const std::exception& e) {
-        _logger.fatal(std::format("Failed to create teams: {}", e.what()));
-        throw;
+        _logger.info(std::format("Created team '{}'", teamName));
     }
+    _logger.info("Teams initialized.");
 
     this->_serv.init(parameters.port, this->_clientRegistry, this->_time);
     _logger.info("Network layer initialized.");
