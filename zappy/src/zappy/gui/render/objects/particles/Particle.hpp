@@ -9,17 +9,14 @@
 
 #include <raylib.h>
 
-#include <string_view>
-
-#include "Billboard.hpp"
 #include "Color.hpp"
 #include "TimeValue.hpp"
 #include "Vector3.hpp"
 
 namespace zappy::gui::render {
-class Particle : public Billboard {
+class Particle {
   public:
-    Particle(std::string_view path);
+    Particle() = default;
     Particle(const Particle&) = delete;
     Particle(Particle&&) noexcept = default;
     ~Particle();

@@ -17,7 +17,7 @@
 #include "Vector3.hpp"
 
 namespace zappy::gui::render {
-ParticleEmitter::ParticleEmitter(std::string_view path) {}
+ParticleEmitter::ParticleEmitter(Billboard& billboard) : _billboard(billboard) {}
 
 void ParticleEmitter::setOrigin(Vector3 origin) { _origin = origin; }
 void ParticleEmitter::setVolume(Vector3 volume) { _volume = volume; }
