@@ -7,6 +7,8 @@
 
 #include "Direction.hpp"
 
+#include <cstdint>
+#include <random>
 #include <tuple>
 #include <unordered_map>
 
@@ -29,4 +31,12 @@ namespace {
 Direction turnLeft(const Direction direction) { return std::get<0>(turnMap().at(direction)); }
 
 Direction turnRight(const Direction direction) { return std::get<1>(turnMap().at(direction)); }
+
+Direction random() {
+    static std::random_device randomDevice;
+    static std::mt19937 randomEngine{randomDevice()};
+    std::uniform_int_distribution<std::uint8_t> distribution{0, 3};
+
+    return Direction{distribution(randomEngine)};
+}
 }  // namespace zappy::math::direction
