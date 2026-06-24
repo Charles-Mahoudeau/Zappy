@@ -15,12 +15,14 @@
 #include "zappy/server/client/ClientRegistry.hpp"
 #include "zappy/server/commands/ACommandGroup.hpp"
 #include "zappy/server/commands/ICommandGroup.hpp"
+#include "zappy/server/game/World.hpp"
+#include "zappy/shared/io/Logger.hpp"
 
 namespace zappy::server::command {
 
 class PlayerCommands : public ACommandGroup {
   public:
-    PlayerCommands(Timer& timer, client::ClientRegistry& clients);
+    PlayerCommands(Timer& timer, client::ClientRegistry& clients, game::World& world, io::Logger& logger);
     ~PlayerCommands() override = default;
 
     PlayerCommands(const PlayerCommands&) = delete;
@@ -33,7 +35,7 @@ class PlayerCommands : public ACommandGroup {
   private:
     std::unordered_map<std::string_view, CommandInvoker> _commands;
 
-    static bool ignore(const Client* client, const CommandData& params);
+    static bool ignore(const CommandCtx& ctx);
 };
 
 }  // namespace zappy::server::command

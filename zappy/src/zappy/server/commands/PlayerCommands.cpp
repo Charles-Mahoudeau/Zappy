@@ -14,31 +14,35 @@
 #include "zappy/server/client/ClientRegistry.hpp"
 #include "zappy/server/commands/ACommandGroup.hpp"
 #include "zappy/server/commands/ICommandGroup.hpp"
+#include "zappy/server/game/World.hpp"
+#include "zappy/shared/io/Logger.hpp"
 
 namespace zappy::server::command {
 
-PlayerCommands::PlayerCommands(Timer& timer, client::ClientRegistry& clients)
-    : ACommandGroup(timer, clients),
+PlayerCommands::PlayerCommands(Timer& timer, client::ClientRegistry& clients, game::World& world, io::Logger& logger)
+    : ACommandGroup(timer, clients, world, logger),
       _commands({
-          {"Forward", [](auto* client, auto& params) { return PlayerCommands::ignore(client, params); }},
-          {"Right", [](auto* client, auto& params) { return PlayerCommands::ignore(client, params); }},
-          {"Left", [](auto* client, auto& params) { return PlayerCommands::ignore(client, params); }},
-          {"Look", [](auto* client, auto& params) { return PlayerCommands::ignore(client, params); }},
-          {"Inventory", [](auto* client, auto& params) { return PlayerCommands::ignore(client, params); }},
-          {"Broadcast", [](auto* client, auto& params) { return PlayerCommands::ignore(client, params); }},
-          {"Connect_nbr", [](auto* client, auto& params) { return PlayerCommands::ignore(client, params); }},
-          {"Fork", [](auto* client, auto& params) { return PlayerCommands::ignore(client, params); }},
-          {"Eject", [](auto* client, auto& params) { return PlayerCommands::ignore(client, params); }},
-          {"Take", [](auto* client, auto& params) { return PlayerCommands::ignore(client, params); }},
-          {"Set", [](auto* client, auto& params) { return PlayerCommands::ignore(client, params); }},
-          {"Incantation", [](auto* client, auto& params) { return PlayerCommands::ignore(client, params); }},
+          {"Forward", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
+          {"Right", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
+          {"Left", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
+          {"Look", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
+          {"Inventory", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
+          {"Broadcast", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
+          {"Connect_nbr", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
+          {"Fork", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
+          {"Eject", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
+          {"Take", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
+          {"Set", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
+          {"Incantation", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
       }) {}
 
 void PlayerCommands::execute(Client* client, std::string_view msg) {
-    CommandData cmd = this->extractCommand(msg);
+    CommandCtx& ctx = this->commandCtx();
 
-    if (auto iter = this->_commands.find(cmd.name); iter != this->_commands.end()) {
-        if (!iter->second(client, cmd)) {
+    ctx.data = this->extractCommand(msg);
+
+    if (auto iter = this->_commands.find(ctx.data.name); iter != this->_commands.end()) {
+        if (!iter->second(ctx)) {
             (void)client->sendMessage("ko\n");
         }
     } else {
@@ -46,9 +50,8 @@ void PlayerCommands::execute(Client* client, std::string_view msg) {
     }
 }
 
-bool PlayerCommands::ignore(const Client* client, const CommandData& params) {
-    (void)client;
-    (void)params;
+bool PlayerCommands::ignore(const CommandCtx& ctx) {
+    (void)ctx;
     return false;
 }
 
