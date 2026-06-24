@@ -25,6 +25,7 @@ add_executable(unit_tests
         src/gui/ui/GuiTheme.cpp
         src/gui/ui/InfoPanel.cpp
         src/gui/ui/Leaderboard.cpp
+        src/gui/ui/PlayerInfo.cpp
         src/gui/ui/TileInfo.cpp
         src/gui/ui/TimeUnitSlider.cpp
         src/gui/ui/utils/Rectangle.cpp
