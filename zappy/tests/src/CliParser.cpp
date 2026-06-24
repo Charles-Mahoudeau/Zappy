@@ -152,7 +152,7 @@ TEST(CliParser, validity_rejects_zero_clients) {
 }
 
 TEST(CliParser, validity_rejects_to_high_frequency) {
-    auto argv = makeFullArgv("4242", "10", "10", {"teamA", "teamB"}, "5", "9999999999");
+    auto argv = makeFullArgv("4242", "10", "10", {"teamA", "teamB"}, "5", "10001");
     ASSERT_THROW(build(argv), InvalidArg);
 }
 
