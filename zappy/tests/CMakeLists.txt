@@ -36,6 +36,7 @@ add_executable(unit_tests
         src/shared/math/Vector2.cpp
         src/server/game/WorldMock.hpp
         src/server/game/EntityMock.hpp
+        src/server/commands/ICommandGroup.cpp
         src/server/client/TeamRegistry.cpp
         src/server/client/Team.cpp
 )

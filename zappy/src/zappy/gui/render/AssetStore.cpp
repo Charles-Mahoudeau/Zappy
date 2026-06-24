@@ -26,8 +26,10 @@ void AssetStore::load(const ProgressCallback& onProgress) {
     for (const auto& [name, loadStep] : AssetLoaderRegistry::create(*this)) {
         loadStep();
         if (onProgress) {
-            onProgress(name, static_cast<float>(_playerModels.size() + _resourcesModels.size()) /
-                                 static_cast<float>(kMaxModels + std::to_underlying(game::ResourceType::Thystame) + 1));
+            onProgress(name,
+                       (static_cast<float>(_playerModels.size()) + static_cast<float>(_resourcesModels.size()) + 3.0F) /
+                           (static_cast<float>(kMaxModels) +
+                            static_cast<float>(std::to_underlying(game::ResourceType::Thystame)) + 1.0F + 3.0F));
         }
     }
 }
@@ -119,6 +121,14 @@ void AssetStore::loadEggModel() {
     _eggModel = std::make_unique<Model>(
         createModel("assets/egg/source/EGG.glb",
                     {{.mapIndex = Model::MaterialMapIndex::ALBEDO, .path = "assets/egg/textures/egg_0.png"}}));
+}
+
+void AssetStore::loadIslandModel() {
+    _islandModel = std::make_unique<Model>(createModel("assets/models/grid/island.glb", {}));
+}
+
+void AssetStore::loadBridgeModel() {
+    _bridgeModel = std::make_unique<Model>(createModel("assets/models/grid/bridge.glb", {}));
 }
 
 const Skybox& AssetStore::skybox() const { return _skybox; }

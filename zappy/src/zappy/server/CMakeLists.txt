@@ -38,6 +38,15 @@ add_library(zappy_server_objects OBJECT
         game/Grid.hpp
         game/EventHelper.cpp
         game/EventHelper.hpp
+        commands/ICommandGroup.hpp
+        commands/ACommandGroup.hpp
+        commands/ACommandGroup.cpp
+        commands/UnknownCommands.hpp
+        commands/UnknownCommands.cpp
+        commands/GuiCommands.hpp
+        commands/GuiCommands.cpp
+        commands/PlayerCommands.hpp
+        commands/PlayerCommands.cpp
         client/TeamRegistry.cpp
         client/TeamRegistry.hpp
         client/Team.cpp
