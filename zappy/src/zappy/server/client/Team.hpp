@@ -32,16 +32,16 @@ class Team {
 
     /// @brief Get the addresses of the clients in the team.
     /// @return The addresses of the clients in the team.
-    [[nodiscard]] std::span<const network::Address> clientAddresses() const;
+    [[nodiscard]] std::span<const network::Address> members() const;
 
     /// @brief Check if the team has a client with the given address.
     /// @param address The address of the client to check.
     /// @return True if the team has a client with the given address, false otherwise.
-    [[nodiscard]] bool hasClientAddress(const network::Address& address) const;
+    [[nodiscard]] bool hasMember(const network::Address& address) const;
 
     /// @brief Add a client address to the team.
     /// @param address The address of the client to add.
-    void addClientAddress(network::Address address);
+    void addMember(network::Address address);
 
   private:
     std::string _name;
