@@ -16,8 +16,7 @@
 #include "zappy/shared/exception/Exception.hpp"
 
 namespace zappy::server {
-
-void Core::init(std::span<std::string_view> argv) {
+void Core::init(const std::span<std::string_view> argv) {
     CliParser parser{argv};
     const CliParser::CliParameters& parameters = parser.parameters();
 
@@ -36,16 +35,6 @@ void Core::run() {
     }
 }
 
-void Core::nextTick() {
-    int timeout = this->_time.timeoutUntilSchedule();
-
-    while (this->_serv.poll(timeout)) {
-        timeout = this->_time.timeoutUntilNextTick();
-    }
-    this->_time.update();
-    this->_clientRegistry.update();
-}
-
 void Core::processCommands() {
     for (Client* client : this->_clientRegistry.viewAll()) {
         if (client->inTimeout()) {
@@ -61,4 +50,13 @@ void Core::processCommands() {
     }
 }
 
+void Core::nextTick() {
+    int timeout = this->_time.timeoutUntilSchedule();
+
+    while (this->_serv.poll(timeout)) {
+        timeout = this->_time.timeoutUntilNextTick();
+    }
+    this->_time.update();
+    this->_clientRegistry.update();
+}
 }  // namespace zappy::server
