@@ -8,7 +8,6 @@
 #pragma once
 
 #include <cstdint>
-#include <functional>
 #include <optional>
 #include <string>
 #include <variant>
