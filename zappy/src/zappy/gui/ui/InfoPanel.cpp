@@ -12,8 +12,8 @@
 #include <utility>
 
 #include "Leaderboard.hpp"
+#include "PlayerInfo.hpp"
 #include "TileInfo.hpp"
-#include "Widgets.hpp"
 #include "utils/Rectangle.hpp"
 #include "utils/Vector2.hpp"
 #include "zappy/gui/game/GameState.hpp"
@@ -21,9 +21,9 @@
 
 namespace zappy::gui::ui {
 
-std::optional<std::uint32_t> InfoPanel::pickPlayer(Vector2 /*mousePos*/, const render::Camera& /*camera*/,
-                                                   const game::GameState& /*state*/) {
-    return std::nullopt;
+std::optional<std::uint32_t> InfoPanel::pickPlayer(Vector2 mousePos, const render::Camera& camera,
+                                                   const game::GameState& state) {
+    return PlayerInfo::pick(mousePos, camera, state);
 }
 
 std::optional<std::pair<std::uint32_t, std::uint32_t>> InfoPanel::pickTile(Vector2 mousePos,
@@ -34,6 +34,11 @@ std::optional<std::pair<std::uint32_t, std::uint32_t>> InfoPanel::pickTile(Vecto
 
 void InfoPanel::update(Vector2 mousePos, bool clicked, const render::Camera& camera, const game::GameState& state) {
     using enum InfoPanelState;
+
+    if (_state == Player && _selectedPlayerId.has_value() && !state.players().contains(*_selectedPlayerId)) {
+        _selectedPlayerId.reset();
+        _state = Leaderboard;
+    }
 
     if (!clicked) {
         return;
@@ -67,11 +72,13 @@ void InfoPanel::draw(const game::GameState& state, Rectangle bounds) const {
             break;
         case Tile:
             if (_selectedTile.has_value()) {
-                TileInfo::draw(state, _selectedTile->first, _selectedTile->second, bounds);
+                TileInfo::draw(state, _selectedTile.value().first, _selectedTile.value().second, bounds);
             }
             break;
         case Player:
-            Widgets::panel(bounds, "Player");
+            if (_selectedPlayerId.has_value()) {
+                PlayerInfo::draw(state, _selectedPlayerId.value(), bounds);
+            }
             break;
     }
 }

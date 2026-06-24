@@ -51,6 +51,8 @@ add_library(zappy_gui_objects OBJECT
         ui/Leaderboard.hpp
         ui/Mouse.cpp
         ui/Mouse.hpp
+        ui/PlayerInfo.cpp
+        ui/PlayerInfo.hpp
         ui/RaylibGuiImpl.cpp
         ui/TileInfo.cpp
         ui/TileInfo.hpp
