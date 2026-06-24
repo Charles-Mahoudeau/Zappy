@@ -56,7 +56,7 @@ void Poller::remove(const int fd) { _toRemove.push_back(fd); }
 
 std::size_t Poller::size() const { return _entries.size(); }
 
-void Poller::poll(const std::int32_t timeout) {
+bool Poller::poll(const std::int32_t timeout) {
     if (_entries.size() != _pollFds.size()) {
         throw exception::InvalidState{"Poller _pollFds and _fds size mismatch"};
     }
@@ -75,7 +75,7 @@ void Poller::poll(const std::int32_t timeout) {
 
     if (ret == -1) {
         if (errno == EINTR) {
-            return;
+            return true;
         }
 
         const std::error_code error{errno, std::generic_category()};
@@ -83,7 +83,7 @@ void Poller::poll(const std::int32_t timeout) {
         throw exception::InvalidState{"Failed to poll: " + error.message()};
     }
     if (ret == 0) {
-        return;
+        return false;
     }
     for (std::size_t i = 0; i < _entries.size(); i++) {
         const pollfd& pollEntry = _pollFds.at(i);
@@ -109,6 +109,7 @@ void Poller::poll(const std::int32_t timeout) {
             entry.handler(events);
         }
     }
+    return true;
 }
 
 void Poller::reconstructPollFds() {

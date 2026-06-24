@@ -5,6 +5,8 @@ add_library(zappy_server_objects OBJECT
         Core.cpp
         CliParser.hpp
         CliParser.cpp
+		Timer.hpp
+		Timer.cpp
         game/EntityDatabase.cpp
         game/EntityDatabase.hpp
         game/IEntity.hpp
@@ -15,6 +17,8 @@ add_library(zappy_server_objects OBJECT
         game/entity/Player.hpp
         game/entity/Egg.cpp
         game/entity/Egg.hpp
+        net/Server.hpp
+        net/Server.cpp
         net/SocketRegistry.hpp
         net/SocketRegistry.cpp
         client/Client.hpp

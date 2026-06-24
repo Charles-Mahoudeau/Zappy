@@ -65,7 +65,8 @@ class Poller {
 
     /// @brief Polls for events on the file descriptors.
     /// @param timeout The timeout in milliseconds, or -1 for infinite.
-    void poll(int32_t timeout = -1);
+    /// @return bool true if timeout stopped by fd. false if normal stop when timeout finish
+    bool poll(int32_t timeout = -1);
 
   private:
     struct PollEntry {

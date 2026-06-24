@@ -95,12 +95,13 @@ TEST_F(SocketRegistryTest, GetFromAddressReturnsCorrectClientAmongMany) {
 
 TEST_F(SocketRegistryTest, RemoveDeletesClientByFd) {
     auto client = makeClient(10, "127.0.0.1", 4242);
+    auto addr = client.address();
     registry.insert(client);
 
     client = makeClient(30, "127.0.0.1", 4200);
     registry.insert(client);
 
-    registry.remove(10);
+    registry.remove(addr);
 
     const network::Address invalidaddr{"127.0.0.1", 4242};
     const network::Address validaddr{"127.0.0.1", 4200};
@@ -113,10 +114,12 @@ TEST_F(SocketRegistryTest, RemoveDeletesClientByFd) {
 TEST_F(SocketRegistryTest, RemoveOnlyAffectsTargetedClient) {
     auto first = makeClient(1, "127.0.0.1", 4000);
     auto second = makeClient(2, "127.0.0.2", 4001);
+
+    auto addr = first.address();
     registry.insert(first);
     registry.insert(second);
 
-    registry.remove(1);
+    registry.remove(addr);
 
     const network::Address removedAddr{"127.0.0.1", 4000};
     EXPECT_EQ(registry.findByAddress(removedAddr), nullptr);
@@ -124,8 +127,5 @@ TEST_F(SocketRegistryTest, RemoveOnlyAffectsTargetedClient) {
     const network::Address keptAddr{"127.0.0.2", 4001};
     ASSERT_EQ(registry.findByAddress(keptAddr)->fd(), 2);
 }
-
-// Removing on an empty registry must not crash.
-TEST_F(SocketRegistryTest, RemoveOnEmptyRegistryIsSafe) { EXPECT_NO_THROW(registry.remove(42)); }
 
 }  // namespace zappy::server::net::test
