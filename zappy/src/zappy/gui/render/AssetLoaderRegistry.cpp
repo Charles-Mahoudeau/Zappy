@@ -18,6 +18,7 @@ AssetLoaderList AssetLoaderRegistry::create(AssetStore& assets) {
     return {
         {"skybox", [&assets]() { assets.loadSkybox(); }},
         {"player model", [&assets]() { assets.loadPlayerModel(); }},
+        {"egg", [&assets]() { assets.loadEggModel(); }},
         {"food", [&assets]() { assets.loadResourceModel(Food); }},
         {"linemate", [&assets]() { assets.loadResourceModel(Linemate); }},
         {"deraumere", [&assets]() { assets.loadResourceModel(Deraumere); }},
@@ -25,6 +26,8 @@ AssetLoaderList AssetLoaderRegistry::create(AssetStore& assets) {
         {"mendiane", [&assets]() { assets.loadResourceModel(Mendiane); }},
         {"phiras", [&assets]() { assets.loadResourceModel(Phiras); }},
         {"thystame", [&assets]() { assets.loadResourceModel(Thystame); }},
+        {"island", [&assets]() { assets.loadIslandModel(); }},
+        {"bridge", [&assets]() { assets.loadBridgeModel(); }},
     };
 }
 
