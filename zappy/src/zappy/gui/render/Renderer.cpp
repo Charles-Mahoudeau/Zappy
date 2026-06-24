@@ -17,6 +17,7 @@
 
 #include "AssetStore.hpp"
 #include "Camera.hpp"
+#include "ParticleEmitter.hpp"
 #include "objects/Model.hpp"
 #include "zappy/gui/display/Window.hpp"
 #include "zappy/gui/game/GameState.hpp"
@@ -232,5 +233,15 @@ float Renderer::calculAngle(game::Orientation orientation) {
             return 0.0F;
     }
 }
+
+void Renderer::drawVFXs(Camera& camera, AssetStore& assets) {
+    uint16_t totalParticles = 0;
+
+    for (auto& [name, emitter] : assets.vfxs()) {
+        totalParticles += emitter.draw(camera);
+        if (totalParticles >= kMaxParticles) {
+            break;
+        }
+    }
 
 }  // namespace zappy::gui::render
