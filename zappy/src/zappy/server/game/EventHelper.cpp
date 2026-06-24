@@ -66,7 +66,12 @@ std::string EventHelper::toWire(const Event& event) {
             },
             [](const PlayerDeathEvent& e) -> std::string { return std::format("pdi #{}", e.playerId); },
             [](const EggLaidEvent& e) -> std::string {
-                return std::format("enw #{} #{} {} {}", e.eggId, e.playerId.value_or(-1), e.position.x, e.position.y);
+                std::string playerIdStr = "-1";
+
+                if (e.playerId.has_value()) {
+                    playerIdStr = std::format("{}", *e.playerId);
+                }
+                return std::format("enw #{} #{} {} {}", e.eggId, playerIdStr, e.position.x, e.position.y);
             },
             [](const EggConnectionEvent& e) -> std::string { return std::format("ebo #{}", e.eggId); },
             [](const EggDeathEvent& e) -> std::string { return std::format("edi #{}", e.eggId); },
