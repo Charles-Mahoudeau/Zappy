@@ -12,6 +12,8 @@
 #include <algorithm>
 #include <utility>
 
+#include "zappy/gui/ui/Mouse.hpp"
+
 namespace zappy::gui::render {
 
 Camera::Camera(const Vector3 position, const Vector3 target, const Vector3 up, const float fovy,
@@ -66,6 +68,22 @@ void Camera::zoom(float delta) {
     static constexpr float kMinFovy = 5.0F;
     static constexpr float kMaxFovy = 500.0F;
     _camera.fovy = std::clamp(_camera.fovy - (delta * kZoomSpeed), kMinFovy, kMaxFovy);
+}
+
+void Camera::applyManualZoomInput() {
+    static constexpr float kKeyZoomSpeed = 20.0F;
+
+    float zoomDelta = ui::Mouse::scrollDelta();
+    const float keyZoom = kKeyZoomSpeed * GetFrameTime();
+    if (IsKeyDown(KEY_EQUAL) || IsKeyDown(KEY_KP_ADD)) {
+        zoomDelta += keyZoom;
+    }
+    if (IsKeyDown(KEY_MINUS) || IsKeyDown(KEY_KP_SUBTRACT)) {
+        zoomDelta -= keyZoom;
+    }
+    if (zoomDelta != 0.0F) {
+        zoom(zoomDelta);
+    }
 }
 
 void Camera::update() { UpdateCamera(&_camera, std::to_underlying(_cameraMode)); }

@@ -50,6 +50,8 @@ class Camera {
     void setCameraMode(CameraMode mode);
     void zoom(float delta);
 
+    void applyManualZoomInput();
+
     void update();
 
     operator Camera3D() const { return _camera; }

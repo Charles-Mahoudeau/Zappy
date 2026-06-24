@@ -17,7 +17,6 @@
 #include "zappy/gui/network/ProtocolParser.hpp"
 #include "zappy/gui/render/AssetStore.hpp"
 #include "zappy/gui/render/Camera.hpp"
-#include "zappy/gui/render/CameraController.hpp"
 #include "zappy/gui/render/Renderer.hpp"
 #include "zappy/gui/ui/GuiTheme.hpp"
 #include "zappy/gui/ui/Hud.hpp"
@@ -61,7 +60,6 @@ class GUI {
     display::Window _window;
     ui::GuiTheme _theme;
     render::Camera _camera;  // May be placed in renderer ?
-    render::CameraController _cameraController;
     render::AssetStore _assets;
     render::Renderer _renderer;
     ui::Hud _hud;

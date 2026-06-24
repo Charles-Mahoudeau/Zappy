@@ -134,7 +134,7 @@ int GUI::run() {
     while (!_window.shouldClose()) {
         _poller.poll(kPollTimeoutMs);
         _window.beginFrame();
-        _cameraController.update(_camera);
+        _camera.applyManualZoomInput();
         _renderer.update(_camera, _state, _assets);
         _hud.update(_camera, _state);
         _hud.draw(_state);

@@ -30,8 +30,6 @@ add_library(zappy_gui_objects OBJECT
         render/Grid.hpp
         render/Camera.cpp
         render/Camera.hpp
-        render/CameraController.cpp
-        render/CameraController.hpp
         render/tools/Vec2D.cpp
         render/tools/Vec2D.hpp
         render/objects/Texture.cpp
