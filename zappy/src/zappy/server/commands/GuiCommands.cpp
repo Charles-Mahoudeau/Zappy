@@ -132,7 +132,7 @@ bool GuiCommands::ppo(const CommandCtx& ctx) {
     const game::entity::Player* player = ctx.world.get().player(*playerId);
 
     if (player == nullptr) {
-        ctx.logger.get().warn("invalid argument");
+        ctx.logger.get().warn("player not found");
         return false;
     }
 
@@ -153,7 +153,7 @@ bool GuiCommands::plv(const CommandCtx& ctx) {
     const game::entity::Player* player = ctx.world.get().player(*playerId);
 
     if (player == nullptr) {
-        ctx.logger.get().warn("invalid argument");
+        ctx.logger.get().warn("player not found");
         return false;
     }
     std::ignore = ctx.client->sendMessage(std::format("plv #{} {}\n", *playerId, player->level()));
