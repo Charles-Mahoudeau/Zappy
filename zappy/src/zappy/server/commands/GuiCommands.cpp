@@ -111,64 +111,43 @@ bool GuiCommands::tna(const CommandCtx& ctx) {
 }
 
 bool GuiCommands::ppo(const CommandCtx& ctx) {
-    const std::optional<std::uint32_t> playerId = parsePlayerId(ctx.data.params.at(0));
-
-    if (!playerId.has_value()) {
-        ctx.logger.get().warn("Unable to parse player id argument.");
-        return false;
-    }
-
-    const game::entity::Player* player = ctx.world.get().player(*playerId);
+    const game::entity::Player* player = parsePlayer(ctx);
 
     if (player == nullptr) {
-        ctx.logger.get().warn("Player #{} not found.", *playerId);
+        ctx.logger.get().warn("Player not found.");
         return false;
     }
 
     const math::Vector2u playerPosition = player->position();
 
-    std::ignore = ctx.client->sendMessage("ppo #{} {} {} {}\n", *playerId, playerPosition.x, playerPosition.y,
+    std::ignore = ctx.client->sendMessage("ppo #{} {} {} {}\n", player->id(), playerPosition.x, playerPosition.y,
                                           std::to_underlying(player->orientation()));
     return true;
 }
 
 bool GuiCommands::plv(const CommandCtx& ctx) {
-    const std::optional<std::uint32_t> playerId = parsePlayerId(ctx.data.params.at(0));
-
-    if (!playerId.has_value()) {
-        ctx.logger.get().warn("Unable to parse player id argument.");
-        return false;
-    }
-
-    const game::entity::Player* player = ctx.world.get().player(*playerId);
+    const game::entity::Player* player = parsePlayer(ctx);
 
     if (player == nullptr) {
-        ctx.logger.get().warn("Player #{} not found.", *playerId);
+        ctx.logger.get().warn("Player not found.");
         return false;
     }
-    std::ignore = ctx.client->sendMessage("plv #{} {}\n", *playerId, player->level());
+    std::ignore = ctx.client->sendMessage("plv #{} {}\n", player->id(), player->level());
     return true;
 }
 
 bool GuiCommands::pin(const CommandCtx& ctx) {
-    const std::optional<std::uint32_t> playerId = parsePlayerId(ctx.data.params.at(0));
-
-    if (!playerId.has_value()) {
-        ctx.logger.get().warn("Unable to parse player id argument.");
-        return false;
-    }
-
-    const game::entity::Player* player = ctx.world.get().player(*playerId);
+    const game::entity::Player* player = parsePlayer(ctx);
 
     if (player == nullptr) {
-        ctx.logger.get().warn("Player #{} not found.", *playerId);
+        ctx.logger.get().warn("Player not found.");
         return false;
     }
 
     math::Vector2u position = player->position();
 
-    std::ignore =
-        ctx.client->sendMessage("pin #{} {} {} {}\n", *playerId, position.x, position.y, player->inventory().string());
+    std::ignore = ctx.client->sendMessage("pin #{} {} {} {}\n", player->id(), position.x, position.y,
+                                          player->inventory().string());
     return true;
 }
 
@@ -242,5 +221,21 @@ std::optional<std::uint32_t> GuiCommands::parsePlayerId(const std::string_view s
         return std::nullopt;
     }
     return parseUint32(std::string{str.substr(1)});
+}
+
+game::entity::Player* GuiCommands::parsePlayer(const CommandCtx& ctx) {
+    if (ctx.data.params.size() != 1) {
+        ctx.logger.get().warn("Invalid number of arguments.");
+        return nullptr;
+    }
+
+    const std::optional<std::uint32_t> playerId = parsePlayerId(ctx.data.params.at(0));
+
+    if (!playerId.has_value()) {
+        ctx.logger.get().warn("Unable to parse player id argument.");
+        return nullptr;
+    }
+
+    return ctx.world.get().player(*playerId);
 }
 }  // namespace zappy::server::command

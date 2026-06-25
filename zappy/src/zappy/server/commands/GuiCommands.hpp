@@ -46,6 +46,7 @@ class GuiCommands : public ACommandGroup {
     static std::optional<std::uint32_t> parseUint32(const std::string& str);
     static std::optional<math::Vector2u> parsePosition(std::span<const std::string> params);
     static std::optional<std::uint32_t> parsePlayerId(std::string_view str);
+    static game::entity::Player* parsePlayer(const CommandCtx& ctx);
 
     std::unordered_map<std::string_view, CommandInvoker> _commands;
 };
