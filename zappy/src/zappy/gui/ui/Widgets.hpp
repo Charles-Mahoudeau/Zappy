@@ -22,6 +22,7 @@ class Widgets {
 
     static void panel(render::Rectangle bounds, std::string_view title);
     static void label(render::Rectangle bounds, std::string_view text);
+    static void centeredLabel(render::Rectangle bounds, std::string_view text);
     [[nodiscard]] static bool button(render::Rectangle bounds, std::string_view text);
     static render::Rectangle scrollPanel(render::Rectangle bounds, std::string_view title, render::Rectangle content,
                                          render::Vector2& scroll);

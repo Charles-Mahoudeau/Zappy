@@ -21,6 +21,13 @@ void Widgets::panel(render::Rectangle bounds, std::string_view title) { GuiPanel
 
 void Widgets::label(render::Rectangle bounds, std::string_view text) { GuiLabel(bounds, std::string{text}.c_str()); }
 
+void Widgets::centeredLabel(render::Rectangle bounds, std::string_view text) {
+    const int previousAlignment = GuiGetStyle(LABEL, TEXT_ALIGNMENT);
+    GuiSetStyle(LABEL, TEXT_ALIGNMENT, TEXT_ALIGN_CENTER);
+    GuiLabel(bounds, std::string{text}.c_str());
+    GuiSetStyle(LABEL, TEXT_ALIGNMENT, previousAlignment);
+}
+
 bool Widgets::button(render::Rectangle bounds, std::string_view text) {
     return GuiButton(bounds, std::string{text}.c_str()) != 0;
 }

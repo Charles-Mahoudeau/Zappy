@@ -33,9 +33,10 @@ bool VictoryScreen::draw(std::string_view winnerTeam, render::Rectangle screenBo
     Widgets::panel(panelBounds, "Victory");
 
     const std::string text = std::format("{} wins the game!", winnerTeam);
-    Widgets::label(render::Rectangle{panelBounds.x(), panelBounds.y() + Widgets::kPanelHeaderHeight + kTextMarginTop,
-                                     panelBounds.width(), kTextHeight},
-                   text);
+    Widgets::centeredLabel(
+        render::Rectangle{panelBounds.x(), panelBounds.y() + Widgets::kPanelHeaderHeight + kTextMarginTop,
+                          panelBounds.width(), kTextHeight},
+        text);
 
     const render::Rectangle buttonBounds{panelBounds.x() + ((panelBounds.width() - kButtonWidth) / 2.0F),
                                          panelBounds.y() + panelBounds.height() - kButtonHeight - kButtonMarginBottom,
