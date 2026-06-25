@@ -28,8 +28,8 @@ bool VictoryScreen::draw(std::string_view winnerTeam, render::Rectangle screenBo
     Widgets::overlay(screenBounds);
 
     const render::Rectangle panelBounds{screenBounds.x() + ((screenBounds.width() - kPanelWidth) / 2.0F),
-                                        screenBounds.y() + ((screenBounds.height() - kPanelHeight) / 2.0F),
-                                        kPanelWidth, kPanelHeight};
+                                        screenBounds.y() + ((screenBounds.height() - kPanelHeight) / 2.0F), kPanelWidth,
+                                        kPanelHeight};
     Widgets::panel(panelBounds, "Victory");
 
     const std::string text = std::format("{} wins the game!", winnerTeam);

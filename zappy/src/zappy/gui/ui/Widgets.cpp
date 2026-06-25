@@ -17,13 +17,9 @@
 
 namespace zappy::gui::ui {
 
-void Widgets::panel(render::Rectangle bounds, std::string_view title) {
-    GuiPanel(bounds, std::string{title}.c_str());
-}
+void Widgets::panel(render::Rectangle bounds, std::string_view title) { GuiPanel(bounds, std::string{title}.c_str()); }
 
-void Widgets::label(render::Rectangle bounds, std::string_view text) {
-    GuiLabel(bounds, std::string{text}.c_str());
-}
+void Widgets::label(render::Rectangle bounds, std::string_view text) { GuiLabel(bounds, std::string{text}.c_str()); }
 
 bool Widgets::button(render::Rectangle bounds, std::string_view text) {
     return GuiButton(bounds, std::string{text}.c_str()) != 0;

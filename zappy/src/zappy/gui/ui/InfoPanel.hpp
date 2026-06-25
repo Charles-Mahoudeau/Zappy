@@ -49,11 +49,11 @@ class InfoPanel {
     [[nodiscard]] std::optional<std::uint32_t> selectedPlayerId() const;
 
   private:
-    [[nodiscard]] static std::optional<std::uint32_t> pickPlayer(render::Vector2 mousePos,
-                                                                  const render::Camera& camera,
-                                                                  const game::GameState& state);
-    [[nodiscard]] static std::optional<std::pair<std::uint32_t, std::uint32_t>> pickTile(
-        render::Vector2 mousePos, const render::Camera& camera, const game::GameState& state);
+    [[nodiscard]] static std::optional<std::uint32_t> pickPlayer(render::Vector2 mousePos, const render::Camera& camera,
+                                                                 const game::GameState& state);
+    [[nodiscard]] static std::optional<std::pair<std::uint32_t, std::uint32_t>> pickTile(render::Vector2 mousePos,
+                                                                                         const render::Camera& camera,
+                                                                                         const game::GameState& state);
 
     InfoPanelState _state{InfoPanelState::Leaderboard};
     std::optional<std::pair<std::uint32_t, std::uint32_t>> _selectedTile;

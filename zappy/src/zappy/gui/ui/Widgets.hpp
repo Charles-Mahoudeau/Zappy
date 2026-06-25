@@ -25,8 +25,8 @@ class Widgets {
     [[nodiscard]] static bool button(render::Rectangle bounds, std::string_view text);
     static render::Rectangle scrollPanel(render::Rectangle bounds, std::string_view title, render::Rectangle content,
                                          render::Vector2& scroll);
-    static float slider(render::Rectangle bounds, std::string_view textLeft, std::string_view textRight,
-                        float current, float min, float max);
+    static float slider(render::Rectangle bounds, std::string_view textLeft, std::string_view textRight, float current,
+                        float min, float max);
     static void progressBar(render::Rectangle bounds, std::string_view textLeft, std::string_view textRight,
                             float progress);
     static void beginScissor(render::Rectangle area);

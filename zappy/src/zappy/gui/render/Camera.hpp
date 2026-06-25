@@ -70,7 +70,7 @@ class Camera {
     float _maxFovy{500.0F};
 
     bool _focusInitialized{false};
-    Vector3 _defaultTarget{};
+    Vector3 _defaultTarget;
     float _manualFovy{0.0F};
 };
 }  // namespace zappy::gui::render

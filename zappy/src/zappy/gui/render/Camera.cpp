@@ -11,8 +11,10 @@
 
 #include <algorithm>
 #include <cmath>
+#include <optional>
 #include <utility>
 
+#include "zappy/gui/render/utils/Vector3.hpp"
 #include "zappy/gui/ui/Mouse.hpp"
 
 namespace zappy::gui::render {

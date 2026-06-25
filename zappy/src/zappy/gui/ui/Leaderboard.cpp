@@ -55,9 +55,9 @@ void Leaderboard::draw(const game::GameState& state, render::Rectangle bounds) {
         const float progress =
             static_cast<float>(entry.playersAtMaxLevel) / static_cast<float>(game::GameState::kPlayersNeededToWin);
         const render::Rectangle rowBounds{bounds.x() + kBarMarginLeft,
-                                  bounds.y() + Widgets::kPanelHeaderHeight + kTextMarginTop +
-                                      (static_cast<float>(i) * kRowHeight) + ((kRowHeight - kBarHeight) / 2.0F),
-                                  bounds.width() - kBarMarginLeft - kBarMarginRight, kBarHeight};
+                                          bounds.y() + Widgets::kPanelHeaderHeight + kTextMarginTop +
+                                              (static_cast<float>(i) * kRowHeight) + ((kRowHeight - kBarHeight) / 2.0F),
+                                          bounds.width() - kBarMarginLeft - kBarMarginRight, kBarHeight};
         Widgets::progressBar(rowBounds, textLeft, textRight, std::min(progress, 1.0F));
     }
 }

@@ -8,7 +8,10 @@
 #include "Hud.hpp"
 
 #include <algorithm>
+#include <cstdint>
+#include <optional>
 
+#include "InfoPanel.hpp"
 #include "Mouse.hpp"
 #include "VictoryScreen.hpp"
 #include "zappy/gui/game/GameState.hpp"

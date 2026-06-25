@@ -60,7 +60,7 @@ class Billboard : public Texture {
     void drawPro(Camera& camera) const;
 
   private:
-    Rectangle _source{};
+    Rectangle _source;
     Vector3 _position{0.0F, 0.0F, 0.0F};
     Vector3 _up{0.0F, 1.0F, 0.0F};
     Vector2 _size{1.0F, 1.0F};
