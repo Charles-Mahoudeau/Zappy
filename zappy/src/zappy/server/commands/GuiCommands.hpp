@@ -33,7 +33,6 @@ class GuiCommands : public ACommandGroup {
     void execute(Client* client, std::string_view msg) override;
 
   private:
-    static bool ignore(const CommandCtx& ctx);
     static bool msz(const CommandCtx& ctx);
     static bool bct(const CommandCtx& ctx);
     static bool mct(const CommandCtx& ctx);

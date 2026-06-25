@@ -67,11 +67,6 @@ void GuiCommands::execute(Client* client, [[maybe_unused]] const std::string_vie
     }
 }
 
-bool GuiCommands::ignore(const CommandCtx& ctx) {
-    (void)ctx;
-    return false;
-}
-
 bool GuiCommands::msz(const CommandCtx& ctx) {
     math::Vector2u worldSize = ctx.world.get().size();
 
