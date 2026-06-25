@@ -17,6 +17,7 @@
 #include "zappy/server/client/Client.hpp"
 #include "zappy/server/commands/ACommandGroup.hpp"
 #include "zappy/server/commands/ICommandGroup.hpp"
+#include "zappy/server/game/entity/Player.hpp"
 #include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server::command {
