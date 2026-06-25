@@ -117,7 +117,7 @@ bool Core::initTimer(const std::uint16_t frequency) {
         _logger.info("Using default timer frequency.");
         return true;
     }
-    _timer.setFrequencies(frequency);
+    _timer.setFrequency(frequency);
     _logger.info("Timer initialized.");
     return true;
 }

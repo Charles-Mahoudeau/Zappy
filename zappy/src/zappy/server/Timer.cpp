@@ -15,9 +15,9 @@
 
 namespace zappy::server {
 
-Timer::Timer() { this->setFrequencies(kDefault_Frequencies); }
+Timer::Timer() { this->setFrequency(kDefaultFrequency); }
 
-Timer::Timer(std::uint16_t freq) { this->setFrequencies(freq); }
+Timer::Timer(std::uint16_t freq) { this->setFrequency(freq); }
 
 int Timer::update() {
     std::chrono::steady_clock::time_point const now = std::chrono::steady_clock::now();
@@ -47,15 +47,18 @@ int Timer::update() {
     return nbTick;
 }
 
-void Timer::setFrequencies(std::uint16_t freq) {
-    if (freq < kMinFrequency) {
-        freq = kMinFrequency;
-    } else if (freq > kMaxFrequency) {
-        freq = kMaxFrequency;
+std::uint16_t Timer::frequency() const { return _frequency; }
+
+void Timer::setFrequency(std::uint16_t frequency) {
+    if (frequency < kMinFrequency) {
+        frequency = kMinFrequency;
+    } else if (frequency > kMaxFrequency) {
+        frequency = kMaxFrequency;
     }
 
-    this->_tickTime = std::chrono::milliseconds(kTick_milli_default) / freq;
-    this->_previousTick = std::chrono::steady_clock::now();
+    _frequency = frequency;
+    _tickTime = std::chrono::milliseconds(kTick_milli_default) / frequency;
+    _previousTick = std::chrono::steady_clock::now();
 }
 
 int Timer::timeoutUntilSchedule() const {
