@@ -65,11 +65,10 @@ void Core::run() {
 
 void Core::processCommandGroup() {
     for (Client* client : this->_clientRegistry.viewAll()) {
+        if (client->inTimeout()) {
+            continue;
+        }
         while (std::optional<std::string> request = client->nextRequest()) {
-            if (client->inTimeout()) {
-                break;
-            }
-
             auto it = _cmdGroups.find(client->type());
 
             if (it == _cmdGroups.end()) {
