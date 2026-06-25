@@ -7,12 +7,17 @@
 
 #pragma once
 
+#include <cstdint>
+#include <optional>
+#include <span>
+#include <string>
 #include <string_view>
 #include <unordered_map>
 
 #include "zappy/server/client/Client.hpp"
 #include "zappy/server/commands/ACommandGroup.hpp"
 #include "zappy/server/commands/ICommandGroup.hpp"
+#include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server::command {
 class GuiCommands : public ACommandGroup {
