@@ -22,6 +22,7 @@ void UnknownCommands::execute(Client* client, [[maybe_unused]] const std::string
 
     if (!ctx.data.params.empty()) {
         std::ignore = client->sendMessage("ko\n");
+        return;
     }
     const auto& askedTeam = ctx.data.name;
 
@@ -51,7 +52,6 @@ bool UnknownCommands::PlayerType(std::string_view askedTeam, Client* client, Com
     auto& logger = ctx.logger.get();
 
     try {
-        teams.addToTeam(askedTeam, client->address());
         auto worldSize = world.size();
 
         auto result = world.hatchRandomEgg(askedTeam);
@@ -59,6 +59,7 @@ bool UnknownCommands::PlayerType(std::string_view askedTeam, Client* client, Com
             logger.error(std::format("Fail to hatch egg for {}", client->address().string()));
             return false;
         }
+        teams.addToTeam(askedTeam, client->address());
         client->setPlayerID(result.value());
         client->changeType(Client::Type::kPlayer);
         std::ignore = client->sendMessage(std::format("{}\n", world.eggCount(askedTeam)));
