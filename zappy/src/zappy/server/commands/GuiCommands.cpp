@@ -19,7 +19,7 @@ namespace zappy::server::command {
 GuiCommands::GuiCommands(CommandCtx context)
     : ACommandGroup{std::move(context)},
       _commands({
-          {"msz", [](auto& ctx) { return GuiCommands::ignore(ctx); }},
+          {"msz", [](const CommandCtx& ctx) { return msz(ctx); }},
           {"bct", [](auto& ctx) { return GuiCommands::ignore(ctx); }},
           {"mct", [](auto& ctx) { return GuiCommands::ignore(ctx); }},
           {"tna", [](auto& ctx) { return GuiCommands::ignore(ctx); }},
@@ -61,4 +61,10 @@ bool GuiCommands::ignore(const CommandCtx& ctx) {
     return false;
 }
 
+bool GuiCommands::msz(const CommandCtx& ctx) {
+    math::Vector2u worldSize = ctx.world.get().size();
+
+    std::ignore = ctx.client->sendMessage(std::format("msz {} {}\n", worldSize.x, worldSize.y));
+    return true;
+}
 }  // namespace zappy::server::command

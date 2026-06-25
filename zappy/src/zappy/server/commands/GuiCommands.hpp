@@ -30,6 +30,7 @@ class GuiCommands : public ACommandGroup {
 
   private:
     static bool ignore(const CommandCtx& ctx);
+    static bool msz(const CommandCtx& ctx);
 
     std::unordered_map<std::string_view, CommandInvoker> _commands;
 };
