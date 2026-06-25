@@ -53,7 +53,7 @@ class Inventory {
     /// @return The string representation of the inventory.
     [[nodiscard]] std::string string() const;
 
-    [[nodiscard]] std::string playerString() const;
+    [[nodiscard]] std::string detailledString() const;
 
   private:
     /// @brief Check if a resource type is valid.

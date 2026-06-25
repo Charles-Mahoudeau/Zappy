@@ -44,10 +44,10 @@ void PlayerCommands::execute(Client* client, [[maybe_unused]] const std::string_
 
     if (const auto iter = this->_commands.find(ctx.data.name); iter != this->_commands.end()) {
         if (!iter->second(ctx)) {
-            (void)client->sendMessage("ko\n");
+            client->sendError();
         }
     } else {
-        (void)client->sendMessage("ko\n");
+        client->sendError();
     }
 }
 
