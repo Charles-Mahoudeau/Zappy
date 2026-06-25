@@ -29,9 +29,9 @@ class GuiCommands : public ACommandGroup {
     void execute(Client* client, std::string_view msg) override;
 
   private:
-    std::unordered_map<std::string_view, CommandInvoker> _commands;
-
     static bool ignore(const CommandCtx& ctx);
+
+    std::unordered_map<std::string_view, CommandInvoker> _commands;
 };
 
 }  // namespace zappy::server::command
