@@ -85,7 +85,7 @@ class World : public IEventEmitter {
     void spawnResource(ResourceType type);
 
     /// @brief Spawns the initial eggs in the world.
-    void spawnStartEggs(std::span<std::string_view> teams, std::uint8_t playersPerTeam);
+    void spawnStartEggs(std::span<const std::string_view> teams, std::uint8_t playersPerTeam);
 
     /// @brief Spawns the initial eggs in the world.
     void spawnStartEggs(std::span<const std::string> teams, std::uint8_t playersPerTeam);

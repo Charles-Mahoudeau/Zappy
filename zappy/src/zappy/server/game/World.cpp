@@ -104,7 +104,7 @@ void World::spawnResource(const ResourceType type) {
     });
 }
 
-void World::spawnStartEggs(const std::span<std::string_view> teams, const std::uint8_t playersPerTeam) {
+void World::spawnStartEggs(const std::span<const std::string_view> teams, const std::uint8_t playersPerTeam) {
     for (const std::string_view teamName : teams) {
         for (std::uint16_t i = 0; i < playersPerTeam; ++i) {
             std::ignore = spawnEgg(teamName);
