@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <format>
 #include <optional>
+#include <sstream>
 #include <string>
 
 #include "Tile.hpp"
