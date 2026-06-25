@@ -11,7 +11,9 @@
 #include <format>
 #include <iostream>
 #include <memory>
+#include <optional>
 #include <span>
+#include <string>
 #include <string_view>
 
 #include "zappy/server/CliParser.hpp"
@@ -59,19 +61,20 @@ void Core::run() {
 
 void Core::processCommandGroup() {
     for (Client* client : this->_clientRegistry.viewAll()) {
-        if (client->inTimeout()) {
-            continue;
-        }
+        while (std::optional<std::string> request = client->nextRequest()) {
+            if (client->inTimeout()) {
+                break;
+            }
 
-        auto req = client->nextRequest();
-        if (!req.has_value()) {
-            continue;
-        }
+            auto it = _cmdGroups.find(client->type());
 
-        if (auto iter = this->_cmdGroups.find(client->type()); iter != this->_cmdGroups.end()) {
-            const auto& commands = iter->second;
+            if (it == _cmdGroups.end()) {
+                continue;
+            }
 
-            (*commands)(client, req.value());
+            const std::unique_ptr<command::ICommandGroup>& commands = it->second;
+
+            (*commands)(client, *request);
         }
     }
 }
