@@ -37,7 +37,7 @@ GuiCommands::GuiCommands(CommandCtx context)
           {"tna", [](const CommandCtx& ctx) { return tna(ctx); }},
           {"ppo", [](const CommandCtx& ctx) { return ppo(ctx); }},
           {"plv", [](const CommandCtx& ctx) { return plv(ctx); }},
-          {"pin", [](const CommandCtx& ctx) { return ignore(ctx); }},
+          {"pin", [](const CommandCtx& ctx) { return pin(ctx); }},
           {"sgt", [](const CommandCtx& ctx) { return sgt(ctx); }},
           {"sst", [](const CommandCtx& ctx) { return sst(ctx); }},
       }) {}
@@ -157,6 +157,28 @@ bool GuiCommands::plv(const CommandCtx& ctx) {
         return false;
     }
     std::ignore = ctx.client->sendMessage(std::format("plv #{} {}\n", *playerId, player->level()));
+    return true;
+}
+
+bool GuiCommands::pin(const CommandCtx& ctx) {
+    const std::optional<std::uint32_t> playerId = parseUint32(ctx.data.params.at(0));
+
+    if (!playerId.has_value()) {
+        ctx.logger.get().warn("invalid argument");
+        return false;
+    }
+
+    const game::entity::Player* player = ctx.world.get().player(*playerId);
+
+    if (player == nullptr) {
+        ctx.logger.get().warn("player not found");
+        return false;
+    }
+
+    math::Vector2u position = player->position();
+
+    std::ignore = ctx.client->sendMessage(
+        std::format("pin #{} {} {} {}\n", *playerId, position.x, position.y, player->inventory().string()));
     return true;
 }
 

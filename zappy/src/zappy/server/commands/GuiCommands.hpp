@@ -40,6 +40,7 @@ class GuiCommands : public ACommandGroup {
     static bool tna(const CommandCtx& ctx);
     static bool ppo(const CommandCtx& ctx);
     static bool plv(const CommandCtx& ctx);
+    static bool pin(const CommandCtx& ctx);
     static bool sgt(const CommandCtx& ctx);
     static bool sst(const CommandCtx& ctx);
 
