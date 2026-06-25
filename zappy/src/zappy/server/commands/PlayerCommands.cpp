@@ -8,19 +8,15 @@
 #include "zappy/server/commands/PlayerCommands.hpp"
 
 #include <string_view>
+#include <utility>
 
-#include "zappy/server/Timer.hpp"
 #include "zappy/server/client/Client.hpp"
-#include "zappy/server/client/ClientRegistry.hpp"
 #include "zappy/server/commands/ACommandGroup.hpp"
 #include "zappy/server/commands/ICommandGroup.hpp"
-#include "zappy/server/game/World.hpp"
-#include "zappy/shared/io/Logger.hpp"
 
 namespace zappy::server::command {
-
-PlayerCommands::PlayerCommands(Timer& timer, client::ClientRegistry& clients, game::World& world, io::Logger& logger)
-    : ACommandGroup(timer, clients, world, logger),
+PlayerCommands::PlayerCommands(CommandCtx context)
+    : ACommandGroup{std::move(context)},
       _commands({
           {"Forward", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
           {"Right", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
@@ -36,12 +32,10 @@ PlayerCommands::PlayerCommands(Timer& timer, client::ClientRegistry& clients, ga
           {"Incantation", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
       }) {}
 
-void PlayerCommands::execute(Client* client, std::string_view msg) {
+void PlayerCommands::execute(Client* client, [[maybe_unused]] const std::string_view msg) {
     CommandCtx& ctx = this->commandCtx();
 
-    ctx.data = this->extractCommand(msg);
-
-    if (auto iter = this->_commands.find(ctx.data.name); iter != this->_commands.end()) {
+    if (const auto iter = this->_commands.find(ctx.data.name); iter != this->_commands.end()) {
         if (!iter->second(ctx)) {
             (void)client->sendMessage("ko\n");
         }

@@ -11,36 +11,29 @@
 #include <sstream>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
-#include "zappy/server/Timer.hpp"
 #include "zappy/server/client/Client.hpp"
-#include "zappy/server/client/ClientRegistry.hpp"
 #include "zappy/server/commands/ICommandGroup.hpp"
-#include "zappy/server/game/World.hpp"
-#include "zappy/shared/io/Logger.hpp"
 
 namespace zappy::server::command {
+ACommandGroup::ACommandGroup(CommandCtx context) : _ctx{std::move(context)} {}
 
-ACommandGroup::ACommandGroup(Timer& timer, client::ClientRegistry& clients, game::World& world, io::Logger& logger)
-    : _ctx{.timer = timer, .clientRegistry = clients, .world = world, .logger = logger} {}
-
-ICommandGroup::CommandCtx& ACommandGroup::commandCtx() {
-    this->_ctx.data.name.clear();
-    this->_ctx.data.params.clear();
-    return this->_ctx;
+void ACommandGroup::operator()(Client* client, const std::string_view cmd) {
+    _ctx.client = client;
+    _ctx.data = extractCommand(cmd);
+    execute(client, cmd);
 }
 
-void ACommandGroup::operator()(Client* client, std::string_view cmd) { this->execute(client, cmd); }
+ICommandGroup::CommandCtx& ACommandGroup::commandCtx() { return _ctx; }
 
-ICommandGroup::CommandData ACommandGroup::extractCommand(std::string_view msg) {
+ICommandGroup::CommandData ACommandGroup::extractCommand(const std::string_view msg) {
     CommandData cmd;
     std::istringstream iss{std::string(msg)};
 
     iss >> cmd.name;
-    cmd.params =
-        std::vector<std::string>((std::istream_iterator<std::string>(iss)), std::istream_iterator<std::string>());
+    cmd.params = std::vector(std::istream_iterator<std::string>{iss}, std::istream_iterator<std::string>{});
     return cmd;
 }
-
 }  // namespace zappy::server::command

@@ -9,18 +9,14 @@
 
 #include <string_view>
 
-#include "zappy/server/Timer.hpp"
 #include "zappy/server/client/Client.hpp"
-#include "zappy/server/client/ClientRegistry.hpp"
 #include "zappy/server/commands/ICommandGroup.hpp"
-#include "zappy/server/game/World.hpp"
-#include "zappy/shared/io/Logger.hpp"
 
 namespace zappy::server::command {
 
 class ACommandGroup : public ICommandGroup {
   public:
-    ACommandGroup(Timer& timer, client::ClientRegistry& clients, game::World& world, io::Logger& logger);
+    explicit ACommandGroup(CommandCtx context);
     ~ACommandGroup() override = default;
 
     ACommandGroup(const ACommandGroup&) = delete;

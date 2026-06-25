@@ -14,7 +14,7 @@
 
 namespace zappy::server::command {
 
-void UnknownCommands::execute(Client* client, std::string_view cmd) {
+void UnknownCommands::execute(Client* client, const std::string_view cmd) {
     std::cout << client->address() << " -> " << cmd << "\n";
 }
 
