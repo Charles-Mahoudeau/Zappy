@@ -15,7 +15,6 @@
 #include "zappy/server/commands/ICommandGroup.hpp"
 
 namespace zappy::server::command {
-
 class GuiCommands : public ACommandGroup {
   public:
     explicit GuiCommands(CommandCtx context);
@@ -35,6 +34,7 @@ class GuiCommands : public ACommandGroup {
     static bool mct(const CommandCtx& ctx);
     static bool tna(const CommandCtx& ctx);
     static bool sgt(const CommandCtx& ctx);
+    static bool sst(const CommandCtx& ctx);
 
     static std::optional<std::string> serializeTile(const CommandCtx& ctx, math::Vector2u position);
 
@@ -42,5 +42,4 @@ class GuiCommands : public ACommandGroup {
 
     std::unordered_map<std::string_view, CommandInvoker> _commands;
 };
-
 }  // namespace zappy::server::command

@@ -28,7 +28,7 @@ GuiCommands::GuiCommands(CommandCtx context)
           {"plv", [](const CommandCtx& ctx) { return ignore(ctx); }},
           {"pin", [](const CommandCtx& ctx) { return ignore(ctx); }},
           {"sgt", [](const CommandCtx& ctx) { return sgt(ctx); }},
-          {"sst", [](const CommandCtx& ctx) { return ignore(ctx); }},
+          {"sst", [](const CommandCtx& ctx) { return sst(ctx); }},
       }) {}
 
 void GuiCommands::execute(Client* client, [[maybe_unused]] const std::string_view msg) {
@@ -112,6 +112,22 @@ bool GuiCommands::tna(const CommandCtx& ctx) {
 
 bool GuiCommands::sgt(const CommandCtx& ctx) {
     std::ignore = ctx.client->sendMessage(std::format("sgt {}\n", ctx.timer.get().frequency()));
+    return true;
+}
+
+bool GuiCommands::sst(const CommandCtx& ctx) {
+    try {
+        const std::uint64_t timeUnit = std::stoul(ctx.data.params.at(0));
+
+        ctx.timer.get().setFrequency(timeUnit);
+        std::ignore = ctx.client->sendMessage(std::format("sst {}\n", ctx.timer.get().frequency()));
+    } catch (const std::invalid_argument& e) {
+        ctx.logger.get().warn(std::format("invalid argument: {}", e.what()));
+        return false;
+    } catch (const std::out_of_range& e) {
+        ctx.logger.get().warn(std::format("out of range: {}", e.what()));
+        return false;
+    }
     return true;
 }
 
