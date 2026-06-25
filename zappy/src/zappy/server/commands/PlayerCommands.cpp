@@ -31,10 +31,8 @@ PlayerCommands::PlayerCommands(CommandCtx context)
           {"Incantation", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
       }) {}
 
-void PlayerCommands::execute(Client* client, const std::string_view msg) {
+void PlayerCommands::execute(Client* client, [[maybe_unused]] const std::string_view msg) {
     CommandCtx& ctx = this->commandCtx();
-
-    ctx.data = this->extractCommand(msg);
 
     if (const auto iter = this->_commands.find(ctx.data.name); iter != this->_commands.end()) {
         if (!iter->second(ctx)) {

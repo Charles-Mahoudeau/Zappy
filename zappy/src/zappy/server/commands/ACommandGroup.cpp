@@ -20,13 +20,13 @@
 namespace zappy::server::command {
 ACommandGroup::ACommandGroup(CommandCtx context) : _ctx{std::move(context)} {}
 
-void ACommandGroup::operator()(Client* client, const std::string_view cmd) { this->execute(client, cmd); }
-
-ICommandGroup::CommandCtx& ACommandGroup::commandCtx() {
-    this->_ctx.data.name.clear();
-    this->_ctx.data.params.clear();
-    return this->_ctx;
+void ACommandGroup::operator()(Client* client, const std::string_view cmd) {
+    _ctx.client = client;
+    _ctx.data = extractCommand(cmd);
+    execute(client, cmd);
 }
+
+ICommandGroup::CommandCtx& ACommandGroup::commandCtx() { return _ctx; }
 
 ICommandGroup::CommandData ACommandGroup::extractCommand(const std::string_view msg) {
     CommandData cmd;
@@ -36,5 +36,4 @@ ICommandGroup::CommandData ACommandGroup::extractCommand(const std::string_view 
     cmd.params = std::vector(std::istream_iterator<std::string>{iss}, std::istream_iterator<std::string>{});
     return cmd;
 }
-
 }  // namespace zappy::server::command

@@ -32,11 +32,10 @@ GuiCommands::GuiCommands(CommandCtx context)
 
       }) {}
 
-void GuiCommands::execute(Client* client, std::string_view msg) {
+void GuiCommands::execute(Client* client, [[maybe_unused]] const std::string_view msg) {
     CommandCtx& ctx = this->commandCtx();
 
-    ctx.data = this->extractCommand(msg);
-    if (auto iter = this->_commands.find(ctx.data.name); iter != this->_commands.end()) {
+    if (const auto iter = this->_commands.find(ctx.data.name); iter != this->_commands.end()) {
         if (!iter->second(ctx)) {
             std::ignore = client->sendMessage("sbp\n");
         }
