@@ -126,11 +126,11 @@ bool Core::initTimer(const std::uint16_t frequency) {
 bool Core::initWorld(math::Vector2u size, std::span<const std::string_view> teams, std::uint16_t nbPlayerPerTeam) {
     try {
         _world = std::make_unique<game::World>(size, _logger.derive("World"));
+        this->_world->spawnStartEggs(teams, nbPlayerPerTeam);
     } catch (const exception::Exception& e) {
         _logger.error(std::format("Failed to initialize world: {}", e.what()));
         return false;
     }
-    this->_world->spawnStartEggs(teams, nbPlayerPerTeam);
     _logger.info("World initialized.");
     return true;
 }
