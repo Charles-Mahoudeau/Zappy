@@ -68,6 +68,10 @@ class Player : public AEntity {
     /// @return True if the player ate food, false otherwise.
     bool eat();
 
+    /// @brief Get the player's inventory.
+    /// @return The player's inventory.
+    [[nodiscard]] const Inventory& inventory() const;
+
   private:
     std::uint32_t _lifetimeLeft{kDefaultLifetime};
     std::uint8_t _level{1};

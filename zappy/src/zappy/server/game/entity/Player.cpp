@@ -104,4 +104,6 @@ bool Player::eat() {
     });
     return true;
 }
+
+const Inventory& Player::inventory() const { return _inventory; }
 }  // namespace zappy::server::game::entity
