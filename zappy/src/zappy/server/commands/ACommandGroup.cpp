@@ -13,12 +13,8 @@
 #include <string_view>
 #include <vector>
 
-#include "zappy/server/Timer.hpp"
 #include "zappy/server/client/Client.hpp"
-#include "zappy/server/client/ClientRegistry.hpp"
 #include "zappy/server/commands/ICommandGroup.hpp"
-#include "zappy/server/game/World.hpp"
-#include "zappy/shared/io/Logger.hpp"
 
 namespace zappy::server::command {
 ACommandGroup::ACommandGroup(CommandCtx context) : _ctx{std::move(context)} {}
