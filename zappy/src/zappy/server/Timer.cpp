@@ -50,12 +50,12 @@ int Timer::update() {
 std::uint16_t Timer::frequency() const { return _frequency; }
 
 void Timer::setFrequency(std::uint16_t frequency) {
+    update();
     if (frequency < kMinFrequency) {
         frequency = kMinFrequency;
     } else if (frequency > kMaxFrequency) {
         frequency = kMaxFrequency;
     }
-
     _frequency = frequency;
     _tickTime = std::chrono::milliseconds(kTick_milli_default) / frequency;
     _previousTick = std::chrono::steady_clock::now();
