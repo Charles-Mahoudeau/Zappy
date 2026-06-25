@@ -53,9 +53,9 @@ class World : public IEventEmitter {
     /// @return A reference to the entity database.
     [[nodiscard]] const EntityDatabase& entityDatabase() const;
 
-    /// @brief Returns a reference to the entity database.
-    /// @return A reference to the entity database.
-    [[nodiscard]] EntityDatabase& entityDatabase();
+    /// @brief Returns a reference to the grid.
+    /// @return A reference to the grid.
+    [[nodiscard]] const Grid& grid() const;
 
     /// @brief Returns the number of entities of type T in the world.
     /// @tparam T The type of entity to count.

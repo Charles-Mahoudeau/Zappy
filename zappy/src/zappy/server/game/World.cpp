@@ -57,7 +57,7 @@ math::Vector2u World::size() const { return _grid.size(); }
 
 const EntityDatabase& World::entityDatabase() const { return _entityDatabase; }
 
-EntityDatabase& World::entityDatabase() { return _entityDatabase; }
+const Grid& World::grid() const { return _grid; }
 
 std::uint64_t World::countResources(const ResourceType type) const {
     std::uint64_t count = 0;
