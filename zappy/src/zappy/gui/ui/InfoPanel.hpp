@@ -42,6 +42,8 @@ class InfoPanel {
                 render::Rectangle panelBounds = render::Rectangle{});
     void draw(const game::GameState& state, render::Rectangle bounds);
 
+    [[nodiscard]] render::Rectangle currentBounds(render::Rectangle anchor) const;
+
     [[nodiscard]] float contentHeight(const game::GameState& state) const;
 
     [[nodiscard]] InfoPanelState state() const;

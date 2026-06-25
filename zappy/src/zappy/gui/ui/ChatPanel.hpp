@@ -30,6 +30,8 @@ class ChatPanel {
 
     void draw(const std::deque<std::string>& broadcasts, render::Rectangle bounds);
 
+    [[nodiscard]] render::Rectangle currentBounds(render::Rectangle anchor) const;
+
     [[nodiscard]] static render::Rectangle contentRect(render::Rectangle bounds, std::size_t messageCount);
 
     bool consumeAutoScrollReset(std::size_t messageCount);

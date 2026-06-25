@@ -13,6 +13,8 @@
 #include "ChatPanel.hpp"
 #include "InfoPanel.hpp"
 #include "TimeUnitSlider.hpp"
+#include "zappy/gui/render/utils/Rectangle.hpp"
+#include "zappy/gui/render/utils/Vector2.hpp"
 
 namespace zappy::gui::render {
 class Camera;
@@ -46,6 +48,10 @@ class Hud {
 
   private:
     [[nodiscard]] bool victoryActive(const game::GameState& state) const;
+    [[nodiscard]] bool isOverAnyPanel(render::Vector2 mousePos, const game::GameState& state) const;
+    [[nodiscard]] render::Rectangle chatPanelAnchor() const;
+    [[nodiscard]] static render::Rectangle timeSliderAnchor();
+    [[nodiscard]] render::Rectangle infoPanelAnchor(const game::GameState& state) const;
 
     static constexpr float kChatPanelWidth = 320.0F;
     static constexpr float kChatPanelHeight = 180.0F;

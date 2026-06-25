@@ -16,8 +16,7 @@
 namespace zappy::gui::ui {
 
 render::Rectangle Draggable::apply(render::Rectangle bounds, float headerHeight) {
-    const render::Rectangle dragged{bounds.x() + _offset.x(), bounds.y() + _offset.y(), bounds.width(),
-                                    bounds.height()};
+    const render::Rectangle dragged = currentBounds(bounds);
     const render::Rectangle header{dragged.x(), dragged.y(), dragged.width(), headerHeight};
     const render::Vector2 mouse = Mouse::position();
 
@@ -36,12 +35,16 @@ render::Rectangle Draggable::apply(render::Rectangle bounds, float headerHeight)
         }
     }
 
-    return render::Rectangle{bounds.x() + _offset.x(), bounds.y() + _offset.y(), bounds.width(), bounds.height()};
+    return currentBounds(bounds);
 }
 
 bool Draggable::isOverHeader(render::Vector2 mouse, render::Rectangle bounds, float headerHeight) const {
     const render::Rectangle header{bounds.x() + _offset.x(), bounds.y() + _offset.y(), bounds.width(), headerHeight};
     return CheckCollisionPointRec(mouse, header);
+}
+
+render::Rectangle Draggable::currentBounds(render::Rectangle bounds) const {
+    return render::Rectangle{bounds.x() + _offset.x(), bounds.y() + _offset.y(), bounds.width(), bounds.height()};
 }
 
 }  // namespace zappy::gui::ui

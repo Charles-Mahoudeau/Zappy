@@ -18,6 +18,8 @@
 
 namespace zappy::gui::ui {
 
+render::Rectangle ChatPanel::currentBounds(render::Rectangle anchor) const { return _drag.currentBounds(anchor); }
+
 render::Rectangle ChatPanel::contentRect(render::Rectangle bounds, std::size_t messageCount) {
     return render::Rectangle{0.0F, 0.0F, bounds.width(), static_cast<float>(messageCount) * kLineHeight};
 }

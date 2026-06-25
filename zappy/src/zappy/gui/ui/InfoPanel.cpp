@@ -62,6 +62,8 @@ void InfoPanel::update(render::Vector2 mousePos, bool clicked, const render::Cam
     _state = Leaderboard;
 }
 
+render::Rectangle InfoPanel::currentBounds(render::Rectangle anchor) const { return _drag.currentBounds(anchor); }
+
 InfoPanelState InfoPanel::state() const { return _state; }
 
 std::optional<std::pair<std::uint32_t, std::uint32_t>> InfoPanel::selectedTile() const { return _selectedTile; }

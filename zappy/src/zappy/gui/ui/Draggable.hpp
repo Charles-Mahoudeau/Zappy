@@ -20,6 +20,8 @@ class Draggable {
 
     [[nodiscard]] bool isOverHeader(render::Vector2 mouse, render::Rectangle bounds, float headerHeight) const;
 
+    [[nodiscard]] render::Rectangle currentBounds(render::Rectangle bounds) const;
+
   private:
     render::Vector2 _offset;
     render::Vector2 _dragStartMouse;
