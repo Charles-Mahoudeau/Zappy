@@ -8,11 +8,14 @@
 #include "zappy/server/commands/PlayerCommands.hpp"
 
 #include <string_view>
+#include <tuple>
 #include <utility>
 
 #include "zappy/server/client/Client.hpp"
 #include "zappy/server/commands/ACommandGroup.hpp"
 #include "zappy/server/commands/ICommandGroup.hpp"
+#include "zappy/server/game/IEntity.hpp"
+#include "zappy/server/game/entity/Player.hpp"
 
 namespace zappy::server::command {
 PlayerCommands::PlayerCommands(CommandCtx context)
@@ -22,7 +25,11 @@ PlayerCommands::PlayerCommands(CommandCtx context)
           {"Right", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
           {"Left", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
           {"Look", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
-          {"Inventory", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
+          {"Inventory",
+           [](auto& ctx) {
+               PlayerCommands::inventory(ctx);
+               return true;
+           }},
           {"Broadcast", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
           {"Connect_nbr", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
           {"Fork", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
@@ -47,6 +54,19 @@ void PlayerCommands::execute(Client* client, [[maybe_unused]] const std::string_
 bool PlayerCommands::ignore(const CommandCtx& ctx) {
     (void)ctx;
     return false;
+}
+
+void PlayerCommands::inventory(CommandCtx& ctx) {
+    const game::IEntity* entity = ctx.world.get().entityDatabase().query(ctx.client->playerID());
+    if (entity == nullptr) {
+        return;
+    }
+
+    const auto* player = dynamic_cast<const game::entity::Player*>(entity);
+    if (player == nullptr) {
+        return;
+    }
+    std::ignore = ctx.client->sendMessage("[ {} ]\n", player->inventory().playerString());
 }
 
 }  // namespace zappy::server::command
