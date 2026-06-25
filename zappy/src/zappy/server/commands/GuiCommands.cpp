@@ -9,19 +9,16 @@
 
 #include <string_view>
 #include <tuple>
+#include <utility>
 
-#include "zappy/server/Timer.hpp"
 #include "zappy/server/client/Client.hpp"
-#include "zappy/server/client/ClientRegistry.hpp"
 #include "zappy/server/commands/ACommandGroup.hpp"
 #include "zappy/server/commands/ICommandGroup.hpp"
-#include "zappy/server/game/World.hpp"
-#include "zappy/shared/io/Logger.hpp"
 
 namespace zappy::server::command {
 
-GuiCommands::GuiCommands(Timer& timer, client::ClientRegistry& clients, game::World& world, io::Logger& logger)
-    : ACommandGroup(timer, clients, world, logger),
+GuiCommands::GuiCommands(CommandCtx context)
+    : ACommandGroup{std::move(context)},
       _commands({
           {"msz", [](auto& ctx) { return GuiCommands::ignore(ctx); }},
           {"bct", [](auto& ctx) { return GuiCommands::ignore(ctx); }},
@@ -35,11 +32,10 @@ GuiCommands::GuiCommands(Timer& timer, client::ClientRegistry& clients, game::Wo
 
       }) {}
 
-void GuiCommands::execute(Client* client, std::string_view msg) {
+void GuiCommands::execute(Client* client, [[maybe_unused]] const std::string_view msg) {
     CommandCtx& ctx = this->commandCtx();
 
-    ctx.data = this->extractCommand(msg);
-    if (auto iter = this->_commands.find(ctx.data.name); iter != this->_commands.end()) {
+    if (const auto iter = this->_commands.find(ctx.data.name); iter != this->_commands.end()) {
         if (!iter->second(ctx)) {
             std::ignore = client->sendMessage("sbp\n");
         }
@@ -48,7 +44,7 @@ void GuiCommands::execute(Client* client, std::string_view msg) {
     }
 }
 
-bool GuiCommands::ignore(CommandCtx& ctx) {
+bool GuiCommands::ignore(const CommandCtx& ctx) {
     (void)ctx;
     return false;
 }
