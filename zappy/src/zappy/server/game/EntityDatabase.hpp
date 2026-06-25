@@ -57,6 +57,19 @@ class EntityDatabase {
     /// @brief Get an entity from the database.
     /// @param id The id of the entity to get.
     /// @return A pointer to the entity, or nullptr if the entity does not exist.
+    [[nodiscard]] const IEntity* query(std::uint64_t id) const;
+
+    /// @brief Get an entity of a given type from the database.
+    /// @tparam T The type of the entity to get.
+    /// @param id The id of the entity to get.
+    /// @return A pointer to the entity, or nullptr if the entity does not exist or if the entity is not of the given
+    /// type.
+    template <IsEntity T>
+    [[nodiscard]] const T* query(std::uint64_t id) const;
+
+    /// @brief Get an entity from the database.
+    /// @param id The id of the entity to get.
+    /// @return A pointer to the entity, or nullptr if the entity does not exist.
     [[nodiscard]] IEntity* query(std::uint64_t id);
 
     /// @brief Get an entity of a given type from the database.
@@ -152,6 +165,19 @@ void EntityDatabase::removeAll() {
         _entities.erase(id);
     }
     _entitiesByType.erase(it);
+}
+
+template <IsEntity T>
+const T* EntityDatabase::query(const std::uint64_t id) const {
+    const IEntity* entity = query(id);
+
+    if (entity == nullptr) {
+        return nullptr;
+    }
+    if (typeid(T) != typeIndex(*entity)) {
+        return nullptr;
+    }
+    return static_cast<const T*>(entity);
 }
 
 template <IsEntity T>
