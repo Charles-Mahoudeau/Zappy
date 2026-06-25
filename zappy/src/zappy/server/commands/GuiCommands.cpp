@@ -21,15 +21,14 @@ GuiCommands::GuiCommands(CommandCtx context)
     : ACommandGroup{std::move(context)},
       _commands({
           {"msz", [](const CommandCtx& ctx) { return msz(ctx); }},
-          {"bct", [](auto& ctx) { return bct(ctx); }},
-          {"mct", [](auto& ctx) { return GuiCommands::ignore(ctx); }},
-          {"tna", [](auto& ctx) { return GuiCommands::ignore(ctx); }},
-          {"ppo", [](auto& ctx) { return GuiCommands::ignore(ctx); }},
-          {"plv", [](auto& ctx) { return GuiCommands::ignore(ctx); }},
-          {"pin", [](auto& ctx) { return GuiCommands::ignore(ctx); }},
-          {"sgt", [](auto& ctx) { return GuiCommands::ignore(ctx); }},
-          {"sst", [](auto& ctx) { return GuiCommands::ignore(ctx); }},
-
+          {"bct", [](const CommandCtx& ctx) { return bct(ctx); }},
+          {"mct", [](const CommandCtx& ctx) { return mct(ctx); }},
+          {"tna", [](const CommandCtx& ctx) { return ignore(ctx); }},
+          {"ppo", [](const CommandCtx& ctx) { return ignore(ctx); }},
+          {"plv", [](const CommandCtx& ctx) { return ignore(ctx); }},
+          {"pin", [](const CommandCtx& ctx) { return ignore(ctx); }},
+          {"sgt", [](const CommandCtx& ctx) { return ignore(ctx); }},
+          {"sst", [](const CommandCtx& ctx) { return ignore(ctx); }},
       }) {}
 
 void GuiCommands::execute(Client* client, [[maybe_unused]] const std::string_view msg) {
@@ -83,6 +82,21 @@ bool GuiCommands::bct(const CommandCtx& ctx) {
         return false;
     }
     std::ignore = ctx.client->sendMessage(*serializedTile);
+    return true;
+}
+
+bool GuiCommands::mct(const CommandCtx& ctx) {
+    const math::Vector2u worldSize = ctx.world.get().size();
+
+    for (std::uint32_t x = 0; x < worldSize.x; ++x) {
+        for (std::uint32_t y = 0; y < worldSize.y; ++y) {
+            const std::optional<std::string> serializedTile = serializeTile(ctx, {x, y});
+
+            if (serializedTile.has_value()) {
+                std::ignore = ctx.client->sendMessage(*serializedTile);
+            }
+        }
+    }
     return true;
 }
 

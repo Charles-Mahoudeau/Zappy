@@ -32,6 +32,7 @@ class GuiCommands : public ACommandGroup {
     static bool ignore(const CommandCtx& ctx);
     static bool msz(const CommandCtx& ctx);
     static bool bct(const CommandCtx& ctx);
+    static bool mct(const CommandCtx& ctx);
 
     static std::optional<std::string> serializeTile(const CommandCtx& ctx, math::Vector2u position);
 
