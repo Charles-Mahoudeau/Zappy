@@ -15,13 +15,27 @@
 #include "zappy/server/Timer.hpp"
 #include "zappy/server/client/Client.hpp"
 #include "zappy/server/client/ClientRegistry.hpp"
+#include "zappy/server/client/TeamRegistry.hpp"
 #include "zappy/server/game/World.hpp"
 #include "zappy/shared/io/Logger.hpp"
 
 namespace zappy::server::command {
-
 class ICommandGroup {
   public:
+    struct CommandData {
+        std::string name;
+        std::vector<std::string> params;
+    };
+    struct CommandCtx {
+        std::reference_wrapper<Timer> timer;
+        std::reference_wrapper<client::ClientRegistry> clientRegistry;
+        std::reference_wrapper<client::TeamRegistry> teamRegistry;
+        std::reference_wrapper<game::World> world;
+        std::reference_wrapper<io::Logger> logger;
+        CommandData data{};
+        Client* client{nullptr};
+    };
+
     ICommandGroup() = default;
     virtual ~ICommandGroup() = default;
 
@@ -35,24 +49,9 @@ class ICommandGroup {
     virtual void operator()(Client* client, std::string_view cmd) = 0;
 
   protected:
-    struct CommandData {
-        std::string name;
-        std::vector<std::string> params;
-    };
-
-    struct CommandCtx {
-        std::reference_wrapper<Timer> timer;
-        std::reference_wrapper<client::ClientRegistry> clientRegistry;
-        std::reference_wrapper<game::World> world;
-        std::reference_wrapper<io::Logger> logger;
-        CommandData data{};
-        Client* client = nullptr;
-    };
-
     using CommandInvoker = std::function<bool(CommandCtx&)>;
 
     virtual CommandCtx& commandCtx() = 0;
     virtual CommandData extractCommand(std::string_view msg) = 0;
 };
-
 }  // namespace zappy::server::command

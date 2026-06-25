@@ -22,7 +22,7 @@ namespace zappy::server::command {
 
 class PlayerCommands : public ACommandGroup {
   public:
-    PlayerCommands(Timer& timer, client::ClientRegistry& clients, game::World& world, io::Logger& logger);
+    explicit PlayerCommands(CommandCtx context);
     ~PlayerCommands() override = default;
 
     PlayerCommands(const PlayerCommands&) = delete;

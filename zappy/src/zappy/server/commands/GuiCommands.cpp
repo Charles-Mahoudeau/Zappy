@@ -20,8 +20,8 @@
 
 namespace zappy::server::command {
 
-GuiCommands::GuiCommands(Timer& timer, client::ClientRegistry& clients, game::World& world, io::Logger& logger)
-    : ACommandGroup(timer, clients, world, logger),
+GuiCommands::GuiCommands(CommandCtx context)
+    : ACommandGroup{std::move(context)},
       _commands({
           {"msz", [](auto& ctx) { return GuiCommands::ignore(ctx); }},
           {"bct", [](auto& ctx) { return GuiCommands::ignore(ctx); }},
@@ -48,7 +48,7 @@ void GuiCommands::execute(Client* client, std::string_view msg) {
     }
 }
 
-bool GuiCommands::ignore(CommandCtx& ctx) {
+bool GuiCommands::ignore(const CommandCtx& ctx) {
     (void)ctx;
     return false;
 }

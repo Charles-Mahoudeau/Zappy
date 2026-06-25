@@ -21,9 +21,9 @@
 #include "zappy/shared/io/Logger.hpp"
 
 namespace zappy::server::command {
+ACommandGroup::ACommandGroup(CommandCtx context) : _ctx{std::move(context)} {}
 
-ACommandGroup::ACommandGroup(Timer& timer, client::ClientRegistry& clients, game::World& world, io::Logger& logger)
-    : _ctx{.timer = timer, .clientRegistry = clients, .world = world, .logger = logger} {}
+void ACommandGroup::operator()(Client* client, const std::string_view cmd) { this->execute(client, cmd); }
 
 ICommandGroup::CommandCtx& ACommandGroup::commandCtx() {
     this->_ctx.data.name.clear();
@@ -31,15 +31,12 @@ ICommandGroup::CommandCtx& ACommandGroup::commandCtx() {
     return this->_ctx;
 }
 
-void ACommandGroup::operator()(Client* client, std::string_view cmd) { this->execute(client, cmd); }
-
-ICommandGroup::CommandData ACommandGroup::extractCommand(std::string_view msg) {
+ICommandGroup::CommandData ACommandGroup::extractCommand(const std::string_view msg) {
     CommandData cmd;
     std::istringstream iss{std::string(msg)};
 
     iss >> cmd.name;
-    cmd.params =
-        std::vector<std::string>((std::istream_iterator<std::string>(iss)), std::istream_iterator<std::string>());
+    cmd.params = std::vector(std::istream_iterator<std::string>{iss}, std::istream_iterator<std::string>{});
     return cmd;
 }
 

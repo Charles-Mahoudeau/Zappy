@@ -20,7 +20,7 @@ namespace zappy::server::command {
 
 class ACommandGroup : public ICommandGroup {
   public:
-    ACommandGroup(Timer& timer, client::ClientRegistry& clients, game::World& world, io::Logger& logger);
+    explicit ACommandGroup(CommandCtx context);
     ~ACommandGroup() override = default;
 
     ACommandGroup(const ACommandGroup&) = delete;

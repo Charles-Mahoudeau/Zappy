@@ -136,7 +136,13 @@ bool Core::initCommandGroups() {
     using enum Client::Type;
 
     const auto makeGroup = [this]<typename T>() {
-        return std::make_unique<T>(_timer, _clientRegistry, *_world, _logger);
+        return std::make_unique<T>(command::ICommandGroup::CommandCtx{
+            .timer = _timer,
+            .clientRegistry = _clientRegistry,
+            .teamRegistry = _teamRegistry,
+            .world = *_world,
+            .logger = _logger,
+        });
     };
 
     _cmdGroups.emplace(kPlayer, makeGroup.operator()<command::PlayerCommands>());
