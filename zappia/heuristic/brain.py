@@ -30,7 +30,7 @@ DONOR_KEEP = 20
 
 INV_REFRESH_EVERY = 4
 CALL_EVERY = 3
-CALL_MEMORY = 12
+CALL_MEMORY = 5
 SOS_EVERY = 6
 SOS_MEMORY = 10
 
@@ -70,6 +70,9 @@ class HeuristicAI:
 
         self.sos_dir: Optional[int] = None
         self.sos_ttl = 0
+
+        self._fork_sent = False
+        self._stranded_ticks = 0
 
     def run(self) -> None:
         self.refresh_all()
@@ -223,8 +226,25 @@ class HeuristicAI:
 
         self.handle_messages()
 
-        stranded = self.req_players() > 1 and self.is_stranded()
+        raw_stranded = self.req_players() > 1 and self.is_stranded()
+        if raw_stranded:
+            self._stranded_ticks += 1
+        else:
+            self._stranded_ticks = 0
+            self._fork_sent = False  # reset if we recover
+        # Only commit to suicide after being consistently stranded for a while,
+        # to avoid false positives from brief peer-window gaps.
+        stranded = self._stranded_ticks >= 20
         leader = not stranded and self.req_players() > 1 and self.am_leader()
+
+        if stranded:
+            self.suicide()
+            return
+
+        # Incant the INSTANT we're assembled -- highest priority, before any broadcast.
+        if leader and self.ready_to_incant():
+            self.try_incantation()
+            return
 
         if leader and self.tick % CALL_EVERY == 0:
             self.send("CALL", ",".join(self.tile_short().keys()))
@@ -233,11 +253,7 @@ class HeuristicAI:
         if not leader and not stranded and self.tick % PEER_PING == 0:
             self.send("HERE")
             return
-        
-        if stranded:
-            self.farm_food()
-            return
-        
+
         if self.food >= DONOR_FOOD and self.sos_dir is not None and self.deliver_food():
             return
 
@@ -258,29 +274,59 @@ class HeuristicAI:
             self.solo_elevate()
             return
 
-        self.maybe_fork()
+        # Followers may lay eggs while travelling; the leader forks only inside
+        # run_beacon (after checking it can't incant), so growing the team never
+        # delays an available elevation.
+        if not leader:
+            self.maybe_fork()
         self.rally()
 
     def is_stranded(self) -> bool:
-        """
-        True si on ne pourra mathématiquement plus jamais s'élever :
-        il n'y a pas assez de joueurs de notre niveau ou d'un niveau inférieur 
-        pour atteindre le quota requis.
-        """
+        """True only for a player in a permanent dead-end: BELOW the team's top
+        level, with too few teammates at or under its level to ever meet the rite
+        (higher teammates can't drop back to complete the group). The front itself
+        is never stranded -- it just waits for climbers / forked replacements to
+        bring up the missing members."""
+        if self.level >= self.team_max():
+            return False
         reachable = 1 + sum(1 for _, lv in self.team_seen.values() if lv <= self.level)
         return reachable < self.req_players()
 
     def maybe_fork(self) -> None:
-        """Lay an egg now and then, when well fed, until the team is big enough,
-        the launcher connects a fresh player into it. Keeps a couple of spares so
-        a death or a strand never drops us below the 6 needed at the top."""
-        if self.food >= FORK_FOOD and self.team_size() < TEAM_TARGET and self.c.connect_nbr() > 0:
+        """Lay an egg now and then, when well fed, until the team is big enough --
+        the launcher then connects a fresh player into it. Rate-limited (forking
+        blocks us 42/f, and we must not spam connect_nbr -- it's a server command)."""
+        if (
+            self.team_size() < TEAM_TARGET
+            and self.food >= FORK_FOOD
+            and self.tick % FORK_EVERY == 0
+        ):
             self.c.fork()
 
-    def farm_food(self) -> None:
-        if self.food >= FORK_FOOD and self.team_size() < TEAM_TARGET and self.c.connect_nbr() > 0:
-            self.c.fork()
+    def suicide(self) -> None:
+        """Drop our whole inventory where we stand, then starve so the launcher
+        respawns us fresh at level 1. Fork FIRST (once, unconditionally) so the
+        launcher has an egg to fill before we vanish -- without this the team wipes."""
+        if not self._fork_sent:
+            if self.food >= 2:
+                self.c.fork()
+            self._fork_sent = True
             return
+        for stone in STONES:
+            if self.inv.get(stone, 0) > 0:
+                if self.c.set_down(stone):
+                    self.inv[stone] -= 1
+                    self.refresh_look()
+                return
+        if self.food > 0:
+            if self.c.set_down("food"):
+                self.inv["food"] -= 1
+                self.refresh_look()
+            return
+        self.refresh_look()
+
+    def farm_food(self) -> None:
+        self.maybe_fork()
         if self.food < FOOD_CAP and self.maybe_eat():
             return
         if self.sos_dir is not None and self.food > 2:
@@ -294,7 +340,6 @@ class HeuristicAI:
         self.forage()
 
     def solo_elevate(self) -> None:
-        self.maybe_fork()
         if self.tile_ready():
             self.try_incantation()
             return
@@ -304,6 +349,7 @@ class HeuristicAI:
         if idx is not None:
             self.move_toward(idx)
             return
+        self.maybe_fork()
         if self.maybe_eat():
             return
         self.explore()
@@ -326,15 +372,15 @@ class HeuristicAI:
             self.explore()
 
     def run_beacon(self) -> None:
-        self.maybe_fork()
+        self.refresh_look()
         if self.ready_to_incant():
             self.try_incantation()
             return
         if self.drop_needed_stone():
             return
+        self.maybe_fork()
         if self.maybe_eat():
             return
-        self.refresh_look()
 
     def team_max(self) -> int:
         """Highest level anyone on the team is currently on (us included)."""
@@ -345,13 +391,15 @@ class HeuristicAI:
         return 1 + len(self.team_seen)
 
     def ready_to_incant(self) -> bool:
-        """Incant as soon as the rite's MINIMUM is met: the required stones plus
-        the required number of same-level players on the tile (more is fine -- the
-        server elevates everyone present, "at least N players"). Waiting to gather
-        the whole team is too slow and starves everyone on a crowded map; advancing
-        in waves of the requirement is far easier (only 2-6 bodies to assemble) and,
-        with a couple of spare players, still floats 6 to the top."""
-        return self.tile_ready()
+        """Incant as soon as the rite's MINIMUM is met (correct stones + enough players).
+        When more same-level peers are alive than the minimum, wait for them all: incanting
+        with a subset leaves stragglers who can never form their own quorum and are stuck."""
+        if not self.tile_ready():
+            return False
+        known_at_level = len(self.peers) + 1
+        if known_at_level > self.req_players():
+            return self.players_here() >= known_at_level
+        return True
 
     def needed_here(self) -> List[str]:
         """Stones the beacon's tile still needs that I'm not yet carrying any of."""
@@ -361,23 +409,38 @@ class HeuristicAI:
         ]
 
     def converge(self) -> None:
-        """Move toward the rally beacon. If the beacon needs stones we aren't carrying,
-        explore the map to find them first (acting as a fetcher)."""
+        """Move toward the rally beacon. Pick up needed stones found en route."""
         missing_stones = [s for s in self.call_missing if s in STONES]
         carrying_useful = any(self.inv.get(s, 0) > 0 for s in missing_stones)
+
         if self.call_dir == 0:
             if self.drop_needed_stone():
                 return
-            if missing_stones:
-                self.explore()
-                return
-            self.refresh_look()
+            actual_short = list(self.tile_short().keys())
+            if actual_short:
+                for stone in actual_short:
+                    idx = self.nearest_tile_with(stone)
+                    if idx is not None and idx != 0:
+                        self.move_toward(idx)
+                        return
+                self.refresh_look()
+            else:
+                self.refresh_look()
             return
+
         if missing_stones and not carrying_useful:
-            if self.go_get(missing_stones):
-                return
-            self.explore()
-            return
+            for stone in missing_stones:
+                if self.tile0().count(stone) > 0:
+                    if self.c.take(stone):
+                        self.inv[stone] = self.inv.get(stone, 0) + 1
+                        self.refresh_look()
+                        return
+            for stone in missing_stones:
+                idx = self.nearest_tile_with(stone)
+                if idx is not None and idx != 0:
+                    self.move_toward(idx)
+                    return
+
         if self.call_dir is None:
             self.explore()
             return
