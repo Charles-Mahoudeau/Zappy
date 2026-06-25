@@ -36,6 +36,10 @@ add_library(zappy_gui_objects OBJECT
         render/objects/Model.hpp
         render/objects/Skybox.cpp
         render/objects/Skybox.hpp
+        render/objects/particles/ParticleEmitter.cpp
+        render/objects/particles/ParticleEmitter.hpp
+        render/objects/particles/Particle.hpp
+        render/objects/particles/Particle.hpp
         render/utils/Vec2D.cpp
         render/utils/Vec2D.hpp
         render/utils/Color.hpp
