@@ -120,7 +120,8 @@ void AssetStore::loadResourceModel(game::ResourceType type) {
 }
 
 void AssetStore::loadVFXs() {
-    _vfxs.emplace("test", ParticleEmitter("assets/models/resources/textures/thystameBase.png"));
+    ParticleEmitter test("assets/models/resources/textures/thystameBase.png");
+    _vfxs.emplace("test", test);
 }
 void AssetStore::loadEggModel() {
     _eggModel = std::make_unique<Model>(
@@ -174,4 +175,10 @@ const std::map<std::string_view, ParticleEmitter>& AssetStore::vfxs() const { re
 
 std::map<std::string_view, ParticleEmitter>& AssetStore::vfxs() { return _vfxs; }
 
+ParticleEmitter AssetStore::emit(std::string_view path, Vector3 pos) {
+    ParticleEmitter emitter{path};
+    emitter.setOrigin(pos);
+    emitter.emitRate();
+    return emitter;
+}
 }  // namespace zappy::gui::render

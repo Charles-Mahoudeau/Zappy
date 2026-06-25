@@ -68,6 +68,8 @@ class AssetStore {
                              std::initializer_list<TextureMap> textures, bool flipVertical = false);
     static constexpr int kMaxModels = 6;
 
+    static ParticleEmitter emit(std::string_view path, Vector3 pos);
+
     Skybox _skybox;
     std::vector<Model> _playerModels;
     std::map<game::ResourceType, Model> _resourcesModels;
