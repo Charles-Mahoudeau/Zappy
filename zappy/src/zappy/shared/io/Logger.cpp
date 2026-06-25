@@ -57,7 +57,7 @@ void Logger::debug(const std::string_view message) const { log(Level::kDebug, me
 
 void Logger::info(const std::string_view message) const { log(Level::kInfo, message); }
 
-void Logger::warn(const std::string_view message) const { log(Level::kWarning, message); }
+void Logger::warn(const std::string_view message) const { log(Level::kWarn, message); }
 
 void Logger::error(const std::string_view message) const { log(Level::kError, message); }
 
