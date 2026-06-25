@@ -31,7 +31,7 @@ class CliParser {
         std::uint32_t mapWidth = 0;
         std::uint32_t mapHeight = 0;
         std::vector<std::string_view> teamsName;
-        std::uint32_t nbInitialClient = 0;
+        std::uint32_t nbPlayerPerTeam = 0;
         std::uint16_t frequencies = 0;
     };
 

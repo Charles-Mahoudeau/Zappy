@@ -36,7 +36,7 @@ void Core::init(const std::span<std::string_view> argv) {
 
     // ReSharper disable CppDFAConstantConditions
     if (initTeams(parameters.teamsName) && initNetwork(parameters.port) && initTimer(parameters.frequencies) &&
-        initWorld({parameters.mapWidth, parameters.mapHeight}, parameters.teamsName, parameters.nbInitialClient) &&
+        initWorld({parameters.mapWidth, parameters.mapHeight}, parameters.teamsName, parameters.nbPlayerPerTeam) &&
         initCommandGroups()) {
         _logger.info("Initialization done.");
     } else {

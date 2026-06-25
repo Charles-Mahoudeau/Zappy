@@ -50,7 +50,7 @@ TEST(CliParser, valid_full_arguments_parsed_correctly) {
     EXPECT_EQ(params.port, 4242);
     EXPECT_EQ(params.mapWidth, 10U);
     EXPECT_EQ(params.mapHeight, 10U);
-    EXPECT_EQ(params.nbInitialClient, 5U);
+    EXPECT_EQ(params.nbPlayerPerTeam, 5U);
     EXPECT_EQ(params.frequencies, 100U);
     ASSERT_EQ(params.teamsName.size(), 2U);
     EXPECT_EQ(params.teamsName.at(0), "teamA");
@@ -67,7 +67,7 @@ TEST(CliParser, flags_in_different_order_parsed_correctly) {
     EXPECT_EQ(params.mapWidth, 25U);
     EXPECT_EQ(params.mapHeight, 15U);
     EXPECT_EQ(params.frequencies, 50U);
-    EXPECT_EQ(params.nbInitialClient, 3U);
+    EXPECT_EQ(params.nbPlayerPerTeam, 3U);
     ASSERT_EQ(params.teamsName.size(), 2U);
 }
 
