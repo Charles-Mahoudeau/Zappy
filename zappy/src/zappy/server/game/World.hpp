@@ -91,17 +91,22 @@ class World : public IEventEmitter {
     void spawnStartEggs(std::span<const std::string> teams, std::uint8_t playersPerTeam);
 
     /// @brief Hatches a random egg for the specified team.
-    /// @param teamName The ID of the team to hatch the egg for.
+    /// @param teamName The name of the team to hatch the egg for.
     /// @return The ID of the new player, or an error message if no egg could be hatched.
     std::expected<std::uint64_t, std::string> hatchRandomEgg(std::string_view teamName);
 
+    /// @brief get the number of Egg in the given team
+    /// @param teamName The name of the team to hatch the egg for.
+    /// @return The number of egg in the team
+    std::uint64_t eggCount(std::string_view teamName);
+
     /// @brief Returns a view of all players in the specified team.
-    /// @param teamName The ID of the team to get the players from.
+    /// @param teamName The name of the team to get the players from.
     /// @return A view of all players in the specified team.
     [[nodiscard]] EntityDatabase::EntityView<const entity::Player> players(std::string_view teamName) const;
 
     /// @brief Returns a view of all players in the specified team.
-    /// @param teamName The ID of the team to get the players from.
+    /// @param teamName The name of the team to get the players from.
     /// @return A view of all players in the specified team.
     [[nodiscard]] EntityDatabase::EntityView<entity::Player> players(std::string_view teamName);
 
