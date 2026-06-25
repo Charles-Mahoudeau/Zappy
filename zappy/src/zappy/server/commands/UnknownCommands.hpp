@@ -11,7 +11,6 @@
 
 #include "zappy/server/client/Client.hpp"
 #include "zappy/server/commands/ACommandGroup.hpp"
-#include "zappy/shared/io/Logger.hpp"
 
 namespace zappy::server::command {
 
@@ -28,7 +27,7 @@ class UnknownCommands : public ACommandGroup {
     void execute(Client* client, std::string_view cmd) override;
 
   private:
-    static bool guiType(std::string_view askedTeam, Client* client, io::Logger& logger);
+    static bool guiType(std::string_view askedTeam, Client* client, CommandCtx& ctx);
     static bool PlayerType(std::string_view askedTeam, Client* client, CommandCtx& ctx);
 };
 

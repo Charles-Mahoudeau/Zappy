@@ -25,7 +25,7 @@ void UnknownCommands::execute(Client* client, [[maybe_unused]] const std::string
     }
     const auto& askedTeam = ctx.data.name;
 
-    if (UnknownCommands::guiType(askedTeam, client, ctx.logger.get())) {
+    if (UnknownCommands::guiType(askedTeam, client, ctx)) {
         return;
     }
     if (!UnknownCommands::PlayerType(askedTeam, client, ctx)) {
@@ -33,10 +33,13 @@ void UnknownCommands::execute(Client* client, [[maybe_unused]] const std::string
     }
 }
 
-bool UnknownCommands::guiType(std::string_view askedTeam, Client* client, io::Logger& logger) {
+bool UnknownCommands::guiType(std::string_view askedTeam, Client* client, CommandCtx& ctx) {
+    auto& logger = ctx.logger.get();
+
     if (askedTeam == "GRAPHIC") {
         logger.info(std::format("Client {} registered as GUI", client->address().string()));
         client->changeType(Client::Type::kGui);
+
         return true;
     }
     return false;
