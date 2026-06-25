@@ -42,9 +42,15 @@ class Core {
     void nextTick();
 
   private:
+    [[nodiscard]] bool initTeams(std::span<const std::string_view> names);
+    [[nodiscard]] bool initNetwork(std::uint16_t port);
+    [[nodiscard]] bool initTimer(std::uint16_t frequency);
+    [[nodiscard]] bool initWorld(math::Vector2u size);
+    [[nodiscard]] bool initCommandGroups();
+
     io::Logger _logger{"Server", "server.log", true};
     net::Server _serv;
-    Timer _time;
+    Timer _timer;
     client::ClientRegistry _clientRegistry;
     std::unique_ptr<game::World> _world;
     std::unordered_map<Client::Type, std::unique_ptr<command::ICommandGroup>> _cmdGroups;

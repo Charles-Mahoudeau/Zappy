@@ -21,7 +21,7 @@
 #include "zappy/server/commands/UnknownCommands.hpp"
 #include "zappy/server/game/World.hpp"
 #include "zappy/shared/exception/Exception.hpp"
-#include "zappy/shared/exception/InvalidArgument.hpp"
+#include "zappy/shared/exception/InvalidState.hpp"
 #include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server {
@@ -30,44 +30,15 @@ void Core::init(const std::span<std::string_view> argv) {
 
     CliParser parser{argv};
     const CliParser::CliParameters& parameters = parser.parameters();
-    _logger.info("Parsed command line arguments.");
+    _logger.info("Parameters parsed and validated.");
 
-    for (std::string_view teamName : parameters.teamsName) {
-        try {
-            _teamRegistry.createTeam(teamName);
-        } catch (const exception::InvalidArgument& e) {
-            _logger.error(std::format("Failed to create team '{}': {}", teamName, e.what()));
-            _logger.fatal("Error while teams initialization.");
-            throw;
-        }
-        _logger.info(std::format("Created team '{}'", teamName));
-    }
-    _logger.info("Teams initialized.");
-
-    this->_serv.init(parameters.port, this->_clientRegistry, this->_time);
-    _logger.info("Network layer initialized.");
-
-    if (parameters.frequencies != 0) {
-        this->_time.setFrequencies(parameters.frequencies);
-        _logger.info("Timer initialized.");
+    if (initTeams(parameters.teamsName) && initNetwork(parameters.port) && initTimer(parameters.frequencies) &&
+        initWorld({parameters.mapWidth, parameters.mapHeight}) && initCommandGroups()) {
+        _logger.info("Initialization done.");
     } else {
-        _logger.info("Skipping timer initialization");
+        _logger.fatal("Error occurred during initialization.");
+        throw exception::InvalidState{"initialization error"};
     }
-
-    this->_world = std::make_unique<game::World>(math::Vector2u(parameters.mapWidth, parameters.mapHeight),
-                                                 this->_logger.derive("World"));
-    _logger.info("World initialized.");
-
-    using enum Client::Type;
-    const auto makeGroup = [this]<typename T>() {
-        return std::make_unique<T>(this->_time, this->_clientRegistry, *this->_world, this->_logger);
-    };
-    this->_cmdGroups.emplace(kPlayer, makeGroup.operator()<command::PlayerCommands>());
-    this->_cmdGroups.emplace(kGui, makeGroup.operator()<command::GuiCommands>());
-    this->_cmdGroups.emplace(kUnknown, makeGroup.operator()<command::UnknownCommands>());
-    _logger.info("Command groups initialized.");
-
-    _logger.info("Initialization done.");
 }
 
 void Core::run() {
@@ -79,16 +50,6 @@ void Core::run() {
             std::cerr << "Error: " << err.what() << "\n";
         }
     }
-}
-
-void Core::nextTick() {
-    int timeout = this->_time.timeoutUntilSchedule();
-
-    while (this->_serv.poll(timeout)) {
-        timeout = this->_time.timeoutUntilNextTick();
-    }
-    this->_time.update();
-    this->_clientRegistry.update();
 }
 
 void Core::processCommandGroup() {
@@ -109,4 +70,85 @@ void Core::processCommandGroup() {
     }
 }
 
+void Core::nextTick() {
+    int timeout = this->_timer.timeoutUntilSchedule();
+
+    while (this->_serv.poll(timeout)) {
+        timeout = this->_timer.timeoutUntilNextTick();
+    }
+    this->_timer.update();
+    this->_clientRegistry.update();
+}
+
+bool Core::initTeams(const std::span<const std::string_view> names) {
+    const io::Logger logger = _logger.derive("Teams");
+
+    for (std::string_view teamName : names) {
+        try {
+            _teamRegistry.createTeam(teamName);
+        } catch (const exception::Exception& e) {
+            logger.error(std::format("Failed to create team '{}': {}", teamName, e.what()));
+            return false;
+        }
+        logger.info(std::format("Created team '{}'.", teamName));
+    }
+    _logger.info("Teams initialized.");
+    return true;
+}
+
+bool Core::initNetwork(const std::uint16_t port) {
+    try {
+        _serv.init(port, _clientRegistry, _timer);
+    } catch (const exception::Exception& e) {
+        _logger.error(std::format("Failed to initialize network: {}", e.what()));
+        return false;
+    }
+    _logger.info("Network initialized.");
+    return true;
+}
+
+bool Core::initTimer(const std::uint16_t frequency) {
+    if (frequency == 0) {
+        _logger.info("Using default timer frequency.");
+        return true;
+    }
+    try {
+        _timer.setFrequencies(frequency);
+    } catch (const exception::Exception& e) {
+        _logger.error(std::format("Failed to initialize timer: {}", e.what()));
+        return false;
+    }
+    _logger.info("Timer initialized.");
+    return true;
+}
+
+bool Core::initWorld(math::Vector2u size) {
+    try {
+        _world = std::make_unique<game::World>(size, _logger.derive("World"));
+    } catch (const exception::Exception& e) {
+        _logger.error(std::format("Failed to initialize world: {}", e.what()));
+        return false;
+    }
+    _logger.info("World initialized.");
+    return true;
+}
+
+bool Core::initCommandGroups() {
+    using enum Client::Type;
+
+    const auto makeGroup = [this]<typename T>() {
+        return std::make_unique<T>(_timer, _clientRegistry, *_world, _logger);
+    };
+
+    try {
+        _cmdGroups.emplace(kPlayer, makeGroup.operator()<command::PlayerCommands>());
+        _cmdGroups.emplace(kGui, makeGroup.operator()<command::GuiCommands>());
+        _cmdGroups.emplace(kUnknown, makeGroup.operator()<command::UnknownCommands>());
+    } catch (const exception::Exception& e) {
+        _logger.error(std::format("Failed to initialize command groups: {}", e.what()));
+        return false;
+    }
+    _logger.info("Command groups initialized.");
+    return true;
+}
 }  // namespace zappy::server
