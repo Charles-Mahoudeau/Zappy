@@ -71,7 +71,7 @@ void GuiCommands::execute(Client* client, [[maybe_unused]] const std::string_vie
 bool GuiCommands::msz(const CommandCtx& ctx) {
     math::Vector2u worldSize = ctx.world.get().size();
 
-    std::ignore = ctx.client->sendMessage(std::format("msz {} {}\n", worldSize.x, worldSize.y));
+    std::ignore = ctx.client->sendMessage("msz {} {}\n", worldSize.x, worldSize.y);
     return true;
 }
 
@@ -89,7 +89,7 @@ bool GuiCommands::bct(const CommandCtx& ctx) {
         std::ignore = ctx.client->sendMessage(game::WireHelper::tileToBctCommand(tile));
         return true;
     } catch (const exception::OutOfRange& e) {
-        ctx.logger.get().warn(std::format("tile out of range: {}", e.what()));
+        ctx.logger.get().warn("tile out of range: {}", e.what());
     }
     return false;
 }
@@ -126,8 +126,8 @@ bool GuiCommands::ppo(const CommandCtx& ctx) {
 
     const math::Vector2u playerPosition = player->position();
 
-    std::ignore = ctx.client->sendMessage(std::format("ppo #{} {} {} {}\n", *playerId, playerPosition.x,
-                                                      playerPosition.y, std::to_underlying(player->orientation())));
+    std::ignore = ctx.client->sendMessage("ppo #{} {} {} {}\n", *playerId, playerPosition.x, playerPosition.y,
+                                          std::to_underlying(player->orientation()));
     return true;
 }
 
@@ -145,7 +145,7 @@ bool GuiCommands::plv(const CommandCtx& ctx) {
         ctx.logger.get().warn("player not found");
         return false;
     }
-    std::ignore = ctx.client->sendMessage(std::format("plv #{} {}\n", *playerId, player->level()));
+    std::ignore = ctx.client->sendMessage("plv #{} {}\n", *playerId, player->level());
     return true;
 }
 
@@ -166,13 +166,13 @@ bool GuiCommands::pin(const CommandCtx& ctx) {
 
     math::Vector2u position = player->position();
 
-    std::ignore = ctx.client->sendMessage(
-        std::format("pin #{} {} {} {}\n", *playerId, position.x, position.y, player->inventory().string()));
+    std::ignore =
+        ctx.client->sendMessage("pin #{} {} {} {}\n", *playerId, position.x, position.y, player->inventory().string());
     return true;
 }
 
 bool GuiCommands::sgt(const CommandCtx& ctx) {
-    std::ignore = ctx.client->sendMessage(std::format("sgt {}\n", ctx.timer.get().frequency()));
+    std::ignore = ctx.client->sendMessage("sgt {}\n", ctx.timer.get().frequency());
     return true;
 }
 
