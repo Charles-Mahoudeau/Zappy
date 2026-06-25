@@ -254,7 +254,7 @@ void World::placeEggRandom(const std::uint64_t eggId) {
         .position = tile.position(),
     });
     if (_logger.has_value()) {
-        std::string playerInfo{""};
+        std::string playerInfo;
 
         if (egg->parentPlayerId().has_value()) {
             playerInfo = std::format(" by player #{}", egg->parentPlayerId().value());
