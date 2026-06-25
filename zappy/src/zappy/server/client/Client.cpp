@@ -91,6 +91,32 @@ bool Client::sendMessage(std::string_view msg) const {
     return true;
 }
 
+void Client::sendSuccess() const {
+    auto* socket = this->_socketsRegistery.findByAddress(this->_addr);
+
+    if (socket == nullptr) {
+        return;
+    }
+    try {
+        socket->send("ok\n");
+    } catch (const zappy::exception::SocketError& /*err */) {
+        return;
+    }
+}
+
+void Client::sendError() const {
+    auto* socket = this->_socketsRegistery.findByAddress(this->_addr);
+
+    if (socket == nullptr) {
+        return;
+    }
+    try {
+        socket->send("ko\n");
+    } catch (const zappy::exception::SocketError& /*err */) {
+        return;
+    }
+}
+
 void Client::setPlayerID(std::uint64_t id) { this->_playerID = id; }
 
 std::uint64_t Client::playerID() const { return this->_playerID; }

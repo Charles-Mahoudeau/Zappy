@@ -128,6 +128,9 @@ class Client {
      */
     [[nodiscard]] bool sendMessage(std::string_view msg) const;
 
+    void sendSuccess() const;
+    void sendError() const;
+
     template <typename... Args>
     [[nodiscard]] bool sendMessage(std::format_string<Args...> fmt, Args&&... args) const;
 
