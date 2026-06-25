@@ -40,7 +40,7 @@ std::string WireHelper::worldToEnwCommands(const World& world) {
         if (egg == nullptr) {
             continue;
         }
-        if (std::optional<std::uint32_t> parentPlayerId = egg->parentPlayerId()) {
+        if (std::optional<std::uint64_t> parentPlayerId = egg->parentPlayerId()) {
             result << std::format("enw #{} #{} {} {}\n", egg->id(), *parentPlayerId, egg->position().x,
                                   egg->position().y);
         } else {
