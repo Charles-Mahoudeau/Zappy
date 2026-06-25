@@ -33,11 +33,10 @@ class ParticleEmitter {
     void setOrigin(Vector3 origin);
     void setVolume(Vector3 volume);
     void setSpread(float spread);
+    void setSpeed(float speed);
     void setRate(float rate);
     void setLifetime(float lifetime);
-    void setPosition(Vector3 position, Vector3 increment);
     void setSize(float size, float increment);
-    void setSpeed(float speed, float increment);
     void setRotation(float rotation, float increment);
     void setTint(Color tint, Color increment);
 
@@ -51,16 +50,16 @@ class ParticleEmitter {
     void emitRate();
 
   private:
+    Vector3 getDirection();
     Texture _texture;
     std::vector<Particle> _particles;
     Vector3 _origin{0.0F, 0.0F, 0.0F};
     Vector3 _volume{1.0F, 1.0F, 1.0F};
     float _spread{0.0F};
+    float _speed{1.0F};
     float _rate{1.0F};
     float _lifetime{1.0F};
-    TimeValue<Vector3> _position{Vector3{0.0F, 0.0F, 0.0F}, Vector3{0.0F, 0.0F, 0.0F}};
     TimeValue<float> _size{1.0F, 0.0F};
-    TimeValue<float> _speed{1.0F, 0.0F};
     TimeValue<float> _rotation{0.0F, 0.0F};
     TimeValue<Color> _tint{WHITE, WHITE};
 };

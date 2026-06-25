@@ -9,6 +9,8 @@
 
 #include <raylib.h>
 
+#include <algorithm>
+#include <cmath>
 #include <string_view>
 
 #include "Billboard.hpp"
@@ -23,12 +25,9 @@ void ParticleEmitter::setOrigin(Vector3 origin) { _origin = origin; }
 void ParticleEmitter::setVolume(Vector3 volume) { _volume = volume; }
 void ParticleEmitter::setSpread(float spread) { _spread = spread; }
 void ParticleEmitter::setRate(float rate) { _rate = rate; }
+void ParticleEmitter::setSpeed(float speed) { _speed = speed; }
 void ParticleEmitter::setLifetime(float lifetime) { _lifetime = lifetime; }
-void ParticleEmitter::setPosition(Vector3 position, Vector3 increment) {
-    _position = TimeValue<Vector3>{position, increment};
-}
 void ParticleEmitter::setSize(float size, float increment) { _size = TimeValue<float>{size, increment}; }
-void ParticleEmitter::setSpeed(float speed, float increment) { _speed = TimeValue<float>{speed, increment}; }
 void ParticleEmitter::setRotation(float rotation, float increment) {
     _rotation = TimeValue<float>{rotation, increment};
 }
@@ -59,10 +58,10 @@ uint16_t ParticleEmitter::draw(Camera& camera) {
 
 void ParticleEmitter::particle() {
     Particle newParticle;
-    newParticle.setInitValues(_position.get(), Vec2D{_size.get(), _size.get()}, _speed.get(), _rotation.get(),
-                              _tint.get());
-    newParticle.setIncrementValues(_position.increment(), Vec2D{_size.increment(), _size.increment()},
-                                   _speed.increment(), _rotation.increment(), _tint.increment());
+    Vector3 speed = getDirection() * _speed;
+    newParticle.setInitValues(_origin, Vec2D{_size.get(), _size.get()}, _rotation.get(), _tint.get());
+    newParticle.setIncrementValues(speed, Vec2D{_size.increment(), _size.increment()}, _rotation.increment(),
+                                   _tint.increment());
     newParticle.setLifetime(_lifetime);
     _particles.push_back(std::move(newParticle));
 }
@@ -74,4 +73,17 @@ void ParticleEmitter::emit(uint16_t count) {
 }
 
 void ParticleEmitter::emitRate() { emit(static_cast<uint16_t>(_rate)); }
+
+Vector3 ParticleEmitter::getDirection() {
+    const float maxAngle = (std::clamp(_spread, 0.0f, 90.0f)) * (3.14159265f / 180.0f);
+
+    float inclination = static_cast<float>(GetRandomValue(0, 1000)) / 1000.0f * maxAngle;
+    float azimuth = static_cast<float>(GetRandomValue(0, 1000)) / 1000.0f * 2.0f * 3.14159265f;
+
+    float x = std::sin(inclination) * std::cos(azimuth);
+    float y = std::cos(inclination);
+    float z = std::sin(inclination) * std::sin(azimuth);
+
+    return Vector3{x, y, z};
+}
 }  // namespace zappy::gui::render

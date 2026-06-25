@@ -9,12 +9,12 @@
 
 #include <raylib.h>
 
-#include "Camera.hpp"
-#include "Color.hpp"
-#include "Texture.hpp"
-#include "TimeValue.hpp"
-#include "Vec2D.hpp"
-#include "Vector3.hpp"
+#include "../../Camera.hpp"
+#include "../../utils/Color.hpp"
+#include "../../utils/TimeValue.hpp"
+#include "../../utils/Vec2D.hpp"
+#include "../../utils/Vector3.hpp"
+#include "../Texture.hpp"
 
 namespace zappy::gui::render {
 Particle::Particle() = default;
@@ -27,25 +27,21 @@ void Particle::setSize(Vec2D size, Vec2D increment) { _size = TimeValue<Vec2D>{s
 
 void Particle::setLifetime(float lifetime) { _lifetime = TimeValue<float>{lifetime, 0.0F}; }
 
-void Particle::setSpeed(float speed, float increment) { _speed = TimeValue<float>{speed, increment}; }
-
 void Particle::setRotation(float rotation, float increment) { _rotation = TimeValue<float>{rotation, increment}; }
 
 void Particle::setTint(Color tint, Color increment) { _tint = TimeValue<Color>{tint, increment}; }
 
-void Particle::setIncrementValues(Vector3 positionIncrement, Vec2D sizeIncrement, float speedIncrement,
-                                  float rotationIncrement, Color tintIncrement) {
+void Particle::setIncrementValues(Vector3 positionIncrement, Vec2D sizeIncrement, float rotationIncrement,
+                                  Color tintIncrement) {
     _position = TimeValue<Vector3>{_position.get(), positionIncrement};
     _size = TimeValue<Vec2D>{_size.get(), sizeIncrement};
-    _speed = TimeValue<float>{_speed.get(), speedIncrement};
     _rotation = TimeValue<float>{_rotation.get(), rotationIncrement};
     _tint = TimeValue<Color>{_tint.get(), tintIncrement};
 }
 
-void Particle::setInitValues(Vector3 position, Vec2D size, float speed, float rotation, Color tint) {
+void Particle::setInitValues(Vector3 position, Vec2D size, float rotation, Color tint) {
     _position = TimeValue<Vector3>{position, Vector3{0.0F, 0.0F, 0.0F}};
     _size = TimeValue<Vec2D>{size, Vec2D{0.0F, 0.0F}};
-    _speed = TimeValue<float>{speed, 0.0F};
     _rotation = TimeValue<float>{rotation, 0.0F};
     _tint = TimeValue<Color>{tint, Color{0, 0, 0, 0}};
 }
@@ -53,7 +49,6 @@ void Particle::setInitValues(Vector3 position, Vec2D size, float speed, float ro
 void Particle::update(float dt) {
     _position.update(dt);
     _size.update(dt);
-    _speed.update(dt);
     _rotation.update(dt);
     _tint.update(dt);
 }
