@@ -15,7 +15,7 @@
 #include <string_view>
 
 namespace zappy::io {
-enum class Level : std::uint8_t { kDebug, kInfo, kWarning, kError, kFatal };
+enum class Level : std::uint8_t { kDebug, kInfo, kWarn, kError, kFatal };
 
 class Logger {
   public:
@@ -35,7 +35,7 @@ class Logger {
     void log(Level level, std::string_view message) const;
     void debug(std::string_view message) const;
     void info(std::string_view message) const;
-    void warning(std::string_view message) const;
+    void warn(std::string_view message) const;
     void error(std::string_view message) const;
     void fatal(std::string_view message) const;
 
