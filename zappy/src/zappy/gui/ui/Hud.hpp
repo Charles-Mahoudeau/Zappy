@@ -32,7 +32,7 @@ namespace zappy::gui::ui {
 
 class Hud {
   public:
-    Hud(network::CommandSender& sender, int initialTimeUnit, int windowWidth, int windowHeight);
+    Hud(network::CommandSender& sender, int initialTimeUnit);
     ~Hud() = default;
 
     Hud(const Hud&) = delete;
@@ -49,7 +49,7 @@ class Hud {
   private:
     [[nodiscard]] bool victoryActive(const game::GameState& state) const;
     [[nodiscard]] bool isOverAnyPanel(render::Vector2 mousePos, const game::GameState& state) const;
-    [[nodiscard]] render::Rectangle chatPanelAnchor() const;
+    [[nodiscard]] static render::Rectangle chatPanelAnchor();
     [[nodiscard]] static render::Rectangle timeSliderAnchor();
     [[nodiscard]] render::Rectangle infoPanelAnchor(const game::GameState& state) const;
 
@@ -63,8 +63,6 @@ class Hud {
     static constexpr float kInfoPanelWidth = 320.0F;
     static constexpr float kInfoPanelMargin = 8.0F;
 
-    int _windowWidth;
-    int _windowHeight;
     ChatPanel _chatPanel;
     TimeUnitSlider _timeSlider;
     InfoPanel _infoPanel;

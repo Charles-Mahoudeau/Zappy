@@ -42,7 +42,7 @@ GUI::GUI()
     : _parser{_state},
       _sender{_buffer},
       _handshake{_buffer, _sender, _parser, _state},
-      _hud{_sender, kTimeSliderInitialValue, kWindowWidth, kWindowHeight} {}
+      _hud{_sender, kTimeSliderInitialValue} {}
 
 void GUI::connect(const GuiCliParser& cli) {
     _address = zappy::network::Address{std::string{cli.host()}, cli.port()};
