@@ -9,6 +9,7 @@
 
 #include <cstdint>
 #include <expected>
+#include <optional>
 #include <string>
 
 #include "zappy/server/game/AEntity.hpp"
@@ -104,4 +105,17 @@ bool Player::eat() {
     });
     return true;
 }
+
+const Inventory& Player::inventory() const { return this->_inventory; }
+
+void Player::take(ResourceType resource) { this->_inventory.addResource(resource); }
+
+bool Player::drop(ResourceType resource) {
+    if (this->_inventory.resourceCount(resource) == 0) {
+        return false;
+    }
+    this->_inventory.removeResource(resource);
+    return true;
+};
+
 }  // namespace zappy::server::game::entity
