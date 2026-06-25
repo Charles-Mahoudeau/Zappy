@@ -145,6 +145,18 @@ class Client {
      */
     void removeTimeout();
 
+    /**
+     * @brief set the player id the client is related to
+     * @param id entity id from the entityDB
+     */
+    void setPlayerID(std::uint64_t id);
+
+    /**
+     * @brief get the player Id
+     * @return id as std::unint64
+     */
+    [[nodiscard]] std::uint64_t playerID() const;
+
   private:
     Timer& _timer;
     std::uint64_t _timeoutId = 0;
@@ -152,6 +164,7 @@ class Client {
     Type _type = Client::Type::kUnknown;
     network::Address _addr;
     net::SocketRegistry& _socketsRegistery;
+    std::uint64_t _playerID = 0;
 
     /**
      * @brief Max Number requests related to a client.
