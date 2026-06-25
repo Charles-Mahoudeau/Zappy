@@ -28,8 +28,8 @@ add_executable(unit_tests
         src/gui/ui/PlayerInfo.cpp
         src/gui/ui/TileInfo.cpp
         src/gui/ui/TimeUnitSlider.cpp
-        src/gui/ui/utils/Rectangle.cpp
-        src/gui/ui/utils/Vector2.cpp
+        src/gui/render/utils/Rectangle.cpp
+        src/gui/render/utils/Vector2.cpp
         src/shared/io/Poller.cpp
         src/server/game/EventHelper.cpp
         src/server/game/World.cpp

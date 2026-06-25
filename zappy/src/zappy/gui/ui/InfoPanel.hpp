@@ -12,8 +12,8 @@
 #include <utility>
 
 #include "Draggable.hpp"
-#include "utils/Rectangle.hpp"
-#include "utils/Vector2.hpp"
+#include "zappy/gui/render/utils/Rectangle.hpp"
+#include "zappy/gui/render/utils/Vector2.hpp"
 
 namespace zappy::gui::render {
 class Camera;
@@ -38,9 +38,9 @@ class InfoPanel {
     InfoPanel(InfoPanel&&) noexcept = default;
     InfoPanel& operator=(InfoPanel&&) noexcept = default;
 
-    void update(Vector2 mousePos, bool clicked, const render::Camera& camera, const game::GameState& state,
-                Rectangle panelBounds = Rectangle{});
-    void draw(const game::GameState& state, Rectangle bounds);
+    void update(render::Vector2 mousePos, bool clicked, const render::Camera& camera, const game::GameState& state,
+                render::Rectangle panelBounds = render::Rectangle{});
+    void draw(const game::GameState& state, render::Rectangle bounds);
 
     [[nodiscard]] float contentHeight(const game::GameState& state) const;
 
@@ -49,11 +49,11 @@ class InfoPanel {
     [[nodiscard]] std::optional<std::uint32_t> selectedPlayerId() const;
 
   private:
-    [[nodiscard]] static std::optional<std::uint32_t> pickPlayer(Vector2 mousePos, const render::Camera& camera,
-                                                                 const game::GameState& state);
-    [[nodiscard]] static std::optional<std::pair<std::uint32_t, std::uint32_t>> pickTile(Vector2 mousePos,
-                                                                                         const render::Camera& camera,
-                                                                                         const game::GameState& state);
+    [[nodiscard]] static std::optional<std::uint32_t> pickPlayer(render::Vector2 mousePos,
+                                                                  const render::Camera& camera,
+                                                                  const game::GameState& state);
+    [[nodiscard]] static std::optional<std::pair<std::uint32_t, std::uint32_t>> pickTile(
+        render::Vector2 mousePos, const render::Camera& camera, const game::GameState& state);
 
     InfoPanelState _state{InfoPanelState::Leaderboard};
     std::optional<std::pair<std::uint32_t, std::uint32_t>> _selectedTile;

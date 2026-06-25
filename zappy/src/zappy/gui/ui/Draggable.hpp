@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "utils/Rectangle.hpp"
-#include "utils/Vector2.hpp"
+#include "zappy/gui/render/utils/Rectangle.hpp"
+#include "zappy/gui/render/utils/Vector2.hpp"
 
 namespace zappy::gui::ui {
 
@@ -16,14 +16,14 @@ class Draggable {
   public:
     Draggable() = default;
 
-    [[nodiscard]] Rectangle apply(Rectangle bounds, float headerHeight);
+    [[nodiscard]] render::Rectangle apply(render::Rectangle bounds, float headerHeight);
 
-    [[nodiscard]] bool isOverHeader(Vector2 mouse, Rectangle bounds, float headerHeight) const;
+    [[nodiscard]] bool isOverHeader(render::Vector2 mouse, render::Rectangle bounds, float headerHeight) const;
 
   private:
-    Vector2 _offset;
-    Vector2 _dragStartMouse;
-    Vector2 _dragStartOffset;
+    render::Vector2 _offset;
+    render::Vector2 _dragStartMouse;
+    render::Vector2 _dragStartOffset;
     bool _dragging{false};
 };
 

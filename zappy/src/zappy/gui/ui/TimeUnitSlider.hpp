@@ -9,8 +9,8 @@
 
 #include <functional>
 
-#include "utils/Rectangle.hpp"
 #include "zappy/gui/network/CommandSender.hpp"
+#include "zappy/gui/render/utils/Rectangle.hpp"
 
 namespace zappy::gui::ui {
 
@@ -25,7 +25,7 @@ class TimeUnitSlider {
     TimeUnitSlider(TimeUnitSlider&&) noexcept = default;
     TimeUnitSlider& operator=(TimeUnitSlider&&) noexcept = default;
 
-    void draw(Rectangle bounds);
+    void draw(render::Rectangle bounds);
     bool consumeValueChange(int newValue);
 
     static constexpr int kMinValue = 1;

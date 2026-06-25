@@ -15,7 +15,7 @@
 #include "../network/CommandSender.hpp"
 #include "Mouse.hpp"
 #include "Widgets.hpp"
-#include "utils/Rectangle.hpp"
+#include "zappy/gui/render/utils/Rectangle.hpp"
 
 namespace zappy::gui::ui {
 
@@ -32,7 +32,7 @@ bool TimeUnitSlider::consumeValueChange(int newValue) {
     return true;
 }
 
-void TimeUnitSlider::draw(Rectangle bounds) {
+void TimeUnitSlider::draw(render::Rectangle bounds) {
     const std::string valueLabel = std::format("{}", _displayedValue);
     const float displayed = Widgets::slider(bounds, "Time unit", valueLabel, static_cast<float>(_displayedValue),
                                             static_cast<float>(kMinValue), static_cast<float>(kMaxValue));

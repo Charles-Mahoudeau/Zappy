@@ -15,26 +15,26 @@
 #include "PlayerInfo.hpp"
 #include "TileInfo.hpp"
 #include "Widgets.hpp"
-#include "utils/Rectangle.hpp"
-#include "utils/Vector2.hpp"
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/render/Camera.hpp"
+#include "zappy/gui/render/utils/Rectangle.hpp"
+#include "zappy/gui/render/utils/Vector2.hpp"
 
 namespace zappy::gui::ui {
 
-std::optional<std::uint32_t> InfoPanel::pickPlayer(Vector2 mousePos, const render::Camera& camera,
+std::optional<std::uint32_t> InfoPanel::pickPlayer(render::Vector2 mousePos, const render::Camera& camera,
                                                    const game::GameState& state) {
     return PlayerInfo::pick(mousePos, camera, state);
 }
 
-std::optional<std::pair<std::uint32_t, std::uint32_t>> InfoPanel::pickTile(Vector2 mousePos,
+std::optional<std::pair<std::uint32_t, std::uint32_t>> InfoPanel::pickTile(render::Vector2 mousePos,
                                                                            const render::Camera& camera,
                                                                            const game::GameState& state) {
     return TileInfo::pick(mousePos, camera, state);
 }
 
-void InfoPanel::update(Vector2 mousePos, bool clicked, const render::Camera& camera, const game::GameState& state,
-                       Rectangle panelBounds) {
+void InfoPanel::update(render::Vector2 mousePos, bool clicked, const render::Camera& camera,
+                       const game::GameState& state, render::Rectangle panelBounds) {
     using enum InfoPanelState;
 
     if (_state == Player && _selectedPlayerId.has_value() && !state.players().contains(*_selectedPlayerId)) {
@@ -82,7 +82,7 @@ float InfoPanel::contentHeight(const game::GameState& state) const {
     return 0.0F;
 }
 
-void InfoPanel::draw(const game::GameState& state, Rectangle bounds) {
+void InfoPanel::draw(const game::GameState& state, render::Rectangle bounds) {
     using enum InfoPanelState;
 
     bounds = _drag.apply(bounds, Widgets::kPanelHeaderHeight);

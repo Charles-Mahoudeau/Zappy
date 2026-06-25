@@ -12,9 +12,9 @@
 #include <optional>
 #include <utility>
 
-#include "utils/Rectangle.hpp"
-#include "utils/Vector2.hpp"
 #include "zappy/gui/render/utils/Ray.hpp"
+#include "zappy/gui/render/utils/Rectangle.hpp"
+#include "zappy/gui/render/utils/Vector2.hpp"
 
 namespace zappy::gui::render {
 class Camera;
@@ -33,13 +33,13 @@ class TileInfo {
     [[nodiscard]] static std::optional<std::pair<std::uint32_t, std::uint32_t>> intersectGroundPlane(
         const render::Ray& ray, std::size_t mapWidth, std::size_t mapHeight);
 
-    [[nodiscard]] static std::optional<std::pair<std::uint32_t, std::uint32_t>> pick(Vector2 mousePos,
+    [[nodiscard]] static std::optional<std::pair<std::uint32_t, std::uint32_t>> pick(render::Vector2 mousePos,
                                                                                      const render::Camera& camera,
                                                                                      const game::GameState& state);
 
     [[nodiscard]] static float height();
 
-    static void draw(const game::GameState& state, std::uint32_t x, std::uint32_t y, Rectangle bounds);
+    static void draw(const game::GameState& state, std::uint32_t x, std::uint32_t y, render::Rectangle bounds);
 
   private:
     static constexpr float kRowHeight = 24.0F;

@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "utils/Vector2.hpp"
+#include "zappy/gui/render/utils/Vector2.hpp"
 
 namespace zappy::gui::ui {
 
@@ -17,7 +17,7 @@ class Mouse {
 
     static bool isLeftButtonReleased();
     static bool isLeftButtonPressed();
-    static Vector2 position();
+    static render::Vector2 position();
     static float scrollDelta();
 };
 
