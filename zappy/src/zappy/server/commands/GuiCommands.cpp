@@ -181,10 +181,15 @@ bool GuiCommands::sst(const CommandCtx& ctx) {
         ctx.logger.get().warn("Invalid number of arguments.");
         return false;
     }
+
     const std::optional<std::uint32_t> timeUnit = parseUint32(ctx.data.params.at(0));
 
     if (!timeUnit.has_value()) {
         ctx.logger.get().warn("Unable to parse time unit argument.");
+        return false;
+    }
+    if (*timeUnit > std::numeric_limits<std::uint16_t>::max()) {
+        ctx.logger.get().warn("Time unit must be less than or equal to 65535.");
         return false;
     }
     ctx.timer.get().setFrequency(*timeUnit);
