@@ -43,8 +43,6 @@ class GuiCommands : public ACommandGroup {
     static bool sgt(const CommandCtx& ctx);
     static bool sst(const CommandCtx& ctx);
 
-    static std::optional<std::string> serializeTile(const CommandCtx& ctx, math::Vector2u position);
-
     static std::optional<std::uint32_t> parseUint32(const std::string& str);
     static std::optional<math::Vector2u> parsePosition(std::span<const std::string> params);
     static std::optional<std::uint32_t> parsePlayerId(std::string_view str);

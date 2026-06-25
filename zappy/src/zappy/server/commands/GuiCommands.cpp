@@ -23,6 +23,7 @@
 #include "zappy/server/commands/ACommandGroup.hpp"
 #include "zappy/server/commands/ICommandGroup.hpp"
 #include "zappy/server/game/Tile.hpp"
+#include "zappy/server/game/WireHelper.hpp"
 #include "zappy/server/game/entity/Player.hpp"
 #include "zappy/shared/exception/OutOfRange.hpp"
 #include "zappy/shared/math/Vector2.hpp"
@@ -82,27 +83,19 @@ bool GuiCommands::bct(const CommandCtx& ctx) {
         return false;
     }
 
-    const std::optional<std::string> serializedTile = serializeTile(ctx, *position);
+    try {
+        const game::Tile& tile = ctx.world.get().grid().tile(*position);
 
-    if (!serializedTile.has_value()) {
-        return false;
+        std::ignore = ctx.client->sendMessage(game::WireHelper::tileToBctCommand(tile));
+        return true;
+    } catch (const exception::OutOfRange& e) {
+        ctx.logger.get().warn(std::format("tile out of range: {}", e.what()));
     }
-    std::ignore = ctx.client->sendMessage(*serializedTile);
-    return true;
+    return false;
 }
 
 bool GuiCommands::mct(const CommandCtx& ctx) {
-    const math::Vector2u worldSize = ctx.world.get().size();
-
-    for (std::uint32_t x = 0; x < worldSize.x; ++x) {
-        for (std::uint32_t y = 0; y < worldSize.y; ++y) {
-            const std::optional<std::string> serializedTile = serializeTile(ctx, {x, y});
-
-            if (serializedTile.has_value()) {
-                std::ignore = ctx.client->sendMessage(*serializedTile);
-            }
-        }
-    }
+    std::ignore = ctx.client->sendMessage(game::WireHelper::worldToBctCommands(ctx.world));
     return true;
 }
 
@@ -193,17 +186,6 @@ bool GuiCommands::sst(const CommandCtx& ctx) {
     ctx.timer.get().setFrequency(*timeUnit);
     std::ignore = ctx.client->sendMessage(std::format("sst {}\n", ctx.timer.get().frequency()));
     return true;
-}
-
-std::optional<std::string> GuiCommands::serializeTile(const CommandCtx& ctx, math::Vector2u position) {
-    try {
-        const game::Tile& tile = ctx.world.get().grid().tile(position);
-
-        return std::format("bct {} {} {}\n", position.x, position.y, tile.inventory().string());
-    } catch (const exception::OutOfRange& e) {
-        ctx.logger.get().warn(std::format("tile out of range: {}", e.what()));
-    }
-    return std::nullopt;
 }
 
 std::optional<std::uint32_t> GuiCommands::parseUint32(const std::string& str) {
