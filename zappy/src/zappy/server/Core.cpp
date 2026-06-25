@@ -15,7 +15,10 @@
 #include <span>
 #include <string>
 #include <string_view>
+#include <tuple>
 
+#include "game/Event.hpp"
+#include "game/EventHelper.hpp"
 #include "zappy/server/CliParser.hpp"
 #include "zappy/server/client/Client.hpp"
 #include "zappy/server/commands/GuiCommands.hpp"
@@ -51,8 +54,9 @@ void Core::init(const std::span<std::string_view> argv) {
 void Core::run() {
     while (true) {
         try {
-            this->nextTick();
-            this->processCommandGroup();
+            nextTick();
+            processCommandGroup();
+            processWorldEvents();
         } catch (const exception::Exception& err) {
             std::cerr << "Error: " << err.what() << "\n";
         }
@@ -76,6 +80,18 @@ void Core::processCommandGroup() {
 
             (*commands)(client, *request);
         }
+    }
+}
+
+void Core::processWorldEvents() const {
+    const io::Logger logger = _logger.derive("WorldSync");
+
+    while (_world->hasEvents()) {
+        const game::Event event = _world->popEvent();
+        std::string eventStr = game::EventHelper::toWire(event);
+
+        std::ignore = _clientRegistry.broadcast(Client::Type::kGui, eventStr);
+        logger.debug("Forwarding: {}", eventStr);
     }
 }
 
