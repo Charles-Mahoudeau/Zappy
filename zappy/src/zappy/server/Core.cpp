@@ -68,7 +68,8 @@ void Core::processCommandGroup() {
 
         if (auto iter = this->_cmdGroups.find(client->type()); iter != this->_cmdGroups.end()) {
             const auto& commands = iter->second;
-            commands->execute(client, req.value());
+
+            (*commands)(client, req.value());
         }
     }
 }
