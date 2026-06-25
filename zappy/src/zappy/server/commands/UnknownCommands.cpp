@@ -33,8 +33,8 @@ void UnknownCommands::execute(Client* client, [[maybe_unused]] const std::string
     }
 }
 
-bool UnknownCommands::guiType(std::string_view askedTeam, Client* client, CommandCtx& ctx) {
-    auto& logger = ctx.logger.get();
+bool UnknownCommands::guiType(std::string_view askedTeam, Client* client, const CommandCtx& ctx) {
+    const auto& logger = ctx.logger.get();
 
     if (askedTeam == "GRAPHIC") {
         logger.info(std::format("Client {} registered as GUI", client->address().string()));
@@ -64,6 +64,7 @@ bool UnknownCommands::PlayerType(std::string_view askedTeam, Client* client, Com
         std::ignore = client->sendMessage(std::format("{}\n", world.eggCount(askedTeam)));
         std::ignore = client->sendMessage(std::format("{} {}\n", worldSize.x, worldSize.y));
     } catch (const exception::InvalidArgument& err) {
+        logger.error(std::format("Fail client {} specialization : {}", client->address().string(), err.what()));
         return false;
     }
     logger.info(std::format("Client {} registered to {}", client->address().string(), askedTeam));
