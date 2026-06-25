@@ -11,6 +11,7 @@
 #include <format>
 #include <limits>
 #include <optional>
+#include <span>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -22,6 +23,7 @@
 #include "zappy/server/commands/ACommandGroup.hpp"
 #include "zappy/server/commands/ICommandGroup.hpp"
 #include "zappy/server/game/Tile.hpp"
+#include "zappy/server/game/entity/Player.hpp"
 #include "zappy/shared/exception/OutOfRange.hpp"
 #include "zappy/shared/math/Vector2.hpp"
 
@@ -33,7 +35,7 @@ GuiCommands::GuiCommands(CommandCtx context)
           {"bct", [](const CommandCtx& ctx) { return bct(ctx); }},
           {"mct", [](const CommandCtx& ctx) { return mct(ctx); }},
           {"tna", [](const CommandCtx& ctx) { return tna(ctx); }},
-          {"ppo", [](const CommandCtx& ctx) { return ignore(ctx); }},
+          {"ppo", [](const CommandCtx& ctx) { return ppo(ctx); }},
           {"plv", [](const CommandCtx& ctx) { return ignore(ctx); }},
           {"pin", [](const CommandCtx& ctx) { return ignore(ctx); }},
           {"sgt", [](const CommandCtx& ctx) { return sgt(ctx); }},
@@ -119,24 +121,37 @@ bool GuiCommands::tna(const CommandCtx& ctx) {
     return true;
 }
 
+bool GuiCommands::ppo(const CommandCtx& ctx) {
+    const std::optional<std::uint32_t> playerId = parseUint32(ctx.data.params.at(0));
+
+    if (!playerId.has_value() || !ctx.world.get().entityDatabase().is<game::entity::Player>(*playerId)) {
+        ctx.logger.get().warn("invalid argument");
+        return false;
+    }
+
+    const std::optional<math::Vector2u> position = ctx.world.get().grid().position(*playerId);
+
+    if (!position.has_value()) {
+        return false;
+    }
+    std::ignore = ctx.client->sendMessage(std::format("ppo {} {}\n", position->x, position->y));
+    return true;
+}
+
 bool GuiCommands::sgt(const CommandCtx& ctx) {
     std::ignore = ctx.client->sendMessage(std::format("sgt {}\n", ctx.timer.get().frequency()));
     return true;
 }
 
 bool GuiCommands::sst(const CommandCtx& ctx) {
-    try {
-        const std::uint64_t timeUnit = std::stoul(ctx.data.params.at(0));
+    const std::optional<std::uint32_t> timeUnit = parseUint32(ctx.data.params.at(0));
 
-        ctx.timer.get().setFrequency(timeUnit);
-        std::ignore = ctx.client->sendMessage(std::format("sst {}\n", ctx.timer.get().frequency()));
-    } catch (const std::invalid_argument& e) {
-        ctx.logger.get().warn(std::format("invalid argument: {}", e.what()));
-        return false;
-    } catch (const std::out_of_range& e) {
-        ctx.logger.get().warn(std::format("out of range: {}", e.what()));
+    if (!timeUnit.has_value()) {
+        ctx.logger.get().warn("invalid argument");
         return false;
     }
+    ctx.timer.get().setFrequency(*timeUnit);
+    std::ignore = ctx.client->sendMessage(std::format("sst {}\n", ctx.timer.get().frequency()));
     return true;
 }
 
@@ -149,6 +164,21 @@ std::optional<std::string> GuiCommands::serializeTile(const CommandCtx& ctx, mat
         ctx.logger.get().warn(std::format("tile out of range: {}", e.what()));
     }
     return std::nullopt;
+}
+
+std::optional<std::uint32_t> GuiCommands::parseUint32(const std::string& str) {
+    try {
+        const std::uint64_t v = std::stoul(str);
+
+        if (v > std::numeric_limits<std::uint32_t>::max()) {
+            return std::nullopt;
+        }
+        return v;
+    } catch (const std::invalid_argument&) {
+        return std::nullopt;
+    } catch (const std::out_of_range&) {
+        return std::nullopt;
+    }
 }
 
 std::optional<math::Vector2u> GuiCommands::parsePosition(const std::span<const std::string> params) {

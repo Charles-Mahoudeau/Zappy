@@ -33,11 +33,13 @@ class GuiCommands : public ACommandGroup {
     static bool bct(const CommandCtx& ctx);
     static bool mct(const CommandCtx& ctx);
     static bool tna(const CommandCtx& ctx);
+    static bool ppo(const CommandCtx& ctx);
     static bool sgt(const CommandCtx& ctx);
     static bool sst(const CommandCtx& ctx);
 
     static std::optional<std::string> serializeTile(const CommandCtx& ctx, math::Vector2u position);
 
+    static std::optional<std::uint32_t> parseUint32(const std::string& str);
     static std::optional<math::Vector2u> parsePosition(std::span<const std::string> params);
 
     std::unordered_map<std::string_view, CommandInvoker> _commands;
