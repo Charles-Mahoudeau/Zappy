@@ -35,12 +35,12 @@ class MockedCommand : public zappy::server::command::ACommandGroup {
     MockedCommand& operator=(MockedCommand&&) = delete;
 
     void execute([[maybe_unused]] zappy::server::Client* client, std::string_view msg) override {
-        const CommandData cmd = this->extractCommand(msg);
+        const auto [name, params] = this->extractCommand(msg);
 
-        if (cmd.name == "valid") {
+        if (name == "valid") {
             this->_update = true;
         }
-        if (cmd.params.size() == 2 && cmd.params.at(0) == "valid2" && cmd.params.at(1) == "valid3") {
+        if (params.size() == 2 && params.at(0) == "valid2" && params.at(1) == "valid3") {
             this->_param = true;
         }
     }
@@ -57,6 +57,7 @@ class TestICommandGroup : public ::testing::Test {
   public:
     zappy::server::Timer timer;
     zappy::server::client::ClientRegistry clients;
+    zappy::server::client::TeamRegistry teams;
     zappy::server::net::SocketRegistry socketRegistry;
     std::unique_ptr<MockedCommand> mockCmd;
     std::unique_ptr<zappy::server::Client> client;
@@ -67,7 +68,13 @@ class TestICommandGroup : public ::testing::Test {
     void SetUp() override {
         logger.emplace("TestLogger");
         world = std::make_unique<zappy::server::game::World>(zappy::math::Vector2u{10, 10}, logger);
-        mockCmd = std::make_unique<MockedCommand>(timer, clients, *world, logger.value());
+        mockCmd = std::make_unique<MockedCommand>(zappy::server::command::ICommandGroup::CommandCtx{
+            .timer = timer,
+            .clientRegistry = clients,
+            .teamRegistry = teams,
+            .world = *world,
+            .logger = logger.value(),
+        });
     }
 
     void TearDown() override {
