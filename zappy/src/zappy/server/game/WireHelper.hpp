@@ -24,5 +24,10 @@ class WireHelper {
     /// @param world The world to convert.
     /// @return The bct commands.
     [[nodiscard]] static std::string worldToBctCommands(const World& world);
+
+    /// @brief Converts a world to a enw commands.
+    /// @param world The world to convert.
+    /// @return The enw commands.
+    static std::string worldToEnwCommands(const World& world);
 };
 }  // namespace zappy::server::game
