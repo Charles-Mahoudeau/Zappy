@@ -15,6 +15,7 @@
 #include "Particle.hpp"
 #include "Texture.hpp"
 #include "TimeValue.hpp"
+#include "Vec2D.hpp"
 #include "Vector3.hpp"
 #include "vector"
 
@@ -36,7 +37,7 @@ class ParticleEmitter {
     void setSpeed(float speed);
     void setRate(float rate);
     void setLifetime(float lifetime);
-    void setSize(float size, float increment);
+    void setSize(Vec2D size, Vec2D increment);
     void setRotation(float rotation, float increment);
     void setTint(Color tint, Color increment);
 
@@ -59,7 +60,7 @@ class ParticleEmitter {
     float _speed{1.0F};
     float _rate{1.0F};
     float _lifetime{1.0F};
-    TimeValue<float> _size{1.0F, 0.0F};
+    TimeValue<Vec2D> _size{Vec2D{1.0F, 1.0F}, Vec2D{0.0F, 0.0F}};
     TimeValue<float> _rotation{0.0F, 0.0F};
     TimeValue<Color> _tint{WHITE, WHITE};
 };

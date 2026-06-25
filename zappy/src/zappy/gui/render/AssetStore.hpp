@@ -17,6 +17,7 @@
 #include "objects/Model.hpp"
 #include "objects/Skybox.hpp"
 #include "objects/particles/Particle.hpp"
+#include "objects/particles/ParticleEmitter.hpp"
 #include "zappy/gui/game/GameState.hpp"
 
 namespace zappy::gui::render {

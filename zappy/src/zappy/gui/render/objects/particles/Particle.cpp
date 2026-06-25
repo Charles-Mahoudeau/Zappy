@@ -9,18 +9,14 @@
 
 #include <raylib.h>
 
-#include "../../Camera.hpp"
-#include "../../utils/Color.hpp"
-#include "../../utils/TimeValue.hpp"
-#include "../../utils/Vec2D.hpp"
-#include "../../utils/Vector3.hpp"
-#include "../Texture.hpp"
+#include "Camera.hpp"
+#include "Color.hpp"
+#include "Texture.hpp"
+#include "TimeValue.hpp"
+#include "Vec2D.hpp"
+#include "Vector3.hpp"
 
 namespace zappy::gui::render {
-Particle::Particle() = default;
-
-Particle::~Particle() = default;
-
 void Particle::setPosition(Vector3 position, Vector3 increment) { _position = TimeValue<Vector3>{position, increment}; }
 
 void Particle::setSize(Vec2D size, Vec2D increment) { _size = TimeValue<Vec2D>{size, increment}; }

@@ -27,7 +27,7 @@ void ParticleEmitter::setSpread(float spread) { _spread = spread; }
 void ParticleEmitter::setRate(float rate) { _rate = rate; }
 void ParticleEmitter::setSpeed(float speed) { _speed = speed; }
 void ParticleEmitter::setLifetime(float lifetime) { _lifetime = lifetime; }
-void ParticleEmitter::setSize(float size, float increment) { _size = TimeValue<float>{size, increment}; }
+void ParticleEmitter::setSize(Vec2D size, Vec2D increment) { _size = TimeValue<Vec2D>{size, increment}; }
 void ParticleEmitter::setRotation(float rotation, float increment) {
     _rotation = TimeValue<float>{rotation, increment};
 }
@@ -59,9 +59,8 @@ uint16_t ParticleEmitter::draw(Camera& camera) {
 void ParticleEmitter::particle() {
     Particle newParticle;
     Vector3 speed = getDirection() * _speed;
-    newParticle.setInitValues(_origin, Vec2D{_size.get(), _size.get()}, _rotation.get(), _tint.get());
-    newParticle.setIncrementValues(speed, Vec2D{_size.increment(), _size.increment()}, _rotation.increment(),
-                                   _tint.increment());
+    newParticle.setInitValues(_origin, _size, _rotation.get(), _tint.get());
+    newParticle.setIncrementValues(speed, _size, _rotation.increment(), _tint.increment());
     newParticle.setLifetime(_lifetime);
     _particles.push_back(std::move(newParticle));
 }

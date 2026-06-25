@@ -20,7 +20,7 @@ class TimeValue {
     TimeValue() = default;
     ~TimeValue() = default;
 
-    [[nodiscard]] TimeValue<T>& operator=(const TimeValue<T>& other) {
+    TimeValue<T>& operator=(const TimeValue<T>& other) {
         _value = other._value;
         _increment = other._increment;
         _speed = other._speed;

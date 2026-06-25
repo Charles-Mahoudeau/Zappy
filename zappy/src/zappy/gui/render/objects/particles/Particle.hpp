@@ -9,7 +9,7 @@
 
 #include <raylib.h>
 
-#include "../../Camera.hpp"
+#include "Camera.hpp"
 #include "Color.hpp"
 #include "Texture.hpp"
 #include "TimeValue.hpp"
@@ -22,7 +22,7 @@ class Particle {
     Particle() = default;
     Particle(const Particle&) = delete;
     Particle(Particle&&) noexcept = default;
-    ~Particle();
+    ~Particle() = default;
 
     Particle& operator=(const Particle&) = delete;
     [[nodiscard]] Vector3 position() const { return _position; }

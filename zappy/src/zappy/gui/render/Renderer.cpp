@@ -243,5 +243,6 @@ void Renderer::drawVFXs(Camera& camera, AssetStore& assets) {
             break;
         }
     }
+}
 
 }  // namespace zappy::gui::render

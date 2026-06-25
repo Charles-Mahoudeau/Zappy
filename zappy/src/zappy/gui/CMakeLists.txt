@@ -38,7 +38,7 @@ add_library(zappy_gui_objects OBJECT
         render/objects/Skybox.hpp
         render/objects/particles/ParticleEmitter.cpp
         render/objects/particles/ParticleEmitter.hpp
-        render/objects/particles/Particle.hpp
+        render/objects/particles/Particle.cpp
         render/objects/particles/Particle.hpp
         render/utils/Vec2D.cpp
         render/utils/Vec2D.hpp
@@ -72,8 +72,13 @@ add_library(zappy_gui_objects OBJECT
         ui/Widgets.hpp
 )
 target_include_directories(zappy_gui_objects PUBLIC
-        ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/zappy/gui/render/objects
+    ${CMAKE_SOURCE_DIR}/src/zappy/gui/render/objects/particles
+    ${CMAKE_SOURCE_DIR}/src/zappy/gui/render/utils
+    ${CMAKE_SOURCE_DIR}/src/zappy/gui/render
 )
+
 target_link_libraries(zappy_gui_objects PUBLIC
         zappy_shared
 )

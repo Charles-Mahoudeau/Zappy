@@ -39,25 +39,25 @@ class Vector3 {
         return Vector3{_vector.x / scalar, _vector.y / scalar, _vector.z / scalar};
     }
 
-    [[nodiscard]] Vector3& operator+=(const Vector3& other) {
+    Vector3& operator+=(const Vector3& other) {
         _vector.x += other._vector.x;
         _vector.y += other._vector.y;
         _vector.z += other._vector.z;
         return *this;
     }
-    [[nodiscard]] Vector3& operator-=(const Vector3& other) {
+    Vector3& operator-=(const Vector3& other) {
         _vector.x -= other._vector.x;
         _vector.y -= other._vector.y;
         _vector.z -= other._vector.z;
         return *this;
     }
-    [[nodiscard]] Vector3& operator*=(float scalar) {
+    Vector3& operator*=(float scalar) {
         _vector.x *= scalar;
         _vector.y *= scalar;
         _vector.z *= scalar;
         return *this;
     }
-    [[nodiscard]] Vector3& operator/=(float scalar) {
+    Vector3& operator/=(float scalar) {
         if (scalar == 0.0F) {
             return *this;
         }
