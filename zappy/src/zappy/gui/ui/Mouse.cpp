@@ -19,4 +19,6 @@ bool Mouse::isLeftButtonPressed() { return IsMouseButtonPressed(MOUSE_BUTTON_LEF
 
 Vector2 Mouse::position() { return Vector2{GetMousePosition()}; }
 
+float Mouse::scrollDelta() { return GetMouseWheelMove(); }
+
 }  // namespace zappy::gui::ui
