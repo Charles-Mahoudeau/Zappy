@@ -117,7 +117,7 @@ bool GuiCommands::tna(const CommandCtx& ctx) {
 }
 
 bool GuiCommands::ppo(const CommandCtx& ctx) {
-    const std::optional<std::uint32_t> playerId = parseUint32(ctx.data.params.at(0));
+    const std::optional<std::uint32_t> playerId = parsePlayerId(ctx.data.params.at(0));
 
     if (!playerId.has_value()) {
         ctx.logger.get().warn("invalid argument");
@@ -133,12 +133,12 @@ bool GuiCommands::ppo(const CommandCtx& ctx) {
 
     const math::Vector2u playerPosition = player->position();
 
-    std::ignore = ctx.client->sendMessage(std::format("ppo {} {}\n", playerPosition.x, playerPosition.y));
+    std::ignore = ctx.client->sendMessage(std::format("ppo #{} {}\n", playerPosition.x, playerPosition.y));
     return true;
 }
 
 bool GuiCommands::plv(const CommandCtx& ctx) {
-    const std::optional<std::uint32_t> playerId = parseUint32(ctx.data.params.at(0));
+    const std::optional<std::uint32_t> playerId = parsePlayerId(ctx.data.params.at(0));
 
     if (!playerId.has_value()) {
         ctx.logger.get().warn("invalid argument");
@@ -156,7 +156,7 @@ bool GuiCommands::plv(const CommandCtx& ctx) {
 }
 
 bool GuiCommands::pin(const CommandCtx& ctx) {
-    const std::optional<std::uint32_t> playerId = parseUint32(ctx.data.params.at(0));
+    const std::optional<std::uint32_t> playerId = parsePlayerId(ctx.data.params.at(0));
 
     if (!playerId.has_value()) {
         ctx.logger.get().warn("invalid argument");
@@ -243,5 +243,12 @@ std::optional<math::Vector2u> GuiCommands::parsePosition(const std::span<const s
     } catch (const std::out_of_range&) {
         return std::nullopt;
     }
+}
+
+std::optional<std::uint32_t> GuiCommands::parsePlayerId(const std::string_view str) {
+    if (!str.starts_with('#')) {
+        return std::nullopt;
+    }
+    return parseUint32(std::string{str.substr(1)});
 }
 }  // namespace zappy::server::command
