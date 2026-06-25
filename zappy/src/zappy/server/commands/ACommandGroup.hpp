@@ -11,6 +11,7 @@
 
 #include "zappy/server/client/Client.hpp"
 #include "zappy/server/commands/ICommandGroup.hpp"
+#include "zappy/shared/network/Address.hpp"
 
 namespace zappy::server::command {
 
@@ -29,6 +30,7 @@ class ACommandGroup : public ICommandGroup {
   protected:
     CommandCtx& commandCtx() override;
     CommandData extractCommand(std::string_view msg) override;
+    static void trySendToAddress(CommandCtx& ctx, network::Address addr, std::string_view msg);
 
   private:
     CommandCtx _ctx;
