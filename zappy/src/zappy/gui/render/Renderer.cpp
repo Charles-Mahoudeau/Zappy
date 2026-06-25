@@ -41,6 +41,9 @@ void Renderer::update(Camera& camera, game::GameState& state, AssetStore& assets
 
     _grid.resize(state.width(), state.height());
 
+    if (GetFrameTime() * static_cast<float>(state.timeUnit()) > 5.0F) {
+        assets.emit("test", Vector3{0.0F, 0.0F, 0.0F});
+    }
     display::Window::BeginMode3D(camera);
     _grid.draw(assets);
     drawResources(state, assets);

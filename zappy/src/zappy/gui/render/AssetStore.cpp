@@ -121,7 +121,7 @@ void AssetStore::loadResourceModel(game::ResourceType type) {
 
 void AssetStore::loadVFXs() {
     ParticleEmitter test("assets/models/resources/textures/thystameBase.png");
-    _vfxs.emplace("test", test);
+    _vfxs.insert({"test", std::move(test)});
 }
 void AssetStore::loadEggModel() {
     _eggModel = std::make_unique<Model>(
@@ -171,9 +171,9 @@ Model AssetStore::createModel(std::string_view path, std::string_view animationP
     return model;
 }
 
-const std::map<std::string_view, ParticleEmitter>& AssetStore::vfxs() const { return _vfxs; }
+const std::map<std::string, ParticleEmitter>& AssetStore::vfxs() const { return _vfxs; }
 
-std::map<std::string_view, ParticleEmitter>& AssetStore::vfxs() { return _vfxs; }
+std::map<std::string, ParticleEmitter>& AssetStore::vfxs() { return _vfxs; }
 
 ParticleEmitter AssetStore::emit(std::string_view path, Vector3 pos) {
     ParticleEmitter emitter{path};
