@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <format>
+#include <optional>
 #include <string>
 #include <string_view>
 
@@ -21,9 +22,9 @@
 #include "zappy/gui/render/Camera.hpp"
 #include "zappy/gui/render/Grid.hpp"
 #include "zappy/gui/render/utils/Color.hpp"
+#include "zappy/gui/render/utils/Rectangle.hpp"
 #include "zappy/gui/render/utils/Vector3.hpp"
 #include "zappy/gui/ui/Widgets.hpp"
-#include "zappy/gui/ui/utils/Rectangle.hpp"
 #include "zappy/shared/exception/InvalidState.hpp"
 
 namespace zappy::gui {
@@ -91,8 +92,8 @@ void GUI::drawLoadingFrame(std::string_view name, float progress) {
     const int loadingY = barY - kTextSpacing - kLoadingFontSize;
     DrawText(text.c_str(), loadingTextX, loadingY, kLoadingFontSize, render::Color::kWHITE);
 
-    ui::Widgets::progressBar(ui::Rectangle{static_cast<float>(barX), static_cast<float>(barY),
-                                           static_cast<float>(kBarWidth), static_cast<float>(kBarHeight)},
+    ui::Widgets::progressBar(render::Rectangle{static_cast<float>(barX), static_cast<float>(barY),
+                                               static_cast<float>(kBarWidth), static_cast<float>(kBarHeight)},
                              "", "", progress);
 
     const std::string nameText{name};
@@ -134,9 +135,21 @@ int GUI::run() {
     while (!_window.shouldClose()) {
         _poller.poll(kPollTimeoutMs);
         _window.beginFrame();
-        _camera.applyManualZoomInput();
-        _renderer.update(_camera, _state, _assets);
         _hud.update(_camera, _state);
+
+        std::optional<render::Vector3> focusWorldPos;
+        if (const auto playerId = _hud.focusedPlayerId(); playerId.has_value()) {
+            if (const auto it = _state.players().find(*playerId); it != _state.players().end()) {
+                focusWorldPos =
+                    render::Grid::tileToWorld(static_cast<float>(it->second.x), static_cast<float>(it->second.y));
+            }
+        }
+        if (!focusWorldPos.has_value()) {
+            _camera.applyManualZoomInput();
+        }
+        _camera.followPlayer(focusWorldPos);
+
+        _renderer.update(_camera, _state, _assets);
         _hud.draw(_state);
         _window.endFrame();
     }

@@ -7,6 +7,9 @@
 
 #pragma once
 
+#include <cstdint>
+#include <optional>
+
 #include "ChatPanel.hpp"
 #include "InfoPanel.hpp"
 #include "TimeUnitSlider.hpp"
@@ -38,6 +41,8 @@ class Hud {
 
     void update(const render::Camera& camera, const game::GameState& state);
     void draw(const game::GameState& state);
+
+    [[nodiscard]] std::optional<std::uint32_t> focusedPlayerId() const;
 
   private:
     [[nodiscard]] bool victoryActive(const game::GameState& state) const;
