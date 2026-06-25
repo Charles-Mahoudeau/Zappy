@@ -71,26 +71,18 @@ std::uint64_t World::countResources(const ResourceType type) const {
 
 std::uint64_t World::spawnEgg(std::uint64_t playerId, const std::string_view teamName) {
     const std::uint64_t eggId =
-        _entityDatabase.insert(std::make_unique<entity::Egg>(_grid, *this, std::string{teamName}));
-    Tile& tile = randomTile();
+        _entityDatabase.insert(std::make_unique<entity::Egg>(_grid, *this, std::string{teamName}, playerId));
 
-    tile.addEntity(eggId);
-    pushEvent(EggLaidEvent{
-        .playerId =
-            playerId == std::numeric_limits<decltype(playerId)>::max() ? std::nullopt : std::make_optional(playerId),
-        .eggId = eggId,
-        .position = tile.position(),
-    });
-    if (_logger.has_value()) {
-        _logger->info(std::format("Spawned egg #{} for team #{} at ({}, {})", eggId, teamName, tile.position().x,
-                                  tile.position().y));
-    }
+    placeEggRandom(eggId);
     return eggId;
 }
 
 std::uint64_t World::spawnEgg(const std::string_view teamName) {
-    // That's a shitty solution but it works...
-    return spawnEgg(std::numeric_limits<std::uint64_t>::max(), teamName);
+    const std::uint64_t eggId =
+        _entityDatabase.insert(std::make_unique<entity::Egg>(_grid, *this, std::string{teamName}));
+
+    placeEggRandom(eggId);
+    return eggId;
 }
 
 void World::spawnResource(const ResourceType type) {
@@ -243,6 +235,32 @@ void World::generateResourceThresholds() {
     }
     if (_logger.has_value()) {
         _logger->info("Resources thresholds generated.");
+    }
+}
+
+void World::placeEggRandom(const std::uint64_t eggId) {
+    const entity::Egg* egg = _entityDatabase.query<entity::Egg>(eggId);
+
+    if (egg == nullptr) {
+        throw exception::InvalidArgument{"trying to place an egg that does not exist"};
+    }
+
+    Tile& tile = randomTile();
+
+    tile.addEntity(eggId);
+    pushEvent(EggLaidEvent{
+        .playerId = egg->parentPlayerId(),
+        .eggId = eggId,
+        .position = tile.position(),
+    });
+    if (_logger.has_value()) {
+        std::string playerInfo{""};
+
+        if (egg->parentPlayerId().has_value()) {
+            playerInfo = std::format(" by player #{}", egg->parentPlayerId().value());
+        }
+        _logger->info(std::format("Spawned egg #{} for team {}{} at ({}, {})", eggId, egg->teamName(), playerInfo,
+                                  tile.position().x, tile.position().y));
     }
 }
 }  // namespace zappy::server::game

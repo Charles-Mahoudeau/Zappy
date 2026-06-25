@@ -151,6 +151,10 @@ class World : public IEventEmitter {
     /// @brief Generates the resource thresholds for the world.
     void generateResourceThresholds();
 
+    /// @brief Places an egg at a random tile in the world.
+    /// @param eggId The ID of the egg to place.
+    void placeEggRandom(std::uint64_t eggId);
+
     std::random_device _randomDevice;
     std::mt19937 _randomEngine{_randomDevice()};
     EntityDatabase _entityDatabase;
