@@ -7,6 +7,13 @@
 
 #include "zappy/server/commands/GuiCommands.hpp"
 
+#include <cstdint>
+#include <format>
+#include <limits>
+#include <optional>
+#include <sstream>
+#include <stdexcept>
+#include <string>
 #include <string_view>
 #include <tuple>
 #include <utility>
@@ -14,7 +21,9 @@
 #include "zappy/server/client/Client.hpp"
 #include "zappy/server/commands/ACommandGroup.hpp"
 #include "zappy/server/commands/ICommandGroup.hpp"
+#include "zappy/server/game/Tile.hpp"
 #include "zappy/shared/exception/OutOfRange.hpp"
+#include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server::command {
 GuiCommands::GuiCommands(CommandCtx context)
@@ -148,8 +157,10 @@ std::optional<math::Vector2u> GuiCommands::parsePosition(const std::span<const s
     }
 
     try {
+        // NOLINTBEGIN(*-pro-bounds-avoid-unchecked-container-access)
         const std::uint64_t x = std::stoul(params[0]);
         const std::uint64_t y = std::stoul(params[1]);
+        // NOLINTEND(*-pro-bounds-avoid-unchecked-container-access)
 
         if (x > std::numeric_limits<std::uint32_t>::max() || y > std::numeric_limits<std::uint32_t>::max()) {
             return std::nullopt;
