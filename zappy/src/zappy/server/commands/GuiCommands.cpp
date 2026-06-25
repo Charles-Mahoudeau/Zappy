@@ -133,7 +133,8 @@ bool GuiCommands::ppo(const CommandCtx& ctx) {
 
     const math::Vector2u playerPosition = player->position();
 
-    std::ignore = ctx.client->sendMessage(std::format("ppo #{} {}\n", playerPosition.x, playerPosition.y));
+    std::ignore = ctx.client->sendMessage(std::format("ppo #{} {} {} {}\n", *playerId, playerPosition.x,
+                                                      playerPosition.y, std::to_underlying(player->direction())));
     return true;
 }
 
