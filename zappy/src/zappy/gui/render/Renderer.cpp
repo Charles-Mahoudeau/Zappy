@@ -14,6 +14,8 @@
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
+#include <numbers>
+#include <utility>
 
 #include "AssetStore.hpp"
 #include "Camera.hpp"
@@ -37,17 +39,20 @@ void Renderer::update(Camera& camera, game::GameState& state, AssetStore& assets
     assets.skybox().draw(camera.position());
     display::Window::EndMode3D();
 
+    _grid.resize(state.width(), state.height());
+
     display::Window::BeginMode3D(camera);
-    drawGrid(state);  // TODO: Implement a grid class to render a grid in the scene
-    drawPlayers(state, assets);
+    _grid.draw(assets);
     drawResources(state, assets);
+    drawEggs(state, assets);
+    drawPlayers(state, assets);
     display::Window::EndMode3D();
 }
 
 void Renderer::drawResources(const game::GameState& state, const AssetStore& assets) {
     for (std::size_t y = 0; y < state.height(); ++y) {
         for (std::size_t x = 0; x < state.width(); ++x) {
-            const Vector3 position(static_cast<float>(x), 0.0F, static_cast<float>(y));
+            const Vector3 position = render::Grid::tileToWorld(static_cast<float>(x), static_cast<float>(y));
             drawTileResources(state.tile(x, y), position, assets);
         }
     }
@@ -55,16 +60,37 @@ void Renderer::drawResources(const game::GameState& state, const AssetStore& ass
 
 void Renderer::drawTileResources(const game::Resources& tile, const Vector3& position, const AssetStore& assets) {
     for (const auto& [resourceType, model] : assets.resourceModels()) {
-        drawResourceStack(model, position, resourceCount(tile, resourceType));
+        const std::uint32_t count = resourceCount(tile, resourceType);
+        if (count == 0) {
+            continue;
+        }
+        drawResourceStack(model, position, count, resourceType);
     }
 }
 
-void Renderer::drawResourceStack(const Model& model, const Vector3& position, std::uint32_t count) {
+void Renderer::drawResourceStack(const Model& model, const Vector3& position, std::uint32_t count,
+                                 game::ResourceType type) {
+    static constexpr auto kTypeCount = static_cast<float>(std::to_underlying(game::ResourceType::Thystame) + 1);
+    static constexpr float kBaseRadius = 0.32F;
+    static constexpr float kItemSpacing = 0.16F;
+
+    const float angle =
+        (static_cast<float>(std::to_underlying(type)) / kTypeCount) * (2.0F * std::numbers::pi_v<float>);
+    const float dirX = std::cos(angle);
+    const float dirZ = std::sin(angle);
+
     for (std::uint32_t i = 0; i < count; ++i) {
-        const float offsetX = (static_cast<float>(i % 2) * 0.5F) - 0.25F;
-        const float offsetZ = ((static_cast<float>(i) / 2.0F) * 0.5F) - 0.25F;
-        const Vector3 resourcePosition(position.x() + offsetX, position.y(), position.z() + offsetZ);
+        const float radius = kBaseRadius + (static_cast<float>(i) * kItemSpacing);
+        const Vector3 resourcePosition(position.x() + (dirX * radius), position.y(), position.z() + (dirZ * radius));
         model.draw(resourcePosition, kScale, Color::kWHITE);
+    }
+}
+
+void Renderer::drawEggs(const game::GameState& state, const AssetStore& assets) {
+    const auto& eggs = state.eggs();
+    for (const auto& [eggId, egg] : eggs) {
+        const Vector3 position = render::Grid::tileToWorld(static_cast<float>(egg.x), static_cast<float>(egg.y));
+        assets.eggModel().draw(position, kScale, Color::kWHITE);
     }
 }
 
@@ -89,34 +115,10 @@ std::uint32_t Renderer::resourceCount(const game::Resources& tile, game::Resourc
     return 0;
 }
 
-// TODO: real grid
-void Renderer::drawGrid(const game::GameState& state) {
-    const auto width = static_cast<int>(state.width());
-    const auto height = static_cast<int>(state.height());
-    if (width <= 0 || height <= 0) {
-        return;
-    }
-    constexpr float kOffset = 0.5F;
-    const Color color(60, 60, 60, 255);
-    const auto fWidth = static_cast<float>(width);
-    const auto fHeight = static_cast<float>(height);
-
-    for (int x = 0; x <= width; ++x) {
-        const auto fx = static_cast<float>(x) - kOffset;
-        DrawLine3D(Vector3(fx, 0.0F, -kOffset), Vector3(fx, 0.0F, fHeight - kOffset), color);
-    }
-    for (int z = 0; z <= height; ++z) {
-        const auto fz = static_cast<float>(z) - kOffset;
-        DrawLine3D(Vector3(-kOffset, 0.0F, fz), Vector3(fWidth - kOffset, 0.0F, fz), color);
-    }
-}
-
 void Renderer::drawPlayers(const game::GameState& state, AssetStore& assets) {
     const auto& teams = state.teams();
     const auto& players = state.players();
-    const float dt = GetFrameTime();
-    const auto width = static_cast<float>(state.width());
-    const auto height = static_cast<float>(state.height());
+    const float dt = GetFrameTime() * static_cast<float>(state.timeUnit());
 
     std::erase_if(_playerVisuals, [&players](const auto& entry) { return !players.contains(entry.first); });
 
@@ -132,7 +134,7 @@ void Renderer::drawPlayers(const game::GameState& state, AssetStore& assets) {
         const Color tint = Color{Color::teamTint(teamIndex, modelCount)};
 
         PlayerVisual& visual = _playerVisuals[playerId];
-        updatePlayerVisual(visual, player, width, height, dt, model);
+        updatePlayerVisual(visual, player, dt, model);
 
         model.drawEx(visual.position, Vector3(0.0F, 1.0F, 0.0F), calculAngle(player.orientation), scale, tint);
     }
@@ -152,12 +154,13 @@ float Renderer::torusNearest(float current, float target, float size) {
     return best;
 }
 
-void Renderer::updatePlayerPos(PlayerVisual& visual, const game::Player& player, float width, float height, float dt) {
-    const auto logicalX = static_cast<float>(player.x);
-    const auto logicalZ = static_cast<float>(player.y);
+void Renderer::updatePlayerPos(PlayerVisual& visual, const game::Player& player, float dt) const {
+    const Vector3 target = render::Grid::tileToWorld(static_cast<float>(player.x), static_cast<float>(player.y));
+    const float worldWidth = _grid.worldWidth();
+    const float worldHeight = _grid.worldHeight();
 
     if (!visual.initialized) {
-        visual.position = Vector3(logicalX, 0.0F, logicalZ);
+        visual.position = target;
         visual.tileX = player.x;
         visual.tileY = player.y;
         visual.initialized = true;
@@ -165,8 +168,8 @@ void Renderer::updatePlayerPos(PlayerVisual& visual, const game::Player& player,
 
     if (player.x != visual.tileX || player.y != visual.tileY) {
         visual.moveStart = visual.position;
-        visual.moveTarget = Vector3(torusNearest(visual.position.x(), logicalX, width), 0.0F,
-                                    torusNearest(visual.position.z(), logicalZ, height));
+        visual.moveTarget = Vector3(torusNearest(visual.position.x(), target.x(), worldWidth), 0.0F,
+                                    torusNearest(visual.position.z(), target.z(), worldHeight));
         visual.moveProgress = 0.0F;
         visual.moving = true;
         visual.tileX = player.x;
@@ -177,7 +180,7 @@ void Renderer::updatePlayerPos(PlayerVisual& visual, const game::Player& player,
         visual.moveProgress += (kMoveDuration > 0.0F) ? dt / kMoveDuration : 1.0F;
         if (visual.moveProgress >= 1.0F) {
             visual.moving = false;
-            visual.position = Vector3(logicalX, 0.0F, logicalZ);
+            visual.position = target;
         } else {
             const float t = visual.moveProgress;
             const float posX = visual.moveStart.x() + ((visual.moveTarget.x() - visual.moveStart.x()) * t);
@@ -212,9 +215,8 @@ void Renderer::updatePlayerAnimation(PlayerVisual& visual, float dt, Model& mode
     model.updateAnimation();
 }
 
-void Renderer::updatePlayerVisual(PlayerVisual& visual, const game::Player& player, float width, float height, float dt,
-                                  Model& model) {
-    updatePlayerPos(visual, player, width, height, dt);
+void Renderer::updatePlayerVisual(PlayerVisual& visual, const game::Player& player, float dt, Model& model) const {
+    updatePlayerPos(visual, player, dt);
     updatePlayerAnimation(visual, dt, model);
 }
 

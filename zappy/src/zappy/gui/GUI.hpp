@@ -18,10 +18,8 @@
 #include "zappy/gui/render/AssetStore.hpp"
 #include "zappy/gui/render/Camera.hpp"
 #include "zappy/gui/render/Renderer.hpp"
-#include "zappy/gui/ui/ChatPanel.hpp"
 #include "zappy/gui/ui/GuiTheme.hpp"
-#include "zappy/gui/ui/InfoPanel.hpp"
-#include "zappy/gui/ui/TimeUnitSlider.hpp"
+#include "zappy/gui/ui/Hud.hpp"
 #include "zappy/shared/io/Poller.hpp"
 #include "zappy/shared/network/Address.hpp"
 #include "zappy/shared/network/BufferedClient.hpp"
@@ -64,11 +62,8 @@ class GUI {
     render::Camera _camera;  // May be placed in renderer ?
     render::AssetStore _assets;
     render::Renderer _renderer;
-    ui::ChatPanel _chatPanel;
-    ui::TimeUnitSlider _timeSlider;
-    ui::InfoPanel _infoPanel;
+    ui::Hud _hud;
     int _loadingDots{0};
-    bool _victoryDismissed{false};
 };
 
 }  // namespace zappy::gui

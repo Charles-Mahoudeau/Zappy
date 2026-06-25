@@ -19,10 +19,9 @@
 #include "zappy/gui/display/Window.hpp"
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/render/Camera.hpp"
+#include "zappy/gui/render/Grid.hpp"
 #include "zappy/gui/render/utils/Color.hpp"
 #include "zappy/gui/render/utils/Vector3.hpp"
-#include "zappy/gui/ui/Mouse.hpp"
-#include "zappy/gui/ui/VictoryScreen.hpp"
 #include "zappy/gui/ui/Widgets.hpp"
 #include "zappy/gui/ui/utils/Rectangle.hpp"
 #include "zappy/shared/exception/InvalidState.hpp"
@@ -35,23 +34,14 @@ static constexpr int kTargetFPS = 60;
 static constexpr int kPollTimeoutMs = 16;
 static constexpr int kLoadingFontSize = 30;
 static constexpr int kLoadingMaxDots = 3;
-static constexpr float kChatPanelWidth = 320.0F;
-static constexpr float kChatPanelHeight = 180.0F;
-static constexpr float kChatPanelMargin = 8.0F;
 static constexpr std::string_view kStylePath = "assets/styles/style_lavanda_kyrou.rgs";
-static constexpr float kTimeSliderWidth = 220.0F;
-static constexpr float kTimeSliderHeight = 24.0F;
-static constexpr float kTimeSliderMarginTop = 8.0F;
-static constexpr float kTimeSliderMarginRight = 70.0F;
 static constexpr int kTimeSliderInitialValue = 1;
-static constexpr float kInfoPanelWidth = 320.0F;
-static constexpr float kInfoPanelMargin = 8.0F;
 
 GUI::GUI()
     : _parser{_state},
       _sender{_buffer},
       _handshake{_buffer, _sender, _parser, _state},
-      _timeSlider{_sender, kTimeSliderInitialValue} {}
+      _hud{_sender, kTimeSliderInitialValue, kWindowWidth, kWindowHeight} {}
 
 void GUI::connect(const GuiCliParser& cli) {
     _address = zappy::network::Address{std::string{cli.host()}, cli.port()};
@@ -70,8 +60,8 @@ void GUI::pump() {
 }
 
 void GUI::setupCamera() {
-    const auto width = static_cast<float>(_state.width());
-    const auto height = static_cast<float>(_state.height());
+    const float width = static_cast<float>(_state.width()) * render::Grid::kSpacing;
+    const float height = static_cast<float>(_state.height()) * render::Grid::kSpacing;
     const float span = std::max({width, height, 1.0F});
     const float centerX = width / 2.0F;
     const float centerZ = height / 2.0F;
@@ -144,34 +134,10 @@ int GUI::run() {
     while (!_window.shouldClose()) {
         _poller.poll(kPollTimeoutMs);
         _window.beginFrame();
+        _camera.applyManualZoomInput();
         _renderer.update(_camera, _state, _assets);
-        _chatPanel.draw(
-            _state.broadcasts(),
-            ui::Rectangle{kChatPanelMargin, static_cast<float>(kWindowHeight) - kChatPanelHeight - kChatPanelMargin,
-                          kChatPanelWidth, kChatPanelHeight});
-        _timeSlider.draw(
-            ui::Rectangle{kTimeSliderMarginRight, kTimeSliderMarginTop, kTimeSliderWidth, kTimeSliderHeight});
-
-        const auto& winner = _state.winner();
-        const bool victoryActive = winner.has_value() && !_victoryDismissed;
-        const float infoPanelX = static_cast<float>(kWindowWidth) - kInfoPanelWidth - kInfoPanelMargin;
-
-        if (!victoryActive) {
-            const ui::Rectangle infoPanelHeaderProbe{infoPanelX, kInfoPanelMargin, kInfoPanelWidth, 0.0F};
-            _infoPanel.update(ui::Mouse::position(), ui::Mouse::isLeftButtonPressed(), _camera, _state,
-                              infoPanelHeaderProbe);
-        }
-        const float infoPanelMaxHeight = static_cast<float>(kWindowHeight) - (2.0F * kInfoPanelMargin);
-        const float infoPanelHeight = std::min(_infoPanel.contentHeight(_state), infoPanelMaxHeight);
-        _infoPanel.draw(_state, ui::Rectangle{infoPanelX, kInfoPanelMargin, kInfoPanelWidth, infoPanelHeight});
-
-        if (victoryActive) {
-            const ui::Rectangle screenBounds{0.0F, 0.0F, static_cast<float>(kWindowWidth),
-                                             static_cast<float>(kWindowHeight)};
-            if (ui::VictoryScreen::draw(winner.value(), screenBounds)) {
-                _victoryDismissed = true;
-            }
-        }
+        _hud.update(_camera, _state);
+        _hud.draw(_state);
         _window.endFrame();
     }
     return 0;

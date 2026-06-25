@@ -9,12 +9,14 @@
 
 #include <gtest/gtest.h>
 
+#include "zappy/gui/render/Grid.hpp"
 #include "zappy/gui/render/utils/Ray.hpp"
 
 namespace ui = zappy::gui::ui;
 
 TEST(TileInfoTest, IntersectsValidTileDirectlyBelow) {
-    const zappy::gui::render::Ray ray{{2.0F, 5.0F, 3.0F}, {0.0F, -1.0F, 0.0F}};
+    constexpr float kSpacing = zappy::gui::render::Grid::kSpacing;
+    const zappy::gui::render::Ray ray{{2.0F * kSpacing, 5.0F, 3.0F * kSpacing}, {0.0F, -1.0F, 0.0F}};
     const auto hit = ui::TileInfo::intersectGroundPlane(ray, 10, 10);
     ASSERT_TRUE(hit.has_value());
     const auto [tileX, tileY] = hit.value();  // NOLINT

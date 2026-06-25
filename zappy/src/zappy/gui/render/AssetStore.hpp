@@ -11,6 +11,7 @@
 #include <functional>
 #include <initializer_list>
 #include <map>
+#include <memory>
 #include <string_view>
 #include <vector>
 
@@ -41,12 +42,19 @@ class AssetStore {
     void loadPlayerModel();
     void loadResourceModel(game::ResourceType type);
     void loadVFXs();
+    void loadEggModel();
+    void loadIslandModel();
+    void loadBridgeModel();
+
     [[nodiscard]] const Skybox& skybox() const;
     [[nodiscard]] Model& playerModel(std::size_t index);
     [[nodiscard]] std::size_t playerModelCount() const;
     [[nodiscard]] const std::map<game::ResourceType, Model>& resourceModels() const;
     [[nodiscard]] const std::map<std::string_view, ParticleEmitter>& vfxs() const;
     [[nodiscard]] std::map<std::string_view, ParticleEmitter>& vfxs();
+    [[nodiscard]] const Model& eggModel() const { return *_eggModel; }
+    [[nodiscard]] const Model& islandModel() const { return *_islandModel; }
+    [[nodiscard]] const Model& bridgeModel() const { return *_bridgeModel; }
 
   private:
     struct TextureMap {
@@ -64,6 +72,9 @@ class AssetStore {
     std::vector<Model> _playerModels;
     std::map<game::ResourceType, Model> _resourcesModels;
     std::map<std::string_view, ParticleEmitter> _vfxs;
+    std::unique_ptr<Model> _eggModel;
+    std::unique_ptr<Model> _islandModel;
+    std::unique_ptr<Model> _bridgeModel;
 };
 
 }  // namespace zappy::gui::render

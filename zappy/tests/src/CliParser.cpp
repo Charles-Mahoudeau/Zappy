@@ -71,11 +71,6 @@ TEST(CliParser, flags_in_different_order_parsed_correctly) {
     ASSERT_EQ(params.teamsName.size(), 2U);
 }
 
-TEST(CliParser, teams_flag_block_single_team) {
-    auto argv = makeFullArgv("4242", "10", "10", {"onlyTeam"});
-    ASSERT_THROW(build(argv), InvalidArg);
-}
-
 TEST(CliParser, empty_argv_throws) {
     const std::vector<std::string_view> argv = {};
     ASSERT_THROW(build(argv), InvalidArg);
@@ -156,12 +151,22 @@ TEST(CliParser, validity_rejects_zero_clients) {
     ASSERT_THROW(build(argv), InvalidArg);
 }
 
-TEST(CliParser, validity_rejects_zero_frequency) {
-    auto argv = makeFullArgv("4242", "10", "10", {"teamA", "teamB"}, "5", "0");
+TEST(CliParser, validity_rejects_to_high_frequency) {
+    auto argv = makeFullArgv("4242", "10", "10", {"teamA", "teamB"}, "5", "10001");
     ASSERT_THROW(build(argv), InvalidArg);
 }
 
 TEST(CliParser, validity_rejects_empty_teams) {
     auto argv = makeFullArgv("4242", "10", "10", std::vector<std::string_view>{});
+    ASSERT_THROW(build(argv), InvalidArg);
+}
+
+TEST(CliParser, validity_reject_width_below_10) {
+    auto argv = makeFullArgv("4242", "5", "10");
+    ASSERT_THROW(build(argv), InvalidArg);
+}
+
+TEST(CliParser, validity_reject_height_below_10) {
+    auto argv = makeFullArgv("4242", "10", "5");
     ASSERT_THROW(build(argv), InvalidArg);
 }

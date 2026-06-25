@@ -41,7 +41,12 @@ void GameState::setTile(std::size_t x, std::size_t y, const Resources& resources
     _tiles.at(idx) = resources;
 }
 
-void GameState::addTeam(std::string name) { _teams.push_back(std::move(name)); }
+void GameState::addTeam(std::string name) {
+    if (std::ranges::find(_teams, name) != _teams.end()) {
+        return;
+    }
+    _teams.push_back(std::move(name));
+}
 
 void GameState::addPlayer(std::uint32_t id, std::uint32_t x, std::uint32_t y, Orientation orientation,
                           std::uint32_t level, std::string team) {
@@ -79,7 +84,7 @@ void GameState::setPlayerInventory(std::uint32_t id, std::uint32_t x, std::uint3
 
 void GameState::removePlayer(std::uint32_t id) { _players.erase(id); }
 
-void GameState::addEgg(std::uint32_t eggId, std::uint32_t playerId, std::uint32_t x, std::uint32_t y) {
+void GameState::addEgg(std::uint32_t eggId, std::int32_t playerId, std::uint32_t x, std::uint32_t y) {
     _eggs.emplace(eggId, Egg{.playerId = playerId, .x = x, .y = y});
 }
 
