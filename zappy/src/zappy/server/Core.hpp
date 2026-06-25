@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <memory>
 #include <span>
 #include <string_view>
@@ -20,6 +21,7 @@
 #include "zappy/server/game/World.hpp"
 #include "zappy/server/net/Server.hpp"
 #include "zappy/shared/io/Logger.hpp"
+#include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server {
 

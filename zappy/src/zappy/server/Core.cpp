@@ -7,6 +7,7 @@
 
 #include "zappy/server/Core.hpp"
 
+#include <cstdint>
 #include <format>
 #include <iostream>
 #include <memory>
@@ -32,6 +33,7 @@ void Core::init(const std::span<std::string_view> argv) {
     const CliParser::CliParameters& parameters = parser.parameters();
     _logger.info("Parameters parsed and validated.");
 
+    // ReSharper disable CppDFAConstantConditions
     if (initTeams(parameters.teamsName) && initNetwork(parameters.port) && initTimer(parameters.frequencies) &&
         initWorld({parameters.mapWidth, parameters.mapHeight}) && initCommandGroups()) {
         _logger.info("Initialization done.");
@@ -39,6 +41,7 @@ void Core::init(const std::span<std::string_view> argv) {
         _logger.fatal("Error occurred during initialization.");
         throw exception::InvalidState{"initialization error"};
     }
+    // ReSharper restore CppDFAConstantConditions
 }
 
 void Core::run() {
@@ -107,17 +110,13 @@ bool Core::initNetwork(const std::uint16_t port) {
     return true;
 }
 
+// ReSharper disable once CppDFAConstantFunctionResult
 bool Core::initTimer(const std::uint16_t frequency) {
     if (frequency == 0) {
         _logger.info("Using default timer frequency.");
         return true;
     }
-    try {
-        _timer.setFrequencies(frequency);
-    } catch (const exception::Exception& e) {
-        _logger.error(std::format("Failed to initialize timer: {}", e.what()));
-        return false;
-    }
+    _timer.setFrequencies(frequency);
     _logger.info("Timer initialized.");
     return true;
 }
@@ -140,14 +139,9 @@ bool Core::initCommandGroups() {
         return std::make_unique<T>(_timer, _clientRegistry, *_world, _logger);
     };
 
-    try {
-        _cmdGroups.emplace(kPlayer, makeGroup.operator()<command::PlayerCommands>());
-        _cmdGroups.emplace(kGui, makeGroup.operator()<command::GuiCommands>());
-        _cmdGroups.emplace(kUnknown, makeGroup.operator()<command::UnknownCommands>());
-    } catch (const exception::Exception& e) {
-        _logger.error(std::format("Failed to initialize command groups: {}", e.what()));
-        return false;
-    }
+    _cmdGroups.emplace(kPlayer, makeGroup.operator()<command::PlayerCommands>());
+    _cmdGroups.emplace(kGui, makeGroup.operator()<command::GuiCommands>());
+    _cmdGroups.emplace(kUnknown, makeGroup.operator()<command::UnknownCommands>());
     _logger.info("Command groups initialized.");
     return true;
 }
