@@ -47,6 +47,10 @@ add_library(zappy_server_objects OBJECT
         commands/GuiCommands.cpp
         commands/PlayerCommands.hpp
         commands/PlayerCommands.cpp
+        client/TeamRegistry.cpp
+        client/TeamRegistry.hpp
+        client/Team.cpp
+        client/Team.hpp
 )
 target_include_directories(zappy_server_objects PUBLIC
         ${CMAKE_SOURCE_DIR}/src
