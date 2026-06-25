@@ -10,13 +10,9 @@
 #include <string_view>
 #include <unordered_map>
 
-#include "zappy/server/Timer.hpp"
 #include "zappy/server/client/Client.hpp"
-#include "zappy/server/client/ClientRegistry.hpp"
 #include "zappy/server/commands/ACommandGroup.hpp"
 #include "zappy/server/commands/ICommandGroup.hpp"
-#include "zappy/server/game/World.hpp"
-#include "zappy/shared/io/Logger.hpp"
 
 namespace zappy::server::command {
 

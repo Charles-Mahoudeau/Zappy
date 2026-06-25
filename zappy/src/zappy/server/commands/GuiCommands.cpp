@@ -9,12 +9,11 @@
 
 #include <string_view>
 #include <tuple>
+#include <utility>
 
 #include "zappy/server/client/Client.hpp"
-#include "zappy/server/client/ClientRegistry.hpp"
 #include "zappy/server/commands/ACommandGroup.hpp"
 #include "zappy/server/commands/ICommandGroup.hpp"
-#include "zappy/server/game/World.hpp"
 
 namespace zappy::server::command {
 
