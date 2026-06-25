@@ -8,6 +8,7 @@
 #include "zappy/server/commands/PlayerCommands.hpp"
 
 #include <string_view>
+#include <utility>
 
 #include "zappy/server/client/Client.hpp"
 #include "zappy/server/commands/ACommandGroup.hpp"
