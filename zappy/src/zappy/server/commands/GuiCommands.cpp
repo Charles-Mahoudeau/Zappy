@@ -79,7 +79,7 @@ bool GuiCommands::bct(const CommandCtx& ctx) {
     const std::optional<math::Vector2u> position = parsePosition(ctx.data.params);
 
     if (!position.has_value()) {
-        ctx.logger.get().warn("bct invalid position");
+        ctx.logger.get().warn("Unable to parse position argument.");
         return false;
     }
 
@@ -89,7 +89,7 @@ bool GuiCommands::bct(const CommandCtx& ctx) {
         std::ignore = ctx.client->sendMessage(game::WireHelper::tileToBctCommand(tile));
         return true;
     } catch (const exception::OutOfRange& e) {
-        ctx.logger.get().warn("tile out of range: {}", e.what());
+        ctx.logger.get().warn("Tile out of range: {}.", e.what());
     }
     return false;
 }
@@ -113,14 +113,14 @@ bool GuiCommands::ppo(const CommandCtx& ctx) {
     const std::optional<std::uint32_t> playerId = parsePlayerId(ctx.data.params.at(0));
 
     if (!playerId.has_value()) {
-        ctx.logger.get().warn("invalid argument");
+        ctx.logger.get().warn("Unable to parse player id argument.");
         return false;
     }
 
     const game::entity::Player* player = ctx.world.get().player(*playerId);
 
     if (player == nullptr) {
-        ctx.logger.get().warn("player not found");
+        ctx.logger.get().warn("Player #{} not found.", *playerId);
         return false;
     }
 
@@ -135,14 +135,14 @@ bool GuiCommands::plv(const CommandCtx& ctx) {
     const std::optional<std::uint32_t> playerId = parsePlayerId(ctx.data.params.at(0));
 
     if (!playerId.has_value()) {
-        ctx.logger.get().warn("invalid argument");
+        ctx.logger.get().warn("Unable to parse player id argument.");
         return false;
     }
 
     const game::entity::Player* player = ctx.world.get().player(*playerId);
 
     if (player == nullptr) {
-        ctx.logger.get().warn("player not found");
+        ctx.logger.get().warn("Player #{} not found.", *playerId);
         return false;
     }
     std::ignore = ctx.client->sendMessage("plv #{} {}\n", *playerId, player->level());
@@ -153,14 +153,14 @@ bool GuiCommands::pin(const CommandCtx& ctx) {
     const std::optional<std::uint32_t> playerId = parsePlayerId(ctx.data.params.at(0));
 
     if (!playerId.has_value()) {
-        ctx.logger.get().warn("invalid argument");
+        ctx.logger.get().warn("Unable to parse player id argument.");
         return false;
     }
 
     const game::entity::Player* player = ctx.world.get().player(*playerId);
 
     if (player == nullptr) {
-        ctx.logger.get().warn("player not found");
+        ctx.logger.get().warn("Player #{} not found.", *playerId);
         return false;
     }
 
@@ -178,18 +178,18 @@ bool GuiCommands::sgt(const CommandCtx& ctx) {
 
 bool GuiCommands::sst(const CommandCtx& ctx) {
     if (ctx.data.params.size() != 1) {
-        ctx.logger.get().warn("invalid number of arguments");
+        ctx.logger.get().warn("Invalid number of arguments.");
         return false;
     }
     const std::optional<std::uint32_t> timeUnit = parseUint32(ctx.data.params.at(0));
 
     if (!timeUnit.has_value()) {
-        ctx.logger.get().warn("invalid argument");
+        ctx.logger.get().warn("Unable to parse time unit argument.");
         return false;
     }
     ctx.timer.get().setFrequency(*timeUnit);
     std::ignore = ctx.clientRegistry.get().broadcast(Client::Type::kGui, "sgt {}\n", ctx.timer.get().frequency());
-    ctx.logger.get().info("timer frequency set to {} (from '{}')", ctx.timer.get().frequency(), ctx.data.params.at(0));
+    ctx.logger.get().info("Timer frequency set to {} (from '{}').", ctx.timer.get().frequency(), ctx.data.params.at(0));
     return true;
 }
 
