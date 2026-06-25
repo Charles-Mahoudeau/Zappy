@@ -129,7 +129,7 @@ class Client {
     [[nodiscard]] bool sendMessage(std::string_view msg) const;
 
     template <typename... Args>
-    [[nodiscard]] bool sendMessage(std::string_view fmt, Args... args) const;
+    [[nodiscard]] bool sendMessage(std::format_string<Args...> fmt, Args&&... args) const;
 
     /**
      * @brief check if the client currently have a action running
@@ -179,8 +179,8 @@ class Client {
 };
 
 template <typename... Args>
-bool Client::sendMessage(std::string_view fmt, Args... args) const {
-    return this->sendMessage(std::vformat(fmt, std::make_format_args(args...)));
+bool Client::sendMessage(std::format_string<Args...> fmt, Args&&... args) const {
+    return this->sendMessage(std::format(fmt, std::forward<Args>(args)...));
 }
 
 }  // namespace zappy::server
