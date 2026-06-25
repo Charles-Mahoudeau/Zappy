@@ -22,6 +22,7 @@
 #include "utils/Vector2.hpp"
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/render/Camera.hpp"
+#include "zappy/gui/render/Grid.hpp"
 #include "zappy/gui/render/utils/Ray.hpp"
 #include "zappy/gui/render/utils/Vector3.hpp"
 
@@ -72,7 +73,9 @@ std::optional<std::uint32_t> PlayerInfo::pick(Vector2 mousePos, const render::Ca
     const render::Ray ray{GetMouseRay(mousePos, camera.operator Camera3D())};
 
     for (const auto& [id, player] : state.players()) {
-        if (intersectsPlayer(ray, static_cast<float>(player.x), static_cast<float>(player.y), kPickRadius)) {
+        const render::Vector3 worldPos =
+            render::Grid::tileToWorld(static_cast<float>(player.x), static_cast<float>(player.y));
+        if (intersectsPlayer(ray, worldPos.x(), worldPos.z(), kPickRadius)) {
             return id;
         }
     }

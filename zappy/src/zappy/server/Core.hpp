@@ -12,6 +12,7 @@
 #include <string_view>
 #include <unordered_map>
 
+#include "client/TeamRegistry.hpp"
 #include "zappy/server/Timer.hpp"
 #include "zappy/server/client/Client.hpp"
 #include "zappy/server/client/ClientRegistry.hpp"
@@ -41,12 +42,13 @@ class Core {
     void nextTick();
 
   private:
+    io::Logger _logger{"Server", "server.log", true};
     net::Server _serv;
     Timer _time;
     client::ClientRegistry _clientRegistry;
     std::unique_ptr<game::World> _world;
-    io::Logger _logger{"Zappy Server"};
     std::unordered_map<Client::Type, std::unique_ptr<command::ICommandGroup>> _cmdGroups;
+    client::TeamRegistry _teamRegistry;
 };
 
 }  // namespace zappy::server

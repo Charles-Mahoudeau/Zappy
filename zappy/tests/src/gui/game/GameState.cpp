@@ -92,6 +92,13 @@ TEST(GameStateTest, AddTeamStoresName) {
     EXPECT_EQ(state.teams().at(1), "beta");
 }
 
+TEST(GameStateTest, AddTeamIgnoresDuplicateName) {
+    GameState state;
+    state.addTeam("alpha");
+    state.addTeam("alpha");
+    EXPECT_EQ(state.teams().size(), 1U);
+}
+
 TEST(GameStateTest, AddPlayerStoresPlayer) {
     GameState state;
     state.addPlayer(1, 3, 4, Orientation::North, 2, "alpha");
