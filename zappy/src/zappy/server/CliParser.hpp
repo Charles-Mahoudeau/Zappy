@@ -40,8 +40,8 @@ class CliParser {
   private:
     CliParameters _parameters;
 
-    static constexpr std::string_view kOVERFLOW_MESSAGE = "Value overflow for -{}: '{}' exceeds allowed range [0, {}]";
-    static constexpr std::string_view kNAME_KEYWORD = "GRAPHIC";
+    static constexpr std::string_view kOverflowMessage = "Value overflow for -{}: '{}' exceeds allowed range [0, {}]";
+    static constexpr std::string_view kNameKeyword = "GRAPHIC";
 
     /**
      * @brief Parses command-line arguments into CLI parameters.

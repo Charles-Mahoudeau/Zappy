@@ -60,7 +60,7 @@ T CliParser::stringToUnNumber(std::string_view value, std::string_view flagName)
     std::uint64_t parsed = 0;
 
     if (!value.empty() && value.at(0) == '-') {
-        throw exception::InvalidArgument(std::format(kOVERFLOW_MESSAGE, flagName, value, maxVal));
+        throw exception::InvalidArgument(std::format(kOverflowMessage, flagName, value, maxVal));
     }
     try {
         size_t pos = 0;
@@ -73,11 +73,11 @@ T CliParser::stringToUnNumber(std::string_view value, std::string_view flagName)
         throw exception::InvalidArgument(
             std::format("Invalid value for -{}: '{}' is not a valid number", flagName, value));
     } catch (const std::out_of_range&) {
-        throw exception::InvalidArgument(std::format(kOVERFLOW_MESSAGE, flagName, value, maxVal));
+        throw exception::InvalidArgument(std::format(kOverflowMessage, flagName, value, maxVal));
     }
 
     if (parsed > maxVal) {
-        throw exception::InvalidArgument(std::format(kOVERFLOW_MESSAGE, flagName, value, maxVal));
+        throw exception::InvalidArgument(std::format(kOverflowMessage, flagName, value, maxVal));
     }
     return static_cast<T>(parsed);
 }
@@ -127,9 +127,9 @@ void CliParser::ensureValidArguments() const {
         }
     }
     for (const auto& teamName : this->_parameters.teamsName) {
-        if (teamName == kNAME_KEYWORD) {
+        if (teamName == kNameKeyword) {
             throw exception::InvalidArgument(
-                std::format("{} is a Keyword. You cannot use it as team name", kNAME_KEYWORD));
+                std::format("{} is a Keyword. You cannot use it as team name", kNameKeyword));
         }
         if (std::ranges::any_of(teamName, [](unsigned char ch) { return std::isspace(ch); })) {
             throw exception::InvalidArgument(std::format("Team space cannot contain spaces: {}", teamName));

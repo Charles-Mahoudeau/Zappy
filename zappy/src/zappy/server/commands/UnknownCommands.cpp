@@ -26,15 +26,15 @@ void UnknownCommands::execute(Client* client, [[maybe_unused]] const std::string
     }
     const auto& askedTeam = ctx.data.name;
 
-    if (UnknownCommands::guiType(askedTeam, client, ctx)) {
+    if (UnknownCommands::handleGuiType(askedTeam, client, ctx)) {
         return;
     }
-    if (!UnknownCommands::PlayerType(askedTeam, client, ctx)) {
+    if (!UnknownCommands::handlePlayerType(askedTeam, client, ctx)) {
         std::ignore = client->sendMessage("ko\n");
     }
 }
 
-bool UnknownCommands::guiType(std::string_view askedTeam, Client* client, const CommandCtx& ctx) {
+bool UnknownCommands::handleGuiType(std::string_view askedTeam, Client* client, const CommandCtx& ctx) {
     const auto& logger = ctx.logger.get();
 
     if (askedTeam == "GRAPHIC") {
@@ -46,7 +46,7 @@ bool UnknownCommands::guiType(std::string_view askedTeam, Client* client, const 
     return false;
 }
 
-bool UnknownCommands::PlayerType(std::string_view askedTeam, Client* client, CommandCtx& ctx) {
+bool UnknownCommands::handlePlayerType(std::string_view askedTeam, Client* client, CommandCtx& ctx) {
     auto& teams = ctx.teamRegistry.get();
     auto& world = ctx.world.get();
     auto& logger = ctx.logger.get();
