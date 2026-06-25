@@ -157,8 +157,11 @@ class ZappyClient:
             return False
         self._send_raw(self.team)
         slots_line = self._readline(5.0)
+        if slots_line is None or slots_line == "ko":
+            self._die()
+            return False
         dims_line = self._readline(5.0)
-        if slots_line is None or dims_line is None:
+        if dims_line is None:
             self._die()
             return False
         try:
