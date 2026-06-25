@@ -7,6 +7,7 @@
 
 #include "zappy/server/commands/GuiCommands.hpp"
 
+#include <cstddef>
 #include <cstdint>
 #include <format>
 #include <limits>
@@ -200,9 +201,10 @@ bool GuiCommands::sst(const CommandCtx& ctx) {
 
 std::optional<std::uint32_t> GuiCommands::parseUint32(const std::string& str) {
     try {
-        const std::uint64_t v = std::stoul(str);
+        std::size_t parsedLength{0};
+        const std::uint64_t v = std::stoul(str, &parsedLength);
 
-        if (v > std::numeric_limits<std::uint32_t>::max()) {
+        if (parsedLength != str.size() || v > std::numeric_limits<std::uint32_t>::max()) {
             return std::nullopt;
         }
         return v;
@@ -220,17 +222,14 @@ std::optional<math::Vector2u> GuiCommands::parsePosition(const std::span<const s
 
     try {
         // NOLINTBEGIN(*-pro-bounds-avoid-unchecked-container-access)
-        const std::uint64_t x = std::stoul(params[0]);
-        const std::uint64_t y = std::stoul(params[1]);
+        const std::optional<std::uint32_t> x = parseUint32(params[0]);
+        const std::optional<std::uint32_t> y = parseUint32(params[1]);
         // NOLINTEND(*-pro-bounds-avoid-unchecked-container-access)
 
-        if (x > std::numeric_limits<std::uint32_t>::max() || y > std::numeric_limits<std::uint32_t>::max()) {
+        if (!x.has_value() || !y.has_value()) {
             return std::nullopt;
         }
-        return math::Vector2u{
-            static_cast<std::uint32_t>(x),
-            static_cast<std::uint32_t>(y),
-        };
+        return math::Vector2u{*x, *y};
     } catch (const std::invalid_argument&) {
         return std::nullopt;
     } catch (const std::out_of_range&) {
