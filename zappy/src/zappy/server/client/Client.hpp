@@ -8,6 +8,7 @@
 #pragma once
 
 #include <cstdint>
+#include <format>
 #include <optional>
 #include <queue>
 #include <string>
@@ -127,6 +128,9 @@ class Client {
      */
     [[nodiscard]] bool sendMessage(std::string_view msg) const;
 
+    template <typename... Args>
+    [[nodiscard]] bool sendMessage(std::format_string<Args...> fmt, Args&&... args) const;
+
     /**
      * @brief check if the client currently have a action running
      * @return bool true if in timeout. false otherwise
@@ -145,6 +149,18 @@ class Client {
      */
     void removeTimeout();
 
+    /**
+     * @brief set the player id the client is related to
+     * @param id entity id from the entityDB
+     */
+    void setPlayerID(std::uint64_t id);
+
+    /**
+     * @brief get the player Id
+     * @return id as std::unint64
+     */
+    [[nodiscard]] std::uint64_t playerID() const;
+
   private:
     Timer& _timer;
     std::uint64_t _timeoutId = 0;
@@ -152,6 +168,7 @@ class Client {
     Type _type = Client::Type::kUnknown;
     network::Address _addr;
     net::SocketRegistry& _socketsRegistery;
+    std::uint64_t _playerID = 0;
 
     /**
      * @brief Max Number requests related to a client.
@@ -160,5 +177,10 @@ class Client {
      */
     static constexpr int kMaxRequests = 10;
 };
+
+template <typename... Args>
+bool Client::sendMessage(std::format_string<Args...> fmt, Args&&... args) const {
+    return this->sendMessage(std::format(fmt, std::forward<Args>(args)...));
+}
 
 }  // namespace zappy::server

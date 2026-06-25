@@ -7,6 +7,7 @@
 
 #include "World.hpp"
 
+#include <algorithm>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
@@ -103,7 +104,7 @@ void World::spawnResource(const ResourceType type) {
     });
 }
 
-void World::spawnStartEggs(const std::span<std::string_view> teams, const std::uint8_t playersPerTeam) {
+void World::spawnStartEggs(const std::span<const std::string_view> teams, const std::uint8_t playersPerTeam) {
     for (const std::string_view teamName : teams) {
         for (std::uint16_t i = 0; i < playersPerTeam; ++i) {
             std::ignore = spawnEgg(teamName);
@@ -169,6 +170,11 @@ std::expected<std::uint64_t, std::string> World::hatchRandomEgg(const std::strin
         .eggId = *eggIdOpt,
     });
     return playerId;
+}
+
+std::uint64_t World::eggCount(std::string_view teamName) {
+    return std::ranges::count_if(this->entityDatabase().viewAll<entity::Egg>(),
+                                 [teamName](const entity::Egg* egg) { return egg->teamName() == teamName; });
 }
 
 EntityDatabase::EntityView<const entity::Player> World::players(const std::string_view teamName) const {

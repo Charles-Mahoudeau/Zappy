@@ -7,6 +7,7 @@
 
 #include "zappy/server/client/Client.hpp"
 
+#include <cstdint>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -89,5 +90,9 @@ bool Client::sendMessage(std::string_view msg) const {
     }
     return true;
 }
+
+void Client::setPlayerID(std::uint64_t id) { this->_playerID = id; }
+
+std::uint64_t Client::playerID() const { return this->_playerID; }
 
 }  // namespace zappy::server

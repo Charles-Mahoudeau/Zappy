@@ -47,7 +47,8 @@ class Core {
     [[nodiscard]] bool initTeams(std::span<const std::string_view> names);
     [[nodiscard]] bool initNetwork(std::uint16_t port);
     [[nodiscard]] bool initTimer(std::uint16_t frequency);
-    [[nodiscard]] bool initWorld(math::Vector2u size);
+    [[nodiscard]] bool initWorld(math::Vector2u size, std::span<const std::string_view> teams,
+                                 std::uint16_t nbPlayerPerTeam);
     [[nodiscard]] bool initCommandGroups();
 
     io::Logger _logger{"Server", "server.log", true};

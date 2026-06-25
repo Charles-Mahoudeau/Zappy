@@ -71,6 +71,22 @@ TEST_F(WorldTest, EggSpawning) {
     EXPECT_EQ(world.count<zappy::server::game::entity::Egg>(), 1);
 }
 
+TEST_F(WorldTest, TeamCount) {
+    zappy::server::game::World world{
+        {10, 10},
+        logger("EggSpawning"),
+    };
+
+    std::ignore = world.spawnEgg("team1");
+    std::ignore = world.spawnEgg("team1");
+    std::ignore = world.spawnEgg("team1");
+    std::ignore = world.spawnEgg("team2");
+
+    EXPECT_EQ(world.eggCount("team1"), 3);
+    EXPECT_EQ(world.eggCount("team2"), 1);
+    EXPECT_EQ(world.eggCount("team3"), 0);
+}
+
 TEST_F(WorldTest, PlayerAccess) {
     zappy::server::game::World world{
         {10, 10},
