@@ -53,15 +53,16 @@ bool UnknownCommands::handlePlayerType(std::string_view askedTeam, Client* clien
 
     try {
         auto worldSize = world.size();
+        auto playerId = world.hatchRandomEgg(askedTeam);
 
-        auto result = world.hatchRandomEgg(askedTeam);
-        if (!result.has_value()) {
+        if (!playerId.has_value()) {
             logger.error("Fail to hatch egg for {}", client->address().string());
             return false;
         }
         teams.addToTeam(askedTeam, client->address());
-        client->setPlayerID(result.value());
+        client->setPlayerID(playerId.value());
         client->changeType(Client::Type::kPlayer);
+        ctx.logger.get().info("Created new player #{}", *playerId);
         std::ignore = client->sendMessage("{}\n", world.eggCount(askedTeam));
         std::ignore = client->sendMessage("{} {}\n", worldSize.x, worldSize.y);
 
