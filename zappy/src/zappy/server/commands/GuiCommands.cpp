@@ -124,17 +124,21 @@ bool GuiCommands::tna(const CommandCtx& ctx) {
 bool GuiCommands::ppo(const CommandCtx& ctx) {
     const std::optional<std::uint32_t> playerId = parseUint32(ctx.data.params.at(0));
 
-    if (!playerId.has_value() || !ctx.world.get().entityDatabase().is<game::entity::Player>(*playerId)) {
+    if (!playerId.has_value()) {
         ctx.logger.get().warn("invalid argument");
         return false;
     }
 
-    const std::optional<math::Vector2u> position = ctx.world.get().grid().position(*playerId);
+    const game::entity::Player* player = ctx.world.get().player(*playerId);
 
-    if (!position.has_value()) {
+    if (player == nullptr) {
+        ctx.logger.get().warn("invalid argument");
         return false;
     }
-    std::ignore = ctx.client->sendMessage(std::format("ppo {} {}\n", position->x, position->y));
+
+    const math::Vector2u playerPosition = player->position();
+
+    std::ignore = ctx.client->sendMessage(std::format("ppo {} {}\n", playerPosition.x, playerPosition.y));
     return true;
 }
 
