@@ -177,6 +177,10 @@ bool GuiCommands::sgt(const CommandCtx& ctx) {
 }
 
 bool GuiCommands::sst(const CommandCtx& ctx) {
+    if (ctx.data.params.size() != 1) {
+        ctx.logger.get().warn("invalid number of arguments");
+        return false;
+    }
     const std::optional<std::uint32_t> timeUnit = parseUint32(ctx.data.params.at(0));
 
     if (!timeUnit.has_value()) {
@@ -184,7 +188,8 @@ bool GuiCommands::sst(const CommandCtx& ctx) {
         return false;
     }
     ctx.timer.get().setFrequency(*timeUnit);
-    std::ignore = ctx.client->sendMessage(std::format("sst {}\n", ctx.timer.get().frequency()));
+    std::ignore = ctx.clientRegistry.get().broadcast(Client::Type::kGui, "sgt {}\n", ctx.timer.get().frequency());
+    ctx.logger.get().info("timer frequency set to {} (from '{}')", ctx.timer.get().frequency(), ctx.data.params.at(0));
     return true;
 }
 
