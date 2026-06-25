@@ -23,6 +23,7 @@
 #include "zappy/server/game/World.hpp"
 #include "zappy/shared/exception/Exception.hpp"
 #include "zappy/shared/exception/InvalidState.hpp"
+#include "zappy/shared/io/Logger.hpp"
 #include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server {
@@ -35,7 +36,8 @@ void Core::init(const std::span<std::string_view> argv) {
 
     // ReSharper disable CppDFAConstantConditions
     if (initTeams(parameters.teamsName) && initNetwork(parameters.port) && initTimer(parameters.frequencies) &&
-        initWorld({parameters.mapWidth, parameters.mapHeight}) && initCommandGroups()) {
+        initWorld({parameters.mapWidth, parameters.mapHeight}, parameters.teamsName, parameters.nbPlayerPerTeam) &&
+        initCommandGroups()) {
         _logger.info("Initialization done.");
     } else {
         _logger.fatal("Error occurred during initialization.");
@@ -122,9 +124,10 @@ bool Core::initTimer(const std::uint16_t frequency) {
     return true;
 }
 
-bool Core::initWorld(math::Vector2u size) {
+bool Core::initWorld(math::Vector2u size, std::span<const std::string_view> teams, std::uint16_t nbPlayerPerTeam) {
     try {
         _world = std::make_unique<game::World>(size, _logger.derive("World"));
+        _world->spawnStartEggs(teams, nbPlayerPerTeam);
     } catch (const exception::Exception& e) {
         _logger.error(std::format("Failed to initialize world: {}", e.what()));
         return false;

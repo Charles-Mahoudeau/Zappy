@@ -31,7 +31,7 @@ class CliParser {
         std::uint32_t mapWidth = 0;
         std::uint32_t mapHeight = 0;
         std::vector<std::string_view> teamsName;
-        std::uint32_t nbInitialClient = 0;
+        std::uint32_t nbPlayerPerTeam = 0;
         std::uint16_t frequencies = 0;
     };
 
@@ -40,7 +40,8 @@ class CliParser {
   private:
     CliParameters _parameters;
 
-    static constexpr std::string_view OVERFLOW_MESSAGE = "Value overflow for -{}: '{}' exceeds allowed range [0, {}]";
+    static constexpr std::string_view kOverflowMessage = "Value overflow for -{}: '{}' exceeds allowed range [0, {}]";
+    static constexpr std::string_view kNameKeyword = "GRAPHIC";
 
     /**
      * @brief Parses command-line arguments into CLI parameters.

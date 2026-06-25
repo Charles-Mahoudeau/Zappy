@@ -25,6 +25,10 @@ class UnknownCommands : public ACommandGroup {
     UnknownCommands& operator=(UnknownCommands&&) = delete;
 
     void execute(Client* client, std::string_view cmd) override;
+
+  private:
+    static bool handleGuiType(std::string_view askedTeam, Client* client, const CommandCtx& ctx);
+    static bool handlePlayerType(std::string_view askedTeam, Client* client, CommandCtx& ctx);
 };
 
 }  // namespace zappy::server::command
