@@ -119,6 +119,13 @@ class EntityDatabase {
     template <IsEntity T>
     EntityIdView filter(std::span<std::uint64_t> ids) const;
 
+    /// @brief Checks if the specified entity is of type T.
+    /// @tparam T The type to check.
+    /// @param id The ID of the entity to check.
+    /// @return True if the entity is of type T, false otherwise.
+    template <IsEntity T>
+    [[nodiscard]] bool is(std::uint64_t id) const;
+
   private:
     /// @brief Generate a unique ID for a new entity.
     /// @return A unique ID for a new entity.
@@ -209,5 +216,15 @@ EntityDatabase::EntityIdView EntityDatabase::filter(std::span<std::uint64_t> ids
     return entities |
            std::views::filter([ids](const auto& pair) { return std::ranges::find(ids, pair.first) != ids.end(); }) |
            std::views::keys;
+}
+
+template <IsEntity T>
+bool EntityDatabase::is(const std::uint64_t id) const {
+    const auto it = _entitiesByType.find(typeid(T));
+
+    if (it == _entitiesByType.end()) {
+        return false;
+    }
+    return it->second.contains(id);
 }
 }  // namespace zappy::server::game
