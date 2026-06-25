@@ -239,7 +239,7 @@ void Renderer::drawVFXs(Camera& camera, AssetStore& assets) {
 
     for (auto& [name, emitter] : assets.vfxs()) {
         totalParticles += emitter.draw(camera);
-        if (totalParticles >= kMaxParticles) {
+        if (totalParticles >= kParticlesCeiling) {
             break;
         }
     }
