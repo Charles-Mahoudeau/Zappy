@@ -27,7 +27,7 @@ GuiCommands::GuiCommands(CommandCtx context)
           {"ppo", [](const CommandCtx& ctx) { return ignore(ctx); }},
           {"plv", [](const CommandCtx& ctx) { return ignore(ctx); }},
           {"pin", [](const CommandCtx& ctx) { return ignore(ctx); }},
-          {"sgt", [](const CommandCtx& ctx) { return ignore(ctx); }},
+          {"sgt", [](const CommandCtx& ctx) { return sgt(ctx); }},
           {"sst", [](const CommandCtx& ctx) { return ignore(ctx); }},
       }) {}
 
@@ -107,6 +107,11 @@ bool GuiCommands::tna(const CommandCtx& ctx) {
         stringStream << std::format("tna {}\n", teamName);
     }
     std::ignore = ctx.client->sendMessage(stringStream.str());
+    return true;
+}
+
+bool GuiCommands::sgt(const CommandCtx& ctx) {
+    std::ignore = ctx.client->sendMessage(std::format("sgt {}\n", ctx.timer.get().frequency()));
     return true;
 }
 

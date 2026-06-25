@@ -34,6 +34,7 @@ class GuiCommands : public ACommandGroup {
     static bool bct(const CommandCtx& ctx);
     static bool mct(const CommandCtx& ctx);
     static bool tna(const CommandCtx& ctx);
+    static bool sgt(const CommandCtx& ctx);
 
     static std::optional<std::string> serializeTile(const CommandCtx& ctx, math::Vector2u position);
 
