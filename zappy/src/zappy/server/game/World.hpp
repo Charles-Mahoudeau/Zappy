@@ -98,7 +98,7 @@ class World : public IEventEmitter {
     /// @brief get the number of Egg in the given team
     /// @param teamName The name of the team to hatch the egg for.
     /// @return The number of egg in the team
-    std::uint64_t eggCount(std::string_view teamName);
+    [[nodiscard]] std::uint64_t eggCount(std::string_view teamName) const;
 
     /// @brief Returns a view of all players in the specified team.
     /// @param teamName The name of the team to get the players from.

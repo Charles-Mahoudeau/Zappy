@@ -172,7 +172,7 @@ std::expected<std::uint64_t, std::string> World::hatchRandomEgg(const std::strin
     return playerId;
 }
 
-std::uint64_t World::eggCount(std::string_view teamName) {
+std::uint64_t World::eggCount(std::string_view teamName) const {
     return std::ranges::count_if(this->entityDatabase().viewAll<entity::Egg>(),
                                  [teamName](const entity::Egg* egg) { return egg->teamName() == teamName; });
 }
