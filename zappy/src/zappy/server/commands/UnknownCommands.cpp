@@ -38,7 +38,7 @@ bool UnknownCommands::guiType(std::string_view askedTeam, Client* client, const 
     const auto& logger = ctx.logger.get();
 
     if (askedTeam == "GRAPHIC") {
-        logger.info(std::format("Client {} registered as GUI", client->address().string()));
+        logger.info("Client {} registered as GUI", client->address().string());
         client->changeType(Client::Type::kGui);
 
         return true;
@@ -56,19 +56,20 @@ bool UnknownCommands::PlayerType(std::string_view askedTeam, Client* client, Com
 
         auto result = world.hatchRandomEgg(askedTeam);
         if (!result.has_value()) {
-            logger.error(std::format("Fail to hatch egg for {}", client->address().string()));
+            logger.error("Fail to hatch egg for {}", client->address().string());
             return false;
         }
         teams.addToTeam(askedTeam, client->address());
         client->setPlayerID(result.value());
         client->changeType(Client::Type::kPlayer);
-        std::ignore = client->sendMessage(std::format("{}\n", world.eggCount(askedTeam)));
-        std::ignore = client->sendMessage(std::format("{} {}\n", worldSize.x, worldSize.y));
+        std::ignore = client->sendMessage("{}\n", world.eggCount(askedTeam));
+        std::ignore = client->sendMessage("{} {}\n", worldSize.x, worldSize.y);
+
     } catch (const exception::InvalidArgument& err) {
-        logger.error(std::format("Fail client {} specialization : {}", client->address().string(), err.what()));
+        logger.error("Fail client {} specialization : {}", client->address().string(), err.what());
         return false;
     }
-    logger.info(std::format("Client {} registered to {}", client->address().string(), askedTeam));
+    logger.info("Client {} registered to {}", client->address().string(), askedTeam);
     return true;
 }
 
