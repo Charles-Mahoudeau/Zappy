@@ -8,6 +8,7 @@
 #pragma once
 
 #include <cstdint>
+#include <format>
 #include <optional>
 #include <queue>
 #include <string>
@@ -126,6 +127,11 @@ class Client {
      * @return @c false if the socket was not found or a socket error occurred.
      */
     [[nodiscard]] bool sendMessage(std::string_view msg) const;
+
+    template <typename... Args>
+    [[nodiscard]] bool sendMessage(std::string_view fmt, Args... args) const {
+        return this->sendMessage(std::vformat(fmt, std::make_format_args(args...)));
+    }
 
     /**
      * @brief check if the client currently have a action running
