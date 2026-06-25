@@ -42,8 +42,12 @@ void ParticleEmitter::set(Vector3 origin, Vector3 volume, float spread, float ra
 }
 
 void ParticleEmitter::update(float dt) {
-    for (auto& particle : _particles) {
-        particle.update(dt);
+    for (size_t i = 0; i < _particles.size(); ++i) {
+        _particles[i].update(dt);
+        if (!_particles[i].isAlive()) {
+            _particles.erase(_particles.begin() + i);
+            --i;
+        }
     }
 }
 

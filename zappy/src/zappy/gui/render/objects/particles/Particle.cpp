@@ -47,6 +47,7 @@ void Particle::update(float dt) {
     _size.update(dt);
     _rotation.update(dt);
     _tint.update(dt);
+    _elapsedTime += dt;
 }
 
 void Particle::draw(Camera& camera, Texture& texture) {

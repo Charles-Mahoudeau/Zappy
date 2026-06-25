@@ -30,6 +30,8 @@ class Particle {
     [[nodiscard]] float lifetime() const { return _lifetime; }
     [[nodiscard]] float rotation() const { return _rotation; }
     [[nodiscard]] Color tint() const { return _tint; }
+    [[nodiscard]] float elapsedTime() const { return _elapsedTime; }
+    [[nodiscard]] bool isAlive() const { return _elapsedTime < _lifetime; }
 
     void setInitValues(Vector3 position, Vec2D size, float rotation, Color tint);
 
@@ -48,6 +50,7 @@ class Particle {
 
   private:
     float _lifetime{1.0F};
+    float _elapsedTime{0.0F};
     TimeValue<Vector3> _position{Vector3{0.0F, 0.0F, 0.0F}, Vector3{0.0F, 0.0F, 0.0F}};
     TimeValue<Vec2D> _size{Vec2D{1.0F, 1.0F}, Vec2D{0.0F, 0.0F}};
     TimeValue<float> _rotation{0.0F, 0.0F};
