@@ -23,7 +23,7 @@ GuiCommands::GuiCommands(CommandCtx context)
           {"msz", [](const CommandCtx& ctx) { return msz(ctx); }},
           {"bct", [](const CommandCtx& ctx) { return bct(ctx); }},
           {"mct", [](const CommandCtx& ctx) { return mct(ctx); }},
-          {"tna", [](const CommandCtx& ctx) { return ignore(ctx); }},
+          {"tna", [](const CommandCtx& ctx) { return tna(ctx); }},
           {"ppo", [](const CommandCtx& ctx) { return ignore(ctx); }},
           {"plv", [](const CommandCtx& ctx) { return ignore(ctx); }},
           {"pin", [](const CommandCtx& ctx) { return ignore(ctx); }},
@@ -97,6 +97,16 @@ bool GuiCommands::mct(const CommandCtx& ctx) {
             }
         }
     }
+    return true;
+}
+
+bool GuiCommands::tna(const CommandCtx& ctx) {
+    std::stringstream stringStream;
+
+    for (const std::string& teamName : ctx.teamRegistry.get().teamNames()) {
+        stringStream << std::format("tna {}\n", teamName);
+    }
+    std::ignore = ctx.client->sendMessage(stringStream.str());
     return true;
 }
 
