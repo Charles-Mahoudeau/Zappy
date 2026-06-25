@@ -187,6 +187,10 @@ EntityDatabase::EntityView<entity::Player> World::players(const std::string_view
            std::views::filter([teamName](const entity::Player* player) { return player->teamName() == teamName; });
 }
 
+const entity::Player* World::player(const std::uint64_t id) const { return _entityDatabase.query<entity::Player>(id); }
+
+entity::Player* World::player(const std::uint64_t id) { return _entityDatabase.query<entity::Player>(id); }
+
 void World::remove(const std::uint64_t entityId) {
     _grid.remove(entityId);
     _entityDatabase.remove(entityId);

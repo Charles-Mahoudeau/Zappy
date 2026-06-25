@@ -110,6 +110,16 @@ class World : public IEventEmitter {
     /// @return A view of all players in the specified team.
     [[nodiscard]] EntityDatabase::EntityView<entity::Player> players(std::string_view teamName);
 
+    /// @brief Returns a view of the player with the given ID.
+    /// @param id The ID of the player to get.
+    /// @return A pointer to the player with the given ID, or nullptr if no such player exists.
+    [[nodiscard]] const entity::Player* player(std::uint64_t id) const;
+
+    /// @brief Returns a view of the player with the given ID.
+    /// @param id The ID of the player to get.
+    /// @return A pointer to the player with the given ID, or nullptr if no such player exists.
+    [[nodiscard]] entity::Player* player(std::uint64_t id);
+
     /// @brief Removes the specified entity from the world.
     /// @param entityId The ID of the entity to remove.
     void remove(std::uint64_t entityId);
