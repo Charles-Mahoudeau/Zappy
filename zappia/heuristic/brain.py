@@ -160,39 +160,31 @@ class HeuristicAI:
             "data": parts[5] if len(parts) > 5 else "",
         }
 
-    def handle_messages(self) -> None:
+    def _scan_broadcasts(
+        self,
+    ) -> Tuple[Optional[int], Optional[int], List[str], Optional[int]]:
         best_id, best_dir, best_missing = None, None, []
         sos_dir: Optional[int] = None
         for direction, text in self.c.broadcasts:
             msg = self._decode(text)
             if not msg or msg["team"] != self.c.team or msg["id"] == self.id:
                 continue
-
             if msg["verb"] == "SOS":
                 if sos_dir is None or direction == 0:
                     sos_dir = direction
                 continue
-
             self.team_seen[msg["id"]] = (self.tick, msg["level"])
-
             if msg["verb"] == "CALL" and msg["level"] == self.level:
                 if best_id is None or msg["id"] < best_id:
                     best_id, best_dir = msg["id"], direction
                     best_missing = [s for s in msg["data"].split(",") if s]
-
             if msg["level"] == self.level:
                 self.peers[msg["id"]] = self.tick
+        return best_id, best_dir, best_missing, sos_dir
 
-        self.c.broadcasts.clear()
-        self.peers = {
-            p: t for p, t in self.peers.items() if self.tick - t <= PEER_WINDOW
-        }
-        self.team_seen = {
-            i: (t, lv)
-            for i, (t, lv) in self.team_seen.items()
-            if self.tick - t <= PEER_WINDOW
-        }
-
+    def _update_call_state(
+        self, best_id: Optional[int], best_dir: Optional[int], best_missing: List[str]
+    ) -> None:
         if best_id is not None:
             self.call_id, self.call_dir = best_id, best_dir
             self.call_missing = best_missing
@@ -203,6 +195,7 @@ class HeuristicAI:
             self.call_id = self.call_dir = None
             self.call_missing = []
 
+    def _update_sos_state(self, sos_dir: Optional[int]) -> None:
         if sos_dir is not None:
             self.sos_dir = sos_dir
             self.sos_ttl = SOS_MEMORY
@@ -210,6 +203,20 @@ class HeuristicAI:
             self.sos_ttl -= 1
         else:
             self.sos_dir = None
+
+    def handle_messages(self) -> None:
+        best_id, best_dir, best_missing, sos_dir = self._scan_broadcasts()
+        self.c.broadcasts.clear()
+        self.peers = {
+            p: t for p, t in self.peers.items() if self.tick - t <= PEER_WINDOW
+        }
+        self.team_seen = {
+            i: (t, lv)
+            for i, (t, lv) in self.team_seen.items()
+            if self.tick - t <= PEER_WINDOW
+        }
+        self._update_call_state(best_id, best_dir, best_missing)
+        self._update_sos_state(sos_dir)
 
     def reset_rally(self) -> None:
         self.call_id = self.call_dir = None
