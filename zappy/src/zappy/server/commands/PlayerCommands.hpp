@@ -43,7 +43,7 @@ class PlayerCommands : public ACommandGroup {
     static bool inventory(CommandCtx& ctx);
     static bool take(CommandCtx& ctx);
 
-    static PlayerData idToPlayerData(CommandCtx& ctx, std::uint64_t id);
+    static PlayerData getclientData(CommandCtx& ctx, std::uint64_t id);
 };
 
 }  // namespace zappy::server::command

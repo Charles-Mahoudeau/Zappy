@@ -56,29 +56,21 @@ bool PlayerCommands::ignore(const CommandCtx& ctx) {
 
 bool PlayerCommands::inventory(CommandCtx& ctx) {
     ctx.client->setTimeout(1, [&ctx, id = ctx.client->playerID()]() {
-        const PlayerData data = PlayerCommands::idToPlayerData(ctx, id);
+        const auto [player, client] = PlayerCommands::getclientData(ctx, id);
 
-        if (data.client == nullptr) {
+        if (client == nullptr || player == nullptr) {
             return;
         }
-        if (data.player == nullptr) {
-            data.client->sendError();
-        } else {
-            std::ignore = ctx.client->sendMessage("[ {} ]\n", data.player->inventory().detailledString());
-        }
+        std::ignore = ctx.client->sendMessage("[ {} ]\n", player->inventory().detailledString());
     });
     return true;
 }
 
 bool PlayerCommands::take(CommandCtx& ctx) {
     ctx.client->setTimeout(7, [&ctx, id = ctx.client->playerID()]() {
-        const auto [player, client] = PlayerCommands::idToPlayerData(ctx, id);
+        const auto [player, client] = PlayerCommands::getclientData(ctx, id);
 
-        if (client == nullptr) {
-            return;
-        }
-        if (player == nullptr || ctx.data.params.size() != 1) {
-            client->sendError();
+        if (client == nullptr || player == nullptr) {
             return;
         }
         auto resource = game::ResourceHelper::strToRessource(ctx.data.params.at(0));
@@ -92,15 +84,22 @@ bool PlayerCommands::take(CommandCtx& ctx) {
     return true;
 }
 
-PlayerCommands::PlayerData PlayerCommands::idToPlayerData(CommandCtx& ctx, std::uint64_t id) {
+PlayerCommands::PlayerData PlayerCommands::getclientData(CommandCtx& ctx, std::uint64_t id) {
     PlayerData data;
+
     data.client = ctx.clientRegistry.get().findByID(id);
-    game::IEntity* entity = ctx.world.get().entityDatabase().query(id);
-    if (entity == nullptr) {
+    if (data.client == nullptr) {
         return data;
     }
-
+    game::IEntity* entity = ctx.world.get().entityDatabase().query(id);
+    if (entity == nullptr) {
+        data.client->sendError();
+        return data;
+    }
     data.player = dynamic_cast<game::entity::Player*>(entity);
+    if (data.player == nullptr) {
+        data.client->sendError();
+    }
     return data;
 }
 
