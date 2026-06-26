@@ -62,12 +62,25 @@ uint16_t ParticleEmitter::draw(Camera& camera) {
 
 void ParticleEmitter::particle() {
     Particle newParticle;
-    Vector3 speed = getDirection() * _speed;
-    Vec2D size{RandomValue{_size.get().x(), _InitEnvelope.size}, RandomValue{_size.get().y(), _InitEnvelope.size}};
+    Vector3 speed = getDirection() * RandomValue{_speed.value(), _speed.envelope()};
+    float lifetime = RandomValue{_lifetime.value(), _lifetime.envelope()};
+    Vec2D InitSize{RandomValue{_size.get().x(), _InitEnvelope.size}, RandomValue{_size.get().y(), _InitEnvelope.size}};
+    Vec2D incSize{RandomValue{_size.increment().x(), _IncrementEnvelope.size},
+                  RandomValue{_size.increment().y(), _IncrementEnvelope.size}};
+    float initRot = RandomValue{_rotation.get(), _InitEnvelope.rotation};
+    float incRot = RandomValue{_rotation.increment(), _IncrementEnvelope.rotation};
+    Color initColor = _tint.get().toColor();
+    Color incColor = _tint.increment().toColor();
+    ColorF initTint{
+        RandomValue{initColor.get().r, _InitEnvelope.tint}, RandomValue{initColor.get().g, _InitEnvelope.tint},
+        RandomValue{initColor.get().b, _InitEnvelope.tint}, RandomValue{initColor.get().a, _InitEnvelope.tint}};
+    ColorF incTint{
+        RandomValue{incColor.get().r, _IncrementEnvelope.tint}, RandomValue{incColor.get().g, _IncrementEnvelope.tint},
+        RandomValue{incColor.get().b, _IncrementEnvelope.tint}, RandomValue{incColor.get().a, _IncrementEnvelope.tint}};
 
-    newParticle.setInitValues(_origin, _size.get(), _rotation.get(), _tint.get());
-    newParticle.setIncrementValues(speed, _size.increment(), _rotation.increment(), _tint.increment());
-    newParticle.setLifetime(_lifetime);
+    newParticle.setInitValues(_origin, InitSize, initRot, initTint);
+    newParticle.setIncrementValues(speed, incSize, incRot, incTint);
+    newParticle.setLifetime(lifetime);
     _particles.push_back(std::move(newParticle));
 }
 
