@@ -39,7 +39,7 @@ void Particle::setInitValues(Vector3 position, Vec2D size, float rotation, Color
     _position = TimeValue<Vector3>{position, Vector3{0.0F, 0.0F, 0.0F}};
     _size = TimeValue<Vec2D>{size, Vec2D{0.0F, 0.0F}};
     _rotation = TimeValue<float>{rotation, 0.0F};
-    _tint = TimeValue<ColorF>{tint, ColorF{0, 0, 0, 0}};
+    _tint = TimeValue<ColorF>{tint, ColorF{0.0F, 0.0F, 0.0F, 0.0F}};
 }
 
 void Particle::update(float dt) {
@@ -55,10 +55,14 @@ void Particle::draw(Camera& camera, Texture& texture) {
                            .y = 0.0F,
                            .width = static_cast<float>(texture.width()),
                            .height = static_cast<float>(texture.height())};
-    const Vector2 _origin{.x = 0.5F, .y = 0.5F};
+    const Vector2 origin{.x = 0.5F, .y = 0.5F};
+    const Vector3 pos = _position.get();
 
-    DrawBillboardPro(camera, texture, source, _position.get(), camera.up(), _size.get(), _origin, _rotation.get(),
-                     _tint.get().toColor());
+    Vector3 toCamera = (Vector3{camera.position()} - pos).normalized();
+    Vector3 right = toCamera.cross({0.0F, 1.0F, 0.0F}).normalized();
+    Vector3 up = right.cross(toCamera);
+
+    DrawBillboardPro(camera, texture, source, pos, up, _size.get(), origin, _rotation.get(), _tint.get().toColor());
 }
 
 }  // namespace zappy::gui::render
