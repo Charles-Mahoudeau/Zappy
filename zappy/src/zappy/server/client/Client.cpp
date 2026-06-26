@@ -8,6 +8,7 @@
 #include "zappy/server/client/Client.hpp"
 
 #include <cstdint>
+#include <functional>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -63,12 +64,19 @@ std::optional<std::string> Client::nextRequest() {
     return request;
 }
 
-bool Client::setTimeout(int time) {
+bool Client::setTimeout(int time) { return this->setTimeout(time, nullptr); }
+
+bool Client::setTimeout(int time, std::function<void()> event) {
     if (this->inTimeout() || time <= 0) {
         return false;
     }
 
-    this->_timeoutId = this->_timer.scheduleLater(time, [this]() { this->_timeoutId = 0; });
+    this->_timeoutId = this->_timer.scheduleLater(time, [this, event = std::move(event)]() {
+        if (event) {
+            event();
+        }
+        this->_timeoutId = 0;
+    });
     return true;
 }
 

@@ -9,6 +9,7 @@
 
 #include <cstdint>
 #include <format>
+#include <functional>
 #include <optional>
 #include <queue>
 #include <string>
@@ -146,6 +147,8 @@ class Client {
      * @return bool true if successfully timed out. false if already in timeout
      */
     bool setTimeout(int time);
+
+    bool setTimeout(int time, std::function<void()> event);
 
     /**
      * @brief remove the client timeout from the Timer
