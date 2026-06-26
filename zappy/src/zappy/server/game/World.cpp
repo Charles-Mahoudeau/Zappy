@@ -32,6 +32,7 @@
 #include "Tile.hpp"
 #include "entity/Egg.hpp"
 #include "entity/Player.hpp"
+#include "zappy/shared/exception/Exception.hpp"
 #include "zappy/shared/io/Logger.hpp"
 #include "zappy/shared/math/Direction.hpp"
 #include "zappy/shared/math/Vector2.hpp"
@@ -252,6 +253,22 @@ bool World::playerTake(entity::Player* player, ResourceType resource) {
     tile.inventory().removeResource(resource);
     player->take(resource);
     this->pushEvent(PlayerResourceCollectEvent{.playerId = player->id(), .resourceType = resource});
+
+    return true;
+}
+
+bool World::playerDrop(entity::Player* player, ResourceType resource) {
+    try {
+        if (!player->drop(resource)) {
+            return false;
+        }
+        Tile& tile = this->_grid.tile(player->position());
+        tile.inventory().addResource(resource);
+        this->pushEvent(PlayerResourceDropEvent{.playerId = player->id(), .resourceType = resource});
+    } catch (const exception::Exception& err) {
+        this->_logger->error(err.what());
+        return false;
+    }
 
     return true;
 }

@@ -128,6 +128,8 @@ class World : public IEventEmitter {
 
     bool playerTake(entity::Player* player, ResourceType resource);
 
+    bool playerDrop(entity::Player* player, ResourceType resource);
+
   private:
     /// @brief Returns the resource densities for the world.
     /// @return A map of resource types to their densities.
