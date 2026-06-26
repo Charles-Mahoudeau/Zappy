@@ -30,6 +30,11 @@ class TimeValue {
     [[nodiscard]] operator T() const { return _value; }
     [[nodiscard]] T get() const { return _value; }
     [[nodiscard]] T increment() const { return _increment; }
+    [[nodiscard]] float speed() const { return _speed; }
+
+    void setValue(T val) { _value = val; }
+    void setIncrement(T inc) { _increment = inc; }
+    void setSpeed(float speed) { _speed = speed; }
 
     void update(float dt) { _value += _increment * dt * _speed; }
 

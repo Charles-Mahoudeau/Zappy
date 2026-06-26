@@ -44,6 +44,7 @@ class Particle {
     void setLifetime(float lifetime);
     void setRotation(float rotation, float increment);
     void setTint(ColorF tint, ColorF increment);
+    void setAcceleration(Vector3 acceleration) { _acceleration = acceleration; }
 
     void update(float dt);
 
@@ -56,5 +57,6 @@ class Particle {
     TimeValue<Vec2D> _size{Vec2D{1.0F, 1.0F}, Vec2D{0.0F, 0.0F}};
     TimeValue<float> _rotation{0.0F, 0.0F};
     TimeValue<ColorF> _tint{Color::kWHITE, Color::kWHITE};
+    Vector3 _acceleration{0.0F, 0.0F, 0.0F};
 };
 }  // namespace zappy::gui::render

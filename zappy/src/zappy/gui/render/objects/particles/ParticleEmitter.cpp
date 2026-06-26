@@ -34,9 +34,10 @@ void ParticleEmitter::setRotation(float rotation, float increment) {
 }
 void ParticleEmitter::setTint(ColorF tint, ColorF increment) { _tint = TimeValue<ColorF>{tint, increment}; }
 
-void ParticleEmitter::setStatic(Vector3 origin, Vector3 volume, float spread, float rate) {
+void ParticleEmitter::setStatic(Vector3 origin, Vector3 volume, Vector3 acceleration, float spread, float rate) {
     _origin = origin;
     _volume = volume;
+    _acceleration = acceleration;
     _spread = spread;
     _rate = rate;
 }
@@ -74,6 +75,7 @@ void ParticleEmitter::particle() {
     newParticle.setInitValues(_origin, InitSize, initRot, initTint);
     newParticle.setIncrementValues(speed, incSize, incRot, incTint);
     newParticle.setLifetime(lifetime);
+    newParticle.setAcceleration(_acceleration);
     _particles.push_back(std::move(newParticle));
 }
 

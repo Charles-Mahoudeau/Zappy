@@ -48,7 +48,7 @@ class ParticleEmitter {
     void setRotation(float rotation, float increment);
     void setTint(ColorF tint, ColorF increment);
 
-    void setStatic(Vector3 origin, Vector3 volume, float spread, float rate);
+    void setStatic(Vector3 origin, Vector3 volume, Vector3 acceleration, float spread, float rate);
     void setInitParticles(Vec2D size, float rotation, ColorF tint, float lifetime, float speed);
     void setIncrementParticles(Vec2D sizeIncrement, float rotationIncrement, ColorF tintIncrement);
     void setInitEnvelope(ParticleEnvelope envelope, float lifetime, float speed);
@@ -81,6 +81,7 @@ class ParticleEmitter {
     std::vector<Particle> _particles;
     Vector3 _origin{0.0F, 0.0F, 0.0F};
     Vector3 _volume{1.0F, 1.0F, 1.0F};
+    Vector3 _acceleration{0.0F, 0.0F, 0.0F};
     float _spread{0.0F};
     RandomValue _speed{0.0F, 0.0F};
     RandomValue _lifetime{1.0F, 0.0F};

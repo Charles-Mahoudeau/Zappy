@@ -44,6 +44,7 @@ void Particle::setInitValues(Vector3 position, Vec2D size, float rotation, Color
 
 void Particle::update(float dt) {
     _position.update(dt);
+    _position.setIncrement(_position.increment() + _acceleration * dt);
     _size.update(dt);
     _rotation.update(dt);
     _tint.update(dt);
@@ -53,9 +54,10 @@ void Particle::update(float dt) {
 void Particle::draw(Camera& camera, Texture& texture) {
     const float texSize = static_cast<float>(std::min(texture.width(), texture.height()));
     const Rectangle source{.x = 0.0F, .y = 0.0F, .width = texSize, .height = texSize};
-    const Vec2D origin{_size.get().x() * 0.5F, _size.get().y() * 0.5F};
+    const Vector2 origin{.x = _size.get().x() * 0.5F, .y = _size.get().y() * 0.5F};
+    const Vector3 up{0.0F, 1.0F, 0.0F};
 
-    DrawBillboardPro(camera, texture, source, _position.get(), camera.up(), _size.get(), origin, _rotation.get(),
+    DrawBillboardPro(camera, texture, source, _position.get(), up, _size.get(), origin, _rotation.get(),
                      _tint.get().toColor());
 }
 
