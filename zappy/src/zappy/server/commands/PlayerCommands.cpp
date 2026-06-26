@@ -7,6 +7,8 @@
 
 #include "zappy/server/commands/PlayerCommands.hpp"
 
+#include <cstdint>
+#include <print>
 #include <string_view>
 #include <tuple>
 #include <utility>
@@ -15,7 +17,9 @@
 #include "zappy/server/commands/ACommandGroup.hpp"
 #include "zappy/server/commands/ICommandGroup.hpp"
 #include "zappy/server/game/IEntity.hpp"
+#include "zappy/server/game/ResourceType.hpp"
 #include "zappy/server/game/entity/Player.hpp"
+#include "zappy/shared/network/Address.hpp"
 
 namespace zappy::server::command {
 PlayerCommands::PlayerCommands(CommandCtx context)
@@ -57,16 +61,30 @@ bool PlayerCommands::ignore(const CommandCtx& ctx) {
 }
 
 void PlayerCommands::inventory(CommandCtx& ctx) {
-    const game::IEntity* entity = ctx.world.get().entityDatabase().query(ctx.client->playerID());
+    ctx.client->setTimeout(1, [&ctx, id = ctx.client->playerID()]() {
+        const PlayerData data = PlayerCommands::idToPlayerData(ctx, id);
+
+        if (data.client == nullptr) {
+            return;
+        }
+        if (data.player == nullptr) {
+            data.client->sendError();
+        } else {
+            std::ignore = ctx.client->sendMessage("[ {} ]\n", data.player->inventory().detailledString());
+        }
+    });
+}
+
+PlayerCommands::PlayerData PlayerCommands::idToPlayerData(CommandCtx& ctx, std::uint64_t id) {
+    PlayerData data;
+    data.client = ctx.clientRegistry.get().findByID(id);
+    game::IEntity* entity = ctx.world.get().entityDatabase().query(id);
     if (entity == nullptr) {
-        return;
+        return data;
     }
 
-    const auto* player = dynamic_cast<const game::entity::Player*>(entity);
-    if (player == nullptr) {
-        return;
-    }
-    std::ignore = ctx.client->sendMessage("[ {} ]\n", player->inventory().playerString());
+    data.player = dynamic_cast<game::entity::Player*>(entity);
+    return data;
 }
 
 }  // namespace zappy::server::command
