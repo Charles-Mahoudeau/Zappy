@@ -49,6 +49,7 @@ class PlayerCommands : public ACommandGroup {
     static bool inventory(CommandCtx& ctx);
     static bool take(CommandCtx& ctx);
     static bool move(CommandCtx& ctx, Move move);
+    static bool connectNb(CommandCtx& ctx);
 
     static PlayerData getclientData(CommandCtx& ctx, std::uint64_t id);
 };
