@@ -135,7 +135,7 @@ int GUI::run() {
         _poller.poll(kPollTimeoutMs);
         _window.beginFrame();
         _hud.update(_camera, _state);
-        _camera.followPlayer(_hud.focusedPlayerWorldPosition(_state));
+        _camera.followPlayer(_hud.focusedPlayerWorldPosition(_state), !_hud.isMouseOverChatPanel());
 
         _renderer.update(_camera, _state, _assets);
         _hud.draw(_state);

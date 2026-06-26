@@ -47,6 +47,7 @@ class Hud {
 
     [[nodiscard]] std::optional<std::uint32_t> focusedPlayerId() const;
     [[nodiscard]] std::optional<render::Vector3> focusedPlayerWorldPosition(const game::GameState& state) const;
+    [[nodiscard]] bool isMouseOverChatPanel() const;
 
   private:
     [[nodiscard]] bool victoryActive(const game::GameState& state) const;
@@ -58,7 +59,7 @@ class Hud {
     static constexpr float kChatPanelWidth = 320.0F;
     static constexpr float kChatPanelHeight = 180.0F;
     static constexpr float kChatPanelMargin = 8.0F;
-    static constexpr float kTimeSliderWidth = 220.0F;
+    static constexpr float kTimeSliderWidth = 260.0F;
     static constexpr float kTimeSliderHeight = 24.0F;
     static constexpr float kTimeSliderMarginTop = 8.0F;
     static constexpr float kTimeSliderMarginRight = 70.0F;

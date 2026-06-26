@@ -85,6 +85,10 @@ std::optional<std::uint32_t> Hud::focusedPlayerId() const {
     return _infoPanel.state() == InfoPanelState::Player ? _infoPanel.selectedPlayerId() : std::nullopt;
 }
 
+bool Hud::isMouseOverChatPanel() const {
+    return CheckCollisionPointRec(Mouse::position(), _chatPanel.currentBounds(chatPanelAnchor()));
+}
+
 std::optional<render::Vector3> Hud::focusedPlayerWorldPosition(const game::GameState& state) const {
     const auto playerId = focusedPlayerId();
     if (!playerId.has_value()) {

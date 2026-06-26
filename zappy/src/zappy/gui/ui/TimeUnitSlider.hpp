@@ -40,6 +40,7 @@ class TimeUnitSlider {
     int _lastSentValue;
     int _displayedValue;
     bool _dragging{false};
+    bool _editingValue{false};
 };
 
 }  // namespace zappy::gui::ui

@@ -53,7 +53,7 @@ class Camera {
     void setCameraMode(CameraMode mode);
     void zoom(float delta);
 
-    void followPlayer(std::optional<Vector3> worldPosition);
+    void followPlayer(std::optional<Vector3> worldPosition, bool acceptManualZoomInput = true);
 
     void update();
 

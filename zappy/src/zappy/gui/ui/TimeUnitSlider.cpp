@@ -11,8 +11,6 @@
 
 #include <algorithm>
 #include <cmath>
-#include <format>
-#include <string>
 
 #include "../network/CommandSender.hpp"
 #include "Mouse.hpp"
@@ -36,24 +34,38 @@ bool TimeUnitSlider::consumeValueChange(int newValue) {
 }
 
 void TimeUnitSlider::draw(const game::GameState& state, render::Rectangle bounds) {
-    if (!_dragging && Mouse::isLeftButtonPressed() && CheckCollisionPointRec(Mouse::position(), bounds)) {
+    static constexpr float kValueBoxWidth = 60.0F;
+    static constexpr float kValueBoxSpacing = 6.0F;
+
+    const render::Rectangle valueBoxBounds{bounds.x() + bounds.width() - kValueBoxWidth, bounds.y(), kValueBoxWidth,
+                                           bounds.height()};
+    const render::Rectangle sliderBounds{bounds.x(), bounds.y(), bounds.width() - kValueBoxWidth - kValueBoxSpacing,
+                                         bounds.height()};
+
+    if (!_dragging && Mouse::isLeftButtonPressed() && CheckCollisionPointRec(Mouse::position(), sliderBounds)) {
         _dragging = true;
     }
-    if (!_dragging) {
+    if (!_dragging && !_editingValue) {
         _displayedValue = std::clamp(static_cast<int>(state.timeUnit()), kMinValue, kMaxValue);
         _lastSentValue = _displayedValue;
     }
 
-    const std::string valueLabel = std::format("{}", _displayedValue);
-    const float displayed = Widgets::slider(bounds, "Time unit", valueLabel, static_cast<float>(_displayedValue),
-                                            static_cast<float>(kMinValue), static_cast<float>(kMaxValue));
-    _displayedValue = std::clamp(static_cast<int>(std::lround(displayed)), kMinValue, kMaxValue);
+    const float sliderResult = Widgets::slider(sliderBounds, "Time unit", "", static_cast<float>(_displayedValue),
+                                               static_cast<float>(kMinValue), static_cast<float>(kMaxValue));
+    if (!_editingValue) {
+        _displayedValue = std::clamp(static_cast<int>(std::lround(sliderResult)), kMinValue, kMaxValue);
+    }
+
+    _displayedValue = Widgets::valueBox(valueBoxBounds, "", _displayedValue, kMinValue, kMaxValue, _editingValue);
+    if (!_editingValue) {
+        _displayedValue = std::clamp(_displayedValue, kMinValue, kMaxValue);
+    }
 
     if (_dragging && Mouse::isLeftButtonReleased()) {
         _dragging = false;
-        if (consumeValueChange(_displayedValue)) {
-            _sender.get().setTimeUnit(_displayedValue);
-        }
+    }
+    if (!_dragging && !_editingValue && consumeValueChange(_displayedValue)) {
+        _sender.get().setTimeUnit(_displayedValue);
     }
 }
 

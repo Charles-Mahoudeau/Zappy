@@ -47,6 +47,22 @@ float Widgets::slider(render::Rectangle bounds, std::string_view textLeft, std::
     return value;
 }
 
+int Widgets::valueBox(render::Rectangle bounds, std::string_view text, int current, int min, int max, bool& editMode) {
+    const int previousBase = GuiGetStyle(VALUEBOX, BASE_COLOR_NORMAL);
+    const int previousBorder = GuiGetStyle(VALUEBOX, BORDER_COLOR_NORMAL);
+    GuiSetStyle(VALUEBOX, BASE_COLOR_NORMAL, GuiGetStyle(DEFAULT, BACKGROUND_COLOR));
+    GuiSetStyle(VALUEBOX, BORDER_COLOR_NORMAL, GuiGetStyle(DEFAULT, LINE_COLOR));
+
+    int value = current;
+    if (GuiValueBox(bounds, std::string{text}.c_str(), &value, min, max, editMode) == 1) {
+        editMode = !editMode;
+    }
+
+    GuiSetStyle(VALUEBOX, BASE_COLOR_NORMAL, previousBase);
+    GuiSetStyle(VALUEBOX, BORDER_COLOR_NORMAL, previousBorder);
+    return value;
+}
+
 void Widgets::progressBar(render::Rectangle bounds, std::string_view textLeft, std::string_view textRight,
                           float progress) {
     float value = progress;

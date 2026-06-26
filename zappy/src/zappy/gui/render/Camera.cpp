@@ -97,7 +97,7 @@ void Camera::applyManualZoomInput() {
     }
 }
 
-void Camera::followPlayer(std::optional<Vector3> worldPosition) {
+void Camera::followPlayer(std::optional<Vector3> worldPosition, bool acceptManualZoomInput) {
     static constexpr float kBlendSpeed = 4.0F;
     static constexpr float kFocusFovyFactor = 0.35F;
 
@@ -107,7 +107,7 @@ void Camera::followPlayer(std::optional<Vector3> worldPosition) {
         _focusInitialized = true;
     }
 
-    if (!worldPosition.has_value()) {
+    if (!worldPosition.has_value() && acceptManualZoomInput) {
         applyManualZoomInput();
     }
 
