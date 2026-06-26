@@ -127,8 +127,8 @@ void AssetStore::loadVFXs() {
     test.setStatic(Vector3{}, Vector3{1.0F, 1.0F, 1.0F}, 180.0F, 15.0F);
     test.setInitParticles(Vec2D{1.0F, 1.0F}, 0.0F, Color::kWHITE, 150.0F, 0.1F);
     test.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 0.5F, .tint = 0.3F}, 0.1F, 0.3F);
-    test.setIncrementParticles(Vec2D{-0.007F, -0.007F}, 1.0F, ColorF{0, 0, 0, -2.0F});
-    test.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.0F, .rotation = 0.4F, .tint = 0.2F});
+    test.setIncrementParticles(Vec2D{0.0F, 0.0F}, 1.0F, ColorF{0, 0, 0, -3.0F});
+    test.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.0F, .rotation = 0.4F, .tint = 0.1F});
     _vfxs.insert({"test", std::move(test)});
 }
 
