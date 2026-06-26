@@ -38,8 +38,9 @@ PEER_WINDOW = 40
 PEER_PING = 10
 
 TEAM_TARGET = 8
-FORK_FOOD = 20
-FORK_EVERY = 50
+FORK_FOOD = 5
+FORK_MIN_TICK = 25
+FORK_COOLDOWN = 25
 
 PROTO = "ZP"
 SEP = ";"
@@ -73,6 +74,8 @@ class HeuristicAI:
 
         self._fork_sent = False
         self._stranded_ticks = 0
+        self._team_full = False
+        self._last_fork_tick = -(FORK_COOLDOWN + 1)
 
     def run(self) -> None:
         self.refresh_all()
@@ -231,33 +234,37 @@ class HeuristicAI:
             self._stranded_ticks += 1
         else:
             self._stranded_ticks = 0
-            self._fork_sent = False  # reset if we recover
-        # Only commit to suicide after being consistently stranded for a while,
-        # to avoid false positives from brief peer-window gaps.
+            self._fork_sent = False
         stranded = self._stranded_ticks >= 20
         leader = not stranded and self.req_players() > 1 and self.am_leader()
 
         if stranded:
             self.suicide()
             return
-
-        # Incant the INSTANT we're assembled -- highest priority, before any broadcast.
-        if leader and self.ready_to_incant():
-            self.try_incantation()
-            return
-
         if leader and self.tick % CALL_EVERY == 0:
             self.send("CALL", ",".join(self.tile_short().keys()))
             return
 
-        if not leader and not stranded and self.tick % PEER_PING == 0:
+        if not leader and self.tick % PEER_PING == 0:
             self.send("HERE")
+            return
+
+        slots = self.c.connect_nbr()
+        self._team_full = self.team_size() + slots >= TEAM_TARGET
+
+        if not self._team_full:
+            self.maybe_fork()
+            self.farm_food()
+            return
+
+        if leader and self.ready_to_incant():
+            self.try_incantation()
             return
 
         if self.food >= DONOR_FOOD and self.sos_dir is not None and self.deliver_food():
             return
 
-        if not (self.tile_ready() and self.am_leader()) and self.maybe_eat():
+        if not (self.tile_ready() and leader) and self.maybe_eat():
             return
 
         if self.food < LOW_FOOD:
@@ -274,9 +281,6 @@ class HeuristicAI:
             self.solo_elevate()
             return
 
-        # Followers may lay eggs while travelling; the leader forks only inside
-        # run_beacon (after checking it can't incant), so growing the team never
-        # delays an available elevation.
         if not leader:
             self.maybe_fork()
         self.rally()
@@ -293,15 +297,18 @@ class HeuristicAI:
         return reachable < self.req_players()
 
     def maybe_fork(self) -> None:
-        """Lay an egg now and then, when well fed, until the team is big enough --
-        the launcher then connects a fresh player into it. Rate-limited (forking
-        blocks us 42/f, and we must not spam connect_nbr -- it's a server command)."""
-        if (
-            self.team_size() < TEAM_TARGET
-            and self.food >= FORK_FOOD
-            and self.tick % FORK_EVERY == 0
-        ):
-            self.c.fork()
+        """Fork only when the team genuinely needs more members.
+        """
+        if self._team_full or self.food < FORK_FOOD or self.tick < FORK_MIN_TICK:
+            return
+        if self.tick - self._last_fork_tick <= FORK_COOLDOWN:
+            return
+        if self.team_seen:
+            all_ids = list(self.team_seen.keys()) + [self.id]
+            if self.id != min(all_ids):
+                return
+        self.c.fork()
+        self._last_fork_tick = self.tick
 
     def suicide(self) -> None:
         """Drop our whole inventory where we stand, then starve so the launcher
@@ -326,7 +333,6 @@ class HeuristicAI:
         self.refresh_look()
 
     def farm_food(self) -> None:
-        self.maybe_fork()
         if self.food < FOOD_CAP and self.maybe_eat():
             return
         if self.sos_dir is not None and self.food > 2:
