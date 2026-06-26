@@ -126,7 +126,7 @@ void AssetStore::loadVFXs() {
     ParticleEmitter test("assets/models/resources/textures/thystameBase.png");
     test.setStatic(Vector3{}, Vector3{1.0F, 1.0F, 1.0F}, 360.0F, 15.0F);
     test.setInitParticles(Vec2D{1.0F, 1.0F}, 0.0F, Color::kWHITE, 150.0F, 0.1F);
-    test.setIncrementParticles(Vec2D{-0.05F, -0.05F}, 0.1F, ColorF{0, 0, 0, -0.5});
+    test.setIncrementParticles(Vec2D{-0.007F, -0.007F}, 1.0F, ColorF{0, 0, 0, -2.0F});
     _vfxs.insert({"test", std::move(test)});
 }
 void AssetStore::loadEggModel() {
