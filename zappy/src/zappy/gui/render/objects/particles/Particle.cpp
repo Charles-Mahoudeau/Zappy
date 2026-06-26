@@ -55,10 +55,9 @@ void Particle::draw(Camera& camera, Texture& texture) {
                            .y = 0.0F,
                            .width = static_cast<float>(texture.width()),
                            .height = static_cast<float>(texture.height())};
-    const Vector3 up{0.0F, 1.0F, 0.0F};
     const Vector2 _origin{.x = 0.5F, .y = 0.5F};
 
-    DrawBillboardPro(camera, texture, source, _position.get(), up, _size.get(), _origin, _rotation.get(),
+    DrawBillboardPro(camera, texture, source, _position.get(), camera.up(), _size.get(), _origin, _rotation.get(),
                      _tint.get().toColor());
 }
 
