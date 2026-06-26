@@ -225,11 +225,20 @@ std::optional<World::IncantationSnapshot> World::beginIncantation(const std::uin
     if (!verifyIncantationRequirements(snapshot)) {
         return std::nullopt;
     }
+    pushEvent(IncantationBeginEvent{
+        .position = snapshot.position,
+        .level = snapshot.level,
+        .playerIds = snapshot.playerIds,
+    });
     return snapshot;
 }
 
 bool World::endIncantation(const IncantationSnapshot& snapshot) {
     if (!verifyIncantationRequirements(snapshot)) {
+        pushEvent(IncantationEndEvent{
+            .position = snapshot.position,
+            .success = false,
+        });
         return false;
     }
 
@@ -246,6 +255,10 @@ bool World::endIncantation(const IncantationSnapshot& snapshot) {
         }
         std::ignore = incantationPlayer->levelUp();
     }
+    pushEvent(IncantationEndEvent{
+        .position = snapshot.position,
+        .success = true,
+    });
     return true;
 }
 
