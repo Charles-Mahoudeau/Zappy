@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <memory>
 #include <ranges>
 #include <unordered_map>
@@ -77,10 +78,12 @@ class ClientRegistry {
 
     Client* findByAddress(const network::Address& addr);
 
+    Client* findByID(std::uint64_t id);
+
   private:
     std::vector<const Client*> _toRemove;
     std::vector<std::unique_ptr<Client>> _clients;
-    std::unordered_map<Client::Type, std::vector<const Client*>> _clientsPerType = {
+    std::unordered_map<Client::Type, std::vector<Client*>> _clientsPerType = {
         {Client::Type::kUnknown, {}},
         {Client::Type::kGui, {}},
         {Client::Type::kPlayer, {}},

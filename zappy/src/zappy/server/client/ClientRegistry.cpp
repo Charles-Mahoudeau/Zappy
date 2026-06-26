@@ -8,7 +8,9 @@
 #include "zappy/server/client/ClientRegistry.hpp"
 
 #include <algorithm>
+#include <cstdint>
 #include <memory>
+#include <ranges>
 #include <utility>
 #include <vector>
 
@@ -53,17 +55,17 @@ void ClientRegistry::update() {
 }
 
 void ClientRegistry::updateTypeGroup() {
-    std::vector<std::pair<Client::Type, const Client*>> toMove;
+    std::vector<std::pair<Client::Type, Client*>> toMove;
 
-    for (const auto& [groupType, groupList] : this->_clientsPerType) {
-        for (const Client* client : groupList) {
+    for (auto& [groupType, groupList] : this->_clientsPerType) {
+        for (Client* client : groupList) {
             if (groupType != client->type()) {
                 toMove.emplace_back(groupType, client);
             }
         }
     }
 
-    for (const auto& [fromType, client] : toMove) {
+    for (auto& [fromType, client] : toMove) {
         this->_clientsPerType.at(client->type()).emplace_back(client);
         auto& src = this->_clientsPerType.at(fromType);
         std::erase_if(src, [client](const Client* InnerClient) { return client == InnerClient; });
@@ -75,6 +77,17 @@ Client* ClientRegistry::findByAddress(const network::Address& addr) {
             this->_clients, [&addr](const std::unique_ptr<Client>& client) { return client->address() == addr; });
         iter != this->_clients.end()) {
         return iter.base()->get();
+    }
+    return nullptr;
+}
+
+Client* ClientRegistry::findByID(std::uint64_t id) {
+    auto& clients = this->_clientsPerType.at(Client::Type::kPlayer);
+
+    for (auto& client : clients) {
+        if (client->playerID() == id) {
+            return client;
+        }
     }
     return nullptr;
 }
