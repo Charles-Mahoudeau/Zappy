@@ -9,6 +9,7 @@
 
 #include <cstddef>
 #include <initializer_list>
+#include <iostream>
 #include <map>
 #include <memory>
 #include <utility>
@@ -121,6 +122,7 @@ void AssetStore::loadResourceModel(game::ResourceType type) {
 
 void AssetStore::loadVFXs() {
     ParticleEmitter test("assets/models/resources/textures/thystameBase.png");
+    test.setInitParticles(5.0F, Vec2D{50.0F, 50.0F}, 0.0F, WHITE);
     _vfxs.insert({"test", std::move(test)});
 }
 void AssetStore::loadEggModel() {
@@ -175,8 +177,12 @@ const std::map<std::string, ParticleEmitter>& AssetStore::vfxs() const { return 
 
 std::map<std::string, ParticleEmitter>& AssetStore::vfxs() { return _vfxs; }
 
-ParticleEmitter AssetStore::emit(std::string_view path, Vector3 pos) {
-    ParticleEmitter emitter{path};
+ParticleEmitter& AssetStore::emit(std::string_view path, Vector3 pos) {
+    auto it = _vfxs.find(std::string{path});
+    if (it == _vfxs.end()) throw std::runtime_error("VFX not found: " + std::string{path});
+
+    std::cout << "|---- EMIT PARTICLES\n";  // --- IGNORE ---
+    ParticleEmitter& emitter = it->second;
     emitter.setOrigin(pos);
     emitter.emitRate();
     return emitter;

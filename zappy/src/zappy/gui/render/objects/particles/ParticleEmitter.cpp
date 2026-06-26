@@ -15,6 +15,7 @@
 
 #include "Billboard.hpp"
 #include "Color.hpp"
+#include "Randomvalue.hpp"
 #include "TimeValue.hpp"
 #include "Vector3.hpp"
 
@@ -25,20 +26,19 @@ void ParticleEmitter::setOrigin(Vector3 origin) { _origin = origin; }
 void ParticleEmitter::setVolume(Vector3 volume) { _volume = volume; }
 void ParticleEmitter::setSpread(float spread) { _spread = spread; }
 void ParticleEmitter::setRate(float rate) { _rate = rate; }
-void ParticleEmitter::setSpeed(float speed) { _speed = speed; }
-void ParticleEmitter::setLifetime(float lifetime) { _lifetime = lifetime; }
+void ParticleEmitter::setSpeed(float speed, float envelope) { _speed = RandomValue{speed, envelope}; }
+void ParticleEmitter::setLifetime(float lifetime, float envelope) { _lifetime = RandomValue{lifetime, envelope}; }
 void ParticleEmitter::setSize(Vec2D size, Vec2D increment) { _size = TimeValue<Vec2D>{size, increment}; }
 void ParticleEmitter::setRotation(float rotation, float increment) {
     _rotation = TimeValue<float>{rotation, increment};
 }
 void ParticleEmitter::setTint(Color tint, Color increment) { _tint = TimeValue<Color>{tint, increment}; }
 
-void ParticleEmitter::set(Vector3 origin, Vector3 volume, float spread, float rate, float lifetime) {
+void ParticleEmitter::setStatic(Vector3 origin, Vector3 volume, float spread, float rate) {
     _origin = origin;
     _volume = volume;
     _spread = spread;
     _rate = rate;
-    _lifetime = lifetime;
 }
 
 void ParticleEmitter::update(float dt) {
@@ -63,6 +63,8 @@ uint16_t ParticleEmitter::draw(Camera& camera) {
 void ParticleEmitter::particle() {
     Particle newParticle;
     Vector3 speed = getDirection() * _speed;
+    Vec2D size{RandomValue{_size.get().x(), _InitEnvelope.size}, RandomValue{_size.get().y(), _InitEnvelope.size}};
+
     newParticle.setInitValues(_origin, _size, _rotation.get(), _tint.get());
     newParticle.setIncrementValues(speed, _size, _rotation.increment(), _tint.increment());
     newParticle.setLifetime(_lifetime);
@@ -90,7 +92,9 @@ Vector3 ParticleEmitter::getDirection() {
     return Vector3{x, y, z};
 }
 
-void ParticleEmitter::setInitParticles(Vec2D size, float rotation, Color tint) {
+void ParticleEmitter::setInitParticles(Vec2D size, float rotation, Color tint, float lifetime, float speed) {
+    setLifetime(lifetime);
+    setSpeed(speed);
     _size = TimeValue<Vec2D>{size, Vec2D{0.0F, 0.0F}};
     _rotation = TimeValue<float>{rotation, 0.0F};
     _tint = TimeValue<Color>{tint, Color{0, 0, 0, 0}};
@@ -100,5 +104,11 @@ void ParticleEmitter::setIncrementParticles(Vec2D sizeIncrement, float rotationI
     _size = TimeValue<Vec2D>{_size.get(), sizeIncrement};
     _rotation = TimeValue<float>{_rotation.get(), rotationIncrement};
     _tint = TimeValue<Color>{_tint.get(), tintIncrement};
+}
 
+void ParticleEmitter::setInitEnvelope(ParticleEnvelope envelope, float lifetime, float speed) {
+    _InitEnvelope = envelope;
+}
+
+void ParticleEmitter::setIncrementEnvelope(ParticleEnvelope envelope) { _IncrementEnvelope = envelope; }
 }  // namespace zappy::gui::render

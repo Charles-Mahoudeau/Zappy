@@ -47,6 +47,8 @@ add_library(zappy_gui_objects OBJECT
         render/utils/Color.hpp
         render/utils/Ray.hpp
         render/utils/Vector3.hpp
+        render/utils/Randomvalue.hpp
+        render/utils/TimeValue.hpp
         ui/ChatPanel.cpp
         ui/ChatPanel.hpp
         ui/Draggable.cpp

@@ -47,7 +47,7 @@ class AssetStore {
     void loadIslandModel();
     void loadBridgeModel();
 
-    ParticleEmitter emit(std::string_view path, Vector3 pos);
+    ParticleEmitter& emit(std::string_view path, Vector3 pos);
 
     [[nodiscard]] const Skybox& skybox() const;
     [[nodiscard]] Model& playerModel(std::size_t index);
