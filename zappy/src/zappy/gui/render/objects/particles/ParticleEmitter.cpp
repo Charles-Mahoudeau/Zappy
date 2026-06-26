@@ -71,6 +71,8 @@ void ParticleEmitter::particle() {
     float incRot = RandomValue{_rotation.increment(), _IncrementEnvelope.rotation};
     ColorF initTint = _tint.get() * RandomValue{1.0F, _InitEnvelope.tint};
     ColorF incTint = _tint.increment() * RandomValue{1.0F, _IncrementEnvelope.tint};
+    Vector3 origin = _origin + Vector3{RandomValue{0.0F, _volume.x() * 0.5F}, RandomValue{0.0F, _volume.y() * 0.5F},
+                                       RandomValue{0.0F, _volume.z() * 0.5F}};
 
     newParticle.setInitValues(_origin, InitSize, initRot, initTint);
     newParticle.setIncrementValues(speed, incSize, incRot, incTint);
