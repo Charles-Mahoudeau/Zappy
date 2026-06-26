@@ -77,7 +77,7 @@ void Hud::draw(const game::GameState& state) {
     }
 
     _chatPanel.draw(state.broadcasts(), chatPanelAnchor());
-    _timeSlider.draw(timeSliderAnchor());
+    _timeSlider.draw(state, timeSliderAnchor());
     _infoPanel.draw(state, infoPanelAnchor(state));
 }
 

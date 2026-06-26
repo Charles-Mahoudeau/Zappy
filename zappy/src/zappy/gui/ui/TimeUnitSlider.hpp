@@ -12,6 +12,10 @@
 #include "zappy/gui/network/CommandSender.hpp"
 #include "zappy/gui/render/utils/Rectangle.hpp"
 
+namespace zappy::gui::game {
+class GameState;
+}
+
 namespace zappy::gui::ui {
 
 class TimeUnitSlider {
@@ -25,16 +29,17 @@ class TimeUnitSlider {
     TimeUnitSlider(TimeUnitSlider&&) noexcept = default;
     TimeUnitSlider& operator=(TimeUnitSlider&&) noexcept = default;
 
-    void draw(render::Rectangle bounds);
+    void draw(const game::GameState& state, render::Rectangle bounds);
     bool consumeValueChange(int newValue);
 
     static constexpr int kMinValue = 1;
-    static constexpr int kMaxValue = 100;
+    static constexpr int kMaxValue = 1000;
 
   private:
     std::reference_wrapper<network::CommandSender> _sender;
     int _lastSentValue;
     int _displayedValue;
+    bool _dragging{false};
 };
 
 }  // namespace zappy::gui::ui
