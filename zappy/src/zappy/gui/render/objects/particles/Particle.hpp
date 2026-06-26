@@ -20,11 +20,11 @@ namespace zappy::gui::render {
 class Particle {
   public:
     Particle() = default;
-    Particle(const Particle&) = delete;
+    Particle(const Particle&) = default;
     Particle(Particle&&) noexcept = default;
     ~Particle() = default;
 
-    Particle& operator=(const Particle&) = delete;
+    Particle& operator=(const Particle&) = default;
     [[nodiscard]] Vector3 position() const { return _position; }
     [[nodiscard]] Vec2D size() const { return _size; }
     [[nodiscard]] float lifetime() const { return _lifetime; }

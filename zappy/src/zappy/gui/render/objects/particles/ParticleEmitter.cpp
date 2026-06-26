@@ -89,4 +89,16 @@ Vector3 ParticleEmitter::getDirection() {
 
     return Vector3{x, y, z};
 }
+
+void ParticleEmitter::setInitParticles(Vec2D size, float rotation, Color tint) {
+    _size = TimeValue<Vec2D>{size, Vec2D{0.0F, 0.0F}};
+    _rotation = TimeValue<float>{rotation, 0.0F};
+    _tint = TimeValue<Color>{tint, Color{0, 0, 0, 0}};
+}
+
+void ParticleEmitter::setIncrementParticles(Vec2D sizeIncrement, float rotationIncrement, Color tintIncrement) {
+    _size = TimeValue<Vec2D>{_size.get(), sizeIncrement};
+    _rotation = TimeValue<float>{_rotation.get(), rotationIncrement};
+    _tint = TimeValue<Color>{_tint.get(), tintIncrement};
+
 }  // namespace zappy::gui::render

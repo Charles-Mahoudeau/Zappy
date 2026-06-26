@@ -42,6 +42,23 @@ class ParticleEmitter {
     void setTint(Color tint, Color increment);
 
     void set(Vector3 origin, Vector3 volume, float spread, float rate, float lifetime);
+    void setInitParticles(Vec2D size, float rotation, Color tint);
+    void setInitEnvelope(float sizeEnvelope, float rotationEnvelope, float tintEnvelope);
+    void setIncrementParticles(Vec2D sizeIncrement, float rotationIncrement, Color tintIncrement);
+    void setIncrementEnvelope(float sizeIncrementEnvelope, float rotationIncrementEnvelope,
+                              float tintIncrementEnvelope);
+
+    [[nodiscard]] Vector3 origin() const { return _origin; }
+    [[nodiscard]] Vector3 volume() const { return _volume; }
+    [[nodiscard]] float spread() const { return _spread; }
+    [[nodiscard]] float speed() const { return _speed; }
+    [[nodiscard]] float rate() const { return _rate; }
+    [[nodiscard]] float lifetime() const { return _lifetime; }
+    [[nodiscard]] Vec2D size() const { return _size.get(); }
+    [[nodiscard]] float rotation() const { return _rotation.get(); }
+    [[nodiscard]] Color tint() const { return _tint.get(); }
+
+    [[nodiscard]] std::size_t particleCount() const { return _particles.size(); }
 
     void update(float dt);
     uint16_t draw(Camera& camera);
