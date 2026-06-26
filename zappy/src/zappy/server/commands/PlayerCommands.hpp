@@ -8,6 +8,7 @@
 #pragma once
 
 #include <cstdint>
+#include <functional>
 #include <string_view>
 #include <unordered_map>
 
@@ -35,6 +36,11 @@ class PlayerCommands : public ACommandGroup {
         game::entity::Player* player = nullptr;
         Client* client = nullptr;
     };
+    enum class Move : std::uint8_t {
+        kRight,
+        kLeft,
+        kForward,
+    };
 
     std::unordered_map<std::string_view, CommandInvoker> _commands;
 
@@ -42,6 +48,7 @@ class PlayerCommands : public ACommandGroup {
 
     static bool inventory(CommandCtx& ctx);
     static bool take(CommandCtx& ctx);
+    static bool move(CommandCtx& ctx, Move move);
 
     static PlayerData getclientData(CommandCtx& ctx, std::uint64_t id);
 };

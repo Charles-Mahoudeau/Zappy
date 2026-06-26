@@ -8,8 +8,10 @@
 #include "zappy/server/commands/PlayerCommands.hpp"
 
 #include <cstdint>
+#include <functional>
 #include <string_view>
 #include <tuple>
+#include <unordered_map>
 #include <utility>
 
 #include "zappy/server/client/Client.hpp"
@@ -23,9 +25,9 @@ namespace zappy::server::command {
 PlayerCommands::PlayerCommands(CommandCtx context)
     : ACommandGroup{std::move(context)},
       _commands({
-          {"Forward", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
-          {"Right", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
-          {"Left", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
+          {"Forward", [](auto& ctx) { return PlayerCommands::move(ctx, Move::kForward); }},
+          {"Right", [](auto& ctx) { return PlayerCommands::move(ctx, Move::kRight); }},
+          {"Left", [](auto& ctx) { return PlayerCommands::move(ctx, Move::kLeft); }},
           {"Look", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
           {"Inventory", [](auto& ctx) { return PlayerCommands::inventory(ctx); }},
           {"Broadcast", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
@@ -67,19 +69,42 @@ bool PlayerCommands::inventory(CommandCtx& ctx) {
 }
 
 bool PlayerCommands::take(CommandCtx& ctx) {
-    ctx.client->setTimeout(7, [&ctx, id = ctx.client->playerID()]() {
+    // check move later
+    ctx.client->setTimeout(7, [&ctx, id = ctx.client->playerID(), params = ctx.data.params]() {
         const auto [player, client] = PlayerCommands::getclientData(ctx, id);
 
         if (client == nullptr || player == nullptr) {
             return;
         }
-        auto resource = game::ResourceHelper::strToRessource(ctx.data.params.at(0));
+        if (params.size() != 1) {
+            client->sendError();
+            return;
+        }
+        auto resource = game::ResourceHelper::strToRessource(params.at(0));
 
         if (!resource.has_value() || !ctx.world.get().playerTake(player, resource.value())) {
             client->sendError();
         } else {
             client->sendSuccess();
         }
+    });
+    return true;
+}
+
+bool PlayerCommands::move(CommandCtx& ctx, Move move) {
+    ctx.client->setTimeout(7, [&ctx, id = ctx.client->playerID(), move]() {
+        static std::unordered_map<Move, std::function<void(game::entity::Player * player)>> map{
+            {Move::kForward, [](game::entity::Player* player) { player->moveForward(); }},
+            {Move::kLeft, [](game::entity::Player* player) { player->turnLeft(); }},
+            {Move::kRight, [](game::entity::Player* player) { player->turnRight(); }},
+        };
+        const auto [player, client] = PlayerCommands::getclientData(ctx, id);
+
+        if (client == nullptr || player == nullptr) {
+            return;
+        }
+        map.at(move)(player);
+        client->sendSuccess();
     });
     return true;
 }
