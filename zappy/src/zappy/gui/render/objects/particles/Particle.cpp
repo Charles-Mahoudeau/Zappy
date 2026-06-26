@@ -9,6 +9,8 @@
 
 #include <raylib.h>
 
+#include <algorithm>
+
 #include "Camera.hpp"
 #include "ColorF.hpp"
 #include "Texture.hpp"
@@ -56,8 +58,9 @@ void Particle::draw(Camera& camera, Texture& texture) {
     const Rectangle source{.x = 0.0F, .y = 0.0F, .width = texSize, .height = texSize};
     const Vector2 origin{.x = _size.get().x() * 0.5F, .y = _size.get().y() * 0.5F};
     const Vector3 up{0.0F, 1.0F, 0.0F};
+    const Vec2D size{std::min(_size.get().x(), 0.0F), std::min(_size.get().y(), 0.0F)};
 
-    DrawBillboardPro(camera, texture, source, _position.get(), up, _size.get(), origin, _rotation.get(),
+    DrawBillboardPro(camera, texture, source, _position.get(), up, size, origin, _rotation.get(),
                      _tint.get().toColor());
 }
 
