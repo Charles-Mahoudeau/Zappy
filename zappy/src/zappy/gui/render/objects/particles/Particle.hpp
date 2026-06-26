@@ -56,7 +56,7 @@ class Particle {
     TimeValue<Vector3> _position{Vector3{0.0F, 0.0F, 0.0F}, Vector3{0.0F, 0.0F, 0.0F}};
     TimeValue<Vec2D> _size{Vec2D{1.0F, 1.0F}, Vec2D{0.0F, 0.0F}};
     TimeValue<float> _rotation{0.0F, 0.0F};
-    TimeValue<ColorF> _tint{Color::kWHITE, Color::kWHITE};
+    TimeValue<ColorF> _tint{ColorF(Color::kWHITE), ColorF(Color::kWHITE)};
     Vector3 _acceleration{0.0F, 0.0F, 0.0F};
 };
 }  // namespace zappy::gui::render

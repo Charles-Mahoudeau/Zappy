@@ -88,7 +88,7 @@ class ParticleEmitter {
     float _rate{1.0F};
     TimeValue<Vec2D> _size{Vec2D{1.0F, 1.0F}, Vec2D{0.0F, 0.0F}};
     TimeValue<float> _rotation{0.0F, 0.0F};
-    TimeValue<ColorF> _tint{WHITE, WHITE};
+    TimeValue<ColorF> _tint{ColorF(Color::kWHITE), ColorF(Color::kWHITE)};
     ParticleEnvelope _InitEnvelope;
     ParticleEnvelope _IncrementEnvelope;
 };

@@ -16,8 +16,8 @@ class ColorF {
   public:
     ColorF() = default;
     ColorF(float r, float g, float b, float a) : r(r), g(g), b(b), a(a) {}
-    ColorF(const Color& c);
-    ColorF(const ::Color& c)
+    explicit ColorF(const Color& c);
+    explicit ColorF(const ::Color& c)
         : r(static_cast<float>(c.r)),
           g(static_cast<float>(c.g)),
           b(static_cast<float>(c.b)),
@@ -81,7 +81,7 @@ class ColorF {
     [[nodiscard]] float alpha() const { return a; }
 
     [[nodiscard]] Color toColor() const;
-    [[nodiscard]] operator Color() const;
+    [[nodiscard]] explicit operator Color() const;
 
   private:
     ColorF FromColor(const Color& c);
