@@ -8,14 +8,12 @@
 #pragma once
 
 #include <cstdint>
-#include <functional>
 #include <string_view>
 #include <unordered_map>
 
 #include "zappy/server/client/Client.hpp"
 #include "zappy/server/commands/ACommandGroup.hpp"
 #include "zappy/server/commands/ICommandGroup.hpp"
-#include "zappy/server/game/entity/Player.hpp"
 
 namespace zappy::server::command {
 
@@ -32,20 +30,12 @@ class PlayerCommands : public ACommandGroup {
     void execute(Client* client, std::string_view msg) override;
 
   private:
-    enum class Move : std::uint8_t {
-        kRight,
-        kLeft,
-        kForward,
-    };
-
     std::unordered_map<std::string_view, CommandInvoker> _commands;
 
     static bool ignore(const CommandCtx& ctx);
 
     static bool inventory(CommandCtx& ctx);
     static bool take(CommandCtx& ctx);
-    static bool set(CommandCtx& ctx);
-    static bool move(CommandCtx& ctx, Move move);
     static bool connectNb(CommandCtx& ctx);
 };
 
