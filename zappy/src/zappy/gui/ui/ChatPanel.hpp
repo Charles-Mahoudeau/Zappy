@@ -12,8 +12,8 @@
 #include <string>
 
 #include "Draggable.hpp"
-#include "utils/Rectangle.hpp"
-#include "utils/Vector2.hpp"
+#include "zappy/gui/render/utils/Rectangle.hpp"
+#include "zappy/gui/render/utils/Vector2.hpp"
 
 namespace zappy::gui::ui {
 
@@ -28,9 +28,11 @@ class ChatPanel {
     ChatPanel(ChatPanel&&) noexcept = default;
     ChatPanel& operator=(ChatPanel&&) noexcept = default;
 
-    void draw(const std::deque<std::string>& broadcasts, Rectangle bounds);
+    void draw(const std::deque<std::string>& broadcasts, render::Rectangle bounds);
 
-    [[nodiscard]] static Rectangle contentRect(Rectangle bounds, std::size_t messageCount);
+    [[nodiscard]] render::Rectangle currentBounds(render::Rectangle anchor) const;
+
+    [[nodiscard]] static render::Rectangle contentRect(render::Rectangle bounds, std::size_t messageCount);
 
     bool consumeAutoScrollReset(std::size_t messageCount);
 
@@ -38,7 +40,7 @@ class ChatPanel {
     static constexpr float kLineHeight = 20.0F;
 
     std::size_t _lastMessageCount{0};
-    Vector2 _scroll;
+    render::Vector2 _scroll;
     Draggable _drag;
 };
 

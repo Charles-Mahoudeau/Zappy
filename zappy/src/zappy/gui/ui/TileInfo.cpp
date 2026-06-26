@@ -24,9 +24,9 @@
 #include "zappy/gui/render/Camera.hpp"
 #include "zappy/gui/render/Grid.hpp"
 #include "zappy/gui/render/utils/Ray.hpp"
+#include "zappy/gui/render/utils/Rectangle.hpp"
+#include "zappy/gui/render/utils/Vector2.hpp"
 #include "zappy/gui/render/utils/Vector3.hpp"
-#include "zappy/gui/ui/utils/Rectangle.hpp"
-#include "zappy/gui/ui/utils/Vector2.hpp"
 
 namespace zappy::gui::ui {
 
@@ -67,7 +67,8 @@ std::optional<std::pair<std::uint32_t, std::uint32_t>> TileInfo::intersectGround
     return std::pair{tileX, tileY};
 }
 
-std::optional<std::pair<std::uint32_t, std::uint32_t>> TileInfo::pick(Vector2 mousePos, const render::Camera& camera,
+std::optional<std::pair<std::uint32_t, std::uint32_t>> TileInfo::pick(render::Vector2 mousePos,
+                                                                      const render::Camera& camera,
                                                                       const game::GameState& state) {
     const render::Ray ray{GetMouseRay(mousePos, camera.operator Camera3D())};
     return intersectGroundPlane(ray, state.width(), state.height());
@@ -77,7 +78,7 @@ float TileInfo::height() {
     return Widgets::kPanelHeaderHeight + kTextMarginTop + (static_cast<float>(kRowCount) * kRowHeight);
 }
 
-void TileInfo::draw(const game::GameState& state, std::uint32_t x, std::uint32_t y, Rectangle bounds) {
+void TileInfo::draw(const game::GameState& state, std::uint32_t x, std::uint32_t y, render::Rectangle bounds) {
     Widgets::panel(bounds, std::format("Tile ({}, {})", x, y));
 
     const game::Resources& resources = state.tile(x, y);
@@ -94,7 +95,7 @@ void TileInfo::draw(const game::GameState& state, std::uint32_t x, std::uint32_t
     for (std::size_t i = 0; i < rows.size(); ++i) {
         const auto& [label, count] = rows.at(i);
         const std::string text = std::format("{}: {}", label, count);
-        const Rectangle rowBounds{
+        const render::Rectangle rowBounds{
             bounds.x() + kTextMarginLeft,
             bounds.y() + Widgets::kPanelHeaderHeight + kTextMarginTop + (static_cast<float>(i) * kRowHeight),
             bounds.width(), kRowHeight};

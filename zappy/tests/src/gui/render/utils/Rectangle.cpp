@@ -5,16 +5,16 @@
 ** Rectangle tests
 */
 
-#include "zappy/gui/ui/utils/Rectangle.hpp"
+#include "zappy/gui/render/utils/Rectangle.hpp"
 
 #include <gtest/gtest.h>
 
 #include "raylib.h"
 
-namespace ui = zappy::gui::ui;
+namespace render = zappy::gui::render;
 
 TEST(RectangleTest, DefaultConstructorZeroesFields) {
-    const ui::Rectangle rect;
+    const render::Rectangle rect;
     EXPECT_FLOAT_EQ(rect.x(), 0.0F);
     EXPECT_FLOAT_EQ(rect.y(), 0.0F);
     EXPECT_FLOAT_EQ(rect.width(), 0.0F);
@@ -22,7 +22,7 @@ TEST(RectangleTest, DefaultConstructorZeroesFields) {
 }
 
 TEST(RectangleTest, ConstructorSetsFields) {
-    const ui::Rectangle rect{1.0F, 2.0F, 3.0F, 4.0F};
+    const render::Rectangle rect{1.0F, 2.0F, 3.0F, 4.0F};
     EXPECT_FLOAT_EQ(rect.x(), 1.0F);
     EXPECT_FLOAT_EQ(rect.y(), 2.0F);
     EXPECT_FLOAT_EQ(rect.width(), 3.0F);
@@ -31,7 +31,7 @@ TEST(RectangleTest, ConstructorSetsFields) {
 
 TEST(RectangleTest, ConstructsFromNativeType) {
     const ::Rectangle native{.x = 5.0F, .y = 6.0F, .width = 7.0F, .height = 8.0F};
-    const ui::Rectangle rect{native};
+    const render::Rectangle rect{native};
     EXPECT_FLOAT_EQ(rect.x(), 5.0F);
     EXPECT_FLOAT_EQ(rect.y(), 6.0F);
     EXPECT_FLOAT_EQ(rect.width(), 7.0F);
@@ -39,7 +39,7 @@ TEST(RectangleTest, ConstructsFromNativeType) {
 }
 
 TEST(RectangleTest, ConvertsToNativeType) {
-    const ui::Rectangle rect{1.0F, 2.0F, 3.0F, 4.0F};
+    const render::Rectangle rect{1.0F, 2.0F, 3.0F, 4.0F};
     const ::Rectangle native = rect;
     EXPECT_FLOAT_EQ(native.x, 1.0F);
     EXPECT_FLOAT_EQ(native.y, 2.0F);
@@ -48,14 +48,14 @@ TEST(RectangleTest, ConvertsToNativeType) {
 }
 
 TEST(RectangleTest, MutableReferenceConversionMutatesOriginal) {
-    ui::Rectangle rect{1.0F, 2.0F, 3.0F, 4.0F};
+    render::Rectangle rect{1.0F, 2.0F, 3.0F, 4.0F};
     auto& native = static_cast<::Rectangle&>(rect);
     native.width = 42.0F;
     EXPECT_FLOAT_EQ(rect.width(), 42.0F);
 }
 
 TEST(RectangleTest, GetReturnsSameValuesAsAccessors) {
-    const ui::Rectangle rect{1.0F, 2.0F, 3.0F, 4.0F};
+    const render::Rectangle rect{1.0F, 2.0F, 3.0F, 4.0F};
     const ::Rectangle native = rect.get();
     EXPECT_FLOAT_EQ(native.x, rect.x());
     EXPECT_FLOAT_EQ(native.y, rect.y());

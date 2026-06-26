@@ -14,6 +14,10 @@
 #include <string_view>
 
 #include "Texture.hpp"
+#include "zappy/gui/render/utils/Color.hpp"
+#include "zappy/gui/render/utils/Rectangle.hpp"
+#include "zappy/gui/render/utils/Vector2.hpp"
+#include "zappy/gui/render/utils/Vector3.hpp"
 
 namespace zappy::gui::render {
 class Camera;
@@ -31,9 +35,9 @@ class Billboard : public Texture {
     Billboard(Billboard&&) noexcept = default;
     Billboard& operator=(Billboard&&) noexcept = default;
 
-    void setSimpleBillboard(Vector3 position, float size = 1.0F, Color tint = WHITE);
-    void setBillboard(Vector3 position, Vector2 size = {.x = 1.0F, .y = 1.0F}, float rotation = 0.0F,
-                      Color tint = WHITE, Vector3 up = {0.0F, 1.0F, 0.0F});
+    void setSimpleBillboard(Vector3 position, float size = 1.0F, Color tint = Color{WHITE});
+    void setBillboard(Vector3 position, Vector2 size = {1.0F, 1.0F}, float rotation = 0.0F, Color tint = Color{WHITE},
+                      Vector3 up = {0.0F, 1.0F, 0.0F});
     void setPosition(Vector3 position);
     void setBillboardSize(float size);
     void setSource(Rectangle source);
@@ -56,13 +60,13 @@ class Billboard : public Texture {
     void drawPro(Camera& camera) const;
 
   private:
-    Rectangle _source{};
+    Rectangle _source;
     Vector3 _position{0.0F, 0.0F, 0.0F};
     Vector3 _up{0.0F, 1.0F, 0.0F};
     Vector2 _size{1.0F, 1.0F};
     Vector2 _origin{0.5F, 0.5F};
     float _rotation{0.0F};
-    Color _tint{WHITE};
+    Color _tint{Color::kWHITE};
 };
 
 class BillboardException : public std::runtime_error {

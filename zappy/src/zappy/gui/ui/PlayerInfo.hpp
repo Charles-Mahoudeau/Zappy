@@ -10,9 +10,9 @@
 #include <cstdint>
 #include <optional>
 
-#include "utils/Rectangle.hpp"
-#include "utils/Vector2.hpp"
 #include "zappy/gui/render/utils/Ray.hpp"
+#include "zappy/gui/render/utils/Rectangle.hpp"
+#include "zappy/gui/render/utils/Vector2.hpp"
 
 namespace zappy::gui::render {
 class Camera;
@@ -33,12 +33,12 @@ class PlayerInfo {
 
     [[nodiscard]] static bool intersectsPlayer(const render::Ray& ray, float playerX, float playerY, float radius);
 
-    [[nodiscard]] static std::optional<std::uint32_t> pick(Vector2 mousePos, const render::Camera& camera,
+    [[nodiscard]] static std::optional<std::uint32_t> pick(render::Vector2 mousePos, const render::Camera& camera,
                                                            const game::GameState& state);
 
     [[nodiscard]] static float height();
 
-    static void draw(const game::GameState& state, std::uint32_t playerId, Rectangle bounds);
+    static void draw(const game::GameState& state, std::uint32_t playerId, render::Rectangle bounds);
 
   private:
     static constexpr float kRowHeight = 24.0F;
