@@ -8,17 +8,31 @@
 #include "Inventory.hpp"
 
 #include <algorithm>
+#include <compare>
 #include <cstdint>
 #include <limits>
 #include <numeric>
+#include <ranges>
+#include <set>
 #include <sstream>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "ResourceType.hpp"
 #include "zappy/shared/exception/InvalidArgument.hpp"
 
 namespace zappy::server::game {
+Inventory::Inventory(const ResourcesInit& resourcesInit) {
+    addResource(ResourceType::kFood, resourcesInit.food);
+    addResource(ResourceType::kLinemate, resourcesInit.linemate);
+    addResource(ResourceType::kDeraumere, resourcesInit.deraumere);
+    addResource(ResourceType::kSibur, resourcesInit.sibur);
+    addResource(ResourceType::kMendiane, resourcesInit.mendiane);
+    addResource(ResourceType::kPhiras, resourcesInit.phiras);
+    addResource(ResourceType::kThystame, resourcesInit.thystame);
+}
+
 std::uint32_t Inventory::resourceCount() const {
     return std::accumulate(_resources.begin(), _resources.end(), 0,
                            [](const auto& acc, const auto& resource) { return acc + resource.second; });
@@ -80,6 +94,61 @@ std::string Inventory::string() const {
         }
     }
     return stringStream.str();
+}
+
+Inventory& Inventory::operator+=(const Inventory& other) {
+    for (const auto& [type, amount] : other._resources) {
+        addResource(type, amount);
+    }
+    return *this;
+}
+
+Inventory& Inventory::operator-=(const Inventory& other) {
+    for (const auto& [type, amount] : other._resources) {
+        removeResource(type, amount);
+    }
+    return *this;
+}
+
+std::partial_ordering Inventory::operator<=>(const Inventory& other) const {
+    bool hasGreater = false;
+    bool hasLess = false;
+    std::vector<ResourceType> allKeys;
+
+    allKeys.reserve(_resources.size() + other._resources.size());
+    for (const auto& key : _resources | std::views::keys) {
+        allKeys.emplace_back(key);
+    }
+    for (const auto& key : other._resources | std::views::keys) {
+        allKeys.emplace_back(key);
+    }
+    std::ranges::sort(allKeys);
+
+    auto [last, end] = std::ranges::unique(allKeys);
+
+    allKeys.erase(last, end);
+
+    for (const auto& key : allKeys) {
+        const std::uint16_t quantity = resourceCount(key);
+        const std::uint16_t otherQuantity = other.resourceCount(key);
+
+        if (quantity > otherQuantity) {
+            hasGreater = true;
+        }
+        if (quantity < otherQuantity) {
+            hasLess = true;
+        }
+        if (hasGreater && hasLess) {
+            return std::partial_ordering::unordered;
+        }
+    }
+    if (hasGreater) {
+        return std::partial_ordering::greater;
+    }
+    if (hasLess) {
+        return std::partial_ordering::less;
+    }
+    return std::partial_ordering::equivalent;
 }
 
 bool Inventory::isValidResourceType(const ResourceType type) {
