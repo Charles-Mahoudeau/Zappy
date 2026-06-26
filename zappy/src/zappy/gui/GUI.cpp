@@ -69,7 +69,7 @@ void GUI::setupCamera() {
     const float fovy = span * 1.5F;
 
     _camera = render::Camera{render::Vector3(centerX + offset, span, centerZ + offset),
-                             render::Vector3(centerX, 0.0F, centerZ), render::Vector3(0, 1, 0), fovy,
+                             render::Vector3(centerX, 0.0F, centerZ), render::Vector3(0, 0.75, 0), fovy,
                              render::CameraProjection::CAMERA_ORTHOGRAPHIC};
     _camera.setCameraMode(render::CameraMode::CAMERA_CUSTOM);
 }
