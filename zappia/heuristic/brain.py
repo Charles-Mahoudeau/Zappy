@@ -406,37 +406,43 @@ class HeuristicAI:
         """Stones the beacon's tile still needs that I'm not yet carrying any of."""
         return [s for s in self.call_missing if s in STONES and self.inv.get(s, 0) < 1]
 
+    def _converge_at_beacon(self) -> None:
+        """Arrived on the beacon tile: drop carried stones, fetch nearby missing ones."""
+        if self.drop_needed_stone():
+            return
+        for stone in self.tile_short():
+            idx = self.nearest_tile_with(stone)
+            if idx is not None and idx != 0:
+                self.move_toward(idx)
+                return
+        self.refresh_look()
+
+    def _fetch_stone_enroute(self, missing_stones: List[str]) -> bool:
+        """Pick up or step toward a needed stone while travelling to the beacon.
+        Returns True if an action was taken."""
+        for stone in missing_stones:
+            if self.tile0().count(stone) > 0 and self.c.take(stone):
+                self.inv[stone] = self.inv.get(stone, 0) + 1
+                self.refresh_look()
+                return True
+        for stone in missing_stones:
+            idx = self.nearest_tile_with(stone)
+            if idx is not None and idx != 0:
+                self.move_toward(idx)
+                return True
+        return False
+
     def converge(self) -> None:
         """Move toward the rally beacon. Pick up needed stones found en route."""
         missing_stones = [s for s in self.call_missing if s in STONES]
         carrying_useful = any(self.inv.get(s, 0) > 0 for s in missing_stones)
 
         if self.call_dir == 0:
-            if self.drop_needed_stone():
-                return
-            actual_short = list(self.tile_short().keys())
-            if actual_short:
-                for stone in actual_short:
-                    idx = self.nearest_tile_with(stone)
-                    if idx is not None and idx != 0:
-                        self.move_toward(idx)
-                        return
-                self.refresh_look()
-            else:
-                self.refresh_look()
+            self._converge_at_beacon()
             return
 
         if missing_stones and not carrying_useful:
-            for stone in missing_stones:
-                if self.tile0().count(stone) > 0 and self.c.take(stone):
-                    self.inv[stone] = self.inv.get(stone, 0) + 1
-                    self.refresh_look()
-                    return
-            for stone in missing_stones:
-                idx = self.nearest_tile_with(stone)
-                if idx is not None and idx != 0:
-                    self.move_toward(idx)
-                    return
+            self._fetch_stone_enroute(missing_stones)
 
         if self.call_dir is None:
             self.explore()
