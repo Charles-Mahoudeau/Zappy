@@ -51,18 +51,16 @@ void Particle::update(float dt) {
 }
 
 void Particle::draw(Camera& camera, Texture& texture) {
-    const Rectangle source{.x = 0.0F,
-                           .y = 0.0F,
-                           .width = static_cast<float>(texture.width()),
-                           .height = static_cast<float>(texture.height())};
-    const Vector2 origin{.x = 0.5F, .y = 0.5F};
-    const Vector3 pos = _position.get();
+    const float texSize = static_cast<float>(std::min(texture.width(), texture.height()));
+    const Rectangle source{.x = 0.0F, .y = 0.0F, .width = texSize, .height = texSize};
 
-    Vector3 toCamera = (Vector3{camera.position()} - pos).normalized();
-    Vector3 right = toCamera.cross({0.0F, 1.0F, 0.0F}).normalized();
-    Vector3 up = right.cross(toCamera);
+    const float aspect = static_cast<float>(texture.width()) / static_cast<float>(texture.height());
+    const Vec2D size{_size.get().x() * aspect, _size.get().y()};
+    const Vector2 origin{.x = size.x() * 0.5F, .y = size.y() * 0.5F};
+    const ::Vector3 up{0.0F, 1.0F, 0.0F};
 
-    DrawBillboardPro(camera, texture, source, pos, up, _size.get(), origin, _rotation.get(), _tint.get().toColor());
+    DrawBillboardPro(camera, texture, source, _position.get(), up, size, origin, _rotation.get(),
+                     _tint.get().toColor());
 }
 
 }  // namespace zappy::gui::render
