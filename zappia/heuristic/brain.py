@@ -510,15 +510,14 @@ class HeuristicAI:
             return True
         return False
 
-    def forage(self) -> bool:
+    def forage(self) -> None:
         if self.maybe_eat():
-            return True
+            return
         idx = self.nearest_tile_with("food")
         if idx not in (None, 0):
             self.move_toward(idx)
-            return True
+            return
         self.explore()
-        return True
 
     def explore(self) -> None:
         roll = secrets.randbelow(100)
