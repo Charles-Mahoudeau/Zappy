@@ -31,6 +31,7 @@
 #include "Tile.hpp"
 #include "entity/Egg.hpp"
 #include "entity/Player.hpp"
+#include "zappy/shared/exception/OutOfRange.hpp"
 #include "zappy/shared/io/Logger.hpp"
 #include "zappy/shared/math/Direction.hpp"
 #include "zappy/shared/math/Vector2.hpp"
@@ -198,6 +199,56 @@ Event World::popEvent() {
 
 void World::pushEvent(Event event) { _events.push_back(std::move(event)); }
 
+std::optional<World::IncantationSnapshot> World::beginIncantation(const std::uint64_t playerId) {
+    const entity::Player* incantationPlayer = player(playerId);
+
+    if (incantationPlayer == nullptr) {
+        return std::nullopt;
+    }
+
+    const Tile& tile = _grid.tile(incantationPlayer->position());
+    std::vector<std::uint64_t> players;
+
+    for (const std::uint64_t entityId : tile.entities()) {
+        if (_entityDatabase.is<entity::Player>(entityId)) {
+            players.push_back(entityId);
+        }
+    }
+
+    IncantationSnapshot snapshot{
+        .position = {},
+        .level = incantationPlayer->level(),
+        .playerId = incantationPlayer->id(),
+        .playerIds = players,
+    };
+
+    if (!verifyIncantationRequirements(snapshot)) {
+        return std::nullopt;
+    }
+    return snapshot;
+}
+
+bool World::endIncantation(const IncantationSnapshot& snapshot) {
+    if (!verifyIncantationRequirements(snapshot)) {
+        return false;
+    }
+
+    const auto& [players, resources] = incantationRequirements(snapshot.level);
+
+    Tile& tile = _grid.tile(snapshot.position);
+
+    tile.inventory() -= resources;
+    for (const std::uint64_t playerId : snapshot.playerIds) {
+        entity::Player* incantationPlayer = player(playerId);
+
+        if (incantationPlayer == nullptr) {
+            continue;
+        }
+        std::ignore = incantationPlayer->levelUp();
+    }
+    return true;
+}
+
 const std::unordered_map<ResourceType, float>& World::resourceDensities() {
     using enum ResourceType;
 
@@ -217,6 +268,98 @@ void World::spawnResources() {
     if (_logger.has_value()) {
         _logger->info("Resources spawned.");
     }
+}
+
+const World::IncantationRequirements& World::incantationRequirements(const std::uint8_t level) {
+    static std::unordered_map<std::uint8_t, IncantationRequirements> requirements = {
+        {
+            1,
+            IncantationRequirements{
+                .players = 1,
+                .resources = Inventory{{
+                    .linemate = 1,
+                }},
+            },
+        },
+        {
+            2,
+            IncantationRequirements{
+                .players = 2,
+                .resources = Inventory{{
+                    .linemate = 1,
+                    .deraumere = 1,
+                    .sibur = 1,
+                }},
+            },
+        },
+        {
+            3,
+            IncantationRequirements{
+                .players = 2,
+                .resources = Inventory{{
+                    .linemate = 2,
+                    .sibur = 1,
+                    .phiras = 2,
+                }},
+            },
+        },
+        {
+            4,
+            IncantationRequirements{
+                .players = 4,
+                .resources = Inventory{{
+                    .linemate = 1,
+                    .deraumere = 1,
+                    .sibur = 2,
+                    .phiras = 1,
+                }},
+            },
+        },
+        {
+            5,
+            IncantationRequirements{
+                .players = 4,
+                .resources = Inventory{{
+                    .linemate = 1,
+                    .deraumere = 2,
+                    .sibur = 1,
+                    .mendiane = 3,
+                }},
+            },
+        },
+        {
+            6,
+            IncantationRequirements{
+                .players = 6,
+                .resources = Inventory{{
+                    .linemate = 1,
+                    .deraumere = 2,
+                    .sibur = 3,
+                    .phiras = 1,
+                }},
+            },
+        },
+        {
+            7,
+            IncantationRequirements{
+                .players = 6,
+                .resources = Inventory{{
+                    .linemate = 2,
+                    .deraumere = 2,
+                    .sibur = 2,
+                    .mendiane = 2,
+                    .phiras = 2,
+                    .thystame = 1,
+                }},
+            },
+        },
+    };
+    const auto it = requirements.find(level);
+
+    if (it == requirements.end()) {
+        throw exception::OutOfRange{"invalid incantation level"};
+    }
+    return it->second;
 }
 
 Tile& World::randomTile() {
@@ -261,5 +404,39 @@ void World::placeEggRandom(const std::uint64_t eggId) {
         _logger->info(std::format("Spawned egg #{} for team {}{} at ({}, {})", eggId, egg->teamName(), playerInfo,
                                   tile.position().x, tile.position().y));
     }
+}
+
+std::expected<void, std::string> World::verifyIncantationRequirements(const IncantationSnapshot& snapshot) const {
+    const entity::Player* incantationPlayer = player(snapshot.playerId);
+
+    if (incantationPlayer == nullptr) {
+        return std::unexpected{"player does not exist"};
+    }
+    if (incantationPlayer->level() != snapshot.level) {
+        return std::unexpected{"player is not at the right level"};
+    }
+
+    const auto& [playersNecessary, resourcesNecessary] = incantationRequirements(snapshot.level);
+
+    if (snapshot.playerIds.size() < playersNecessary) {
+        return std::unexpected{"not enough players"};
+    }
+    for (const std::uint64_t playerId : snapshot.playerIds) {
+        const entity::Player* participant = player(playerId);
+
+        if (participant == nullptr) {
+            return std::unexpected{"participant does not exist"};
+        }
+        if (participant->level() != snapshot.level) {
+            return std::unexpected{"participant is not at the right level"};
+        }
+        if (participant->position() != snapshot.position) {
+            return std::unexpected{"participant is not at the right position"};
+        }
+    }
+    if (const Tile& incantationTile = _grid.tile(snapshot.position); incantationTile.inventory() < resourcesNecessary) {
+        return std::unexpected{"not enough resources"};
+    }
+    return {};
 }
 }  // namespace zappy::server::game
