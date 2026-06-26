@@ -28,7 +28,7 @@ class Color {
     Color& operator=(Color&&) noexcept = default;
     ~Color() = default;
 
-    Color(const ColorF& colorF) : _color{static_cast<::Color>(colorF.toColor())} {}
+    explicit Color(const ColorF& colorF) : _color{static_cast<::Color>(colorF.toColor())} {}
 
     [[nodiscard]] ::Color get() const { return _color; }
 
