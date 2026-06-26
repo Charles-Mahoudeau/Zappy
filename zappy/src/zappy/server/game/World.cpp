@@ -241,4 +241,19 @@ void World::generateResourceThresholds() {
         _logger->info("Resources thresholds generated.");
     }
 }
+
+bool World::playerTake(entity::Player* player, ResourceType resource) {
+    const math::Vector2u pos = player->position();
+    Tile& tile = this->_grid.tile(pos);
+
+    if (tile.inventory().resourceCount(resource) == 0) {
+        return false;
+    }
+    tile.inventory().removeResource(resource);
+    player->take(resource);
+    this->pushEvent(PlayerResourceCollectEvent{.playerId = player->id(), .resourceType = resource});
+
+    return true;
+}
+
 }  // namespace zappy::server::game
