@@ -93,11 +93,11 @@ Vector3 ParticleEmitter::getDirection() {
 }
 
 void ParticleEmitter::setInitParticles(Vec2D size, float rotation, Color tint, float lifetime, float speed) {
-    setLifetime(lifetime);
-    setSpeed(speed);
     _size = TimeValue<Vec2D>{size, Vec2D{0.0F, 0.0F}};
     _rotation = TimeValue<float>{rotation, 0.0F};
     _tint = TimeValue<Color>{tint, Color{0, 0, 0, 0}};
+    _lifetime.setValue(lifetime);
+    _speed.setValue(speed);
 }
 
 void ParticleEmitter::setIncrementParticles(Vec2D sizeIncrement, float rotationIncrement, Color tintIncrement) {
@@ -108,7 +108,17 @@ void ParticleEmitter::setIncrementParticles(Vec2D sizeIncrement, float rotationI
 
 void ParticleEmitter::setInitEnvelope(ParticleEnvelope envelope, float lifetime, float speed) {
     _InitEnvelope = envelope;
+    _lifetime.setEnvelope(lifetime);
+    _speed.setEnvelope(speed);
 }
 
 void ParticleEmitter::setIncrementEnvelope(ParticleEnvelope envelope) { _IncrementEnvelope = envelope; }
+
+void ParticleEmitter::setStaticParticles(Vec2D size, float rotation, Color tint, float lifetime, float speed) {
+    _size = TimeValue<Vec2D>{size, Vec2D{0.0F, 0.0F}};
+    _rotation = TimeValue<float>{rotation, 0.0F};
+    _tint = TimeValue<Color>{tint, Color{0, 0, 0, 0}};
+    _lifetime.setValue(lifetime);
+    _speed.setValue(speed);
+
 }  // namespace zappy::gui::render

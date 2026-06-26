@@ -25,7 +25,6 @@ namespace zappy::gui::render {
 class ParticleEmitter {
   public:
     struct ParticleEnvelope {
-        float lifetime{1.0F};
         float size{1.0F};
         float rotation{1.0F};
         float tint{1.0F};
@@ -54,6 +53,8 @@ class ParticleEmitter {
     void setIncrementParticles(Vec2D sizeIncrement, float rotationIncrement, Color tintIncrement);
     void setInitEnvelope(ParticleEnvelope envelope, float lifetime, float speed);
     void setIncrementEnvelope(ParticleEnvelope envelope);
+
+    void setStaticParticles(Vec2D size, float rotation, Color tint, float lifetime, float speed);
 
     [[nodiscard]] Vector3 origin() const { return _origin; }
     [[nodiscard]] Vector3 volume() const { return _volume; }
