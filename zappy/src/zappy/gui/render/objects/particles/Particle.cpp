@@ -10,7 +10,7 @@
 #include <raylib.h>
 
 #include "Camera.hpp"
-#include "Color.hpp"
+#include "ColorF.hpp"
 #include "Texture.hpp"
 #include "TimeValue.hpp"
 #include "Vec2D.hpp"
@@ -25,21 +25,21 @@ void Particle::setLifetime(float lifetime) { _lifetime = TimeValue<float>{lifeti
 
 void Particle::setRotation(float rotation, float increment) { _rotation = TimeValue<float>{rotation, increment}; }
 
-void Particle::setTint(Color tint, Color increment) { _tint = TimeValue<Color>{tint, increment}; }
+void Particle::setTint(ColorF tint, ColorF increment) { _tint = TimeValue<ColorF>{tint, increment}; }
 
 void Particle::setIncrementValues(Vector3 positionIncrement, Vec2D sizeIncrement, float rotationIncrement,
-                                  Color tintIncrement) {
+                                  ColorF tintIncrement) {
     _position = TimeValue<Vector3>{_position.get(), positionIncrement};
     _size = TimeValue<Vec2D>{_size.get(), sizeIncrement};
     _rotation = TimeValue<float>{_rotation.get(), rotationIncrement};
-    _tint = TimeValue<Color>{_tint.get(), tintIncrement};
+    _tint = TimeValue<ColorF>{_tint.get(), tintIncrement};
 }
 
-void Particle::setInitValues(Vector3 position, Vec2D size, float rotation, Color tint) {
+void Particle::setInitValues(Vector3 position, Vec2D size, float rotation, ColorF tint) {
     _position = TimeValue<Vector3>{position, Vector3{0.0F, 0.0F, 0.0F}};
     _size = TimeValue<Vec2D>{size, Vec2D{0.0F, 0.0F}};
     _rotation = TimeValue<float>{rotation, 0.0F};
-    _tint = TimeValue<Color>{tint, Color{0, 0, 0, 0}};
+    _tint = TimeValue<ColorF>{tint, ColorF{0, 0, 0, 0}};
 }
 
 void Particle::update(float dt) {
@@ -58,7 +58,8 @@ void Particle::draw(Camera& camera, Texture& texture) {
     const Vector3 up{0.0F, 1.0F, 0.0F};
     const Vector2 _origin{.x = 0.5F, .y = 0.5F};
 
-    DrawBillboardPro(camera, texture, source, _position.get(), up, _size.get(), _origin, _rotation.get(), _tint.get());
+    DrawBillboardPro(camera, texture, source, _position.get(), up, _size.get(), _origin, _rotation.get(),
+                     _tint.get().toColor());
 }
 
 }  // namespace zappy::gui::render

@@ -20,6 +20,8 @@
 #include "objects/particles/Particle.hpp"
 #include "objects/particles/ParticleEmitter.hpp"
 #include "zappy/gui/game/GameState.hpp"
+#include "zappy/gui/render/utils/Color.hpp"
+#include "zappy/gui/render/utils/ColorF.hpp"
 
 namespace zappy::gui::render {
 
@@ -122,8 +124,9 @@ void AssetStore::loadResourceModel(game::ResourceType type) {
 
 void AssetStore::loadVFXs() {
     ParticleEmitter test("assets/models/resources/textures/thystameBase.png");
-    test.setStatic(Vector3{}, Vector3{1.0F, 1.0F, 1.0F}, 360.0F, 5.0F);
-    test.setInitParticles(Vec2D{1.0F, 1.0F}, 0.0F, WHITE, 150.0F, 0.1F);
+    test.setStatic(Vector3{}, Vector3{1.0F, 1.0F, 1.0F}, 360.0F, 15.0F);
+    test.setInitParticles(Vec2D{1.0F, 1.0F}, 0.0F, Color::kWHITE, 150.0F, 0.1F);
+    test.setIncrementParticles(Vec2D{-0.05F, -0.05F}, 0.1F, ColorF{0, 0, 0, -0.5});
     _vfxs.insert({"test", std::move(test)});
 }
 void AssetStore::loadEggModel() {

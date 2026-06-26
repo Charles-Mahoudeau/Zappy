@@ -14,7 +14,7 @@
 #include <string_view>
 
 #include "Billboard.hpp"
-#include "Color.hpp"
+#include "ColorF.hpp"
 #include "Randomvalue.hpp"
 #include "TimeValue.hpp"
 #include "Vector3.hpp"
@@ -32,7 +32,7 @@ void ParticleEmitter::setSize(Vec2D size, Vec2D increment) { _size = TimeValue<V
 void ParticleEmitter::setRotation(float rotation, float increment) {
     _rotation = TimeValue<float>{rotation, increment};
 }
-void ParticleEmitter::setTint(Color tint, Color increment) { _tint = TimeValue<Color>{tint, increment}; }
+void ParticleEmitter::setTint(ColorF tint, ColorF increment) { _tint = TimeValue<ColorF>{tint, increment}; }
 
 void ParticleEmitter::setStatic(Vector3 origin, Vector3 volume, float spread, float rate) {
     _origin = origin;
@@ -92,18 +92,18 @@ Vector3 ParticleEmitter::getDirection() {
     return Vector3{x, y, z};
 }
 
-void ParticleEmitter::setInitParticles(Vec2D size, float rotation, Color tint, float lifetime, float speed) {
+void ParticleEmitter::setInitParticles(Vec2D size, float rotation, ColorF tint, float lifetime, float speed) {
     _size = TimeValue<Vec2D>{size, Vec2D{0.0F, 0.0F}};
     _rotation = TimeValue<float>{rotation, 0.0F};
-    _tint = TimeValue<Color>{tint, Color{0, 0, 0, 0}};
+    _tint = TimeValue<ColorF>{tint, ColorF{0, 0, 0, 0}};
     _lifetime.setValue(lifetime);
     _speed.setValue(speed);
 }
 
-void ParticleEmitter::setIncrementParticles(Vec2D sizeIncrement, float rotationIncrement, Color tintIncrement) {
+void ParticleEmitter::setIncrementParticles(Vec2D sizeIncrement, float rotationIncrement, ColorF tintIncrement) {
     _size = TimeValue<Vec2D>{_size.get(), sizeIncrement};
     _rotation = TimeValue<float>{_rotation.get(), rotationIncrement};
-    _tint = TimeValue<Color>{_tint.get(), tintIncrement};
+    _tint = TimeValue<ColorF>{_tint.get(), tintIncrement};
 }
 
 void ParticleEmitter::setInitEnvelope(ParticleEnvelope envelope, float lifetime, float speed) {
@@ -114,10 +114,10 @@ void ParticleEmitter::setInitEnvelope(ParticleEnvelope envelope, float lifetime,
 
 void ParticleEmitter::setIncrementEnvelope(ParticleEnvelope envelope) { _IncrementEnvelope = envelope; }
 
-void ParticleEmitter::setStaticParticles(Vec2D size, float rotation, Color tint, float lifetime, float speed) {
+void ParticleEmitter::setStaticParticles(Vec2D size, float rotation, ColorF tint, float lifetime, float speed) {
     _size = TimeValue<Vec2D>{size, Vec2D{0.0F, 0.0F}};
     _rotation = TimeValue<float>{rotation, 0.0F};
-    _tint = TimeValue<Color>{tint, Color{0, 0, 0, 0}};
+    _tint = TimeValue<ColorF>{tint, ColorF{0, 0, 0, 0}};
     _lifetime.setValue(lifetime);
     _speed.setValue(speed);
 }

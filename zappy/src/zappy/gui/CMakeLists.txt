@@ -45,6 +45,8 @@ add_library(zappy_gui_objects OBJECT
         render/utils/Vec2D.cpp
         render/utils/Vec2D.hpp
         render/utils/Color.hpp
+        render/utils/ColorF.hpp
+        render/utils/ColorF.cpp
         render/utils/Ray.hpp
         render/utils/Vector3.hpp
         render/utils/Randomvalue.hpp

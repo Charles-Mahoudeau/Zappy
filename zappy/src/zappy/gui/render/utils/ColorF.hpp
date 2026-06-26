@@ -6,23 +6,27 @@
 */
 
 #pragma once
+#include <raylib.h>
+
 #include <algorithm>
 
-#include "Color.hpp"
-
 namespace zappy::gui::render {
-
+class Color;
 class ColorF {
   public:
     ColorF() = default;
     ColorF(float r, float g, float b, float a) : r(r), g(g), b(b), a(a) {}
-    explicit ColorF(const Color& c) {
-        auto rayColor = c.get();
-        r = static_cast<float>(rayColor.r);
-        g = static_cast<float>(rayColor.g);
-        b = static_cast<float>(rayColor.b);
-        a = static_cast<float>(rayColor.a);
-    }
+    ColorF(const Color& c);
+    ColorF(const ::Color& c)
+        : r(static_cast<float>(c.r)),
+          g(static_cast<float>(c.g)),
+          b(static_cast<float>(c.b)),
+          a(static_cast<float>(c.a)) {}
+    ColorF(const ColorF&) = default;
+    ColorF& operator=(const ColorF&) = default;
+    ColorF(ColorF&&) noexcept = default;
+    ColorF& operator=(ColorF&&) noexcept = default;
+    ~ColorF() = default;
 
     ColorF& operator+=(const ColorF& other) {
         r += other.r;
@@ -61,23 +65,18 @@ class ColorF {
         return *this;
     }
 
-    [[nodiscard]] Color toColor() const {
-        return Color{static_cast<unsigned char>(std::clamp(r, 0.0F, 255.0F)),
-                     static_cast<unsigned char>(std::clamp(g, 0.0F, 255.0F)),
-                     static_cast<unsigned char>(std::clamp(b, 0.0F, 255.0F)),
-                     static_cast<unsigned char>(std::clamp(a, 0.0F, 255.0F))};
-    }
-
-    [[nodiscard]] operator Color() const { return toColor(); }
+    [[nodiscard]] Color toColor() const;
+    [[nodiscard]] operator Color() const;
 
   private:
+    ColorF FromColor(const Color& c);
+
     float r{0.0F};
     float g{0.0F};
     float b{0.0F};
     float a{0.0F};
 };
 
-// Allows float * ColorF
 inline ColorF operator*(float scalar, const ColorF& color) { return color * scalar; }
 
 }  // namespace zappy::gui::render

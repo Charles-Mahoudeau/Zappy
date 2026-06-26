@@ -46,15 +46,15 @@ class ParticleEmitter {
     void setLifetime(float lifetime, float envelope = 0.0F);
     void setSize(Vec2D size, Vec2D increment);
     void setRotation(float rotation, float increment);
-    void setTint(Color tint, Color increment);
+    void setTint(ColorF tint, ColorF increment);
 
     void setStatic(Vector3 origin, Vector3 volume, float spread, float rate);
-    void setInitParticles(Vec2D size, float rotation, Color tint, float lifetime, float speed);
-    void setIncrementParticles(Vec2D sizeIncrement, float rotationIncrement, Color tintIncrement);
+    void setInitParticles(Vec2D size, float rotation, ColorF tint, float lifetime, float speed);
+    void setIncrementParticles(Vec2D sizeIncrement, float rotationIncrement, ColorF tintIncrement);
     void setInitEnvelope(ParticleEnvelope envelope, float lifetime, float speed);
     void setIncrementEnvelope(ParticleEnvelope envelope);
 
-    void setStaticParticles(Vec2D size, float rotation, Color tint, float lifetime, float speed);
+    void setStaticParticles(Vec2D size, float rotation, ColorF tint, float lifetime, float speed);
 
     [[nodiscard]] Vector3 origin() const { return _origin; }
     [[nodiscard]] Vector3 volume() const { return _volume; }
@@ -64,7 +64,7 @@ class ParticleEmitter {
     [[nodiscard]] float lifetime() const { return _lifetime; }
     [[nodiscard]] Vec2D size() const { return _size.get(); }
     [[nodiscard]] float rotation() const { return _rotation.get(); }
-    [[nodiscard]] Color tint() const { return _tint.get(); }
+    [[nodiscard]] ColorF tint() const { return _tint.get(); }
 
     [[nodiscard]] std::size_t particleCount() const { return _particles.size(); }
 
@@ -87,7 +87,7 @@ class ParticleEmitter {
     float _rate{1.0F};
     TimeValue<Vec2D> _size{Vec2D{1.0F, 1.0F}, Vec2D{0.0F, 0.0F}};
     TimeValue<float> _rotation{0.0F, 0.0F};
-    TimeValue<Color> _tint{WHITE, WHITE};
+    TimeValue<ColorF> _tint{WHITE, WHITE};
     ParticleEnvelope _InitEnvelope;
     ParticleEnvelope _IncrementEnvelope;
 };
