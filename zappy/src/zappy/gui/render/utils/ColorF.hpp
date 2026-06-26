@@ -84,7 +84,7 @@ class ColorF {
     [[nodiscard]] explicit operator Color() const;
 
   private:
-    ColorF FromColor(const Color& c);
+    static ColorF FromColor(const Color& c);
 
     float r{0.0F};
     float g{0.0F};
