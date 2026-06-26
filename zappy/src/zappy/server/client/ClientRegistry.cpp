@@ -10,7 +10,6 @@
 #include <algorithm>
 #include <cstdint>
 #include <memory>
-#include <ranges>
 #include <utility>
 #include <vector>
 
@@ -46,7 +45,7 @@ void ClientRegistry::update() {
     }
 
     for (const Client* clientPtr : this->_toRemove) {
-        std::vector<const Client*>& typedList = this->_clientsPerType.at(clientPtr->type());
+        std::vector<Client*>& typedList = this->_clientsPerType.at(clientPtr->type());
         std::erase_if(typedList, [&clientPtr](const Client* client) { return client == clientPtr; });
         std::erase_if(this->_clients,
                       [&clientPtr](const std::unique_ptr<Client>& client) { return client.get() == clientPtr; });

@@ -40,8 +40,8 @@ class PlayerCommands : public ACommandGroup {
 
     static bool ignore(const CommandCtx& ctx);
 
-    static void inventory(CommandCtx& ctx);
-    static void take(CommandCtx& ctx);
+    static bool inventory(CommandCtx& ctx);
+    static bool take(CommandCtx& ctx);
 
     static PlayerData idToPlayerData(CommandCtx& ctx, std::uint64_t id);
 };

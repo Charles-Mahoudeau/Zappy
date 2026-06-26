@@ -8,7 +8,6 @@
 #include "zappy/server/commands/PlayerCommands.hpp"
 
 #include <cstdint>
-#include <print>
 #include <string_view>
 #include <tuple>
 #include <utility>
@@ -19,7 +18,6 @@
 #include "zappy/server/game/IEntity.hpp"
 #include "zappy/server/game/ResourceType.hpp"
 #include "zappy/server/game/entity/Player.hpp"
-#include "zappy/shared/network/Address.hpp"
 
 namespace zappy::server::command {
 PlayerCommands::PlayerCommands(CommandCtx context)
@@ -29,16 +27,12 @@ PlayerCommands::PlayerCommands(CommandCtx context)
           {"Right", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
           {"Left", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
           {"Look", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
-          {"Inventory",
-           [](auto& ctx) {
-               PlayerCommands::inventory(ctx);
-               return true;
-           }},
+          {"Inventory", [](auto& ctx) { return PlayerCommands::inventory(ctx); }},
           {"Broadcast", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
           {"Connect_nbr", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
           {"Fork", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
           {"Eject", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
-          {"Take", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
+          {"Take", [](auto& ctx) { return PlayerCommands::take(ctx); }},
           {"Set", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
           {"Incantation", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
       }) {}
@@ -60,7 +54,7 @@ bool PlayerCommands::ignore(const CommandCtx& ctx) {
     return false;
 }
 
-void PlayerCommands::inventory(CommandCtx& ctx) {
+bool PlayerCommands::inventory(CommandCtx& ctx) {
     ctx.client->setTimeout(1, [&ctx, id = ctx.client->playerID()]() {
         const PlayerData data = PlayerCommands::idToPlayerData(ctx, id);
 
@@ -73,6 +67,29 @@ void PlayerCommands::inventory(CommandCtx& ctx) {
             std::ignore = ctx.client->sendMessage("[ {} ]\n", data.player->inventory().detailledString());
         }
     });
+    return true;
+}
+
+bool PlayerCommands::take(CommandCtx& ctx) {
+    ctx.client->setTimeout(7, [&ctx, id = ctx.client->playerID()]() {
+        const auto [player, client] = PlayerCommands::idToPlayerData(ctx, id);
+
+        if (client == nullptr) {
+            return;
+        }
+        if (player == nullptr || ctx.data.params.size() != 1) {
+            client->sendError();
+            return;
+        }
+        auto resource = game::ResourceHelper::strToRessource(ctx.data.params.at(0));
+
+        if (!resource.has_value() || !ctx.world.get().playerTake(player, resource.value())) {
+            client->sendError();
+        } else {
+            client->sendSuccess();
+        }
+    });
+    return true;
 }
 
 PlayerCommands::PlayerData PlayerCommands::idToPlayerData(CommandCtx& ctx, std::uint64_t id) {
