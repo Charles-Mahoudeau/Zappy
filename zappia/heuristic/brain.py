@@ -288,9 +288,7 @@ class HeuristicAI:
     def is_stranded(self) -> bool:
         """True only for a player in a permanent dead-end: BELOW the team's top
         level, with too few teammates at or under its level to ever meet the rite
-        (higher teammates can't drop back to complete the group). The front itself
-        is never stranded -- it just waits for climbers / forked replacements to
-        bring up the missing members."""
+        (higher teammates can't drop back to complete the group)."""
         if self.level >= self.team_max():
             return False
         reachable = 1 + sum(1 for _, lv in self.team_seen.values() if lv <= self.level)
@@ -312,8 +310,7 @@ class HeuristicAI:
 
     def suicide(self) -> None:
         """Drop our whole inventory where we stand, then starve so the launcher
-        respawns us fresh at level 1. Fork FIRST (once, unconditionally) so the
-        launcher has an egg to fill before we vanish -- without this the team wipes."""
+        respawns us fresh at level 1."""
         if not self._fork_sent:
             if self.food >= 2:
                 self.c.fork()
@@ -362,10 +359,7 @@ class HeuristicAI:
 
     def am_leader(self) -> bool:
         """The single lowest-id player at our level is the designated gatherer /
-        beacon. We require having actually HEARD a teammate first: until the peer
-        set is known nobody gathers, so we never get a brief free-for-all where
-        everyone grabs (and then scatters) the level's stones. Everyone pings
-        HERE, so on a populated team the lowest id quickly and stably wins."""
+        beacon."""
         return bool(self.peers) and self.id < min(self.peers)
 
     def rally(self) -> None:
@@ -397,9 +391,7 @@ class HeuristicAI:
         return 1 + len(self.team_seen)
 
     def ready_to_incant(self) -> bool:
-        """Incant as soon as the rite's MINIMUM is met (correct stones + enough players).
-        When more same-level peers are alive than the minimum, wait for them all: incanting
-        with a subset leaves stragglers who can never form their own quorum and are stuck."""
+        """Incant as soon as the rite's MINIMUM is met."""
         if not self.tile_ready():
             return False
         known_at_level = len(self.peers) + 1
@@ -453,8 +445,7 @@ class HeuristicAI:
         self.move_for_direction(self.call_dir)
 
     def deliver_food(self) -> bool:
-        """Carry surplus food to a starving teammate so a single unlucky player
-        doesn't die while others sit fat. Returns True if we acted."""
+        """Carry surplus food to a starving teammate"""
         if self.sos_dir is None:
             return False
         if self.sos_dir == 0:
