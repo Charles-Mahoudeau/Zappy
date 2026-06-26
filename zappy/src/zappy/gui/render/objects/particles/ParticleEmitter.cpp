@@ -64,20 +64,12 @@ void ParticleEmitter::particle() {
     Particle newParticle;
     Vector3 speed = getDirection() * RandomValue{_speed.value(), _speed.envelope()};
     float lifetime = RandomValue{_lifetime.value(), _lifetime.envelope()};
-    float initSizeCoef = RandomValue{1.0F, _InitEnvelope.size};
-    float incSizeCoef = RandomValue{1.0F, _IncrementEnvelope.size};
-    Vec2D InitSize{_size.get().x() * initSizeCoef, _size.get().y() * initSizeCoef};
-    Vec2D incSize{_size.increment().x() * incSizeCoef, _size.increment().y() * incSizeCoef};
+    Vec2D InitSize = _size.get() * RandomValue{1.0F, _InitEnvelope.size};
+    Vec2D incSize = _size.increment() * RandomValue{1.0F, _IncrementEnvelope.size};
     float initRot = RandomValue{_rotation.get(), _InitEnvelope.rotation};
     float incRot = RandomValue{_rotation.increment(), _IncrementEnvelope.rotation};
-    Color initColor = _tint.get().toColor();
-    Color incColor = _tint.increment().toColor();
-    ColorF initTint{
-        RandomValue{initColor.get().r, _InitEnvelope.tint}, RandomValue{initColor.get().g, _InitEnvelope.tint},
-        RandomValue{initColor.get().b, _InitEnvelope.tint}, RandomValue{initColor.get().a, _InitEnvelope.tint}};
-    ColorF incTint{
-        RandomValue{incColor.get().r, _IncrementEnvelope.tint}, RandomValue{incColor.get().g, _IncrementEnvelope.tint},
-        RandomValue{incColor.get().b, _IncrementEnvelope.tint}, RandomValue{incColor.get().a, _IncrementEnvelope.tint}};
+    ColorF initTint = _tint.get() * RandomValue{1.0F, _InitEnvelope.tint};
+    ColorF incTint = _tint.increment() * RandomValue{1.0F, _IncrementEnvelope.tint};
 
     newParticle.setInitValues(_origin, InitSize, initRot, initTint);
     newParticle.setIncrementValues(speed, incSize, incRot, incTint);

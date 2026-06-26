@@ -65,6 +65,29 @@ class ColorF {
         return *this;
     }
 
+    [[nodiscard]] ColorF operator+(const ColorF& other) const {
+        return ColorF{r + other.red(), g + other.green(), b + other.blue(), a + other.alpha()};
+    }
+    [[nodiscard]] ColorF operator-(const ColorF& other) const {
+        return ColorF{r - other.red(), g - other.green(), b - other.blue(), a - other.alpha()};
+    }
+
+    [[nodiscard]] ColorF operator*(float scalar) const {
+        return ColorF{r * scalar, g * scalar, b * scalar, a * scalar};
+    }
+
+    [[nodiscard]] ColorF operator/(float scalar) const {
+        if (scalar == 0.0F) {
+            return *this;
+        }
+        return ColorF{r / scalar, g / scalar, b / scalar, a / scalar};
+    }
+
+    [[nodiscard]] float red() const { return r; }
+    [[nodiscard]] float green() const { return g; }
+    [[nodiscard]] float blue() const { return b; }
+    [[nodiscard]] float alpha() const { return a; }
+
     [[nodiscard]] Color toColor() const;
     [[nodiscard]] operator Color() const;
 
