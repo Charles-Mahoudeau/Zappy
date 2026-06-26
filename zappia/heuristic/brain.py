@@ -217,21 +217,19 @@ class HeuristicAI:
         self.call_ttl = 0
         self.peers = {}
 
-    def step(self) -> None:
+    def _tick_update(self) -> None:
         self.tick += 1
         self.ticks_since_inv += 1
-
         if self.c.pending_level is not None:
             self.level = self.c.pending_level
             self.c.pending_level = None
             self.reset_rally()
             self.refresh_all()
-
         if self.ticks_since_inv >= INV_REFRESH_EVERY:
             self.refresh_inv()
-
         self.handle_messages()
 
+    def _compute_roles(self) -> Tuple[bool, bool]:
         raw_stranded = self.req_players() > 1 and self.is_stranded()
         if raw_stranded:
             self._stranded_ticks += 1
@@ -240,16 +238,52 @@ class HeuristicAI:
             self._fork_sent = False
         stranded = self._stranded_ticks >= 20
         leader = not stranded and self.req_players() > 1 and self.am_leader()
+        return stranded, leader
+
+    def _broadcast_if_due(self, leader: bool) -> bool:
+        if leader and self.tick % CALL_EVERY == 0:
+            self.send("CALL", ",".join(self.tile_short().keys()))
+            return True
+        if not leader and self.tick % PEER_PING == 0:
+            self.send("HERE")
+            return True
+        return False
+
+    def _act_low_food(self) -> None:
+        if self.tick % SOS_EVERY == 0:
+            self.send("SOS")
+            return
+        if self.call_dir is not None:
+            self.converge()
+            return
+        self.farm_food()
+
+    def _phase2(self, leader: bool) -> None:
+        if leader and self.ready_to_incant():
+            self.try_incantation()
+            return
+        if self.food >= DONOR_FOOD and self.sos_dir is not None and self.deliver_food():
+            return
+        if not (self.tile_ready() and leader) and self.maybe_eat():
+            return
+        if self.food < LOW_FOOD:
+            self._act_low_food()
+            return
+        if self.req_players() <= 1:
+            self.solo_elevate()
+            return
+        if not leader:
+            self.maybe_fork()
+        self.rally()
+
+    def step(self) -> None:
+        self._tick_update()
+        stranded, leader = self._compute_roles()
 
         if stranded:
             self.suicide()
             return
-        if leader and self.tick % CALL_EVERY == 0:
-            self.send("CALL", ",".join(self.tile_short().keys()))
-            return
-
-        if not leader and self.tick % PEER_PING == 0:
-            self.send("HERE")
+        if self._broadcast_if_due(leader):
             return
 
         slots = self.c.connect_nbr()
@@ -260,33 +294,7 @@ class HeuristicAI:
             self.farm_food()
             return
 
-        if leader and self.ready_to_incant():
-            self.try_incantation()
-            return
-
-        if self.food >= DONOR_FOOD and self.sos_dir is not None and self.deliver_food():
-            return
-
-        if not (self.tile_ready() and leader) and self.maybe_eat():
-            return
-
-        if self.food < LOW_FOOD:
-            if self.tick % SOS_EVERY == 0:
-                self.send("SOS")
-                return
-            if self.call_dir is not None:
-                self.converge()
-                return
-            self.farm_food()
-            return
-
-        if self.req_players() <= 1:
-            self.solo_elevate()
-            return
-
-        if not leader:
-            self.maybe_fork()
-        self.rally()
+        self._phase2(leader)
 
     def is_stranded(self) -> bool:
         """True only for a player in a permanent dead-end: BELOW the team's top
