@@ -69,7 +69,7 @@ void Player::setPosition(const math::Vector2u position) {
     });
 }
 
-void Player::moveFoward() {
+void Player::moveForward() {
     const math::Vector2u gridSize = this->gridSize();
     math::Vector2u pos = this->position();
 
