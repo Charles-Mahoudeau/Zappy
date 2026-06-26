@@ -47,10 +47,10 @@ void Renderer::update(Camera& camera, game::GameState& state, AssetStore& assets
     testTime += GetFrameTime() * static_cast<float>(state.timeUnit());
     if (testTime >= 200.0F) {
         testTime = 0.0F;
-        assets.emit("test1", Vector3{-3.0F, 0.0F, 0.0F});
-        assets.emit("test2", Vector3{3.0F, 0.0F, 0.0F});
-        assets.emit("test3", Vector3{0.0F, 0.0F, -3.0F});
-        assets.emit("test4", Vector3{0.0F, 0.0F, 3.0F});
+        assets.emit("test1", Vector3{-5.0F, 0.0F, 0.0F});
+        assets.emit("test2", Vector3{5.0F, 0.0F, 0.0F});
+        assets.emit("test3", Vector3{0.0F, 0.0F, -5.0F});
+        assets.emit("test4", Vector3{0.0F, 0.0F, 5.0F});
     }
     display::Window::BeginMode3D(camera);
     _grid.draw(assets);
