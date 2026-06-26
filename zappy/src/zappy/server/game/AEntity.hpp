@@ -51,6 +51,7 @@ class AEntity : public IEntity {
 
   protected:
     [[nodiscard]] IEventEmitter& eventEmitter() const;
+    math::Vector2u gridSize();
 
   private:
     std::uint64_t _id{};

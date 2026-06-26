@@ -65,6 +65,8 @@ class Player : public AEntity {
     /// @return The new direction.
     math::Direction turnRight();
 
+    void moveFoward();
+
     /// @brief Eat one unit of food.
     /// @return True if the player ate food, false otherwise.
     bool eat();

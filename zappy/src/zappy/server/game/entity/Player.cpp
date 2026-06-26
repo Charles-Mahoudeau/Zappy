@@ -9,7 +9,6 @@
 
 #include <cstdint>
 #include <expected>
-#include <optional>
 #include <string>
 
 #include "zappy/server/game/AEntity.hpp"
@@ -68,6 +67,27 @@ void Player::setPosition(const math::Vector2u position) {
         .position = position,
         .orientation = direction(),
     });
+}
+
+void Player::moveFoward() {
+    const math::Vector2u gridSize = this->gridSize();
+    math::Vector2u pos = this->position();
+
+    switch (this->_direction) {
+        case math::Direction::kNorth:
+            pos.y = (pos.y == gridSize.y) ? 0 : pos.y + 1;
+            break;
+        case math::Direction::kEast:
+            pos.x = (pos.x == gridSize.x) ? 0 : pos.x + 1;
+            break;
+        case math::Direction::kSouth:
+            pos.y = (pos.y == 0) ? gridSize.y : pos.y - 1;
+            break;
+        case math::Direction::kWest:
+            pos.x = (pos.x == 0) ? gridSize.x : pos.x - 1;
+            break;
+    }
+    this->setPosition(pos);
 }
 
 math::Direction Player::direction() const { return _direction; }
