@@ -33,7 +33,7 @@ class TimeUnitSlider {
     bool consumeValueChange(int newValue);
 
     static constexpr int kMinValue = 1;
-    static constexpr int kMaxValue = 1000;
+    static constexpr int kMaxValue = 500;
 
   private:
     std::reference_wrapper<network::CommandSender> _sender;
