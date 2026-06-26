@@ -15,6 +15,7 @@
 #include "TimeUnitSlider.hpp"
 #include "zappy/gui/render/utils/Rectangle.hpp"
 #include "zappy/gui/render/utils/Vector2.hpp"
+#include "zappy/gui/render/utils/Vector3.hpp"
 
 namespace zappy::gui::render {
 class Camera;
@@ -45,6 +46,7 @@ class Hud {
     void draw(const game::GameState& state);
 
     [[nodiscard]] std::optional<std::uint32_t> focusedPlayerId() const;
+    [[nodiscard]] std::optional<render::Vector3> focusedPlayerWorldPosition(const game::GameState& state) const;
 
   private:
     [[nodiscard]] bool victoryActive(const game::GameState& state) const;

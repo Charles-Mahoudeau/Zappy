@@ -53,8 +53,6 @@ class Camera {
     void setCameraMode(CameraMode mode);
     void zoom(float delta);
 
-    void applyManualZoomInput();
-
     void followPlayer(std::optional<Vector3> worldPosition);
 
     void update();
@@ -65,6 +63,8 @@ class Camera {
     operator const Camera3D&() const { return _camera; }
 
   private:
+    void applyManualZoomInput();
+
     Camera3D _camera{};
     CameraMode _cameraMode{CameraMode::CAMERA_CUSTOM};
     float _maxFovy{500.0F};

@@ -98,13 +98,17 @@ void Camera::applyManualZoomInput() {
 }
 
 void Camera::followPlayer(std::optional<Vector3> worldPosition) {
-    static constexpr float kBlendSpeed = 4.0F;  // per second
+    static constexpr float kBlendSpeed = 4.0F;
     static constexpr float kFocusFovyFactor = 0.35F;
 
     if (!_focusInitialized) {
         _defaultTarget = target();
         _manualFovy = fovy();
         _focusInitialized = true;
+    }
+
+    if (!worldPosition.has_value()) {
+        applyManualZoomInput();
     }
 
     const float blend = std::clamp(kBlendSpeed * GetFrameTime(), 0.0F, 1.0F);

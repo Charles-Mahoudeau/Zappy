@@ -12,7 +12,6 @@
 #include <algorithm>
 #include <cstddef>
 #include <format>
-#include <optional>
 #include <string>
 #include <string_view>
 
@@ -136,18 +135,7 @@ int GUI::run() {
         _poller.poll(kPollTimeoutMs);
         _window.beginFrame();
         _hud.update(_camera, _state);
-
-        std::optional<render::Vector3> focusWorldPos;
-        if (const auto playerId = _hud.focusedPlayerId(); playerId.has_value()) {
-            if (const auto it = _state.players().find(*playerId); it != _state.players().end()) {
-                focusWorldPos =
-                    render::Grid::tileToWorld(static_cast<float>(it->second.x), static_cast<float>(it->second.y));
-            }
-        }
-        if (!focusWorldPos.has_value()) {
-            _camera.applyManualZoomInput();
-        }
-        _camera.followPlayer(focusWorldPos);
+        _camera.followPlayer(_hud.focusedPlayerWorldPosition(_state));
 
         _renderer.update(_camera, _state, _assets);
         _hud.draw(_state);

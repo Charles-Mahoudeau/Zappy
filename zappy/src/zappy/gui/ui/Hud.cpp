@@ -18,8 +18,10 @@
 #include "VictoryScreen.hpp"
 #include "zappy/gui/display/Window.hpp"
 #include "zappy/gui/game/GameState.hpp"
+#include "zappy/gui/render/Grid.hpp"
 #include "zappy/gui/render/utils/Rectangle.hpp"
 #include "zappy/gui/render/utils/Vector2.hpp"
+#include "zappy/gui/render/utils/Vector3.hpp"
 
 namespace zappy::gui::ui {
 
@@ -81,6 +83,18 @@ void Hud::draw(const game::GameState& state) {
 
 std::optional<std::uint32_t> Hud::focusedPlayerId() const {
     return _infoPanel.state() == InfoPanelState::Player ? _infoPanel.selectedPlayerId() : std::nullopt;
+}
+
+std::optional<render::Vector3> Hud::focusedPlayerWorldPosition(const game::GameState& state) const {
+    const auto playerId = focusedPlayerId();
+    if (!playerId.has_value()) {
+        return std::nullopt;
+    }
+    const auto it = state.players().find(*playerId);
+    if (it == state.players().end()) {
+        return std::nullopt;
+    }
+    return render::Grid::tileToWorld(static_cast<float>(it->second.x), static_cast<float>(it->second.y));
 }
 
 }  // namespace zappy::gui::ui
