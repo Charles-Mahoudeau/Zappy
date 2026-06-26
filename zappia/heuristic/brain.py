@@ -323,6 +323,7 @@ class HeuristicAI:
                 if self.c.set_down(stone):
                     self.inv[stone] -= 1
                     self.refresh_look()
+                    return
                 return
         if self.food > 0:
             if self.c.set_down("food"):
@@ -427,11 +428,10 @@ class HeuristicAI:
 
         if missing_stones and not carrying_useful:
             for stone in missing_stones:
-                if self.tile0().count(stone) > 0:
-                    if self.c.take(stone):
-                        self.inv[stone] = self.inv.get(stone, 0) + 1
-                        self.refresh_look()
-                        return
+                if self.tile0().count(stone) > 0 and self.c.take(stone):
+                    self.inv[stone] = self.inv.get(stone, 0) + 1
+                    self.refresh_look()
+                    return
             for stone in missing_stones:
                 idx = self.nearest_tile_with(stone)
                 if idx is not None and idx != 0:
