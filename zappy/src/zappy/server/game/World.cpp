@@ -13,7 +13,6 @@
 #include <cstdint>
 #include <expected>
 #include <format>
-#include <limits>
 #include <memory>
 #include <optional>
 #include <random>
@@ -58,7 +57,7 @@ math::Vector2u World::size() const { return _grid.size(); }
 
 const EntityDatabase& World::entityDatabase() const { return _entityDatabase; }
 
-EntityDatabase& World::entityDatabase() { return _entityDatabase; }
+const Grid& World::grid() const { return _grid; }
 
 std::uint64_t World::countResources(const ResourceType type) const {
     std::uint64_t count = 0;
@@ -71,26 +70,18 @@ std::uint64_t World::countResources(const ResourceType type) const {
 
 std::uint64_t World::spawnEgg(std::uint64_t playerId, const std::string_view teamName) {
     const std::uint64_t eggId =
-        _entityDatabase.insert(std::make_unique<entity::Egg>(_grid, *this, std::string{teamName}));
-    Tile& tile = randomTile();
+        _entityDatabase.insert(std::make_unique<entity::Egg>(_grid, *this, std::string{teamName}, playerId));
 
-    tile.addEntity(eggId);
-    pushEvent(EggLaidEvent{
-        .playerId =
-            playerId == std::numeric_limits<decltype(playerId)>::max() ? std::nullopt : std::make_optional(playerId),
-        .eggId = eggId,
-        .position = tile.position(),
-    });
-    if (_logger.has_value()) {
-        _logger->info(std::format("Spawned egg #{} for team #{} at ({}, {})", eggId, teamName, tile.position().x,
-                                  tile.position().y));
-    }
+    placeEggRandom(eggId);
     return eggId;
 }
 
 std::uint64_t World::spawnEgg(const std::string_view teamName) {
-    // That's a shitty solution but it works...
-    return spawnEgg(std::numeric_limits<std::uint64_t>::max(), teamName);
+    const std::uint64_t eggId =
+        _entityDatabase.insert(std::make_unique<entity::Egg>(_grid, *this, std::string{teamName}));
+
+    placeEggRandom(eggId);
+    return eggId;
 }
 
 void World::spawnResource(const ResourceType type) {
@@ -172,7 +163,7 @@ std::expected<std::uint64_t, std::string> World::hatchRandomEgg(const std::strin
     return playerId;
 }
 
-std::uint64_t World::eggCount(std::string_view teamName) {
+std::uint64_t World::eggCount(std::string_view teamName) const {
     return std::ranges::count_if(this->entityDatabase().viewAll<entity::Egg>(),
                                  [teamName](const entity::Egg* egg) { return egg->teamName() == teamName; });
 }
@@ -186,6 +177,10 @@ EntityDatabase::EntityView<entity::Player> World::players(const std::string_view
     return _entityDatabase.viewAll<entity::Player>() |
            std::views::filter([teamName](const entity::Player* player) { return player->teamName() == teamName; });
 }
+
+const entity::Player* World::player(const std::uint64_t id) const { return _entityDatabase.query<entity::Player>(id); }
+
+entity::Player* World::player(const std::uint64_t id) { return _entityDatabase.query<entity::Player>(id); }
 
 void World::remove(const std::uint64_t entityId) {
     _grid.remove(entityId);
@@ -239,6 +234,32 @@ void World::generateResourceThresholds() {
     }
     if (_logger.has_value()) {
         _logger->info("Resources thresholds generated.");
+    }
+}
+
+void World::placeEggRandom(const std::uint64_t eggId) {
+    const entity::Egg* egg = _entityDatabase.query<entity::Egg>(eggId);
+
+    if (egg == nullptr) {
+        throw exception::InvalidArgument{"trying to place an egg that does not exist"};
+    }
+
+    Tile& tile = randomTile();
+
+    tile.addEntity(eggId);
+    pushEvent(EggLaidEvent{
+        .playerId = egg->parentPlayerId(),
+        .eggId = eggId,
+        .position = tile.position(),
+    });
+    if (_logger.has_value()) {
+        std::string playerInfo;
+
+        if (egg->parentPlayerId().has_value()) {
+            playerInfo = std::format(" by player #{}", egg->parentPlayerId().value());
+        }
+        _logger->info(std::format("Spawned egg #{} for team {}{} at ({}, {})", eggId, egg->teamName(), playerInfo,
+                                  tile.position().x, tile.position().y));
     }
 }
 }  // namespace zappy::server::game

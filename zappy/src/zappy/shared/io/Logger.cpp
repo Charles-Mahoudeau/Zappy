@@ -57,7 +57,7 @@ void Logger::debug(const std::string_view message) const { log(Level::kDebug, me
 
 void Logger::info(const std::string_view message) const { log(Level::kInfo, message); }
 
-void Logger::warn(const std::string_view message) const { log(Level::kWarning, message); }
+void Logger::warn(const std::string_view message) const { log(Level::kWarn, message); }
 
 void Logger::error(const std::string_view message) const { log(Level::kError, message); }
 
@@ -74,8 +74,8 @@ std::string Logger::levelToString(const Level level) {
             return "DEBUG";
         case kInfo:
             return "INFO";
-        case kWarning:
-            return "WARNING";
+        case kWarn:
+            return "WARN";
         case kError:
             return "ERROR";
         case kFatal:

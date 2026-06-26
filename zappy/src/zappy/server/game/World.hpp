@@ -53,9 +53,9 @@ class World : public IEventEmitter {
     /// @return A reference to the entity database.
     [[nodiscard]] const EntityDatabase& entityDatabase() const;
 
-    /// @brief Returns a reference to the entity database.
-    /// @return A reference to the entity database.
-    [[nodiscard]] EntityDatabase& entityDatabase();
+    /// @brief Returns a reference to the grid.
+    /// @return A reference to the grid.
+    [[nodiscard]] const Grid& grid() const;
 
     /// @brief Returns the number of entities of type T in the world.
     /// @tparam T The type of entity to count.
@@ -98,7 +98,7 @@ class World : public IEventEmitter {
     /// @brief get the number of Egg in the given team
     /// @param teamName The name of the team to hatch the egg for.
     /// @return The number of egg in the team
-    std::uint64_t eggCount(std::string_view teamName);
+    [[nodiscard]] std::uint64_t eggCount(std::string_view teamName) const;
 
     /// @brief Returns a view of all players in the specified team.
     /// @param teamName The name of the team to get the players from.
@@ -109,6 +109,16 @@ class World : public IEventEmitter {
     /// @param teamName The name of the team to get the players from.
     /// @return A view of all players in the specified team.
     [[nodiscard]] EntityDatabase::EntityView<entity::Player> players(std::string_view teamName);
+
+    /// @brief Returns a view of the player with the given ID.
+    /// @param id The ID of the player to get.
+    /// @return A pointer to the player with the given ID, or nullptr if no such player exists.
+    [[nodiscard]] const entity::Player* player(std::uint64_t id) const;
+
+    /// @brief Returns a view of the player with the given ID.
+    /// @param id The ID of the player to get.
+    /// @return A pointer to the player with the given ID, or nullptr if no such player exists.
+    [[nodiscard]] entity::Player* player(std::uint64_t id);
 
     /// @brief Removes the specified entity from the world.
     /// @param entityId The ID of the entity to remove.
@@ -140,6 +150,10 @@ class World : public IEventEmitter {
 
     /// @brief Generates the resource thresholds for the world.
     void generateResourceThresholds();
+
+    /// @brief Places an egg at a random tile in the world.
+    /// @param eggId The ID of the egg to place.
+    void placeEggRandom(std::uint64_t eggId);
 
     std::random_device _randomDevice;
     std::mt19937 _randomEngine{_randomDevice()};

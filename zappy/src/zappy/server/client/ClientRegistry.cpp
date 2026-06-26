@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -18,7 +19,6 @@
 #include "zappy/shared/network/Address.hpp"
 
 namespace zappy::server::client {
-
 void ClientRegistry::makeNewClient(net::SocketRegistry& socketRegistery, network::Address addr, Timer& timer) {
     auto newClient = std::make_unique<Client>(socketRegistery, addr, timer);
 
@@ -79,4 +79,24 @@ Client* ClientRegistry::findByAddress(const network::Address& addr) {
     return nullptr;
 }
 
+bool ClientRegistry::broadcast(const std::string_view msg) const {
+    bool success = true;
+
+    for (const auto& client : _clients) {
+        success &= client->sendMessage(msg);
+    }
+    return success;
+}
+
+bool ClientRegistry::broadcast(const Client::Type type, const std::string_view msg) const {
+    bool success = true;
+
+    for (const auto& client : _clients) {
+        if (client->type() != type) {
+            continue;
+        }
+        success &= client->sendMessage(msg);
+    }
+    return success;
+}
 }  // namespace zappy::server::client
