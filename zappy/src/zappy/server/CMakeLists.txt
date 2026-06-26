@@ -11,6 +11,7 @@ add_library(zappy_server_objects OBJECT
         game/EntityDatabase.hpp
         game/IEntity.hpp
         game/ResourceType.hpp
+        game/ResourceType.cpp
         game/Inventory.cpp
         game/Inventory.hpp
         game/entity/Player.cpp

@@ -36,25 +36,8 @@ class ResourceHelper {
     ResourceHelper& operator=(ResourceHelper&&) = delete;
     ~ResourceHelper() = delete;
 
-    static std::optional<ResourceType> strToRessource(std::string_view resource) {
-        auto map = ResourceHelper::map();
-
-        if (auto iter = map.find(resource); iter != map.end()) {
-            return iter->second;
-        }
-        return std::nullopt;
-    }
-
-    static std::string_view ressourceToString(ResourceType resource) {
-        auto map = ResourceHelper::map();
-
-        for (const auto& [name, type] : map) {
-            if (resource == type) {
-                return name;
-            }
-        }
-        return {};
-    }
+    static std::optional<ResourceType> strToRessource(std::string_view resource);
+    static std::string_view ressourceToString(ResourceType resource);
 
   private:
     static std::unordered_map<std::string_view, game::ResourceType> map();
