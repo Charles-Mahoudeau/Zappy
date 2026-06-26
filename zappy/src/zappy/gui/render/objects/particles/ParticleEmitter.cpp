@@ -120,5 +120,5 @@ void ParticleEmitter::setStaticParticles(Vec2D size, float rotation, Color tint,
     _tint = TimeValue<Color>{tint, Color{0, 0, 0, 0}};
     _lifetime.setValue(lifetime);
     _speed.setValue(speed);
-
+}
 }  // namespace zappy::gui::render

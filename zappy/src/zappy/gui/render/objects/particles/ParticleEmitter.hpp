@@ -25,9 +25,9 @@ namespace zappy::gui::render {
 class ParticleEmitter {
   public:
     struct ParticleEnvelope {
-        float size{1.0F};
-        float rotation{1.0F};
-        float tint{1.0F};
+        float size{0.0F};
+        float rotation{0.0F};
+        float tint{0.0F};
     };
 
     explicit ParticleEmitter(std::string_view path);

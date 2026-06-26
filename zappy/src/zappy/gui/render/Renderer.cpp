@@ -42,7 +42,7 @@ void Renderer::update(Camera& camera, game::GameState& state, AssetStore& assets
 
     _grid.resize(state.width(), state.height());
 
-    if (GetFrameTime() * static_cast<float>(state.timeUnit()) > 0.1F) {
+    if (GetFrameTime() * static_cast<float>(state.timeUnit()) > 10.0F) {
         std::cout << "|---- EMIT TEST\n";  // --- IGNORE ---
         assets.emit("test", Vector3{0.0F, 0.0F, 0.0F});
     }

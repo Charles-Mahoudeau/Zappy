@@ -122,7 +122,8 @@ void AssetStore::loadResourceModel(game::ResourceType type) {
 
 void AssetStore::loadVFXs() {
     ParticleEmitter test("assets/models/resources/textures/thystameBase.png");
-    test.setInitParticles(5.0F, Vec2D{50.0F, 50.0F}, 0.0F, WHITE);
+    test.setStatic(Vector3{0.0F, 0.0F, 3.0F}, Vector3{1.0F, 1.0F, 1.0F}, 360.0F, 100.0F);
+    test.setInitParticles(Vec2D{5.0F, 5.0F}, 0.0F, WHITE, 1000.0F, 0.0F);
     _vfxs.insert({"test", std::move(test)});
 }
 void AssetStore::loadEggModel() {

@@ -9,6 +9,7 @@
 
 #include <raylib.h>
 
+#include <cmath>
 #include <random>
 
 namespace zappy::gui::render {
@@ -22,18 +23,15 @@ class RandomValue {
     ~RandomValue() = default;
 
     void setValue(float val) { _value = val; }
-    void setEnvelope(float envelope) {
-        float env = envelope > 1.0F ? 1.0F : envelope;
-
-        _envelope = env;
-    }
+    void setEnvelope(float envelope) { _envelope = std::abs(envelope); }
 
     [[nodiscard]] float value() const { return _value; }
     [[nodiscard]] float envelope() const { return _envelope; }
 
     [[nodiscard]] operator float() const {
-        float min = _value * (1.0F - _envelope);
-        float max = _value * (1.0F + _envelope);
+        float rawEnvelope = _value * _envelope;
+        float min = _value - rawEnvelope;
+        float max = _value + rawEnvelope;
         static std::mt19937 rng{std::random_device{}()};
         std::uniform_real_distribution<float> dist{min, max};
 
