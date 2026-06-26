@@ -167,26 +167,29 @@ class HeuristicAI:
             msg = self._decode(text)
             if not msg or msg["team"] != self.c.team or msg["id"] == self.id:
                 continue
-            
+
             if msg["verb"] == "SOS":
                 if sos_dir is None or direction == 0:
                     sos_dir = direction
                 continue
-                
+
             self.team_seen[msg["id"]] = (self.tick, msg["level"])
-            
+
             if msg["verb"] == "CALL" and msg["level"] == self.level:
                 if best_id is None or msg["id"] < best_id:
                     best_id, best_dir = msg["id"], direction
                     best_missing = [s for s in msg["data"].split(",") if s]
-                    
+
             if msg["level"] == self.level:
                 self.peers[msg["id"]] = self.tick
-                
+
         self.c.broadcasts.clear()
-        self.peers = {p: t for p, t in self.peers.items() if self.tick - t <= PEER_WINDOW}
+        self.peers = {
+            p: t for p, t in self.peers.items() if self.tick - t <= PEER_WINDOW
+        }
         self.team_seen = {
-            i: (t, lv) for i, (t, lv) in self.team_seen.items()
+            i: (t, lv)
+            for i, (t, lv) in self.team_seen.items()
             if self.tick - t <= PEER_WINDOW
         }
 
@@ -295,8 +298,7 @@ class HeuristicAI:
         return reachable < self.req_players()
 
     def maybe_fork(self) -> None:
-        """Fork only when the team genuinely needs more members.
-        """
+        """Fork only when the team genuinely needs more members."""
         if self._team_full or self.food < FORK_FOOD or self.tick < FORK_MIN_TICK:
             return
         if self.tick - self._last_fork_tick <= FORK_COOLDOWN:
@@ -401,10 +403,7 @@ class HeuristicAI:
 
     def needed_here(self) -> List[str]:
         """Stones the beacon's tile still needs that I'm not yet carrying any of."""
-        return [
-            s for s in self.call_missing
-            if s in STONES and self.inv.get(s, 0) < 1
-        ]
+        return [s for s in self.call_missing if s in STONES and self.inv.get(s, 0) < 1]
 
     def converge(self) -> None:
         """Move toward the rally beacon. Pick up needed stones found en route."""
