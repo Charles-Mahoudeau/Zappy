@@ -35,8 +35,6 @@ class ColorF {
         a += other.a;
         return *this;
     }
-    ColorF operator+(const ColorF& other) const { return ColorF{r + other.r, g + other.g, b + other.b, a + other.a}; }
-
     ColorF& operator-=(const ColorF& other) {
         r -= other.r;
         g -= other.g;
@@ -44,10 +42,6 @@ class ColorF {
         a -= other.a;
         return *this;
     }
-    ColorF operator-(const ColorF& other) const { return ColorF{r - other.r, g - other.g, b - other.b, a - other.a}; }
-
-    ColorF operator*(float scalar) const { return {r * scalar, g * scalar, b * scalar, a * scalar}; }
-
     ColorF& operator*=(float scalar) {
         r *= scalar;
         g *= scalar;
@@ -55,8 +49,6 @@ class ColorF {
         a *= scalar;
         return *this;
     }
-
-    ColorF operator/(float scalar) const { return {r / scalar, g / scalar, b / scalar, a / scalar}; }
     ColorF& operator/=(float scalar) {
         r /= scalar;
         g /= scalar;
@@ -99,7 +91,5 @@ class ColorF {
     float b{0.0F};
     float a{0.0F};
 };
-
-inline ColorF operator*(float scalar, const ColorF& color) { return color * scalar; }
 
 }  // namespace zappy::gui::render
