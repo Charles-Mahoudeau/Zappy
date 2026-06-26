@@ -14,8 +14,8 @@
 #include <vector>
 
 #include "Widgets.hpp"
-#include "utils/Rectangle.hpp"
 #include "zappy/gui/game/GameState.hpp"
+#include "zappy/gui/render/utils/Rectangle.hpp"
 
 namespace zappy::gui::ui {
 
@@ -44,7 +44,7 @@ float Leaderboard::height(const game::GameState& state) {
     return Widgets::kPanelHeaderHeight + kTextMarginTop + (static_cast<float>(state.teams().size()) * kRowHeight);
 }
 
-void Leaderboard::draw(const game::GameState& state, Rectangle bounds) {
+void Leaderboard::draw(const game::GameState& state, render::Rectangle bounds) {
     Widgets::panel(bounds, "Leaderboard");
     const auto entries = compute(state);
     for (std::size_t i = 0; i < entries.size(); ++i) {
@@ -54,10 +54,10 @@ void Leaderboard::draw(const game::GameState& state, Rectangle bounds) {
             std::format("{}/{}", entry.playersAtMaxLevel, game::GameState::kPlayersNeededToWin);
         const float progress =
             static_cast<float>(entry.playersAtMaxLevel) / static_cast<float>(game::GameState::kPlayersNeededToWin);
-        const Rectangle rowBounds{bounds.x() + kBarMarginLeft,
-                                  bounds.y() + Widgets::kPanelHeaderHeight + kTextMarginTop +
-                                      (static_cast<float>(i) * kRowHeight) + ((kRowHeight - kBarHeight) / 2.0F),
-                                  bounds.width() - kBarMarginLeft - kBarMarginRight, kBarHeight};
+        const render::Rectangle rowBounds{bounds.x() + kBarMarginLeft,
+                                          bounds.y() + Widgets::kPanelHeaderHeight + kTextMarginTop +
+                                              (static_cast<float>(i) * kRowHeight) + ((kRowHeight - kBarHeight) / 2.0F),
+                                          bounds.width() - kBarMarginLeft - kBarMarginRight, kBarHeight};
         Widgets::progressBar(rowBounds, textLeft, textRight, std::min(progress, 1.0F));
     }
 }

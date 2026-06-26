@@ -18,10 +18,15 @@
 namespace zappy::gui::display {
 
 Window::Window(int width, int height, std::string_view title) {
+    static constexpr int kMinWidth = 800;
+    static constexpr int kMinHeight = 600;
+
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(width, height, std::string{title}.c_str());
     if (!IsWindowReady()) {
         throw exception::WindowException{"Failed to open window"};
     }
+    SetWindowMinSize(kMinWidth, kMinHeight);
     _open = true;
 }
 
@@ -47,6 +52,12 @@ Window& Window::operator=(Window&& other) noexcept {
 
 // NOLINTNEXTLINE
 bool Window::shouldClose() const { return WindowShouldClose(); }
+
+// NOLINTNEXTLINE
+int Window::width() { return GetScreenWidth(); }
+
+// NOLINTNEXTLINE
+int Window::height() { return GetScreenHeight(); }
 
 // NOLINTNEXTLINE
 void Window::setTargetFPS(int fps) { SetTargetFPS(fps); }

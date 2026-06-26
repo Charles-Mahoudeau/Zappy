@@ -9,7 +9,7 @@
 
 #include <raylib.h>
 
-namespace zappy::gui::ui {
+namespace zappy::gui::render {
 class Vector2 {
   public:
     Vector2(float x, float y) : _vector{.x = x, .y = y} {}
@@ -32,4 +32,4 @@ class Vector2 {
   private:
     ::Vector2 _vector{};
 };
-}  // namespace zappy::gui::ui
+}  // namespace zappy::gui::render
