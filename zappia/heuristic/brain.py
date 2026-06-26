@@ -76,6 +76,7 @@ class HeuristicAI:
         self._stranded_ticks = 0
         self._team_full = False
         self._last_fork_tick = -(FORK_COOLDOWN + 1)
+        self._explore_steps = secrets.randbelow(7)
 
     def run(self) -> None:
         self.refresh_all()
@@ -343,8 +344,8 @@ class HeuristicAI:
         """Drop our whole inventory where we stand, then starve so the launcher
         respawns us fresh at level 1."""
         if not self._fork_sent:
-            if self.food >= 2 and not self.c.fork():
-                return
+            if self.food >= 2:
+                self.c.fork()
             self._fork_sent = True
             return
         for stone in STONES:
@@ -411,8 +412,7 @@ class HeuristicAI:
         if self.drop_needed_stone():
             return
         self.maybe_fork()
-        if self.maybe_eat():
-            return
+        self.maybe_eat()
 
     def team_max(self) -> int:
         """Highest level anyone on the team is currently on (us included)."""
@@ -423,7 +423,7 @@ class HeuristicAI:
         return 1 + len(self.team_seen)
 
     def ready_to_incant(self) -> bool:
-        """Incant as soon as the rite's MINIMUM is met."""
+        """Incant only when ALL known same-level peers are assembled on tile."""
         if not self.tile_ready():
             return False
         known_at_level = len(self.peers) + 1
@@ -439,11 +439,13 @@ class HeuristicAI:
         """Arrived on the beacon tile: drop carried stones, fetch nearby missing ones."""
         if self.drop_needed_stone():
             return
-        for stone in self.tile_short():
-            idx = self.nearest_tile_with(stone)
-            if idx is not None and idx != 0:
-                self.move_toward(idx)
-                return
+        actual_short = list(self.tile_short().keys())
+        if actual_short:
+            for stone in actual_short:
+                idx = self.nearest_tile_with(stone)
+                if idx is not None and idx != 0:
+                    self.move_toward(idx)
+                    return
         self.refresh_look()
 
     def _fetch_stone_enroute(self, missing_stones: List[str]) -> bool:
@@ -471,7 +473,8 @@ class HeuristicAI:
             return
 
         if missing_stones and not carrying_useful:
-            self._fetch_stone_enroute(missing_stones)
+            if self._fetch_stone_enroute(missing_stones):
+                return
 
         if self.call_dir is None:
             self.explore()
@@ -545,23 +548,26 @@ class HeuristicAI:
             return True
         return False
 
-    def forage(self) -> None:
+    def forage(self) -> bool:
         if self.maybe_eat():
-            return
+            return True
         idx = self.nearest_tile_with("food")
         if idx not in (None, 0):
             self.move_toward(idx)
-            return
+            return True
         self.explore()
+        return True
 
     def explore(self) -> None:
-        roll = secrets.randbelow(100)
-        if roll < 50:
+        if self._explore_steps > 0:
             self.c.forward()
-        elif roll < 75:
-            self.c.left()
+            self._explore_steps -= 1
         else:
-            self.c.right()
+            if secrets.randbelow(2):
+                self.c.left()
+            else:
+                self.c.right()
+            self._explore_steps = secrets.randbelow(5) + 3
         self.refresh_look()
 
     def move_toward(self, idx: int) -> None:
