@@ -20,6 +20,7 @@
 #include "zappy/server/client/Team.hpp"
 #include "zappy/server/commands/ACommandGroup.hpp"
 #include "zappy/server/commands/ICommandGroup.hpp"
+#include "zappy/server/commands/player/PlayerData.hpp"
 #include "zappy/server/game/IEntity.hpp"
 #include "zappy/server/game/ResourceType.hpp"
 #include "zappy/server/game/entity/Egg.hpp"
@@ -73,7 +74,28 @@ bool PlayerCommands::inventory(CommandCtx& ctx) {
 }
 
 bool PlayerCommands::take(CommandCtx& ctx) {
-    // check move later
+    ctx.client->setTimeout(7, [&ctx, id = ctx.client->playerID(), params = ctx.data.params]() {
+        const auto [player, client] = PlayerCommands::getclientData(ctx, id);
+
+        if (client == nullptr || player == nullptr) {
+            return;
+        }
+        if (params.size() != 1) {
+            client->sendError();
+            return;
+        }
+        auto resource = game::ResourceHelper::strToRessource(params.at(0));
+
+        if (!resource.has_value() || !ctx.world.get().playerTake(player, resource.value())) {
+            client->sendError();
+        } else {
+            client->sendSuccess();
+        }
+    });
+    return true;
+}
+
+bool PlayerCommands::set(CommandCtx& ctx) {
     ctx.client->setTimeout(7, [&ctx, id = ctx.client->playerID(), params = ctx.data.params]() {
         const auto [player, client] = PlayerCommands::getclientData(ctx, id);
 
@@ -97,18 +119,18 @@ bool PlayerCommands::take(CommandCtx& ctx) {
 
 bool PlayerCommands::move(CommandCtx& ctx, Move move) {
     ctx.client->setTimeout(7, [&ctx, id = ctx.client->playerID(), move]() {
-        static std::unordered_map<Move, std::function<void(game::entity::Player * player)>> map{
-            {Move::kForward, [](game::entity::Player* player) { player->moveForward(); }},
-            {Move::kLeft, [](game::entity::Player* player) { player->turnLeft(); }},
-            {Move::kRight, [](game::entity::Player* player) { player->turnRight(); }},
+        static std::unordered_map<Move, std::function<void(const game::entity::Player* player)>> map{
+            {Move::kForward, [](const game::entity::Player* player) { player->moveForward(); }},
+            {Move::kLeft, [](const game::entity::Player* player) { player->turnLeft(); }},
+            {Move::kRight, [](const game::entity::Player* player) { player->turnRight(); }},
         };
-        const auto [player, client] = PlayerCommands::getclientData(ctx, id);
+        const player::PlayerData data(ctx, id);
 
-        if (client == nullptr || player == nullptr) {
+        if (data.valid()) {
             return;
         }
-        map.at(move)(player);
-        client->sendSuccess();
+        map.at(move)(data.player());
+        data.client()->sendSuccess();
     });
     return true;
 }

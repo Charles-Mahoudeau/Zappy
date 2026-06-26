@@ -32,10 +32,6 @@ class PlayerCommands : public ACommandGroup {
     void execute(Client* client, std::string_view msg) override;
 
   private:
-    struct PlayerData {
-        game::entity::Player* player = nullptr;
-        Client* client = nullptr;
-    };
     enum class Move : std::uint8_t {
         kRight,
         kLeft,
@@ -48,10 +44,9 @@ class PlayerCommands : public ACommandGroup {
 
     static bool inventory(CommandCtx& ctx);
     static bool take(CommandCtx& ctx);
+    static bool set(CommandCtx& ctx);
     static bool move(CommandCtx& ctx, Move move);
     static bool connectNb(CommandCtx& ctx);
-
-    static PlayerData getclientData(CommandCtx& ctx, std::uint64_t id);
 };
 
 }  // namespace zappy::server::command
