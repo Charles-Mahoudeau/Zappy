@@ -50,6 +50,8 @@ add_library(zappy_server_objects OBJECT
         commands/PlayerCommands.cpp
 		commands/player/MoveCommand.hpp
         commands/player/MoveCommand.cpp
+		commands/player/ObjectCommand.hpp
+        commands/player/ObjectCommand.cpp
 		commands/player/PlayerData.hpp
         commands/player/PlayerData.cpp
         client/TeamRegistry.cpp

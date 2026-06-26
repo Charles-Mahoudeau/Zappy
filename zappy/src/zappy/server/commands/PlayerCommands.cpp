@@ -20,8 +20,8 @@
 #include "zappy/server/commands/ACommandGroup.hpp"
 #include "zappy/server/commands/ICommandGroup.hpp"
 #include "zappy/server/commands/player/MoveCommand.hpp"
+#include "zappy/server/commands/player/ObjectCommand.hpp"
 #include "zappy/server/commands/player/PlayerData.hpp"
-#include "zappy/server/game/ResourceType.hpp"
 #include "zappy/server/game/entity/Egg.hpp"
 
 namespace zappy::server::command {
@@ -37,8 +37,8 @@ PlayerCommands::PlayerCommands(CommandCtx context)
           {"Connect_nbr", [](auto& ctx) { return PlayerCommands::connectNb(ctx); }},
           {"Fork", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
           {"Eject", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
-          {"Take", [](auto& ctx) { return PlayerCommands::take(ctx); }},
-          {"Set", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
+          {"Take", [](auto& ctx) { return player::ObjectCommand::take(ctx); }},
+          {"Set", [](auto& ctx) { return player::ObjectCommand::drop(ctx); }},
           {"Incantation", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
       }) {}
 
@@ -67,28 +67,6 @@ bool PlayerCommands::inventory(CommandCtx& ctx) {
             return;
         }
         std::ignore = ctx.client->sendMessage("[ {} ]\n", data.player()->inventory().detailledString());
-    });
-    return true;
-}
-
-bool PlayerCommands::take(CommandCtx& ctx) {
-    ctx.client->setTimeout(7, [&ctx, id = ctx.client->playerID(), params = ctx.data.params]() {
-        player::PlayerData data(ctx, id);
-
-        if (!data.valid()) {
-            return;
-        }
-        if (params.size() != 1) {
-            data.client()->sendError();
-            return;
-        }
-        auto resource = game::ResourceHelper::strToRessource(params.at(0));
-
-        if (!resource.has_value() || !ctx.world.get().playerTake(data.player(), resource.value())) {
-            data.client()->sendError();
-        } else {
-            data.client()->sendSuccess();
-        }
     });
     return true;
 }

@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include <cstdint>
 #include <string_view>
 #include <unordered_map>
 
@@ -35,7 +34,6 @@ class PlayerCommands : public ACommandGroup {
     static bool ignore(const CommandCtx& ctx);
 
     static bool inventory(CommandCtx& ctx);
-    static bool take(CommandCtx& ctx);
     static bool connectNb(CommandCtx& ctx);
 };
 
