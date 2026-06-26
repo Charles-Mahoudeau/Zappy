@@ -65,8 +65,8 @@ void ParticleEmitter::particle() {
     Vector3 speed = getDirection() * _speed;
     Vec2D size{RandomValue{_size.get().x(), _InitEnvelope.size}, RandomValue{_size.get().y(), _InitEnvelope.size}};
 
-    newParticle.setInitValues(_origin, _size, _rotation.get(), _tint.get());
-    newParticle.setIncrementValues(speed, _size, _rotation.increment(), _tint.increment());
+    newParticle.setInitValues(_origin, _size.get(), _rotation.get(), _tint.get());
+    newParticle.setIncrementValues(speed, _size.increment(), _rotation.increment(), _tint.increment());
     newParticle.setLifetime(_lifetime);
     _particles.push_back(std::move(newParticle));
 }

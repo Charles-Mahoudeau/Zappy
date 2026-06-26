@@ -122,8 +122,8 @@ void AssetStore::loadResourceModel(game::ResourceType type) {
 
 void AssetStore::loadVFXs() {
     ParticleEmitter test("assets/models/resources/textures/thystameBase.png");
-    test.setStatic(Vector3{0.0F, 0.0F, 3.0F}, Vector3{1.0F, 1.0F, 1.0F}, 360.0F, 100.0F);
-    test.setInitParticles(Vec2D{5.0F, 5.0F}, 0.0F, WHITE, 1000.0F, 0.0F);
+    test.setStatic(Vector3{}, Vector3{1.0F, 1.0F, 1.0F}, 360.0F, 5.0F);
+    test.setInitParticles(Vec2D{1.0F, 1.0F}, 0.0F, WHITE, 150.0F, 0.1F);
     _vfxs.insert({"test", std::move(test)});
 }
 void AssetStore::loadEggModel() {
@@ -181,8 +181,6 @@ std::map<std::string, ParticleEmitter>& AssetStore::vfxs() { return _vfxs; }
 ParticleEmitter& AssetStore::emit(std::string_view path, Vector3 pos) {
     auto it = _vfxs.find(std::string{path});
     if (it == _vfxs.end()) throw std::runtime_error("VFX not found: " + std::string{path});
-
-    std::cout << "|---- EMIT PARTICLES\n";  // --- IGNORE ---
     ParticleEmitter& emitter = it->second;
     emitter.setOrigin(pos);
     emitter.emitRate();
