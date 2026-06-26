@@ -18,12 +18,12 @@
 #include <string_view>
 
 #include "Widgets.hpp"
-#include "utils/Rectangle.hpp"
-#include "utils/Vector2.hpp"
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/render/Camera.hpp"
 #include "zappy/gui/render/Grid.hpp"
 #include "zappy/gui/render/utils/Ray.hpp"
+#include "zappy/gui/render/utils/Rectangle.hpp"
+#include "zappy/gui/render/utils/Vector2.hpp"
 #include "zappy/gui/render/utils/Vector3.hpp"
 
 namespace zappy::gui::ui {
@@ -68,7 +68,7 @@ bool PlayerInfo::intersectsPlayer(const render::Ray& ray, float playerX, float p
     return t0 >= 0.0F || t1 >= 0.0F;
 }
 
-std::optional<std::uint32_t> PlayerInfo::pick(Vector2 mousePos, const render::Camera& camera,
+std::optional<std::uint32_t> PlayerInfo::pick(render::Vector2 mousePos, const render::Camera& camera,
                                               const game::GameState& state) {
     const render::Ray ray{GetMouseRay(mousePos, camera.operator Camera3D())};
 
@@ -91,7 +91,7 @@ float PlayerInfo::height() {
            sectionHeight(kStateRowCount) + kSectionGap + sectionHeight(kInventoryRowCount) + kSectionGap;
 }
 
-void PlayerInfo::draw(const game::GameState& state, std::uint32_t playerId, Rectangle bounds) {
+void PlayerInfo::draw(const game::GameState& state, std::uint32_t playerId, render::Rectangle bounds) {
     static constexpr float kTextMarginLeft = 8.0F;
     static constexpr float kSectionMargin = 8.0F;
 
@@ -109,13 +109,13 @@ void PlayerInfo::draw(const game::GameState& state, std::uint32_t playerId, Rect
 
     const auto drawSection = [&](std::string_view title, std::initializer_list<std::string> lines) {
         const float boxHeight = sectionHeight(static_cast<int>(lines.size()));
-        const Rectangle sectionBounds{sectionX, y, sectionWidth, boxHeight};
+        const render::Rectangle sectionBounds{sectionX, y, sectionWidth, boxHeight};
         Widgets::panel(sectionBounds, title);
 
         float rowY = sectionBounds.y() + Widgets::kPanelHeaderHeight + kTextMarginTop;
         for (const auto& line : lines) {
-            Widgets::label(Rectangle{sectionBounds.x() + kTextMarginLeft, rowY,
-                                     sectionBounds.width() - (2.0F * kTextMarginLeft), kRowHeight},
+            Widgets::label(render::Rectangle{sectionBounds.x() + kTextMarginLeft, rowY,
+                                             sectionBounds.width() - (2.0F * kTextMarginLeft), kRowHeight},
                            line);
             rowY += kRowHeight;
         }

@@ -26,6 +26,9 @@ class Window {
 
     [[nodiscard]] bool shouldClose() const;
 
+    [[nodiscard]] static int width();
+    [[nodiscard]] static int height();
+
     void setTargetFPS(int fps);
     void beginFrame();
     void endFrame();

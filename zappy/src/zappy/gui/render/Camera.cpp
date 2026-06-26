@@ -10,8 +10,11 @@
 #include <raylib.h>
 
 #include <algorithm>
+#include <cmath>
+#include <optional>
 #include <utility>
 
+#include "zappy/gui/render/utils/Vector3.hpp"
 #include "zappy/gui/ui/Mouse.hpp"
 
 namespace zappy::gui::render {
@@ -23,7 +26,12 @@ Camera::Camera(const Vector3 position, const Vector3 target, const Vector3 up, c
       _maxFovy{fovy} {}
 
 Camera::Camera(Camera&& other) noexcept
-    : _camera(other._camera), _cameraMode(other._cameraMode), _maxFovy(other._maxFovy) {
+    : _camera(other._camera),
+      _cameraMode(other._cameraMode),
+      _maxFovy(other._maxFovy),
+      _focusInitialized(other._focusInitialized),
+      _defaultTarget(other._defaultTarget),
+      _manualFovy(other._manualFovy) {
     other._camera = {};
     other._cameraMode = CameraMode::CAMERA_CUSTOM;
 }
@@ -33,17 +41,20 @@ Camera& Camera::operator=(Camera&& other) noexcept {
         _camera = other._camera;
         _cameraMode = other._cameraMode;
         _maxFovy = other._maxFovy;
+        _focusInitialized = other._focusInitialized;
+        _defaultTarget = other._defaultTarget;
+        _manualFovy = other._manualFovy;
         other._camera = {};
         other._cameraMode = CameraMode::CAMERA_CUSTOM;
     }
     return *this;
 }
 
-Vector3 Camera::position() const { return _camera.position; }
+Vector3 Camera::position() const { return Vector3{_camera.position}; }
 
-Vector3 Camera::target() const { return _camera.target; }
+Vector3 Camera::target() const { return Vector3{_camera.target}; }
 
-Vector3 Camera::up() const { return _camera.up; }
+Vector3 Camera::up() const { return Vector3{_camera.up}; }
 
 float Camera::fovy() const { return _camera.fovy; }
 
@@ -67,6 +78,7 @@ void Camera::zoom(float delta) {
     static constexpr float kZoomSpeed = 2.0F;
     static constexpr float kMinFovy = 5.0F;
     _camera.fovy = std::clamp(_camera.fovy - (delta * kZoomSpeed), kMinFovy, _maxFovy);
+    _manualFovy = _camera.fovy;
 }
 
 void Camera::applyManualZoomInput() {
@@ -83,6 +95,30 @@ void Camera::applyManualZoomInput() {
     if (zoomDelta != 0.0F) {
         zoom(zoomDelta);
     }
+}
+
+void Camera::followPlayer(std::optional<Vector3> worldPosition, bool acceptManualZoomInput) {
+    static constexpr float kBlendSpeed = 4.0F;
+    static constexpr float kFocusFovyFactor = 0.35F;
+
+    if (!_focusInitialized) {
+        _defaultTarget = target();
+        _manualFovy = fovy();
+        _focusInitialized = true;
+    }
+
+    if (!worldPosition.has_value() && acceptManualZoomInput) {
+        applyManualZoomInput();
+    }
+
+    const float blend = std::clamp(kBlendSpeed * GetFrameTime(), 0.0F, 1.0F);
+    const Vector3 targetGoal = worldPosition.value_or(_defaultTarget);
+    const float fovyGoal = worldPosition.has_value() ? (_manualFovy * kFocusFovyFactor) : _manualFovy;
+
+    const Vector3 currentTarget = target();
+    setTarget(Vector3{std::lerp(currentTarget.x(), targetGoal.x(), blend), 0.0F,
+                      std::lerp(currentTarget.z(), targetGoal.z(), blend)});
+    setFovy(std::lerp(fovy(), fovyGoal, blend));
 }
 
 void Camera::update() { UpdateCamera(&_camera, std::to_underlying(_cameraMode)); }

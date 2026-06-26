@@ -21,9 +21,9 @@
 #include "zappy/gui/render/Camera.hpp"
 #include "zappy/gui/render/Grid.hpp"
 #include "zappy/gui/render/utils/Color.hpp"
+#include "zappy/gui/render/utils/Rectangle.hpp"
 #include "zappy/gui/render/utils/Vector3.hpp"
 #include "zappy/gui/ui/Widgets.hpp"
-#include "zappy/gui/ui/utils/Rectangle.hpp"
 #include "zappy/shared/exception/InvalidState.hpp"
 
 namespace zappy::gui {
@@ -41,7 +41,7 @@ GUI::GUI()
     : _parser{_state},
       _sender{_buffer},
       _handshake{_buffer, _sender, _parser, _state},
-      _hud{_sender, kTimeSliderInitialValue, kWindowWidth, kWindowHeight} {}
+      _hud{_sender, kTimeSliderInitialValue} {}
 
 void GUI::connect(const GuiCliParser& cli) {
     _address = zappy::network::Address{std::string{cli.host()}, cli.port()};
@@ -91,8 +91,8 @@ void GUI::drawLoadingFrame(std::string_view name, float progress) {
     const int loadingY = barY - kTextSpacing - kLoadingFontSize;
     DrawText(text.c_str(), loadingTextX, loadingY, kLoadingFontSize, render::Color::kWHITE);
 
-    ui::Widgets::progressBar(ui::Rectangle{static_cast<float>(barX), static_cast<float>(barY),
-                                           static_cast<float>(kBarWidth), static_cast<float>(kBarHeight)},
+    ui::Widgets::progressBar(render::Rectangle{static_cast<float>(barX), static_cast<float>(barY),
+                                               static_cast<float>(kBarWidth), static_cast<float>(kBarHeight)},
                              "", "", progress);
 
     const std::string nameText{name};
@@ -134,9 +134,10 @@ int GUI::run() {
     while (!_window.shouldClose()) {
         _poller.poll(kPollTimeoutMs);
         _window.beginFrame();
-        _camera.applyManualZoomInput();
-        _renderer.update(_camera, _state, _assets);
         _hud.update(_camera, _state);
+        _camera.followPlayer(_hud.focusedPlayerWorldPosition(_state), !_hud.isMouseOverChatPanel());
+
+        _renderer.update(_camera, _state, _assets);
         _hud.draw(_state);
         _window.endFrame();
     }
