@@ -314,8 +314,8 @@ class HeuristicAI:
         """Drop our whole inventory where we stand, then starve so the launcher
         respawns us fresh at level 1."""
         if not self._fork_sent:
-            if self.food >= 2:
-                self.c.fork()
+            if self.food >= 2 and not self.c.fork():
+                return
             self._fork_sent = True
             return
         for stone in STONES:
