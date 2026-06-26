@@ -160,6 +160,28 @@ class HeuristicAI:
             "data": parts[5] if len(parts) > 5 else "",
         }
 
+    def _process_broadcast_msg(
+        self,
+        direction: int,
+        msg: dict,
+        best_id: Optional[int],
+        best_dir: Optional[int],
+        best_missing: List[str],
+        sos_dir: Optional[int],
+    ) -> Tuple[Optional[int], Optional[int], List[str], Optional[int]]:
+        if msg["verb"] == "SOS":
+            if sos_dir is None or direction == 0:
+                sos_dir = direction
+            return best_id, best_dir, best_missing, sos_dir
+        self.team_seen[msg["id"]] = (self.tick, msg["level"])
+        if msg["verb"] == "CALL" and msg["level"] == self.level:
+            if best_id is None or msg["id"] < best_id:
+                best_id, best_dir = msg["id"], direction
+                best_missing = [s for s in msg["data"].split(",") if s]
+        if msg["level"] == self.level:
+            self.peers[msg["id"]] = self.tick
+        return best_id, best_dir, best_missing, sos_dir
+
     def _scan_broadcasts(
         self,
     ) -> Tuple[Optional[int], Optional[int], List[str], Optional[int]]:
@@ -169,17 +191,9 @@ class HeuristicAI:
             msg = self._decode(text)
             if not msg or msg["team"] != self.c.team or msg["id"] == self.id:
                 continue
-            if msg["verb"] == "SOS":
-                if sos_dir is None or direction == 0:
-                    sos_dir = direction
-                continue
-            self.team_seen[msg["id"]] = (self.tick, msg["level"])
-            if msg["verb"] == "CALL" and msg["level"] == self.level:
-                if best_id is None or msg["id"] < best_id:
-                    best_id, best_dir = msg["id"], direction
-                    best_missing = [s for s in msg["data"].split(",") if s]
-            if msg["level"] == self.level:
-                self.peers[msg["id"]] = self.tick
+            best_id, best_dir, best_missing, sos_dir = self._process_broadcast_msg(
+                direction, msg, best_id, best_dir, best_missing, sos_dir
+            )
         return best_id, best_dir, best_missing, sos_dir
 
     def _update_call_state(
