@@ -9,7 +9,7 @@
 
 #include <raylib.h>
 
-namespace zappy::gui::ui {
+namespace zappy::gui::render {
 class Rectangle {
   public:
     Rectangle(float x, float y, float width, float height)
@@ -35,4 +35,4 @@ class Rectangle {
   private:
     ::Rectangle _rectangle{};
 };
-}  // namespace zappy::gui::ui
+}  // namespace zappy::gui::render

@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-#include "utils/Rectangle.hpp"
+#include "zappy/gui/render/utils/Rectangle.hpp"
 
 namespace zappy::gui::game {
 class GameState;
@@ -33,7 +33,7 @@ class Leaderboard {
 
     [[nodiscard]] static float height(const game::GameState& state);
 
-    static void draw(const game::GameState& state, Rectangle bounds);
+    static void draw(const game::GameState& state, render::Rectangle bounds);
 
   private:
     static constexpr float kRowHeight = 24.0F;

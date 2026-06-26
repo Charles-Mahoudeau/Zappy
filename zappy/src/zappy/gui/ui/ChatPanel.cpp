@@ -13,12 +13,15 @@
 #include <string>
 
 #include "Widgets.hpp"
-#include "utils/Rectangle.hpp"
+#include "zappy/gui/render/utils/Rectangle.hpp"
+#include "zappy/gui/render/utils/Vector2.hpp"
 
 namespace zappy::gui::ui {
 
-Rectangle ChatPanel::contentRect(Rectangle bounds, std::size_t messageCount) {
-    return Rectangle{0.0F, 0.0F, bounds.width(), static_cast<float>(messageCount) * kLineHeight};
+render::Rectangle ChatPanel::currentBounds(render::Rectangle anchor) const { return _drag.currentBounds(anchor); }
+
+render::Rectangle ChatPanel::contentRect(render::Rectangle bounds, std::size_t messageCount) {
+    return render::Rectangle{0.0F, 0.0F, bounds.width(), static_cast<float>(messageCount) * kLineHeight};
 }
 
 bool ChatPanel::consumeAutoScrollReset(std::size_t messageCount) {
@@ -29,22 +32,22 @@ bool ChatPanel::consumeAutoScrollReset(std::size_t messageCount) {
     return true;
 }
 
-void ChatPanel::draw(const std::deque<std::string>& broadcasts, Rectangle bounds) {
+void ChatPanel::draw(const std::deque<std::string>& broadcasts, render::Rectangle bounds) {
     bounds = _drag.apply(bounds, Widgets::kPanelHeaderHeight);
 
     if (consumeAutoScrollReset(broadcasts.size())) {
         const float fullHeight = static_cast<float>(broadcasts.size()) * kLineHeight;
         const float viewportHeight = bounds.height() - Widgets::kPanelHeaderHeight;
-        _scroll = Vector2{0.0F, -std::max(0.0F, fullHeight - viewportHeight)};
+        _scroll = render::Vector2{0.0F, -std::max(0.0F, fullHeight - viewportHeight)};
     }
 
-    const Rectangle content = contentRect(bounds, broadcasts.size());
-    const Rectangle view = Widgets::scrollPanel(bounds, "Chat", content, _scroll);
+    const render::Rectangle content = contentRect(bounds, broadcasts.size());
+    const render::Rectangle view = Widgets::scrollPanel(bounds, "Chat", content, _scroll);
 
     Widgets::beginScissor(view);
     float y = view.y() + _scroll.y();
     for (const auto& message : broadcasts) {
-        Widgets::label(Rectangle{view.x(), y, content.width(), kLineHeight}, message);
+        Widgets::label(render::Rectangle{view.x(), y, content.width(), kLineHeight}, message);
         y += kLineHeight;
     }
     Widgets::endScissor();

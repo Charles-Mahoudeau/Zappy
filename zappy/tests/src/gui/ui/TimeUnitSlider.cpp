@@ -45,7 +45,7 @@ TEST_F(TimeUnitSliderTest, InitialValueIsClampedToValidRange) {
     ui::TimeUnitSlider tooLow{_sender, 0};
     EXPECT_FALSE(tooLow.consumeValueChange(ui::TimeUnitSlider::kMinValue));
 
-    ui::TimeUnitSlider tooHigh{_sender, 1000};
+    ui::TimeUnitSlider tooHigh{_sender, 5000};
     EXPECT_FALSE(tooHigh.consumeValueChange(ui::TimeUnitSlider::kMaxValue));
 }
 

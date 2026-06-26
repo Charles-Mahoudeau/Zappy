@@ -9,21 +9,22 @@
 
 #include <gtest/gtest.h>
 
-#include "zappy/gui/ui/utils/Rectangle.hpp"
+#include "zappy/gui/render/utils/Rectangle.hpp"
 
 namespace ui = zappy::gui::ui;
+namespace render = zappy::gui::render;
 
 TEST(ChatPanelTest, ContentRectIsEmptyForNoMessages) {
-    const ui::Rectangle bounds{0.0F, 0.0F, 320.0F, 180.0F};
-    const ui::Rectangle content = ui::ChatPanel::contentRect(bounds, 0);
+    const render::Rectangle bounds{0.0F, 0.0F, 320.0F, 180.0F};
+    const render::Rectangle content = ui::ChatPanel::contentRect(bounds, 0);
     EXPECT_FLOAT_EQ(content.width(), 320.0F);
     EXPECT_FLOAT_EQ(content.height(), 0.0F);
 }
 
 TEST(ChatPanelTest, ContentRectGrowsWithMessageCount) {
-    const ui::Rectangle bounds{0.0F, 0.0F, 320.0F, 180.0F};
-    const ui::Rectangle oneMessage = ui::ChatPanel::contentRect(bounds, 1);
-    const ui::Rectangle fiveMessages = ui::ChatPanel::contentRect(bounds, 5);
+    const render::Rectangle bounds{0.0F, 0.0F, 320.0F, 180.0F};
+    const render::Rectangle oneMessage = ui::ChatPanel::contentRect(bounds, 1);
+    const render::Rectangle fiveMessages = ui::ChatPanel::contentRect(bounds, 5);
     EXPECT_GT(fiveMessages.height(), oneMessage.height());
     EXPECT_FLOAT_EQ(fiveMessages.height(), oneMessage.height() * 5.0F);
 }

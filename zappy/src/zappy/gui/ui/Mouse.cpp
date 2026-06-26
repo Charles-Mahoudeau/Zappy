@@ -9,7 +9,7 @@
 
 #include <raylib.h>
 
-#include "zappy/gui/ui/utils/Vector2.hpp"
+#include "zappy/gui/render/utils/Vector2.hpp"
 
 namespace zappy::gui::ui {
 
@@ -17,7 +17,7 @@ bool Mouse::isLeftButtonReleased() { return IsMouseButtonReleased(MOUSE_BUTTON_L
 
 bool Mouse::isLeftButtonPressed() { return IsMouseButtonPressed(MOUSE_BUTTON_LEFT); }
 
-Vector2 Mouse::position() { return Vector2{GetMousePosition()}; }
+render::Vector2 Mouse::position() { return render::Vector2{GetMousePosition()}; }
 
 float Mouse::scrollDelta() { return GetMouseWheelMove(); }
 
