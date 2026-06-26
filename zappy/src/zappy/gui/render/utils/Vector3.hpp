@@ -85,6 +85,13 @@ class Vector3 {
         }
         return (*this / len);
     }
+
+    [[nodiscard]] Vector3 cross(const Vector3& other) const {
+        return Vector3{_vector.y * other._vector.z - _vector.z * other._vector.y,
+                       _vector.z * other._vector.x - _vector.x * other._vector.z,
+                       _vector.x * other._vector.y - _vector.y * other._vector.x};
+    }
+
     [[nodiscard]] ::Vector3 get() const { return _vector; }
 
     operator ::Vector3() const { return _vector; }
