@@ -12,15 +12,17 @@
 #include <string_view>
 #include <vector>
 
-#include "Camera.hpp"
-#include "Color.hpp"
-#include "ColorF.hpp"
+#include "../../Camera.hpp"
+#include "../../utils/Color.hpp"
+#include "../../utils/ColorF.hpp"
+#include "../../utils/RandomValue.hpp"
+#include "../../utils/TimeValue.hpp"
+#include "../../utils/Vec2D.hpp"
+#include "../../utils/Vector3.hpp"
+#include "../Texture.hpp"
 #include "Particle.hpp"
-#include "RandomValue.hpp"
-#include "Texture.hpp"
-#include "TimeValue.hpp"
-#include "Vec2D.hpp"
-#include "Vector3.hpp"
+#include "zappy/gui/render/objects/Texture.hpp"
+#include "zappy/gui/render/objects/particles/Particle.hpp"
 
 namespace zappy::gui::render {
 

@@ -9,18 +9,14 @@
 
 #include <cstddef>
 #include <initializer_list>
-#include <map>
-#include <memory>
-#include <string>
-#include <utility>
 
 #include "AssetLoaderRegistry.hpp"
 #include "objects/Model.hpp"
-#include "objects/Texture.hpp"
 #include "objects/particles/ParticleEmitter.hpp"
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/render/utils/Color.hpp"
 #include "zappy/gui/render/utils/ColorF.hpp"
+#include "zappy/gui/render/utils/Vector3.hpp"
 
 namespace zappy::gui::render {
 
