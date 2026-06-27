@@ -105,13 +105,11 @@ bool PlayerCommands::broadcast(CommandCtx& ctx) {
             if (client->playerID() == id) {
                 continue;
             }
-            const game::entity::Player* receiver = world.get().player(client->playerID());
-            if (receiver == nullptr) {
-                continue;
+            if (const game::entity::Player* receiver = world.get().player(client->playerID()); receiver != nullptr) {
+                std::ignore = client->sendMessage(
+                    "message {},{}\n", world.get().computeDistFromPositions(emitter->position(), receiver->position()),
+                    text);
             }
-            std::ignore = client->sendMessage(
-                "message {},{}\n", world.get().computeDistFromPositions(emitter->position(), receiver->position()),
-                text);
         }
         data.client()->sendSuccess();
     });
@@ -155,13 +153,11 @@ bool PlayerCommands::look(CommandCtx& ctx) {
         }
         auto tiles = world.get().playerView(data.player());
 
-        std::string msg = "[";
-
+        std::string msg;
         for (const auto& tile : tiles) {
             msg += tile.get().string(world.get().entityDatabase()) + ",";
         }
-        msg += "]";
-        std::ignore = data.client()->sendMessage("{}\n", msg);
+        std::ignore = data.client()->sendMessage("[{}]\n", msg);
     });
     return true;
 }
