@@ -14,7 +14,6 @@
 #include <utility>
 
 namespace zappy::server {
-
 Timer::Timer() { this->setFrequency(kDefaultFrequency); }
 
 Timer::Timer(std::uint16_t freq) { this->setFrequency(freq); }
@@ -22,7 +21,6 @@ Timer::Timer(std::uint16_t freq) { this->setFrequency(freq); }
 int Timer::update() {
     std::chrono::steady_clock::time_point const now = std::chrono::steady_clock::now();
     const auto nbTick = static_cast<int>((now - this->_previousTick) / this->_tickTime);
-    auto it = this->_events.begin();
 
     if (nbTick <= 0) {
         return 0;
@@ -30,10 +28,17 @@ int Timer::update() {
 
     this->_previousTick += this->_tickTime * nbTick;
 
+    for (const std::uint64_t id : _toRemove) {
+        std::erase_if(_events, [id](const Event& event) { return event.id == id; });
+    }
+    _toRemove.clear();
+
+    auto it = this->_events.begin();
+
     while (it != this->_events.end()) {
         it->timeout -= nbTick;
         if (it->timeout > 0) {
-            it++;
+            ++it;
             continue;
         }
         it->notifier();
@@ -83,23 +88,6 @@ int Timer::timeoutUntilNextTick() const {
     return timeToWait.count() <= 0 ? 0 : static_cast<int>(timeToWait.count());
 }
 
-int Timer::smallestTimeout() const {
-    if (this->_events.empty()) {
-        return 0;
-    }
-
-    int smallest = this->_events.begin()->timeout;
-
-    for (const auto& event : this->_events) {
-        smallest = std::min(event.timeout, smallest);
-    }
-    return smallest > 0 ? smallest : 0;
-}
-
-void Timer::unschedule(std::uint64_t id) {
-    std::erase_if(this->_events, [id](const Event& event) { return event.id == id; });
-}
-
 std::uint64_t Timer::scheduleLater(int timeout, std::function<void()> notifier) {
     std::uint64_t id = this->_nextId;
     this->_events.emplace_back(timeout, std::move(notifier), id);
@@ -114,4 +102,18 @@ std::uint64_t Timer::scheduleEvery(int timeout, std::function<void()> notifier) 
     return id;
 }
 
+void Timer::unschedule(const std::uint64_t id) { _toRemove.push_back(id); }
+
+int Timer::smallestTimeout() const {
+    if (this->_events.empty()) {
+        return 0;
+    }
+
+    int smallest = this->_events.begin()->timeout;
+
+    for (const auto& event : this->_events) {
+        smallest = std::min(event.timeout, smallest);
+    }
+    return smallest > 0 ? smallest : 0;
+}
 }  // namespace zappy::server

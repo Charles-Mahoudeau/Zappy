@@ -86,6 +86,7 @@ class Timer {
     std::list<Event> _events;
     std::uint16_t _frequency{kDefaultFrequency};
     std::chrono::milliseconds _tickTime{1};
+    std::vector<std::uint64_t> _toRemove;
 
     [[nodiscard]] int smallestTimeout() const;
 };
