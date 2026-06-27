@@ -80,6 +80,8 @@ std::uint16_t Inventory::removeResource(const ResourceType type, const std::uint
 
 void Inventory::clear() { _resources.clear(); }
 
+bool Inventory::canAfford(const Inventory& other) const { return (*this <=> other) >= 0; }
+
 std::string Inventory::string() const {
     std::stringstream stringStream;
 

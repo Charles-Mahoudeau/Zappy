@@ -61,6 +61,11 @@ class Inventory {
     /// @brief Clear the inventory.
     void clear();
 
+    /// @brief Check if the inventory can afford another inventory.
+    /// @param other The inventory to check.
+    /// @return True if the inventory can afford the other inventory, false otherwise.
+    [[nodiscard]] bool canAfford(const Inventory& other) const;
+
     /// @brief Get the string representation of the inventory.
     /// @return The string representation of the inventory.
     [[nodiscard]] std::string string() const;
