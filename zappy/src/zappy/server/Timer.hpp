@@ -58,9 +58,10 @@ class Timer {
      * @param timeout time until the end of the event. time = (timeout / frequencies) seconds
      * @param notifier function which will be called at the end of the timeout. Used to notify the client that the
      *                 event is finished
+     * @param condition The condition to check before scheduling the event.
      * @return id of the scheduled task
      */
-    std::uint64_t scheduleEvery(int timeout, std::function<void()> notifier);
+    std::uint64_t scheduleEvery(int timeout, std::function<void()> notifier, std::function<bool()> condition = nullptr);
 
     /**
      * @brief remove the events related to the given Addr
@@ -70,10 +71,11 @@ class Timer {
 
   private:
     struct Event {
+        std::uint64_t id;
         int timeout;
         std::function<void()> notifier;
-        std::uint64_t id;
-        int repeated_timeout = -1;
+        std::function<bool()> condition;
+        int repeatedTimeout = -1;
     };
 
     static constexpr int kTick_milli_default = 1000;

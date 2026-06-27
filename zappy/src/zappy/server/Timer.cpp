@@ -37,14 +37,14 @@ int Timer::update() {
 
     while (it != this->_events.end()) {
         it->timeout -= nbTick;
-        if (it->timeout > 0) {
+        if (it->timeout > 0 || (it->condition != nullptr && !it->condition())) {
             ++it;
             continue;
         }
         it->notifier();
-        if (it->repeated_timeout != -1) {
-            it->timeout = it->repeated_timeout;
-            it++;
+        if (it->repeatedTimeout != -1) {
+            it->timeout = it->repeatedTimeout;
+            ++it;
             continue;
         }
         it = this->_events.erase(it);
@@ -67,53 +67,76 @@ void Timer::setFrequency(std::uint16_t frequency) {
 }
 
 int Timer::timeoutUntilSchedule() const {
-    auto now = std::chrono::steady_clock::now();
-    auto sinceTick = std::chrono::duration_cast<std::chrono::milliseconds>(now - this->_previousTick);
-
-    if (this->_events.empty()) {
+    if (_events.empty()) {
         return -1;
     }
 
-    const auto nextTicks = this->smallestTimeout();
-    const auto remaining = static_cast<int>((this->_tickTime.count() * nextTicks) - sinceTick.count());
+    const auto now = std::chrono::steady_clock::now();
+    const auto nextTicks = smallestTimeout();
 
-    return remaining < 0 ? 0 : remaining;
-}
+    if (nextTicks == -1) {
+        return -1;
+    }
 
-int Timer::timeoutUntilNextTick() const {
-    auto now = std::chrono::steady_clock::now();
-    auto nextTick = this->_previousTick + this->_tickTime;
-    auto timeToWait = std::chrono::duration_cast<std::chrono::milliseconds>(nextTick - now);
+    const auto targetTickTime = _previousTick + nextTicks * _tickTime;
+    const auto timeToWait = std::chrono::duration_cast<std::chrono::milliseconds>(targetTickTime - now);
 
     return timeToWait.count() <= 0 ? 0 : static_cast<int>(timeToWait.count());
 }
 
-std::uint64_t Timer::scheduleLater(int timeout, std::function<void()> notifier) {
-    std::uint64_t id = this->_nextId;
-    this->_events.emplace_back(timeout, std::move(notifier), id);
-    this->_nextId++;
+int Timer::timeoutUntilNextTick() const {
+    const auto now = std::chrono::steady_clock::now();
+    const auto nextTick = _previousTick + _tickTime;
+    const auto timeToWait = std::chrono::duration_cast<std::chrono::milliseconds>(nextTick - now);
+
+    return timeToWait.count() <= 0 ? 0 : static_cast<int>(timeToWait.count());
+}
+
+std::uint64_t Timer::scheduleLater(const int timeout, std::function<void()> notifier) {
+    const std::uint64_t id = _nextId;
+
+    _events.emplace_back(Event{
+        .id = id,
+        .timeout = timeout,
+        .notifier = std::move(notifier),
+        .condition = nullptr,
+        .repeatedTimeout = timeout,
+    });
+    ++_nextId;
     return id;
 }
 
-std::uint64_t Timer::scheduleEvery(int timeout, std::function<void()> notifier) {
-    std::uint64_t id = this->_nextId;
-    this->_events.emplace_back(timeout, std::move(notifier), id, timeout);
-    this->_nextId++;
+std::uint64_t Timer::scheduleEvery(const int timeout, std::function<void()> notifier, std::function<bool()> condition) {
+    const std::uint64_t id = _nextId;
+
+    _events.emplace_back(Event{
+        .id = id,
+        .timeout = timeout,
+        .notifier = std::move(notifier),
+        .condition = std::move(condition),
+        .repeatedTimeout = timeout,
+    });
+    ++_nextId;
     return id;
 }
 
 void Timer::unschedule(const std::uint64_t id) { _toRemove.push_back(id); }
 
 int Timer::smallestTimeout() const {
-    if (this->_events.empty()) {
-        return 0;
+    if (_events.empty()) {
+        return -1;
     }
 
-    int smallest = this->_events.begin()->timeout;
+    int smallest = std::numeric_limits<int>::max();
+    bool foundValidEvent = false;
 
-    for (const auto& event : this->_events) {
-        smallest = std::min(event.timeout, smallest);
+    for (const auto& event : _events) {
+        if (event.condition != nullptr && !event.condition()) {
+            continue;
+        }
+        smallest = std::min(smallest, event.timeout);
+        foundValidEvent = true;
     }
-    return smallest > 0 ? smallest : 0;
+    return foundValidEvent ? smallest : -1;
 }
 }  // namespace zappy::server
