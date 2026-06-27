@@ -205,6 +205,9 @@ std::optional<World::IncantationSnapshot> World::beginIncantation(const std::uin
     if (incantationPlayer == nullptr) {
         return std::nullopt;
     }
+    if (incantationPlayer->level() >= entity::Player::kMaxLevel) {
+        return std::nullopt;
+    }
 
     const Tile& tile = _grid.tile(incantationPlayer->position());
     std::vector<std::uint64_t> players;
