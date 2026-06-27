@@ -20,18 +20,11 @@ namespace zappy::server::game::entity {
 class Player : public AEntity {
   public:
     static constexpr std::uint8_t kMaxLevel{8};
-    static constexpr std::uint8_t kDefaultLifeUnits{10};
     static constexpr std::uint8_t kTimeUnitsPerFood{126};
-    static constexpr std::uint16_t kDefaultLifetime{kDefaultLifeUnits * kTimeUnitsPerFood};
+    static constexpr std::uint8_t kDefaultFoodAmount{10};
 
-    using AEntity::AEntity;
-
-    /// @brief Update the player.
-    void update() override;
-
-    /// @brief Get the player's lifetime left.
-    /// @return The player's lifetime left.
-    [[nodiscard]] std::uint32_t lifetimeLeft() const;
+    Player(Timer& timer, IGrid& grid, IEventEmitter& eventEmitter, std::string teamName);
+    ~Player() override;
 
     /// @brief Check if the player is alive.
     /// @return True if the player is alive, false otherwise.
@@ -69,9 +62,15 @@ class Player : public AEntity {
     [[nodiscard]] const Inventory& inventory() const;
 
   private:
-    std::uint32_t _lifetimeLeft{kDefaultLifetime};
+    /// @brief Eat one unit of food.
+    /// @return True if the player ate food, false otherwise.
+    bool eat();
+
+    bool _alive{true};
+    std::uint32_t _foodTicksLeft{0};
     std::uint8_t _level{1};
     math::Direction _orientation{math::direction::random()};
     Inventory _inventory;
+    std::optional<std::uint64_t> _foodTimerId;
 };
 }  // namespace zappy::server::game::entity

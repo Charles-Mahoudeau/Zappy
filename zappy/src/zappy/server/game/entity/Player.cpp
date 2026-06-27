@@ -20,27 +20,36 @@
 #include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server::game::entity {
-void Player::update() {
-    if (!alive()) {
-        return;
-    }
-    --_lifetimeLeft;
-    if (_lifetimeLeft == 0) {
-        eventEmitter().pushEvent(PlayerDeathEvent{
-            .playerId = id(),
-        });
+Player::Player(Timer& timer, IGrid& grid, IEventEmitter& eventEmitter, std::string teamName)
+    : AEntity{timer, grid, eventEmitter, std::move(teamName)} {
+    _foodTimerId = timer.scheduleEvery(kTimeUnitsPerFood, [this] {
+        if (_foodTicksLeft > 0) {
+            --_foodTicksLeft;
+            return;
+        }
+        if (!eat()) {
+            kill();
+        }
+    });
+}
+
+Player::~Player() {
+    if (_foodTimerId.has_value()) {
+        timer().unschedule(_foodTimerId.value());
     }
 }
 
-std::uint32_t Player::lifetimeLeft() const { return _lifetimeLeft; }
-
-bool Player::alive() const { return _lifetimeLeft > 0; }
+bool Player::alive() const { return _alive; }
 
 void Player::kill() {
-    if (!alive()) {
+    if (!_alive) {
         return;
     }
-    _lifetimeLeft = 0;
+    _alive = false;
+    if (_foodTimerId.has_value()) {
+        timer().unschedule(_foodTimerId.value());
+        _foodTimerId = std::nullopt;
+    }
     eventEmitter().pushEvent(PlayerDeathEvent{
         .playerId = id(),
     });
@@ -91,12 +100,17 @@ math::Direction Player::turnRight() {
     return _orientation;
 }
 
+const Inventory& Player::inventory() const { return _inventory; }
+
 bool Player::eat() {
+    if (!_alive) {
+        return false;
+    }
     if (_inventory.resourceCount(ResourceType::kFood) == 0) {
         return false;
     }
     _inventory.removeResource(ResourceType::kFood);
-    _lifetimeLeft += kTimeUnitsPerFood;
+    _foodTicksLeft += kTimeUnitsPerFood;
     eventEmitter().pushEvent(PlayerInventoryEvent{
         .playerId = id(),
         .position = position(),
@@ -104,6 +118,4 @@ bool Player::eat() {
     });
     return true;
 }
-
-const Inventory& Player::inventory() const { return _inventory; }
 }  // namespace zappy::server::game::entity
