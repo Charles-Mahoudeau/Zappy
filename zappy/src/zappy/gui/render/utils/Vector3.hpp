@@ -73,13 +73,13 @@ class Vector3 {
     [[nodiscard]] bool operator!=(const Vector3& other) const { return !(*this == other); }
 
     [[nodiscard]] float length() const {
-        return std::sqrt(_vector.x * _vector.x + _vector.y * _vector.y + _vector.z * _vector.z);
+        return std::sqrt((_vector.x * _vector.x) + (_vector.y * _vector.y) + (_vector.z * _vector.z));
     }
     [[nodiscard]] float lengthSquared() const {
-        return (_vector.x * _vector.x + _vector.y * _vector.y + _vector.z * _vector.z);
+        return (_vector.x * _vector.x) + (_vector.y * _vector.y) + (_vector.z * _vector.z);
     }
     [[nodiscard]] Vector3 normalized() const {
-        float len = length();
+        const float len = length();
         if (len == 0.0F) {
             return *this;
         }
@@ -87,9 +87,9 @@ class Vector3 {
     }
 
     [[nodiscard]] Vector3 cross(const Vector3& other) const {
-        return Vector3{_vector.y * other._vector.z - _vector.z * other._vector.y,
-                       _vector.z * other._vector.x - _vector.x * other._vector.z,
-                       _vector.x * other._vector.y - _vector.y * other._vector.x};
+        return Vector3{(_vector.y * other._vector.z) - (_vector.z * other._vector.y),
+                       (_vector.z * other._vector.x) - (_vector.x * other._vector.z),
+                       (_vector.x * other._vector.y) - (_vector.y * other._vector.x)};
     }
 
     [[nodiscard]] ::Vector3 get() const { return _vector; }

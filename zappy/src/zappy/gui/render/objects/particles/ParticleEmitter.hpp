@@ -12,7 +12,9 @@
 #include <string_view>
 #include <vector>
 
+#include "Camera.hpp"
 #include "Color.hpp"
+#include "ColorF.hpp"
 #include "Particle.hpp"
 #include "RandomValue.hpp"
 #include "Texture.hpp"

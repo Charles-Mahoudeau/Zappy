@@ -12,6 +12,8 @@
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
+#include <cstdint>
+#include <numbers>
 #include <string_view>
 #include <utility>
 
@@ -95,11 +97,10 @@ void ParticleEmitter::emit(uint16_t count) {
 void ParticleEmitter::emitRate() { emit(_rate); }
 
 Vector3 ParticleEmitter::getDirection() const {
-    constexpr float kPi = 3.14159265358979323846F;
-    const float maxAngle = std::clamp(_spread, 0.0F, 90.0F) * (kPi / 180.0F);
+    const float maxAngle = std::clamp(_spread, 0.0F, 90.0F) * (std::numbers::pi_v<float> / 180.0F);
 
     const float inclination = (static_cast<float>(GetRandomValue(0, 1000)) / 1000.0F) * maxAngle;
-    const float azimuth = (static_cast<float>(GetRandomValue(0, 1000)) / 1000.0F) * 2.0F * kPi;
+    const float azimuth = (static_cast<float>(GetRandomValue(0, 1000)) / 1000.0F) * 2.0F * std::numbers::pi_v<float>;
 
     const float x = std::sin(inclination) * std::cos(azimuth);
     const float y = std::cos(inclination);
