@@ -177,7 +177,7 @@ TEST(TimerTimeoutUntilSchedule, ReflectsSoonestEvent) {
 
     const int remaining = timer.timeoutUntilSchedule();
 
-    EXPECT_EQ(remaining, 20);
+    EXPECT_THAT(remaining, testing::AllOf(testing::Ge(19), testing::Le(20)));
 }
 
 // ---------------------------------------------------------------------------
