@@ -18,11 +18,8 @@
 namespace zappy::server::game::entity {
 class Egg : public AEntity {
   public:
-    explicit Egg(IGrid& grid, IEventEmitter& eventEmitter, std::string teamName,
+    explicit Egg(Timer& timer, IGrid& grid, IEventEmitter& eventEmitter, std::string teamName,
                  std::optional<std::uint64_t> parentPlayerId = std::nullopt);
-
-    /// @brief Update the egg.
-    void update() override;
 
     [[nodiscard]] std::optional<std::uint64_t> parentPlayerId() const;
 

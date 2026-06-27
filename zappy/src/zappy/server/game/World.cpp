@@ -62,7 +62,7 @@ std::uint64_t World::countResources(const ResourceType type) const {
 
 std::uint64_t World::spawnEgg(std::uint64_t playerId, const std::string_view teamName) {
     const std::uint64_t eggId =
-        _entityDatabase.insert(std::make_unique<entity::Egg>(_grid, *this, std::string{teamName}, playerId));
+        _entityDatabase.insert(std::make_unique<entity::Egg>(_timer, _grid, *this, std::string{teamName}, playerId));
 
     placeEggRandom(eggId);
     return eggId;
@@ -70,7 +70,7 @@ std::uint64_t World::spawnEgg(std::uint64_t playerId, const std::string_view tea
 
 std::uint64_t World::spawnEgg(const std::string_view teamName) {
     const std::uint64_t eggId =
-        _entityDatabase.insert(std::make_unique<entity::Egg>(_grid, *this, std::string{teamName}));
+        _entityDatabase.insert(std::make_unique<entity::Egg>(_timer, _grid, *this, std::string{teamName}));
 
     placeEggRandom(eggId);
     return eggId;
@@ -139,7 +139,7 @@ std::expected<std::uint64_t, std::string> World::hatchRandomEgg(const std::strin
     parentTile->removeEntity(*eggIdOpt);
 
     const std::uint64_t playerId =
-        _entityDatabase.insert(std::make_unique<entity::Player>(_grid, *this, std::string{teamName}));
+        _entityDatabase.insert(std::make_unique<entity::Player>(_timer, _grid, *this, std::string{teamName}));
 
     parentTile->addEntity(playerId);
     pushEvent(PlayerConnectionEvent{
