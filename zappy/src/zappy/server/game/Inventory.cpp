@@ -23,13 +23,15 @@
 
 namespace zappy::server::game {
 Inventory::Inventory(const ResourcesInit& resourcesInit) {
-    addResource(ResourceType::kFood, resourcesInit.food);
-    addResource(ResourceType::kLinemate, resourcesInit.linemate);
-    addResource(ResourceType::kDeraumere, resourcesInit.deraumere);
-    addResource(ResourceType::kSibur, resourcesInit.sibur);
-    addResource(ResourceType::kMendiane, resourcesInit.mendiane);
-    addResource(ResourceType::kPhiras, resourcesInit.phiras);
-    addResource(ResourceType::kThystame, resourcesInit.thystame);
+    using enum ResourceType;
+
+    addResource(kFood, resourcesInit.food);
+    addResource(kLinemate, resourcesInit.linemate);
+    addResource(kDeraumere, resourcesInit.deraumere);
+    addResource(kSibur, resourcesInit.sibur);
+    addResource(kMendiane, resourcesInit.mendiane);
+    addResource(kPhiras, resourcesInit.phiras);
+    addResource(kThystame, resourcesInit.thystame);
 }
 
 std::uint32_t Inventory::resourceCount() const {
