@@ -35,6 +35,6 @@ class TimeValue {
   private:
     T _value{};
     T _increment{};
-    float _speed{};
+    float _speed{1.0F};
 };
 }  // namespace zappy::gui::render
