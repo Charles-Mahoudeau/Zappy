@@ -144,7 +144,7 @@ void AssetStore::loadVFXs() {
     signal.setStatic(Vector3{}, Vector3{0.0F, 0.0F, 0.0F}, Vector3{0.0F, 0.0F, 0.0F}, 0.0F, 1);
     signal.setInitParticles(Vector2{1.0F, 1.0F}, 0.0F, ColorF{230.0F, 255.0F, 255.0F, 255.0F}, 600.0F, 0.0F);
     signal.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 0.5F, .tint = 0.3F}, 0.1F, 0.0F);
-    signal.setIncrementParticles(Vector2{0.05F, 0.05F}, 0.0F, ColorF{0.0F, 0.0F, 0.0F, -3.0F});
+    signal.setIncrementParticles(Vector2{0.05F, 0.05F}, 0.0F, ColorF{0.0F, 0.0F, 0.0F, -1.2F});
     signal.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.01F, .rotation = 0.0F, .tint = 0.1F});
     _vfxs.insert({"signal", std::move(signal)});
 
