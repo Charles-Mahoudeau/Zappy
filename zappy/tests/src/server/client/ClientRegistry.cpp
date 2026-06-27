@@ -28,8 +28,8 @@ class ClientRegistryTest : public ::testing::Test {
     SocketPair pair;
     net::SocketRegistry socketRegistry;
     zappy::network::Address addr{"127.0.0.1", 4242};
-    ClientRegistry registry;
     Timer timer;
+    ClientRegistry registry;
 
   protected:
     void SetUp() override {

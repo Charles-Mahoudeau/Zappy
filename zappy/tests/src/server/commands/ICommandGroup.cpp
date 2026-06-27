@@ -68,7 +68,7 @@ class TestICommandGroup : public ::testing::Test {
   protected:
     void SetUp() override {
         logger.emplace("TestLogger");
-        world = std::make_unique<zappy::server::game::World>(zappy::math::Vector2u{10, 10}, logger);
+        world = std::make_unique<zappy::server::game::World>(zappy::math::Vector2u{10, 10}, timer, logger);
         mockCmd = std::make_unique<MockedCommand>(zappy::server::command::ICommandGroup::CommandCtx{
             .timer = timer,
             .clientRegistry = clients,

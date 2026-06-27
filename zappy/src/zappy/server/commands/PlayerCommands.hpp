@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <string_view>
 #include <unordered_map>
 
@@ -29,15 +30,17 @@ class PlayerCommands : public ACommandGroup {
     void execute(Client* client, std::string_view msg) override;
 
   private:
-    std::unordered_map<std::string_view, CommandInvoker> _commands;
+    static constexpr std::uint16_t kIncantationTimeLimit{300};
 
     static bool ignore(const CommandCtx& ctx);
-
     static bool inventory(CommandCtx& ctx);
     static bool broadcast(CommandCtx& ctx);
     static bool fork(CommandCtx& ctx);
     static bool look(CommandCtx& ctx);
     static bool connectNb(CommandCtx& ctx);
+    static bool incantation(const CommandCtx& ctx);
+
+    std::unordered_map<std::string_view, CommandInvoker> _commands;
 };
 
 }  // namespace zappy::server::command

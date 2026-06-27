@@ -7,9 +7,11 @@
 
 #include "zappy/server/commands/PlayerCommands.hpp"
 
+#include <cstdint>
+#include <format>
 #include <functional>
-#include <iostream>
 #include <iterator>
+#include <optional>
 #include <ranges>
 #include <string>
 #include <string_view>
@@ -25,6 +27,7 @@
 #include "zappy/server/commands/player/ObjectCommand.hpp"
 #include "zappy/server/commands/player/PlayerData.hpp"
 #include "zappy/server/game/Event.hpp"
+#include "zappy/server/game/World.hpp"
 #include "zappy/server/game/entity/Egg.hpp"
 #include "zappy/server/game/entity/Player.hpp"
 #include "zappy/shared/exception/Exception.hpp"
@@ -44,7 +47,7 @@ PlayerCommands::PlayerCommands(CommandCtx context)
           {"Eject", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
           {"Take", [](auto& ctx) { return player::ObjectCommand::take(ctx); }},
           {"Set", [](auto& ctx) { return player::ObjectCommand::drop(ctx); }},
-          {"Incantation", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
+          {"Incantation", [](const CommandCtx& ctx) { return incantation(ctx); }},
       }) {}
 
 void PlayerCommands::execute(Client* client, [[maybe_unused]] const std::string_view msg) {
@@ -143,9 +146,8 @@ bool PlayerCommands::look(CommandCtx& ctx) {
     auto clients = ctx.clientRegistry;
     auto world = ctx.world;
     auto id = ctx.client->playerID();
-    auto logger = ctx.logger;
 
-    ctx.client->setTimeout(1, [clients, world, id, logger]() {
+    ctx.client->setTimeout(1, [clients, world, id]() {
         const player::PlayerData data(clients, world, id);
 
         if (!data.valid()) {
@@ -178,4 +180,43 @@ bool PlayerCommands::connectNb(CommandCtx& ctx) {
     return true;
 }
 
+bool PlayerCommands::incantation(const CommandCtx& ctx) {
+    if (ctx.client == nullptr) {
+        return false;
+    }
+
+    const std::optional<game::World::IncantationSnapshot> snapshot =
+        ctx.world.get().beginIncantation(ctx.client->playerID());
+
+    if (!snapshot.has_value()) {
+        return false;
+    }
+
+    const auto broadcastMessage = [&clientRegistry = ctx.clientRegistry.get(), &logger = ctx.logger.get()](
+                                      const game::World::IncantationSnapshot& incantationSnapshot,
+                                      const std::string_view message) {
+        for (const std::uint64_t playerId : incantationSnapshot.playerIds) {
+            const Client* client = clientRegistry.findByPlayerId(playerId);
+
+            if (client == nullptr) {
+                logger.warn("Client associated with player ID {} not found", playerId);
+                continue;
+            }
+            std::ignore = client->sendMessage(message);
+        }
+    };
+
+    ctx.timer.get().scheduleLater(kIncantationTimeLimit, [&world = ctx.world.get(), &logger = ctx.logger.get(),
+                                                          snapshot = *snapshot, broadcastMessage] {
+        if (!world.endIncantation(snapshot)) {
+            broadcastMessage(snapshot, "ko\n");
+            return;
+        }
+        broadcastMessage(snapshot, std::format("Current level: {}\n", snapshot.level + 1));
+        logger.info("Incantation started by player #{} has reached level {}.", snapshot.playerId, snapshot.level + 1);
+    });
+    ctx.client->setTimeout(kIncantationTimeLimit);
+    broadcastMessage(*snapshot, "Elevation underway\n");
+    return true;
+}
 }  // namespace zappy::server::command
