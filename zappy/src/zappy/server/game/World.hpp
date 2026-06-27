@@ -162,6 +162,10 @@ class World : public IEventEmitter {
     /// @param eggId The ID of the egg to place.
     void placeEggRandom(std::uint64_t eggId);
 
+    /// @brief Places an egg on a tile in the world.
+    /// @param eggId The ID of the egg to place.
+    void placeEggAt(std::uint64_t eggId, Tile& tile);
+
     std::random_device _randomDevice;
     std::mt19937 _randomEngine{_randomDevice()};
     EntityDatabase _entityDatabase;

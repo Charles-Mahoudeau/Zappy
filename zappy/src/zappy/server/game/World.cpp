@@ -76,7 +76,8 @@ std::uint64_t World::spawnEgg(std::uint64_t playerId, const std::string_view tea
     const std::uint64_t eggId =
         _entityDatabase.insert(std::make_unique<entity::Egg>(_grid, *this, std::string{teamName}, playerId));
 
-    placeEggRandom(eggId);
+    Tile& tile = this->_grid.tile(this->_entityDatabase.query(playerId)->position());
+    this->placeEggAt(eggId, tile);
     return eggId;
 }
 
@@ -275,14 +276,14 @@ bool World::playerDrop(entity::Player* player, ResourceType resource) {
     return true;
 }
 
-void World::placeEggRandom(const std::uint64_t eggId) {
+void World::placeEggRandom(std::uint64_t eggId) { this->placeEggAt(eggId, randomTile()); }
+
+void World::placeEggAt(std::uint64_t eggId, Tile& tile) {
     const entity::Egg* egg = _entityDatabase.query<entity::Egg>(eggId);
 
     if (egg == nullptr) {
         throw exception::InvalidArgument{"trying to place an egg that does not exist"};
     }
-
-    Tile& tile = randomTile();
 
     tile.addEntity(eggId);
     pushEvent(EggLaidEvent{
