@@ -154,6 +154,10 @@ class World : public IEventEmitter {
     /// @param event The event to add.
     void pushEvent(Event event) override;
 
+    bool playerTake(entity::Player* player, ResourceType resource);
+
+    bool playerDrop(entity::Player* player, ResourceType resource);
+
     /// @brief Begins an incantation event.
     /// @param playerId The ID of the player initiating the incantation.
     /// @return A snapshot of the incantation event if successful, std::nullopt otherwise.

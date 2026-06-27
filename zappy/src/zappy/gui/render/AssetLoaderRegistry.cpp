@@ -28,6 +28,7 @@ AssetLoaderList AssetLoaderRegistry::create(AssetStore& assets) {
         {"thystame", [&assets]() { assets.loadResourceModel(Thystame); }},
         {"island", [&assets]() { assets.loadIslandModel(); }},
         {"bridge", [&assets]() { assets.loadBridgeModel(); }},
+        {"vfxs", [&assets]() { assets.loadVFXs(); }},
     };
 }
 

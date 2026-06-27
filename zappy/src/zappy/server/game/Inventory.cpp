@@ -9,12 +9,14 @@
 
 #include <algorithm>
 #include <compare>
+#include <cstddef>
 #include <cstdint>
 #include <limits>
 #include <numeric>
 #include <ranges>
 #include <sstream>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -95,6 +97,23 @@ std::string Inventory::string() const {
         } else {
             stringStream << 0;
         }
+    }
+    return stringStream.str();
+}
+
+[[nodiscard]] std::string Inventory::detailedString() const {
+    std::stringstream stringStream;
+    static const std::vector<std::string> resourcesName = {"food",     "linemate", "deraumere", "sibur",
+                                                           "mendiane", "phiras",   "thystame"};
+
+    for (std::uint8_t i = 0; i < std::to_underlying(ResourceType::kCount); ++i) {
+        const auto it = _resources.find(ResourceType{i});
+        const std::size_t count = (it != _resources.end()) ? it->second : 0;
+
+        if (i > 0) {
+            stringStream << ", ";
+        }
+        stringStream << resourcesName.at(i) << " " << count;
     }
     return stringStream.str();
 }

@@ -118,7 +118,7 @@ class ClientRegistry {
   private:
     std::vector<const Client*> _toRemove;
     std::vector<std::unique_ptr<Client>> _clients;
-    std::unordered_map<Client::Type, std::vector<const Client*>> _clientsPerType = {
+    std::unordered_map<Client::Type, std::vector<Client*>> _clientsPerType = {
         {Client::Type::kUnknown, {}},
         {Client::Type::kGui, {}},
         {Client::Type::kPlayer, {}},

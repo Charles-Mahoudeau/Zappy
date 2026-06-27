@@ -70,6 +70,8 @@ class Inventory {
     /// @return The string representation of the inventory.
     [[nodiscard]] std::string string() const;
 
+    [[nodiscard]] std::string detailedString() const;
+
     Inventory& operator+=(const Inventory& other);
     Inventory& operator-=(const Inventory& other);
 

@@ -33,6 +33,8 @@ class PlayerCommands : public ACommandGroup {
     static constexpr std::uint16_t kIncantationTimeLimit{300};
 
     static bool ignore(const CommandCtx& ctx);
+    static bool inventory(CommandCtx& ctx);
+    static bool connectNb(CommandCtx& ctx);
     static bool incantation(const CommandCtx& ctx);
 
     std::unordered_map<std::string_view, CommandInvoker> _commands;

@@ -36,4 +36,5 @@ ICommandGroup::CommandData ACommandGroup::extractCommand(const std::string_view 
     cmd.params = std::vector(std::istream_iterator<std::string>{iss}, std::istream_iterator<std::string>{});
     return cmd;
 }
+
 }  // namespace zappy::server::command

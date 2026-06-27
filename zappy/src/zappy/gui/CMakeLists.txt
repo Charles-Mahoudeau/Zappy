@@ -30,8 +30,6 @@ add_library(zappy_gui_objects OBJECT
         render/Grid.hpp
         render/Camera.cpp
         render/Camera.hpp
-        render/tools/Vec2D.cpp
-        render/tools/Vec2D.hpp
         render/objects/Texture.cpp
         render/objects/Texture.hpp
         render/objects/Billboard.cpp
@@ -40,11 +38,21 @@ add_library(zappy_gui_objects OBJECT
         render/objects/Model.hpp
         render/objects/Skybox.cpp
         render/objects/Skybox.hpp
+        render/objects/particles/ParticleEmitter.cpp
+        render/objects/particles/ParticleEmitter.hpp
+        render/objects/particles/Particle.cpp
+        render/objects/particles/Particle.hpp
+        render/utils/Vector2.cpp
+        render/utils/Vector2.hpp
         render/utils/Color.hpp
+        render/utils/ColorF.hpp
+        render/utils/ColorF.cpp
         render/utils/Ray.hpp
         render/utils/Rectangle.hpp
-        render/utils/Vector2.hpp
         render/utils/Vector3.hpp
+        render/utils/RandomValue.cpp
+        render/utils/RandomValue.hpp
+        render/utils/TimeValue.hpp
         ui/ChatPanel.cpp
         ui/ChatPanel.hpp
         ui/Draggable.cpp
@@ -72,8 +80,13 @@ add_library(zappy_gui_objects OBJECT
         ui/Widgets.hpp
 )
 target_include_directories(zappy_gui_objects PUBLIC
-        ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/zappy/gui/render/objects
+    ${CMAKE_SOURCE_DIR}/src/zappy/gui/render/objects/particles
+    ${CMAKE_SOURCE_DIR}/src/zappy/gui/render/utils
+    ${CMAKE_SOURCE_DIR}/src/zappy/gui/render
 )
+
 target_link_libraries(zappy_gui_objects PUBLIC
         zappy_shared
 )
