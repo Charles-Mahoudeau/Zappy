@@ -134,6 +134,7 @@ bool PlayerCommands::fork(CommandCtx& ctx) {
         } catch (const exception::Exception& err) {
             logger.get().error(err.what());
             data.client()->sendError();
+            return;
         }
         data.client()->sendSuccess();
     });
