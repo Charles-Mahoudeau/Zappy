@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <expected>
 #include <functional>
+#include <iostream>
 #include <optional>
 #include <string>
 #include <unordered_map>
@@ -41,6 +42,9 @@ Player::~Player() {
         try {
             timer().unschedule(_foodTimerId.value());
         } catch (const std::bad_alloc&) {
+            std::cerr << "You tried to destroy a Player (maybe to save some memory), but you did not have enough "
+                         "memory to do so. That's quite amusing, isn't it?"
+                      << std::endl;
         }
     }
 }
