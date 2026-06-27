@@ -25,7 +25,10 @@ namespace zappy::server {
 Client::Client(net::SocketRegistry& socketRegister, network::Address address, Timer& timer)
     : _timer(timer), _addr(address), _socketsRegistery(socketRegister) {}
 
-Client::~Client() { this->removeTimeout(); }
+Client::~Client() {
+    this->removeTimeout();
+    _socketsRegistery.remove(_addr);
+}
 
 const network::Address& Client::address() const { return this->_addr; }
 
