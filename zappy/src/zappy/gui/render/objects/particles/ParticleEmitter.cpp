@@ -7,10 +7,14 @@
 
 #include "ParticleEmitter.hpp"
 
+#include <raylib.h>
+
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <numbers>
 #include <string_view>
+#include <utility>
 
 #include "Billboard.hpp"
 #include "ColorF.hpp"
@@ -44,9 +48,9 @@ void ParticleEmitter::setStatic(Vector3 origin, Vector3 volume, Vector3 accelera
 
 void ParticleEmitter::update(float dt) {
     for (size_t i = 0; i < _particles.size(); ++i) {
-        _particles[i].update(dt);
-        if (!_particles[i].isAlive()) {
-            _particles.erase(_particles.begin() + i);
+        _particles.at(i).update(dt);
+        if (!_particles.at(i).isAlive()) {
+            _particles.erase(_particles.begin() + static_cast<std::ptrdiff_t>(i));
             --i;
         }
     }
@@ -58,24 +62,24 @@ uint16_t ParticleEmitter::draw(Camera& camera) {
             particle.draw(camera, _texture);
         }
     }
-    return _particles.size();
+    return static_cast<uint16_t>(_particles.size());
 }
 
 void ParticleEmitter::particle() {
     Particle newParticle;
-    Vector3 speed = getDirection() * RandomValue{_speed.value(), _speed.envelope()}.generate();
-    float lifetime = RandomValue{_lifetime.value(), _lifetime.envelope()}.generate();
-    Vec2D InitSize = _size.get() * RandomValue{1.0F, _InitEnvelope.size}.generate();
-    Vec2D incSize = _size.increment() * RandomValue{1.0F, _IncrementEnvelope.size}.generate();
-    float initRot = RandomValue{_rotation.get(), _InitEnvelope.rotation}.generate();
-    float incRot = RandomValue{_rotation.increment(), _IncrementEnvelope.rotation}.generate();
-    ColorF initTint = _tint.get() * RandomValue{1.0F, _InitEnvelope.tint}.generate();
-    ColorF incTint = _tint.increment() * RandomValue{1.0F, _IncrementEnvelope.tint}.generate();
-    Vector3 origin = _origin + Vector3{RandomValue{0.0F, _volume.x() * 0.5F}.generate(),
-                                       RandomValue{0.0F, _volume.y() * 0.5F}.generate(),
-                                       RandomValue{0.0F, _volume.z() * 0.5F}.generate()};
+    const Vector3 speed = getDirection() * RandomValue{_speed.value(), _speed.envelope()}.generate();
+    const float lifetime = RandomValue{_lifetime.value(), _lifetime.envelope()}.generate();
+    const Vec2D initSize = _size.get() * RandomValue{1.0F, _initEnvelope.size}.generate();
+    const Vec2D incSize = _size.increment() * RandomValue{1.0F, _incrementEnvelope.size}.generate();
+    const float initRot = RandomValue{_rotation.get(), _initEnvelope.rotation}.generate();
+    const float incRot = RandomValue{_rotation.increment(), _incrementEnvelope.rotation}.generate();
+    const ColorF initTint = _tint.get() * RandomValue{1.0F, _initEnvelope.tint}.generate();
+    const ColorF incTint = _tint.increment() * RandomValue{1.0F, _incrementEnvelope.tint}.generate();
+    const Vector3 origin = _origin + Vector3{RandomValue{0.0F, _volume.x() * 0.5F}.generate(),
+                                             RandomValue{0.0F, _volume.y() * 0.5F}.generate(),
+                                             RandomValue{0.0F, _volume.z() * 0.5F}.generate()};
 
-    newParticle.setInitValues(origin, InitSize, initRot, initTint);
+    newParticle.setInitValues(origin, initSize, initRot, initTint);
     newParticle.setIncrementValues(speed, incSize, incRot, incTint);
     newParticle.setLifetime(lifetime);
     newParticle.setAcceleration(_acceleration);
@@ -90,15 +94,15 @@ void ParticleEmitter::emit(uint16_t count) {
 
 void ParticleEmitter::emitRate() { emit(_rate); }
 
-Vector3 ParticleEmitter::getDirection() {
-    const float maxAngle = (std::clamp(_spread, 0.0f, 90.0f)) * (3.14159265f / 180.0f);
+Vector3 ParticleEmitter::getDirection() const {
+    const float maxAngle = (std::clamp(_spread, 0.0F, 90.0F)) * (std::numbers::pi_v<float> / 180.0F);
 
-    float inclination = static_cast<float>(GetRandomValue(0, 1000)) / 1000.0f * maxAngle;
-    float azimuth = static_cast<float>(GetRandomValue(0, 1000)) / 1000.0f * 2.0f * 3.14159265f;
+    const float inclination = (static_cast<float>(GetRandomValue(0, 1000)) / 1000.0F) * maxAngle;
+    const float azimuth = (static_cast<float>(GetRandomValue(0, 1000)) / 1000.0F) * 2.0F * std::numbers::pi_v<float>;
 
-    float x = std::sin(inclination) * std::cos(azimuth);
-    float y = std::cos(inclination);
-    float z = std::sin(inclination) * std::sin(azimuth);
+    const float x = std::sin(inclination) * std::cos(azimuth);
+    const float y = std::cos(inclination);
+    const float z = std::sin(inclination) * std::sin(azimuth);
 
     return Vector3{x, y, z};
 }
@@ -106,7 +110,7 @@ Vector3 ParticleEmitter::getDirection() {
 void ParticleEmitter::setInitParticles(Vec2D size, float rotation, ColorF tint, float lifetime, float speed) {
     _size = TimeValue<Vec2D>{size, Vec2D{0.0F, 0.0F}};
     _rotation = TimeValue<float>{rotation, 0.0F};
-    _tint = TimeValue<ColorF>{tint, ColorF{0, 0, 0, 0}};
+    _tint = TimeValue<ColorF>{tint, ColorF{0.0F, 0.0F, 0.0F, 0.0F}};
     _lifetime.setValue(lifetime);
     _speed.setValue(speed);
 }
@@ -118,17 +122,17 @@ void ParticleEmitter::setIncrementParticles(Vec2D sizeIncrement, float rotationI
 }
 
 void ParticleEmitter::setInitEnvelope(ParticleEnvelope envelope, float lifetime, float speed) {
-    _InitEnvelope = envelope;
+    _initEnvelope = envelope;
     _lifetime.setEnvelope(lifetime);
     _speed.setEnvelope(speed);
 }
 
-void ParticleEmitter::setIncrementEnvelope(ParticleEnvelope envelope) { _IncrementEnvelope = envelope; }
+void ParticleEmitter::setIncrementEnvelope(ParticleEnvelope envelope) { _incrementEnvelope = envelope; }
 
 void ParticleEmitter::setStaticParticles(Vec2D size, float rotation, ColorF tint, float lifetime, float speed) {
     _size = TimeValue<Vec2D>{size, Vec2D{0.0F, 0.0F}};
     _rotation = TimeValue<float>{rotation, 0.0F};
-    _tint = TimeValue<ColorF>{tint, ColorF{0, 0, 0, 0}};
+    _tint = TimeValue<ColorF>{tint, ColorF{0.0F, 0.0F, 0.0F, 0.0F}};
     _lifetime.setValue(lifetime);
     _speed.setValue(speed);
 }

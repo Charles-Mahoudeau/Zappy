@@ -7,8 +7,10 @@
 
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include <string_view>
+#include <vector>
 
 #include "Color.hpp"
 #include "Particle.hpp"
@@ -17,7 +19,6 @@
 #include "TimeValue.hpp"
 #include "Vec2D.hpp"
 #include "Vector3.hpp"
-#include "vector"
 
 namespace zappy::gui::render {
 
@@ -75,7 +76,7 @@ class ParticleEmitter {
     void emitRate();
 
   private:
-    Vector3 getDirection();
+    [[nodiscard]] Vector3 getDirection() const;
     Texture _texture;
     std::vector<Particle> _particles;
     Vector3 _origin{0.0F, 0.0F, 0.0F};
@@ -88,8 +89,8 @@ class ParticleEmitter {
     TimeValue<Vec2D> _size{Vec2D{1.0F, 1.0F}, Vec2D{0.0F, 0.0F}};
     TimeValue<float> _rotation{0.0F, 0.0F};
     TimeValue<ColorF> _tint{ColorF(Color::kWHITE), ColorF(Color::kWHITE)};
-    ParticleEnvelope _InitEnvelope;
-    ParticleEnvelope _IncrementEnvelope;
+    ParticleEnvelope _initEnvelope;
+    ParticleEnvelope _incrementEnvelope;
 };
 
 }  // namespace zappy::gui::render

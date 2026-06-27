@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <raylib.h>
-
 #include "Camera.hpp"
 #include "Color.hpp"
 #include "ColorF.hpp"
