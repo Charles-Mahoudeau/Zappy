@@ -12,7 +12,6 @@
 #include <algorithm>
 #include <chrono>
 #include <cstddef>
-#include <exception>
 #include <iostream>
 #include <string>
 #include <string_view>
@@ -28,6 +27,7 @@
 #include "zappy/gui/render/utils/Vector3.hpp"
 #include "zappy/gui/ui/DotAnimator.hpp"
 #include "zappy/gui/ui/Widgets.hpp"
+#include "zappy/shared/exception/Exception.hpp"
 #include "zappy/shared/exception/InvalidState.hpp"
 #include "zappy/shared/network/BufferedClient.hpp"
 
@@ -128,7 +128,7 @@ bool GUI::tryConnect() {
         _buffer.connect(_address);
         _handshake.run();
         return true;
-    } catch (const std::exception&) {
+    } catch (const exception::Exception&) {
         return false;
     }
 }
@@ -172,7 +172,7 @@ void GUI::runSession() {
             _hud.draw(_state);
             _window.endFrame();
         }
-    } catch (const std::exception& err) {
+    } catch (const exception::Exception& err) {
         std::cerr << "Server connection lost: " << err.what() << '\n';
     }
 }

@@ -14,13 +14,13 @@
 
 namespace zappy::gui::ui {
 
-DotAnimator::DotAnimator(int maxDots) : _maxDots{maxDots} {}
+DotAnimator::DotAnimator(int maxDots) : _maxDots{maxDots > 0 ? maxDots : 1} {}
 
 void DotAnimator::advance() { _dots = (_dots % _maxDots) + 1; }
 
 void DotAnimator::update(float dt) {
     _timer += dt;
-    if (_timer >= kIntervalSeconds) {
+    while (_timer >= kIntervalSeconds) {
         _timer -= kIntervalSeconds;
         advance();
     }
