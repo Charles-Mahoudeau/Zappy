@@ -9,7 +9,9 @@
 
 #include <cstdint>
 #include <expected>
+#include <functional>
 #include <string>
+#include <unordered_map>
 
 #include "zappy/server/game/AEntity.hpp"
 #include "zappy/server/game/Event.hpp"
@@ -70,23 +72,18 @@ void Player::setPosition(const math::Vector2u position) {
 }
 
 void Player::moveForward() {
-    const math::Vector2u gridSize = this->gridSize();
+    using enum math::Direction;
+    static std::unordered_map<math::Direction, std::function<void(const math::Vector2u, math::Vector2u&)>> map{
+        {kNorth, [](math::Vector2u grid, math::Vector2u& pos) { pos.y = (pos.y + 1) % grid.y; }},
+        {kEast, [](math::Vector2u grid, math::Vector2u& pos) { pos.x = (pos.x + 1) % grid.x; }},
+        {kSouth, [](math::Vector2u grid, math::Vector2u& pos) { pos.y = (pos.y + grid.y - 1) % grid.y; }},
+        {kWest, [](math::Vector2u grid, math::Vector2u& pos) { pos.x = (pos.x + grid.x - 1) % grid.x; }},
+    };
+
     math::Vector2u pos = this->position();
 
-    switch (this->_orientation) {
-        case math::Direction::kNorth:
-            pos.y = (pos.y == gridSize.y) ? 0 : pos.y + 1;
-            break;
-        case math::Direction::kEast:
-            pos.x = (pos.x == gridSize.x) ? 0 : pos.x + 1;
-            break;
-        case math::Direction::kSouth:
-            pos.y = (pos.y == 0) ? gridSize.y : pos.y - 1;
-            break;
-        case math::Direction::kWest:
-            pos.x = (pos.x == 0) ? gridSize.x : pos.x - 1;
-            break;
-    }
+    map.find(this->_orientation)->second(this->gridSize(), pos);
+
     this->setPosition(pos);
 }
 
