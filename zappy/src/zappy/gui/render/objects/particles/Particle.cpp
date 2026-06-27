@@ -5,10 +5,13 @@
 ** Particle
 */
 
-#pragma once
+#include "Particle.hpp"
+
+#include <raylib.h>
+
+#include <algorithm>
 
 #include "Camera.hpp"
-#include "Color.hpp"
 #include "ColorF.hpp"
 #include "Texture.hpp"
 #include "TimeValue.hpp"
@@ -16,47 +19,49 @@
 #include "Vector3.hpp"
 
 namespace zappy::gui::render {
-class Particle {
-  public:
-    Particle() = default;
-    Particle(const Particle&) = default;
-    Particle(Particle&&) noexcept = default;
-    ~Particle() = default;
+void Particle::setPosition(Vector3 position, Vector3 increment) { _position = TimeValue<Vector3>{position, increment}; }
 
-    Particle& operator=(const Particle&) = default;
-    Particle& operator=(Particle&&) noexcept = default;
+void Particle::setSize(Vec2D size, Vec2D increment) { _size = TimeValue<Vec2D>{size, increment}; }
 
-    [[nodiscard]] Vector3 position() const { return _position; }
-    [[nodiscard]] Vec2D size() const { return _size; }
-    [[nodiscard]] float lifetime() const { return _lifetime; }
-    [[nodiscard]] float rotation() const { return _rotation; }
-    [[nodiscard]] ColorF tint() const { return _tint; }
-    [[nodiscard]] float elapsedTime() const { return _elapsedTime; }
-    [[nodiscard]] bool isAlive() const { return _elapsedTime < _lifetime; }
+void Particle::setLifetime(float lifetime) { _lifetime = TimeValue<float>{lifetime, 0.0F}; }
 
-    void setInitValues(Vector3 position, Vec2D size, float rotation, ColorF tint);
+void Particle::setRotation(float rotation, float increment) { _rotation = TimeValue<float>{rotation, increment}; }
 
-    void setIncrementValues(Vector3 positionIncrement, Vec2D sizeIncrement, float rotationIncrement,
-                            ColorF tintIncrement);
+void Particle::setTint(ColorF tint, ColorF increment) { _tint = TimeValue<ColorF>{tint, increment}; }
 
-    void setPosition(Vector3 position, Vector3 increment);
-    void setSize(Vec2D size, Vec2D increment);
-    void setLifetime(float lifetime);
-    void setRotation(float rotation, float increment);
-    void setTint(ColorF tint, ColorF increment);
-    void setAcceleration(Vector3 acceleration) { _acceleration = acceleration; }
+void Particle::setIncrementValues(Vector3 positionIncrement, Vec2D sizeIncrement, float rotationIncrement,
+                                  ColorF tintIncrement) {
+    _position = TimeValue<Vector3>{_position.get(), positionIncrement};
+    _size = TimeValue<Vec2D>{_size.get(), sizeIncrement};
+    _rotation = TimeValue<float>{_rotation.get(), rotationIncrement};
+    _tint = TimeValue<ColorF>{_tint.get(), tintIncrement};
+}
 
-    void update(float dt);
+void Particle::setInitValues(Vector3 position, Vec2D size, float rotation, ColorF tint) {
+    _position = TimeValue<Vector3>{position, Vector3{0.0F, 0.0F, 0.0F}};
+    _size = TimeValue<Vec2D>{size, Vec2D{0.0F, 0.0F}};
+    _rotation = TimeValue<float>{rotation, 0.0F};
+    _tint = TimeValue<ColorF>{tint, ColorF{0.0F, 0.0F, 0.0F, 0.0F}};
+}
 
-    void draw(Camera& camera, Texture& texture);
+void Particle::update(float dt) {
+    _position.update(dt);
+    _position.setIncrement(_position.increment() + (_acceleration * dt));
+    _size.update(dt);
+    _rotation.update(dt);
+    _tint.update(dt);
+    _elapsedTime += dt;
+}
 
-  private:
-    float _lifetime{1.0F};
-    float _elapsedTime{0.0F};
-    TimeValue<Vector3> _position{Vector3{0.0F, 0.0F, 0.0F}, Vector3{0.0F, 0.0F, 0.0F}};
-    TimeValue<Vec2D> _size{Vec2D{1.0F, 1.0F}, Vec2D{0.0F, 0.0F}};
-    TimeValue<float> _rotation{0.0F, 0.0F};
-    TimeValue<ColorF> _tint{ColorF(Color::kWHITE), ColorF(Color::kWHITE)};
-    Vector3 _acceleration{0.0F, 0.0F, 0.0F};
-};
+void Particle::draw(Camera& camera, Texture& texture) {
+    const float texSize = static_cast<float>(std::min(texture.width(), texture.height()));
+    const Rectangle source{.x = 0.0F, .y = 0.0F, .width = texSize, .height = texSize};
+    const Vector2 origin{.x = _size.get().x() * 0.5F, .y = _size.get().y() * 0.5F};
+    const Vector3 up{0.0F, 1.0F, 0.0F};
+    const Vec2D size{std::max(_size.get().x(), 0.0F), std::max(_size.get().y(), 0.0F)};
+
+    DrawBillboardPro(camera, texture, source, _position.get(), up, size, origin, _rotation.get(),
+                     _tint.get().toColor());
+}
+
 }  // namespace zappy::gui::render
