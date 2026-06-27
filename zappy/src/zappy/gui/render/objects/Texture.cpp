@@ -14,12 +14,21 @@
 #include <string_view>
 
 namespace zappy::gui::render {
-Texture::Texture(std::string_view path, bool flipVertical) {
+Texture::Texture(std::string_view path, bool flipVertical, bool premultiplyAlpha) {
     const std::string pathStr{path};
-
-    _texture = loadTexture(pathStr.c_str(), flipVertical);
+    Image img = LoadImage(pathStr.c_str());
+    if (flipVertical) ImageFlipVertical(&img);
+    if (premultiplyAlpha) ImageAlphaPremultiply(&img);
+    _texture = LoadTextureFromImage(img);
+    UnloadImage(img);
     if (!isValid()) {
         throw TextureException{"Failed to load texture from path: " + pathStr};
+    }
+}
+
+Texture::Texture(Texture2D texture) : _texture{texture} {
+    if (!isValid()) {
+        throw TextureException{"Failed to load texture from Texture2D"};
     }
 }
 

@@ -80,6 +80,7 @@ class ParticleEmitter {
   private:
     [[nodiscard]] Vector3 getDirection() const;
     Texture _texture;
+
     std::vector<Particle> _particles;
     Vector3 _origin{0.0F, 0.0F, 0.0F};
     Vector3 _volume{1.0F, 1.0F, 1.0F};

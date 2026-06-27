@@ -18,7 +18,9 @@ namespace zappy::gui::render {
 
 class Texture {
   public:
-    explicit Texture(std::string_view path, bool flipVertical = false);
+    Texture() = default;
+    explicit Texture(std::string_view path, bool flipVertical = false, bool premultiplyAlpha = true);
+    explicit Texture(Texture2D texture);
     ~Texture();
 
     Texture(const Texture&) = delete;

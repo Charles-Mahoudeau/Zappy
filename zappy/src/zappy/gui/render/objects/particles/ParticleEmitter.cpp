@@ -8,6 +8,7 @@
 #include "ParticleEmitter.hpp"
 
 #include <raylib.h>
+#include <rlgl.h>
 
 #include <algorithm>
 #include <cmath>
@@ -16,6 +17,7 @@
 #include <numbers>
 #include <string_view>
 #include <utility>
+#include <vector>
 
 #include "Camera.hpp"
 #include "ColorF.hpp"
@@ -26,7 +28,7 @@
 #include "Vector3.hpp"
 
 namespace zappy::gui::render {
-ParticleEmitter::ParticleEmitter(std::string_view path) : _texture(path) {}
+ParticleEmitter::ParticleEmitter(std::string_view path) : _texture{path, false, true} {}
 
 void ParticleEmitter::setOrigin(Vector3 origin) { _origin = origin; }
 void ParticleEmitter::setVolume(Vector3 volume) { _volume = volume; }
@@ -59,11 +61,17 @@ void ParticleEmitter::update(float dt) {
 }
 
 uint16_t ParticleEmitter::draw(Camera& camera) {
+    rlDisableDepthMask();
+    BeginBlendMode(BLEND_ALPHA_PREMULTIPLY);
+
     for (auto& particle : _particles) {
         if (particle.lifetime() > 0.0F) {
             particle.draw(camera, _texture);
         }
     }
+
+    EndBlendMode();
+    rlEnableDepthMask();
     return static_cast<uint16_t>(_particles.size());
 }
 
