@@ -53,25 +53,25 @@ std::expected<network::Address, std::string> Server::makeNewConnection() {
 
     this->_sockets.insert(newClientSocket);
 
-    this->_poller.add(fd, zappy::io::Poller::kPollRead, [this, addr](std::byte event) {
-        auto* cli = this->_sockets.findByAddress(addr);
+    this->_poller.add(fd, io::Poller::kPollError | io::Poller::kPollRead, [this, fd, addr](const std::byte event) {
         bool fail = false;
 
-        if (cli == nullptr) {
-            std::cerr << "failed to find client for " + addr.string() + "\n";
-            return;
-        }
+        if ((event & io::Poller::kPollRead) != std::byte{0}) {
+            auto* cli = this->_sockets.findByAddress(addr);
 
-        if ((event & zappy::io::Poller::kPollRead) != std::byte{0}) {
+            if (cli == nullptr) {
+                std::cerr << "failed to find client for " + addr.string() + "\n";
+                return;
+            }
             try {
                 cli->poll();
-            } catch (const zappy::exception::SocketError&) {
+            } catch (const exception::SocketError&) {
                 fail = true;
             }
         }
-        if ((event & zappy::io::Poller::kPollError) != std::byte{0} || fail) {
-            this->_sockets.remove(cli->addr());
-            this->_poller.remove(cli->fd());
+        if ((event & io::Poller::kPollError) != std::byte{0} || fail) {
+            this->_sockets.remove(addr);
+            this->_poller.remove(fd);
         }
     });
 
