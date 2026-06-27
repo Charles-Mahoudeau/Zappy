@@ -13,14 +13,12 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
-#include <iostream>
 #include <iterator>
 #include <numbers>
 #include <utility>
 
 #include "AssetStore.hpp"
 #include "Camera.hpp"
-#include "ParticleEmitter.hpp"
 #include "objects/Model.hpp"
 #include "zappy/gui/display/Window.hpp"
 #include "zappy/gui/game/GameState.hpp"

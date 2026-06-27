@@ -16,6 +16,7 @@
 #include <string_view>
 #include <vector>
 
+#include "Vector3.hpp"
 #include "objects/Model.hpp"
 #include "objects/Skybox.hpp"
 #include "objects/particles/ParticleEmitter.hpp"
@@ -46,7 +47,7 @@ class AssetStore {
     void loadIslandModel();
     void loadBridgeModel();
 
-    ParticleEmitter& emit(std::string_view path, Vector3 pos);
+    void emit(std::string_view path, Vector3 pos);
 
     [[nodiscard]] const Skybox& skybox() const;
     [[nodiscard]] Model& playerModel(std::size_t index);

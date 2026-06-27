@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <raylib.h>
-
 #include <cstdint>
 #include <string_view>
 

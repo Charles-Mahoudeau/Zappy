@@ -11,12 +11,12 @@
 #include <initializer_list>
 #include <map>
 #include <memory>
+#include <string>
 #include <utility>
 
 #include "AssetLoaderRegistry.hpp"
 #include "objects/Model.hpp"
 #include "objects/Texture.hpp"
-#include "objects/particles/Particle.hpp"
 #include "objects/particles/ParticleEmitter.hpp"
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/render/utils/Color.hpp"
@@ -209,12 +209,13 @@ const std::map<std::string, ParticleEmitter>& AssetStore::vfxs() const { return 
 
 std::map<std::string, ParticleEmitter>& AssetStore::vfxs() { return _vfxs; }
 
-ParticleEmitter& AssetStore::emit(std::string_view path, Vector3 pos) {
+void AssetStore::emit(std::string_view path, Vector3 pos) {
     auto it = _vfxs.find(std::string{path});
-    if (it == _vfxs.end()) throw std::runtime_error("VFX not found: " + std::string{path});
-    ParticleEmitter& emitter = it->second;
-    emitter.setOrigin(pos);
-    emitter.emitRate();
-    return emitter;
+
+    if (it != _vfxs.end()) {
+        ParticleEmitter& emitter = it->second;
+        emitter.setOrigin(pos);
+        emitter.emitRate();
+    }
 }
 }  // namespace zappy::gui::render
