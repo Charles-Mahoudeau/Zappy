@@ -25,6 +25,11 @@ MAX_LEVEL = 8
 
 LOW_FOOD = 15
 FOOD_CAP = 50
+# While the team is still growing (forking up to TEAM_TARGET), players hold back
+# at this much food instead of FOOD_CAP. The few who start eat a modest reserve
+# and leave the rest on the map, so the players forked in later -- who hatch
+# near-starving -- still find food instead of inheriting a picked-clean map.
+PHASE1_FOOD = 20
 DONOR_FOOD = 45
 DONOR_KEEP = 20
 
@@ -40,7 +45,7 @@ PEER_PING = 10
 TEAM_TARGET = 8
 FORK_FOOD = 5
 FORK_MIN_TICK = 25
-FORK_COOLDOWN = 25
+FORK_COOLDOWN = 15
 
 PROTO = "ZP"
 SEP = ";"
@@ -349,7 +354,14 @@ class HeuristicAI:
 
         if not self._team_full:
             self.maybe_fork()
-            self.farm_food()
+            # Don't hoard while the team is still filling: keep only a modest
+            # reserve and leave the rest of the map's food for the players being
+            # forked in (they hatch near-starving). Once topped up we wander --
+            # spreading out and looking for stones -- rather than eating more.
+            if self.food < PHASE1_FOOD:
+                self.farm_food()
+            else:
+                self.explore()
             return
 
         self._phase2(leader)
