@@ -141,12 +141,21 @@ void AssetStore::loadVFXs() {
     _vfxs.insert({"impact", std::move(impact)});
 
     ParticleEmitter signal("assets/particles/Shockwave.png");
-    impact.setStatic(Vector3{}, Vector3{0.0F, 0.0F, 0.0F}, Vector3{0.0F, 0.0F, 0.0F}, 0.0F, 1);
-    impact.setInitParticles(Vector2{1.0F, 1.0F}, 0.0F, ColorF(Color::kWHITE), 350.0F, 0.0F);
-    impact.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 0.5F, .tint = 0.3F}, 0.1F, 0.0F);
-    impact.setIncrementParticles(Vector2{0.07F, 0.07F}, 0.0F, ColorF{0.0F, 0.0F, 0.0F, -3.0F});
-    impact.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.01F, .rotation = 0.0F, .tint = 0.1F});
+    signal.setStatic(Vector3{}, Vector3{0.0F, 0.0F, 0.0F}, Vector3{0.0F, 0.0F, 0.0F}, 0.0F, 1);
+    signal.setInitParticles(Vector2{1.0F, 1.0F}, 0.0F, ColorF(Color::kWHITE), 350.0F, 0.0F);
+    signal.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 0.5F, .tint = 0.3F}, 0.1F, 0.0F);
+    signal.setIncrementParticles(Vector2{0.07F, 0.07F}, 0.0F, ColorF{0.0F, 0.0F, 0.0F, -3.0F});
+    signal.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.01F, .rotation = 0.0F, .tint = 0.1F});
     _vfxs.insert({"signal", std::move(signal)});
+
+    ParticleEmitter eggCrack("assets/models/resources/textures/thystameBase.png");
+    eggCrack.setStatic(Vector3{}, Vector3{1.0F, 1.0F, 1.0F}, Vector3{0.0F, -0.002F, 0.0F}, 0.0F, 30);
+    eggCrack.setInitParticles(Vector2{1.0F, 1.0F}, 0.0F, ColorF(Color::kWHITE), 150.0F, 0.1F);
+    eggCrack.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 0.5F, .tint = 0.3F}, 0.1F,
+                             0.3F);
+    eggCrack.setIncrementParticles(Vector2{-0.005F, -0.005F}, 1.0F, ColorF{0.0F, 0.0F, 0.0F, -3.0F});
+    eggCrack.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.2F, .rotation = 0.4F, .tint = 0.1F});
+    _vfxs.insert({"eggCrack", std::move(eggCrack)});
 }
 
 void AssetStore::loadEggModel() {
