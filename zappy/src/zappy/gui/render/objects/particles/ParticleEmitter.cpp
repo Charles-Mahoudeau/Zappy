@@ -16,7 +16,7 @@
 
 #include "Billboard.hpp"
 #include "ColorF.hpp"
-#include "Randomvalue.hpp"
+#include "RandomValue.hpp"
 #include "TimeValue.hpp"
 #include "Vector3.hpp"
 

@@ -51,7 +51,8 @@ add_library(zappy_gui_objects OBJECT
         render/utils/Rectangle.hpp
         render/utils/Vector2.hpp
         render/utils/Vector3.hpp
-        render/utils/Randomvalue.hpp
+        render/utils/RandomValue.cpp
+        render/utils/RandomValue.hpp
         render/utils/TimeValue.hpp
         ui/ChatPanel.cpp
         ui/ChatPanel.hpp
