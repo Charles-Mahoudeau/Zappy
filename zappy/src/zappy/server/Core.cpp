@@ -95,8 +95,9 @@ void Core::processWorldEvents() {
             if (const Client* client = _clientRegistry.findByPlayerId(playerId); client != nullptr) {
                 std::ignore = client->sendMessage("dead\n");
                 _clientRegistry.markForRemoval(client);
-                // Schedule useless event to trigger garbage collection
-                _timer.scheduleLater(0, [] {});
+                _timer.scheduleLater(0, [] {
+                    // Schedule useless event to trigger garbage collection
+                });
             }
             _world->remove(playerId);
         }
