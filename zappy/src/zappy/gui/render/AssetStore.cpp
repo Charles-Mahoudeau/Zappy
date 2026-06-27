@@ -142,7 +142,7 @@ void AssetStore::loadVFXs() {
     _vfxs.insert({"signal", std::move(signal)});
 
     ParticleEmitter eggCrack("assets/particles/Shard.png");
-    eggCrack.setStatic(Vector3{}, Vector3{1.0F, 1.0F, 1.0F}, Vector3{0.0F, -0.002F, 0.0F}, 100.0F, 12);
+    eggCrack.setStatic(Vector3{}, Vector3{1.0F, 1.0F, 1.0F}, Vector3{0.0F, -0.002F, 0.0F}, 100.0F, 16);
     eggCrack.setInitParticles(Vector2{0.8F, 0.8F}, 0.0F, ColorF{255.0F, 240.0F, 200.0F, 255.0F}, 150.0F, 0.06F);
     eggCrack.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.2F, .rotation = 360.0F, .tint = 10.0F}, 0.1F,
                              0.03F);
@@ -151,7 +151,7 @@ void AssetStore::loadVFXs() {
     _vfxs.insert({"eggCrack", std::move(eggCrack)});
 
     ParticleEmitter smoke("assets/particles/Shard.png");
-    smoke.setStatic(Vector3{}, Vector3{1.0F, 1.0F, 1.0F}, Vector3{0.0F, 0.0025F, 0.0F}, 100.0F, 12);
+    smoke.setStatic(Vector3{}, Vector3{1.0F, 1.0F, 1.0F}, Vector3{0.0F, 0.0025F, 0.0F}, 100.0F, 11);
     smoke.setInitParticles(Vector2{0.8F, 0.8F}, 0.0F, ColorF{255.0F, 240.0F, 200.0F, 255.0F}, 150.0F, 0.06F);
     smoke.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.2F, .rotation = 360.0F, .tint = 10.0F}, 0.1F,
                           0.03F);
