@@ -225,7 +225,7 @@ std::optional<World::IncantationSnapshot> World::beginIncantation(const std::uin
         .playerIds = players,
     };
 
-    if (!verifyIncantationRequirements(snapshot)) {
+    if (!verifyIncantationRequirements(snapshot).has_value()) {
         return std::nullopt;
     }
     pushEvent(IncantationBeginEvent{
@@ -237,7 +237,7 @@ std::optional<World::IncantationSnapshot> World::beginIncantation(const std::uin
 }
 
 bool World::endIncantation(const IncantationSnapshot& snapshot) {
-    if (!verifyIncantationRequirements(snapshot)) {
+    if (!verifyIncantationRequirements(snapshot).has_value()) {
         pushEvent(IncantationEndEvent{
             .position = snapshot.position,
             .success = false,
