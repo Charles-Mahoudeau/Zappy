@@ -265,7 +265,9 @@ bool World::playerDrop(entity::Player* player, ResourceType resource) {
         this->pushEvent(PlayerResourceDropEvent{.playerId = player->id(), .resourceType = resource});
         this->pushEvent(TileInventoryEvent(tile.position(), tile.inventory()));
     } catch (const exception::Exception& err) {
-        this->_logger->error(err.what());
+        if (this->_logger.has_value()) {
+            this->_logger->error(err.what());
+        }
         return false;
     }
 

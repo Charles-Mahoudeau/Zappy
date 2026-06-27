@@ -85,7 +85,7 @@ std::string Inventory::string() const {
     return stringStream.str();
 }
 
-[[nodiscard]] std::string Inventory::detailledString() const {
+[[nodiscard]] std::string Inventory::detailedString() const {
     std::stringstream stringStream;
     static const std::vector<std::string> resourcesName = {"food",     "linemate", "deraumere", "sibur",
                                                            "mendiane", "phiras",   "thystame"};
