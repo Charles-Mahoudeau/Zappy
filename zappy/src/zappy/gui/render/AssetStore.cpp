@@ -148,7 +148,7 @@ void AssetStore::loadVFXs() {
     signal.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.01F, .rotation = 0.0F, .tint = 0.1F});
     _vfxs.insert({"signal", std::move(signal)});
 
-    ParticleEmitter eggCrack("assets/particles/Shockwave.png");
+    ParticleEmitter eggCrack("assets/particles/Shard.png");
     eggCrack.setStatic(Vector3{}, Vector3{1.0F, 1.0F, 1.0F}, Vector3{0.0F, -0.002F, 0.0F}, 0.0F, 30);
     eggCrack.setInitParticles(Vector2{1.0F, 1.0F}, 0.0F, ColorF(Color::kWHITE), 150.0F, 0.1F);
     eggCrack.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 0.5F, .tint = 0.3F}, 0.1F,
