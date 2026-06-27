@@ -23,12 +23,8 @@ ELEVATION_REQ = {
 }
 MAX_LEVEL = 8
 
-LOW_FOOD = 15
-FOOD_CAP = 50
-# While the team is still growing (forking up to TEAM_TARGET), players hold back
-# at this much food instead of FOOD_CAP. The few who start eat a modest reserve
-# and leave the rest on the map, so the players forked in later -- who hatch
-# near-starving -- still find food instead of inheriting a picked-clean map.
+LOW_FOOD = 18
+FOOD_CAP = 25
 PHASE1_FOOD = 20
 DONOR_FOOD = 45
 DONOR_KEEP = 20
@@ -315,12 +311,6 @@ class HeuristicAI:
         return False
 
     def _act_low_food(self) -> None:
-        # if self.tick % SOS_EVERY == 0:
-        #     self.send("SOS")
-        #     return
-        if self.call_dir is not None:
-            self.converge()
-            return
         self.farm_food()
 
     def _phase2(self, leader: bool) -> None:
@@ -354,10 +344,6 @@ class HeuristicAI:
 
         if not self._team_full:
             self.maybe_fork()
-            # Don't hoard while the team is still filling: keep only a modest
-            # reserve and leave the rest of the map's food for the players being
-            # forked in (they hatch near-starving). Once topped up we wander --
-            # spreading out and looking for stones -- rather than eating more.
             if self.food < PHASE1_FOOD:
                 self.farm_food()
             else:
@@ -542,6 +528,8 @@ class HeuristicAI:
 
     def go_get(self, names: List[str]) -> bool:
         for stone in names:
+            if self.call_dir == 0 and stone in self.tile0():
+                continue
             if self.tile0().count(stone) > 0 and self.c.take(stone):
                 return True
         best, best_d = None, None
