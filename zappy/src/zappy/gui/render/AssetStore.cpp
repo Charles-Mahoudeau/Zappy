@@ -151,12 +151,12 @@ void AssetStore::loadVFXs() {
     _vfxs.insert({"eggCrack", std::move(eggCrack)});
 
     ParticleEmitter smoke("assets/particles/Smoke.png");
-    smoke.setStatic(Vector3{}, Vector3{4.0F, 4.0F, 4.0F}, Vector3{0.0F, 0.0003F, 0.0F}, 250.0F, 16);
-    smoke.setInitParticles(Vector2{0.8F, 0.8F}, 0.0F, ColorF{50.0F, 45.0F, 45.0F, 50.0F}, 150.0F, 0.03F);
+    smoke.setStatic(Vector3{}, Vector3{4.0F, 4.0F, 4.0F}, Vector3{0.0F, 0.0002F, 0.0F}, 250.0F, 16);
+    smoke.setInitParticles(Vector2{0.8F, 0.8F}, 0.0F, ColorF{100.0F, 95.0F, 90.0F, 50.0F}, 150.0F, 0.03F);
     smoke.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.2F, .rotation = 360.0F, .tint = 10.0F}, 0.1F,
                           0.03F);
-    smoke.setIncrementParticles(Vector2{0.01F, 0.01F}, 0.0F, ColorF{-1.0F, -1.0F, -1.0F, -2.0F});
-    smoke.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.004F, .rotation = 2.0F, .tint = 0.0F});
+    smoke.setIncrementParticles(Vector2{0.01F, 0.01F}, 0.0F, ColorF{-1.0F, -1.0F, -1.0F, -1.0F});
+    smoke.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.004F, .rotation = 2.0F, .tint = 0.3F});
     _vfxs.insert({"smoke", std::move(smoke)});
 }
 
