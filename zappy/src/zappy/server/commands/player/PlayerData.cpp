@@ -16,7 +16,7 @@
 #include "zappy/server/game/entity/Player.hpp"
 namespace zappy::server::command::player {
 
-PlayerData::PlayerData(ICommandGroup::CommandCtx& ctx, std::uint64_t id)
+PlayerData::PlayerData(const ICommandGroup::CommandCtx& ctx, std::uint64_t id)
     : PlayerData(ctx.clientRegistry, ctx.world, id) {}
 
 PlayerData::PlayerData(client::ClientRegistry& clients, game::World& world, std::uint64_t id)

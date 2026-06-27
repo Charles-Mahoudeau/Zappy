@@ -250,7 +250,7 @@ bool World::playerTake(entity::Player* player, ResourceType resource) {
     tile.inventory().removeResource(resource);
     player->take(resource);
     this->pushEvent(PlayerResourceCollectEvent{.playerId = player->id(), .resourceType = resource});
-    this->pushEvent(TileInventoryEvent(tile.position(), tile.inventory()));
+    this->pushEvent(TileInventoryEvent{.position = tile.position(), .inventory = tile.inventory()});
 
     return true;
 }
@@ -263,7 +263,7 @@ bool World::playerDrop(entity::Player* player, ResourceType resource) {
         Tile& tile = this->_grid.tile(player->position());
         tile.inventory().addResource(resource);
         this->pushEvent(PlayerResourceDropEvent{.playerId = player->id(), .resourceType = resource});
-        this->pushEvent(TileInventoryEvent(tile.position(), tile.inventory()));
+        this->pushEvent(TileInventoryEvent{.position = tile.position(), .inventory = tile.inventory()});
     } catch (const exception::Exception& err) {
         if (this->_logger.has_value()) {
             this->_logger->error(err.what());

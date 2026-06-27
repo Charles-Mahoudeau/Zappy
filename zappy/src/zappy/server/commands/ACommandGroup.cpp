@@ -16,7 +16,6 @@
 
 #include "zappy/server/client/Client.hpp"
 #include "zappy/server/commands/ICommandGroup.hpp"
-#include "zappy/shared/network/Address.hpp"
 
 namespace zappy::server::command {
 ACommandGroup::ACommandGroup(CommandCtx context) : _ctx{std::move(context)} {}
@@ -36,14 +35,6 @@ ICommandGroup::CommandData ACommandGroup::extractCommand(const std::string_view 
     iss >> cmd.name;
     cmd.params = std::vector(std::istream_iterator<std::string>{iss}, std::istream_iterator<std::string>{});
     return cmd;
-}
-
-void ACommandGroup::trySendToAddress(CommandCtx& ctx, network::Address addr, std::string_view msg) {
-    const Client* client = ctx.clientRegistry.get().findByAddress(addr);
-    if (client == nullptr) {
-        return;
-    }
-    std::ignore = client->sendMessage(msg);
 }
 
 }  // namespace zappy::server::command

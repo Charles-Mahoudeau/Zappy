@@ -19,7 +19,7 @@ namespace zappy::server::command::player {
 
 class PlayerData {
   public:
-    PlayerData(ICommandGroup::CommandCtx& ctx, std::uint64_t id);
+    PlayerData(const ICommandGroup::CommandCtx& ctx, std::uint64_t id);
     PlayerData(client::ClientRegistry& clients, game::World& world, std::uint64_t id);
     ~PlayerData() = default;
 

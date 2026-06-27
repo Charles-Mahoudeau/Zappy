@@ -56,7 +56,7 @@ void ClientRegistry::update() {
 void ClientRegistry::updateTypeGroup() {
     std::vector<std::pair<Client::Type, Client*>> toMove;
 
-    for (auto& [groupType, groupList] : this->_clientsPerType) {
+    for (const auto& [groupType, groupList] : this->_clientsPerType) {
         for (Client* client : groupList) {
             if (groupType != client->type()) {
                 toMove.emplace_back(groupType, client);
@@ -81,9 +81,9 @@ Client* ClientRegistry::findByAddress(const network::Address& addr) {
 }
 
 Client* ClientRegistry::findByID(std::uint64_t id) {
-    auto& clients = this->_clientsPerType.at(Client::Type::kPlayer);
+    const auto& clients = this->_clientsPerType.at(Client::Type::kPlayer);
 
-    for (auto& client : clients) {
+    for (const auto& client : clients) {
         if (client->playerID() == id) {
             return client;
         }
@@ -111,5 +111,4 @@ bool ClientRegistry::broadcast(const Client::Type type, const std::string_view m
     }
     return success;
 }
-
 }  // namespace zappy::server::client

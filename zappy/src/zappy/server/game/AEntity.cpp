@@ -39,6 +39,6 @@ std::string_view AEntity::teamName() const { return _teamName; }
 
 IEventEmitter& AEntity::eventEmitter() const { return _eventEmitter.get(); }
 
-math::Vector2u AEntity::gridSize() { return this->_grid.get().size(); }
+math::Vector2u AEntity::gridSize() const { return this->_grid.get().size(); }
 
 }  // namespace zappy::server::game
