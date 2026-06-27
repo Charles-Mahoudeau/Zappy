@@ -57,16 +57,15 @@ std::expected<network::Address, std::string> Server::makeNewConnection() {
         bool fail = false;
 
         if ((event & io::Poller::kPollRead) != std::byte{0}) {
-            auto* cli = this->_sockets.findByAddress(addr);
-
-            if (cli == nullptr) {
+            if (auto* cli = this->_sockets.findByAddress(addr); cli == nullptr) {
                 std::cerr << "failed to find client for " + addr.string() + "\n";
-                return;
-            }
-            try {
-                cli->poll();
-            } catch (const exception::SocketError&) {
                 fail = true;
+            } else {
+                try {
+                    cli->poll();
+                } catch (const exception::SocketError&) {
+                    fail = true;
+                }
             }
         }
         if ((event & io::Poller::kPollError) != std::byte{0} || fail) {
