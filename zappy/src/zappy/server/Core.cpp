@@ -87,7 +87,7 @@ void Core::processWorldEvents() const {
 
     while (_world->hasEvents()) {
         const game::Event event = _world->popEvent();
-        std::string eventStr = game::EventHelper::toWire(event);
+        const std::string eventStr = game::EventHelper::toWire(event);
 
         std::ignore = _clientRegistry.broadcast(Client::Type::kGui, eventStr);
         logger.debug("Forwarding: {}", eventStr.substr(0, eventStr.size() - 1));

@@ -13,6 +13,7 @@
 #include <string_view>
 #include <tuple>
 
+#include "zappy/server/Timer.hpp"
 #include "zappy/server/game/ResourceType.hpp"
 #include "zappy/server/game/Tile.hpp"
 #include "zappy/server/game/entity/Egg.hpp"

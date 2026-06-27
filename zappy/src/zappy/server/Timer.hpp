@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <functional>
 #include <list>
+#include <vector>
 
 namespace zappy::server {
 
@@ -65,7 +66,7 @@ class Timer {
 
     /**
      * @brief remove the events related to the given Addr
-     * @param addr @c network::Address to identify the related events
+     * @param id The id of the event to unschedule
      */
     void unschedule(std::uint64_t id);
 

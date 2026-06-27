@@ -9,9 +9,13 @@
 
 #include <cstdint>
 #include <expected>
+#include <optional>
 #include <string>
 
+#include "zappy/server/Timer.hpp"
 #include "zappy/server/game/AEntity.hpp"
+#include "zappy/server/game/IEventEmitter.hpp"
+#include "zappy/server/game/IGrid.hpp"
 #include "zappy/server/game/Inventory.hpp"
 #include "zappy/server/game/ResourceType.hpp"
 #include "zappy/shared/math/Direction.hpp"
@@ -26,6 +30,12 @@ class Player : public AEntity {
 
     Player(Timer& timer, IGrid& grid, IEventEmitter& eventEmitter, std::string teamName);
     ~Player() override;
+
+    Player(const Player&) = delete;
+    Player& operator=(const Player&) = delete;
+
+    Player(Player&&) = default;
+    Player& operator=(Player&&) = default;
 
     /// @brief Check if the player is alive.
     /// @return True if the player is alive, false otherwise.

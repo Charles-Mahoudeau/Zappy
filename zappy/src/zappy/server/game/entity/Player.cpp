@@ -10,12 +10,16 @@
 #include <cstdint>
 #include <expected>
 #include <functional>
+#include <optional>
 #include <string>
 #include <unordered_map>
+#include <utility>
 
+#include "zappy/server/Timer.hpp"
 #include "zappy/server/game/AEntity.hpp"
 #include "zappy/server/game/Event.hpp"
 #include "zappy/server/game/IEventEmitter.hpp"
+#include "zappy/server/game/IGrid.hpp"
 #include "zappy/server/game/Inventory.hpp"
 #include "zappy/server/game/ResourceType.hpp"
 #include "zappy/shared/math/Direction.hpp"
@@ -34,7 +38,10 @@ Player::Player(Timer& timer, IGrid& grid, IEventEmitter& eventEmitter, std::stri
 
 Player::~Player() {
     if (_foodTimerId.has_value()) {
-        timer().unschedule(_foodTimerId.value());
+        try {
+            timer().unschedule(_foodTimerId.value());
+        } catch (const std::bad_alloc&) {
+        }
     }
 }
 
@@ -77,22 +84,6 @@ void Player::setPosition(const math::Vector2u position) {
     });
 }
 
-void Player::moveForward() {
-    using enum math::Direction;
-    static std::unordered_map<math::Direction, std::function<void(const math::Vector2u, math::Vector2u&)>> map{
-        {kNorth, [](math::Vector2u grid, math::Vector2u& pos) { pos.y = (pos.y + 1) % grid.y; }},
-        {kEast, [](math::Vector2u grid, math::Vector2u& pos) { pos.x = (pos.x + 1) % grid.x; }},
-        {kSouth, [](math::Vector2u grid, math::Vector2u& pos) { pos.y = (pos.y + grid.y - 1) % grid.y; }},
-        {kWest, [](math::Vector2u grid, math::Vector2u& pos) { pos.x = (pos.x + grid.x - 1) % grid.x; }},
-    };
-
-    math::Vector2u pos = this->position();
-
-    map.find(this->_orientation)->second(this->gridSize(), pos);
-
-    this->setPosition(pos);
-}
-
 math::Direction Player::orientation() const { return _orientation; }
 
 math::Direction Player::turnLeft() {
@@ -115,6 +106,34 @@ math::Direction Player::turnRight() {
     return _orientation;
 }
 
+void Player::moveForward() {
+    using enum math::Direction;
+    static std::unordered_map<math::Direction, std::function<void(const math::Vector2u, math::Vector2u&)>> map{
+        {kNorth, [](math::Vector2u grid, math::Vector2u& pos) { pos.y = (pos.y + 1) % grid.y; }},
+        {kEast, [](math::Vector2u grid, math::Vector2u& pos) { pos.x = (pos.x + 1) % grid.x; }},
+        {kSouth, [](math::Vector2u grid, math::Vector2u& pos) { pos.y = (pos.y + grid.y - 1) % grid.y; }},
+        {kWest, [](math::Vector2u grid, math::Vector2u& pos) { pos.x = (pos.x + grid.x - 1) % grid.x; }},
+    };
+
+    math::Vector2u pos = this->position();
+
+    map.find(this->_orientation)->second(this->gridSize(), pos);
+
+    this->setPosition(pos);
+}
+
+const Inventory& Player::inventory() const { return _inventory; }
+
+void Player::take(const ResourceType resource) { _inventory.addResource(resource); }
+
+bool Player::drop(const ResourceType resource) {
+    if (_inventory.resourceCount(resource) == 0) {
+        return false;
+    }
+    _inventory.removeResource(resource);
+    return true;
+}
+
 bool Player::eat() {
     if (!_alive) {
         return false;
@@ -128,18 +147,6 @@ bool Player::eat() {
         .position = position(),
         .inventory = _inventory,
     });
-    return true;
-}
-
-const Inventory& Player::inventory() const { return _inventory; }
-
-void Player::take(const ResourceType resource) { _inventory.addResource(resource); }
-
-bool Player::drop(const ResourceType resource) {
-    if (_inventory.resourceCount(resource) == 0) {
-        return false;
-    }
-    _inventory.removeResource(resource);
     return true;
 };
 }  // namespace zappy::server::game::entity

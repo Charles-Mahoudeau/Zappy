@@ -31,6 +31,7 @@
 #include "Tile.hpp"
 #include "entity/Egg.hpp"
 #include "entity/Player.hpp"
+#include "zappy/server/Timer.hpp"
 #include "zappy/server/game/Grid.hpp"
 #include "zappy/shared/exception/Exception.hpp"
 #include "zappy/shared/exception/InvalidArgument.hpp"
@@ -199,6 +200,40 @@ Event World::popEvent() {
 
 void World::pushEvent(Event event) { _events.push_back(std::move(event)); }
 
+bool World::playerTake(entity::Player* player, ResourceType resource) {
+    const math::Vector2u pos = player->position();
+    Tile& tile = this->_grid.tile(pos);
+
+    if (tile.inventory().resourceCount(resource) == 0) {
+        return false;
+    }
+    tile.inventory().removeResource(resource);
+    player->take(resource);
+    this->pushEvent(PlayerResourceCollectEvent{.playerId = player->id(), .resourceType = resource});
+    this->pushEvent(TileInventoryEvent{.position = tile.position(), .inventory = tile.inventory()});
+
+    return true;
+}
+
+bool World::playerDrop(entity::Player* player, ResourceType resource) {
+    try {
+        if (!player->drop(resource)) {
+            return false;
+        }
+        Tile& tile = this->_grid.tile(player->position());
+        tile.inventory().addResource(resource);
+        this->pushEvent(PlayerResourceDropEvent{.playerId = player->id(), .resourceType = resource});
+        this->pushEvent(TileInventoryEvent{.position = tile.position(), .inventory = tile.inventory()});
+    } catch (const exception::Exception& err) {
+        if (this->_logger.has_value()) {
+            this->_logger->error(err.what());
+        }
+        return false;
+    }
+
+    return true;
+}
+
 std::optional<World::IncantationSnapshot> World::beginIncantation(const std::uint64_t playerId) {
     const entity::Player* incantationPlayer = player(playerId);
 
@@ -274,18 +309,6 @@ const std::unordered_map<ResourceType, float>& World::resourceDensities() {
     };
 
     return resourceDensities;
-}
-
-void World::spawnResources() {
-    for (const auto& [resourceType, quantity] : _resourceThresholds) {
-        for (std::uint64_t count = countResources(resourceType); count < quantity; ++count) {
-            spawnResource(resourceType);
-        }
-    }
-    _resourcesDirty = false;
-    if (_logger.has_value()) {
-        _logger->info("Resources spawned.");
-    }
 }
 
 const World::IncantationRequirements& World::incantationRequirements(const std::uint8_t level) {
@@ -380,6 +403,18 @@ const World::IncantationRequirements& World::incantationRequirements(const std::
     return it->second;
 }
 
+void World::spawnResources() {
+    for (const auto& [resourceType, quantity] : _resourceThresholds) {
+        for (std::uint64_t count = countResources(resourceType); count < quantity; ++count) {
+            spawnResource(resourceType);
+        }
+    }
+    _resourcesDirty = false;
+    if (_logger.has_value()) {
+        _logger->info("Resources spawned.");
+    }
+}
+
 Tile& World::randomTile() {
     const std::span<Tile> tiles = _grid.tiles();
     std::uniform_int_distribution<std::size_t> distribution{0, tiles.size() - 1};
@@ -396,40 +431,6 @@ void World::generateResourceThresholds() {
     if (_logger.has_value()) {
         _logger->info("Resources thresholds generated.");
     }
-}
-
-bool World::playerTake(entity::Player* player, ResourceType resource) {
-    const math::Vector2u pos = player->position();
-    Tile& tile = this->_grid.tile(pos);
-
-    if (tile.inventory().resourceCount(resource) == 0) {
-        return false;
-    }
-    tile.inventory().removeResource(resource);
-    player->take(resource);
-    this->pushEvent(PlayerResourceCollectEvent{.playerId = player->id(), .resourceType = resource});
-    this->pushEvent(TileInventoryEvent{.position = tile.position(), .inventory = tile.inventory()});
-
-    return true;
-}
-
-bool World::playerDrop(entity::Player* player, ResourceType resource) {
-    try {
-        if (!player->drop(resource)) {
-            return false;
-        }
-        Tile& tile = this->_grid.tile(player->position());
-        tile.inventory().addResource(resource);
-        this->pushEvent(PlayerResourceDropEvent{.playerId = player->id(), .resourceType = resource});
-        this->pushEvent(TileInventoryEvent{.position = tile.position(), .inventory = tile.inventory()});
-    } catch (const exception::Exception& err) {
-        if (this->_logger.has_value()) {
-            this->_logger->error(err.what());
-        }
-        return false;
-    }
-
-    return true;
 }
 
 void World::placeEggRandom(const std::uint64_t eggId) {

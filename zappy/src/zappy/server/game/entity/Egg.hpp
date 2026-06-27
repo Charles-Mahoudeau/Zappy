@@ -11,6 +11,7 @@
 #include <optional>
 #include <string>
 
+#include "zappy/server/Timer.hpp"
 #include "zappy/server/game/AEntity.hpp"
 #include "zappy/server/game/IEventEmitter.hpp"
 #include "zappy/server/game/IGrid.hpp"
@@ -20,6 +21,13 @@ class Egg : public AEntity {
   public:
     explicit Egg(Timer& timer, IGrid& grid, IEventEmitter& eventEmitter, std::string teamName,
                  std::optional<std::uint64_t> parentPlayerId = std::nullopt);
+    ~Egg() override = default;
+
+    Egg(const Egg&) = delete;
+    Egg& operator=(const Egg&) = delete;
+
+    Egg(Egg&&) = default;
+    Egg& operator=(Egg&&) = default;
 
     [[nodiscard]] std::optional<std::uint64_t> parentPlayerId() const;
 

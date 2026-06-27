@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <deque>
 #include <expected>
+#include <functional>
 #include <optional>
 #include <random>
 #include <span>

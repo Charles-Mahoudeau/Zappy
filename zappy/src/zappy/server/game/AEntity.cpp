@@ -15,6 +15,7 @@
 
 #include "IEventEmitter.hpp"
 #include "IGrid.hpp"
+#include "zappy/server/Timer.hpp"
 #include "zappy/shared/exception/InvalidState.hpp"
 #include "zappy/shared/math/Vector2.hpp"
 

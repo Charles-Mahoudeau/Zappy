@@ -12,6 +12,7 @@
 #include <string>
 #include <utility>
 
+#include "zappy/server/Timer.hpp"
 #include "zappy/server/game/AEntity.hpp"
 #include "zappy/server/game/IEventEmitter.hpp"
 #include "zappy/server/game/IGrid.hpp"
