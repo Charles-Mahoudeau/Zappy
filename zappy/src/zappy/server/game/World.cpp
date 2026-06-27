@@ -13,6 +13,7 @@
 #include <cstdint>
 #include <expected>
 #include <format>
+#include <iostream>
 #include <memory>
 #include <optional>
 #include <random>
@@ -298,6 +299,20 @@ void World::placeEggRandom(const std::uint64_t eggId) {
         _logger->info(std::format("Spawned egg #{} for team {}{} at ({}, {})", eggId, egg->teamName(), playerInfo,
                                   tile.position().x, tile.position().y));
     }
+}
+
+std::uint32_t World::computeDistFromPositions(math::Vector2u emitter, math::Vector2u receiver) const {
+    const auto size = _grid.size();
+
+    const auto wrappedDist = [](std::uint32_t a, std::uint32_t b, std::uint32_t length) -> std::uint32_t {
+        const std::uint32_t diff = a > b ? a - b : b - a;
+        return std::min(diff, length - diff);
+    };
+
+    const std::uint32_t dx = wrappedDist(emitter.x, receiver.x, size.x);
+    const std::uint32_t dy = wrappedDist(emitter.y, receiver.y, size.y);
+
+    return dx + dy;
 }
 
 }  // namespace zappy::server::game

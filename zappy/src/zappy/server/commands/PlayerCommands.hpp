@@ -34,6 +34,7 @@ class PlayerCommands : public ACommandGroup {
     static bool ignore(const CommandCtx& ctx);
 
     static bool inventory(CommandCtx& ctx);
+    static bool broadcast(CommandCtx& ctx);
     static bool connectNb(CommandCtx& ctx);
 };
 

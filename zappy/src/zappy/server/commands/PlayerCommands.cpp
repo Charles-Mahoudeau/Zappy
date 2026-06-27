@@ -10,6 +10,7 @@
 #include <functional>
 #include <iterator>
 #include <ranges>
+#include <string>
 #include <string_view>
 #include <tuple>
 #include <unordered_map>
@@ -22,7 +23,9 @@
 #include "zappy/server/commands/player/MoveCommand.hpp"
 #include "zappy/server/commands/player/ObjectCommand.hpp"
 #include "zappy/server/commands/player/PlayerData.hpp"
+#include "zappy/server/game/Event.hpp"
 #include "zappy/server/game/entity/Egg.hpp"
+#include "zappy/server/game/entity/Player.hpp"
 
 namespace zappy::server::command {
 PlayerCommands::PlayerCommands(CommandCtx context)
@@ -33,7 +36,7 @@ PlayerCommands::PlayerCommands(CommandCtx context)
           {"Left", [](auto& ctx) { return player::MoveCommand::left(ctx); }},
           {"Look", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
           {"Inventory", [](auto& ctx) { return PlayerCommands::inventory(ctx); }},
-          {"Broadcast", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
+          {"Broadcast", [](auto& ctx) { return PlayerCommands::broadcast(ctx); }},
           {"Connect_nbr", [](auto& ctx) { return PlayerCommands::connectNb(ctx); }},
           {"Fork", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
           {"Eject", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
@@ -71,6 +74,40 @@ bool PlayerCommands::inventory(CommandCtx& ctx) {
             return;
         }
         std::ignore = data.client()->sendMessage("[ {} ]\n", data.player()->inventory().detailedString());
+    });
+    return true;
+}
+
+bool PlayerCommands::broadcast(CommandCtx& ctx) {
+    auto clients = ctx.clientRegistry;
+    auto world = ctx.world;
+    auto id = ctx.client->playerID();
+    std::string text;
+
+    for (const auto& word : ctx.data.params) {
+        text += " " + word;
+    }
+
+    ctx.client->setTimeout(7, [clients, world, id, text = std::move(text)]() {
+        const player::PlayerData data(clients, world, id);
+
+        if (!data.valid()) {
+            return;
+        }
+        const game::entity::Player* emitter = data.player();
+        world.get().pushEvent(game::PlayerBroadcastEvent{.playerId = emitter->id(), .message = text});
+        for (const auto& client : clients.get().viewAll(Client::Type::kPlayer)) {
+            if (client->playerID() == data.player()->id()) {
+                continue;
+            }
+            const game::entity::Player* receiver = world.get().player(client->playerID());
+            if (receiver == nullptr) {
+                continue;
+            }
+            std::ignore = client->sendMessage(
+                "message {},{}\n", world.get().computeDistFromPositions(emitter->position(), receiver->position()),
+                text);
+        }
     });
     return true;
 }

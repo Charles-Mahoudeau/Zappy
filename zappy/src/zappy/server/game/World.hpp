@@ -26,6 +26,7 @@
 #include "Tile.hpp"
 #include "entity/Player.hpp"
 #include "zappy/shared/io/Logger.hpp"
+#include "zappy/shared/math/Direction.hpp"
 #include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server::game {
@@ -139,6 +140,8 @@ class World : public IEventEmitter {
     bool playerTake(entity::Player* player, ResourceType resource);
 
     bool playerDrop(entity::Player* player, ResourceType resource);
+
+    std::uint32_t computeDistFromPositions(math::Vector2u emitter, math::Vector2u receiver) const;
 
   private:
     /// @brief Returns the resource densities for the world.
