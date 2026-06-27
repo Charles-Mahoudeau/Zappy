@@ -29,9 +29,12 @@ class PlayerCommands : public ACommandGroup {
     void execute(Client* client, std::string_view msg) override;
 
   private:
-    std::unordered_map<std::string_view, CommandInvoker> _commands;
+    static constexpr std::uint16_t kIncantationTimeLimit{300};
 
     static bool ignore(const CommandCtx& ctx);
+    static bool incantation(const CommandCtx& ctx);
+
+    std::unordered_map<std::string_view, CommandInvoker> _commands;
 };
 
 }  // namespace zappy::server::command
