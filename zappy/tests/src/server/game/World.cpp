@@ -18,6 +18,7 @@
 #include "zappy/server/game/entity/Egg.hpp"
 #include "zappy/shared/exception/OutOfRange.hpp"
 #include "zappy/shared/io/Logger.hpp"
+#include "zappy/shared/math/Vector2.hpp"
 
 namespace {
 class WorldTest : public testing::Test {

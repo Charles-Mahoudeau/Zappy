@@ -12,12 +12,15 @@
 #include <initializer_list>
 #include <map>
 #include <memory>
+#include <string>
 #include <string_view>
 #include <vector>
 
+#include "../game/GameState.hpp"
 #include "objects/Model.hpp"
 #include "objects/Skybox.hpp"
-#include "zappy/gui/game/GameState.hpp"
+#include "objects/particles/ParticleEmitter.hpp"
+#include "utils/Vector3.hpp"
 
 namespace zappy::gui::render {
 
@@ -39,14 +42,19 @@ class AssetStore {
     void loadSkybox();
     void loadPlayerModel();
     void loadResourceModel(game::ResourceType type);
+    void loadVFXs();
     void loadEggModel();
     void loadIslandModel();
     void loadBridgeModel();
+
+    void emit(std::string_view path, Vector3 pos);
 
     [[nodiscard]] const Skybox& skybox() const;
     [[nodiscard]] Model& playerModel(std::size_t index);
     [[nodiscard]] std::size_t playerModelCount() const;
     [[nodiscard]] const std::map<game::ResourceType, Model>& resourceModels() const;
+    [[nodiscard]] const std::map<std::string, ParticleEmitter>& vfxs() const;
+    [[nodiscard]] std::map<std::string, ParticleEmitter>& vfxs();
     [[nodiscard]] const Model& eggModel() const { return *_eggModel; }
     [[nodiscard]] const Model& islandModel() const { return *_islandModel; }
     [[nodiscard]] const Model& bridgeModel() const { return *_bridgeModel; }
@@ -61,12 +69,12 @@ class AssetStore {
                              bool flipVertical = false);
     static Model createModel(std::string_view path, std::string_view animationPath,
                              std::initializer_list<TextureMap> textures, bool flipVertical = false);
-
     static constexpr int kMaxModels = 6;
 
     Skybox _skybox;
     std::vector<Model> _playerModels;
     std::map<game::ResourceType, Model> _resourcesModels;
+    std::map<std::string, ParticleEmitter> _vfxs;
     std::unique_ptr<Model> _eggModel;
     std::unique_ptr<Model> _islandModel;
     std::unique_ptr<Model> _bridgeModel;

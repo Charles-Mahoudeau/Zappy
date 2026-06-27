@@ -115,8 +115,8 @@ void CliParser::handleFlag(std::string_view flag, const std::vector<std::string_
 void CliParser::ensureValidArguments() const {
     const std::vector<std::pair<bool, std::string_view>> conditions = {
         {this->_parameters.port == 0, "port"},
-        {this->_parameters.mapWidth < 10, "mapWidth"},
-        {this->_parameters.mapHeight < 10, "mapHeight"},
+        {this->_parameters.mapWidth < 10 || this->_parameters.mapWidth > 10000, "mapWidth"},
+        {this->_parameters.mapHeight < 10 || this->_parameters.mapHeight > 10000, "mapHeight"},
         {this->_parameters.teamsName.empty(), "teamsName"},
         {this->_parameters.nbPlayerPerTeam == 0, "nbPlayerPerTeam"},
         {this->_parameters.frequencies > 10000, "frequencies"}};

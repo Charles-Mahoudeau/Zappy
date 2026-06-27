@@ -8,6 +8,7 @@
 #include "zappy/server/client/ClientRegistry.hpp"
 
 #include <algorithm>
+#include <cstdint>
 #include <memory>
 #include <string_view>
 #include <utility>
@@ -44,7 +45,7 @@ void ClientRegistry::update() {
     }
 
     for (const Client* clientPtr : this->_toRemove) {
-        std::vector<const Client*>& typedList = this->_clientsPerType.at(clientPtr->type());
+        std::vector<Client*>& typedList = this->_clientsPerType.at(clientPtr->type());
         std::erase_if(typedList, [&clientPtr](const Client* client) { return client == clientPtr; });
         std::erase_if(this->_clients,
                       [&clientPtr](const std::unique_ptr<Client>& client) { return client.get() == clientPtr; });
@@ -53,17 +54,17 @@ void ClientRegistry::update() {
 }
 
 void ClientRegistry::updateTypeGroup() {
-    std::vector<std::pair<Client::Type, const Client*>> toMove;
+    std::vector<std::pair<Client::Type, Client*>> toMove;
 
     for (const auto& [groupType, groupList] : this->_clientsPerType) {
-        for (const Client* client : groupList) {
+        for (Client* client : groupList) {
             if (groupType != client->type()) {
                 toMove.emplace_back(groupType, client);
             }
         }
     }
 
-    for (const auto& [fromType, client] : toMove) {
+    for (auto& [fromType, client] : toMove) {
         this->_clientsPerType.at(client->type()).emplace_back(client);
         auto& src = this->_clientsPerType.at(fromType);
         std::erase_if(src, [client](const Client* InnerClient) { return client == InnerClient; });
@@ -71,10 +72,19 @@ void ClientRegistry::updateTypeGroup() {
 }
 
 Client* ClientRegistry::findByAddress(const network::Address& addr) {
-    if (auto iter = std::ranges::find_if(
+    if (const auto it = std::ranges::find_if(
             this->_clients, [&addr](const std::unique_ptr<Client>& client) { return client->address() == addr; });
-        iter != this->_clients.end()) {
-        return iter.base()->get();
+        it != this->_clients.end()) {
+        return it->get();
+    }
+    return nullptr;
+}
+
+Client* ClientRegistry::findByPlayerId(std::uint64_t playerId) {
+    if (const auto it = std::ranges::find_if(
+            _clients, [&playerId](const std::unique_ptr<Client>& client) { return playerId == client->playerID(); });
+        it != this->_clients.end()) {
+        return it->get();
     }
     return nullptr;
 }
