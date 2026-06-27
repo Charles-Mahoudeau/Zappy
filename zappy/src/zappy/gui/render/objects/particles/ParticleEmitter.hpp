@@ -9,6 +9,7 @@
 
 #include <raylib.h>
 
+#include <cstdint>
 #include <string_view>
 
 #include "Color.hpp"
@@ -42,13 +43,13 @@ class ParticleEmitter {
     void setVolume(Vector3 volume);
     void setSpread(float spread);
     void setSpeed(float speed, float envelope = 0.0F);
-    void setRate(float rate);
+    void setRate(uint16_t rate);
     void setLifetime(float lifetime, float envelope = 0.0F);
     void setSize(Vec2D size, Vec2D increment);
     void setRotation(float rotation, float increment);
     void setTint(ColorF tint, ColorF increment);
 
-    void setStatic(Vector3 origin, Vector3 volume, Vector3 acceleration, float spread, float rate);
+    void setStatic(Vector3 origin, Vector3 volume, Vector3 acceleration, float spread, uint16_t rate);
     void setInitParticles(Vec2D size, float rotation, ColorF tint, float lifetime, float speed);
     void setIncrementParticles(Vec2D sizeIncrement, float rotationIncrement, ColorF tintIncrement);
     void setInitEnvelope(ParticleEnvelope envelope, float lifetime, float speed);
@@ -60,7 +61,7 @@ class ParticleEmitter {
     [[nodiscard]] Vector3 volume() const { return _volume; }
     [[nodiscard]] float spread() const { return _spread; }
     [[nodiscard]] float speed() const { return _speed.value(); }
-    [[nodiscard]] float rate() const { return _rate; }
+    [[nodiscard]] uint16_t rate() const { return _rate; }
     [[nodiscard]] float lifetime() const { return _lifetime.generate(); }
     [[nodiscard]] Vec2D size() const { return _size.get(); }
     [[nodiscard]] float rotation() const { return _rotation.get(); }
@@ -85,7 +86,7 @@ class ParticleEmitter {
     float _spread{0.0F};
     RandomValue _speed{0.0F, 0.0F};
     RandomValue _lifetime{1.0F, 0.0F};
-    float _rate{1.0F};
+    uint16_t _rate{1.0F};
     TimeValue<Vec2D> _size{Vec2D{1.0F, 1.0F}, Vec2D{0.0F, 0.0F}};
     TimeValue<float> _rotation{0.0F, 0.0F};
     TimeValue<ColorF> _tint{ColorF(Color::kWHITE), ColorF(Color::kWHITE)};

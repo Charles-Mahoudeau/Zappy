@@ -11,6 +11,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdint>
 #include <string_view>
 
 #include "Billboard.hpp"
@@ -25,7 +26,7 @@ ParticleEmitter::ParticleEmitter(std::string_view path) : _texture(path) {}
 void ParticleEmitter::setOrigin(Vector3 origin) { _origin = origin; }
 void ParticleEmitter::setVolume(Vector3 volume) { _volume = volume; }
 void ParticleEmitter::setSpread(float spread) { _spread = spread; }
-void ParticleEmitter::setRate(float rate) { _rate = rate; }
+void ParticleEmitter::setRate(uint16_t rate) { _rate = rate; }
 void ParticleEmitter::setSpeed(float speed, float envelope) { _speed = RandomValue{speed, envelope}; }
 void ParticleEmitter::setLifetime(float lifetime, float envelope) { _lifetime = RandomValue{lifetime, envelope}; }
 void ParticleEmitter::setSize(Vec2D size, Vec2D increment) { _size = TimeValue<Vec2D>{size, increment}; }
@@ -34,7 +35,7 @@ void ParticleEmitter::setRotation(float rotation, float increment) {
 }
 void ParticleEmitter::setTint(ColorF tint, ColorF increment) { _tint = TimeValue<ColorF>{tint, increment}; }
 
-void ParticleEmitter::setStatic(Vector3 origin, Vector3 volume, Vector3 acceleration, float spread, float rate) {
+void ParticleEmitter::setStatic(Vector3 origin, Vector3 volume, Vector3 acceleration, float spread, uint16_t rate) {
     _origin = origin;
     _volume = volume;
     _acceleration = acceleration;
@@ -83,12 +84,12 @@ void ParticleEmitter::particle() {
 }
 
 void ParticleEmitter::emit(uint16_t count) {
-    for (float i = 0.0F; i < count; i += 1.0F) {
+    for (uint16_t i = 0; i < count; ++i) {
         particle();
     }
 }
 
-void ParticleEmitter::emitRate() { emit(static_cast<uint16_t>(_rate)); }
+void ParticleEmitter::emitRate() { emit(_rate); }
 
 Vector3 ParticleEmitter::getDirection() {
     const float maxAngle = (std::clamp(_spread, 0.0f, 90.0f)) * (3.14159265f / 180.0f);
