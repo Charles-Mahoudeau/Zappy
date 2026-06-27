@@ -65,7 +65,7 @@ void Player::setPosition(const math::Vector2u position) {
     eventEmitter().pushEvent(PlayerPositionEvent{
         .playerId = id(),
         .position = position,
-        .orientation = direction(),
+        .orientation = orientation(),
     });
 }
 
@@ -73,7 +73,7 @@ void Player::moveForward() {
     const math::Vector2u gridSize = this->gridSize();
     math::Vector2u pos = this->position();
 
-    switch (this->_direction) {
+    switch (this->_orientation) {
         case math::Direction::kNorth:
             pos.y = (pos.y == gridSize.y) ? 0 : pos.y + 1;
             break;
@@ -90,26 +90,26 @@ void Player::moveForward() {
     this->setPosition(pos);
 }
 
-math::Direction Player::direction() const { return _direction; }
+math::Direction Player::orientation() const { return _orientation; }
 
 math::Direction Player::turnLeft() {
-    _direction = math::direction::turnLeft(_direction);
+    _orientation = math::direction::turnLeft(_orientation);
     eventEmitter().pushEvent(PlayerPositionEvent{
         .playerId = id(),
         .position = position(),
-        .orientation = _direction,
+        .orientation = _orientation,
     });
-    return _direction;
+    return _orientation;
 }
 
 math::Direction Player::turnRight() {
-    _direction = math::direction::turnRight(_direction);
+    _orientation = math::direction::turnRight(_orientation);
     eventEmitter().pushEvent(PlayerPositionEvent{
         .playerId = id(),
         .position = position(),
-        .orientation = _direction,
+        .orientation = _orientation,
     });
-    return _direction;
+    return _orientation;
 }
 
 bool Player::eat() {
@@ -137,5 +137,4 @@ bool Player::drop(ResourceType resource) {
     this->_inventory.removeResource(resource);
     return true;
 };
-
 }  // namespace zappy::server::game::entity

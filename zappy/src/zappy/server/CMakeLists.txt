@@ -58,6 +58,8 @@ add_library(zappy_server_objects OBJECT
         client/TeamRegistry.hpp
         client/Team.cpp
         client/Team.hpp
+        game/WireHelper.cpp
+        game/WireHelper.hpp
 )
 target_include_directories(zappy_server_objects PUBLIC
         ${CMAKE_SOURCE_DIR}/src

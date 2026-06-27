@@ -11,7 +11,7 @@
 
 #include "zappy/server/client/Client.hpp"
 #include "zappy/server/commands/ICommandGroup.hpp"
-#include "zappy/server/game/IEntity.hpp"
+#include "zappy/server/game/World.hpp"
 #include "zappy/server/game/entity/Player.hpp"
 namespace zappy::server::command::player {
 
@@ -20,12 +20,8 @@ PlayerData::PlayerData(ICommandGroup::CommandCtx& ctx, std::uint64_t id)
     if (this->_client == nullptr) {
         return;
     }
-    game::IEntity* entity = ctx.world.get().entityDatabase().query(id);
-    if (entity == nullptr) {
-        this->_client->sendError();
-        return;
-    }
-    this->_player = dynamic_cast<game::entity::Player*>(entity);
+    this->_player = ctx.world.get().player(id);
+
     if (this->_player == nullptr) {
         this->_client->sendError();
     }

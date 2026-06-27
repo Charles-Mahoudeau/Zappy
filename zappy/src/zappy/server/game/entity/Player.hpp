@@ -55,7 +55,7 @@ class Player : public AEntity {
 
     /// @brief Get the player's direction.
     /// @return The player's direction.
-    [[nodiscard]] math::Direction direction() const;
+    [[nodiscard]] math::Direction orientation() const;
 
     /// @brief Turn the player to the left.
     /// @return The new direction.
@@ -71,9 +71,9 @@ class Player : public AEntity {
     /// @return True if the player ate food, false otherwise.
     bool eat();
 
-    /// @brief get the inventory of the player
-    /// @return const ref to the inventory
-    const Inventory& inventory() const;
+    /// @brief Get the player's inventory.
+    /// @return The player's inventory.
+    [[nodiscard]] const Inventory& inventory() const;
 
     void take(ResourceType resource);
 
@@ -82,7 +82,7 @@ class Player : public AEntity {
   private:
     std::uint32_t _lifetimeLeft{kDefaultLifetime};
     std::uint8_t _level{1};
-    math::Direction _direction{math::direction::random()};
+    math::Direction _orientation{math::direction::random()};
     Inventory _inventory;
 };
 }  // namespace zappy::server::game::entity

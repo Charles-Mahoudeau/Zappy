@@ -79,9 +79,9 @@ bool PlayerCommands::connectNb(CommandCtx& ctx) {
         return true;
     }
 
-    auto eggs =
-        std::views::filter(ctx.world.get().entityDatabase().viewAll<game::entity::Egg>(),
-                           [teamName = team->name()](game::entity::Egg* egg) { return egg->teamName() == teamName; });
+    auto eggs = std::ranges::filter_view(
+        ctx.world.get().entityDatabase().viewAll<game::entity::Egg>(),
+        [teamName = team->name()](const game::entity::Egg* egg) { return egg->teamName() == teamName; });
     std::ignore = client->sendMessage("{}\n", std::ranges::distance(eggs));
     return true;
 }
