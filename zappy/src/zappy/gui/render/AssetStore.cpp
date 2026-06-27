@@ -21,6 +21,7 @@
 #include "objects/particles/ParticleEmitter.hpp"
 #include "utils/Color.hpp"
 #include "utils/ColorF.hpp"
+#include "utils/Vector2.hpp"
 #include "utils/Vector3.hpp"
 
 namespace zappy::gui::render {
