@@ -28,7 +28,13 @@ class Timer {
     // return the nb tick passed since last update
     int update();
 
-    void setFrequencies(std::uint16_t freq);
+    /// @brief Returns the frequency of the timer.
+    /// @return The frequency of the timer.
+    [[nodiscard]] std::uint16_t frequency() const;
+
+    /// @brief Set the frequency of the timer.
+    /// @param frequency The new frequency of the timer.
+    void setFrequency(std::uint16_t frequency);
 
     /**
      * @brief time until the next tick. Zero if now
@@ -73,11 +79,12 @@ class Timer {
     static constexpr int kTick_milli_default = 1000;
     static constexpr std::uint16_t kMinFrequency = 1;
     static constexpr std::uint16_t kMaxFrequency = 1000;
-    static constexpr std::uint16_t kDefault_Frequencies = 100;
+    static constexpr std::uint16_t kDefaultFrequency = 100;
 
     std::uint64_t _nextId = 1;
     std::chrono::steady_clock::time_point _previousTick = std::chrono::steady_clock::now();
     std::list<Event> _events;
+    std::uint16_t _frequency{kDefaultFrequency};
     std::chrono::milliseconds _tickTime{1};
 
     [[nodiscard]] int smallestTimeout() const;
