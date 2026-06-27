@@ -1,0 +1,62 @@
+/*
+** EPITECH PROJECT, 2026
+** projectMirror
+** File description:
+** Particle
+*/
+
+#pragma once
+
+#include "../../Camera.hpp"
+#include "../../utils/Color.hpp"
+#include "../../utils/ColorF.hpp"
+#include "../../utils/TimeValue.hpp"
+#include "../../utils/Vector2.hpp"
+#include "../../utils/Vector3.hpp"
+#include "../Texture.hpp"
+
+namespace zappy::gui::render {
+class Particle {
+  public:
+    Particle() = default;
+    Particle(const Particle&) = default;
+    Particle(Particle&&) noexcept = default;
+    ~Particle() = default;
+
+    Particle& operator=(const Particle&) = default;
+    Particle& operator=(Particle&&) noexcept = default;
+
+    [[nodiscard]] Vector3 position() const { return _position; }
+    [[nodiscard]] Vector2 size() const { return _size; }
+    [[nodiscard]] float lifetime() const { return _lifetime; }
+    [[nodiscard]] float rotation() const { return _rotation; }
+    [[nodiscard]] ColorF tint() const { return _tint; }
+    [[nodiscard]] float elapsedTime() const { return _elapsedTime; }
+    [[nodiscard]] bool isAlive() const { return _elapsedTime < _lifetime; }
+
+    void setInitValues(Vector3 position, Vector2 size, float rotation, ColorF tint);
+
+    void setIncrementValues(Vector3 positionIncrement, Vector2 sizeIncrement, float rotationIncrement,
+                            ColorF tintIncrement);
+
+    void setPosition(Vector3 position, Vector3 increment);
+    void setSize(Vector2 size, Vector2 increment);
+    void setLifetime(float lifetime);
+    void setRotation(float rotation, float increment);
+    void setTint(ColorF tint, ColorF increment);
+    void setAcceleration(Vector3 acceleration) { _acceleration = acceleration; }
+
+    void update(float dt);
+
+    void draw(Camera& camera, Texture& texture);
+
+  private:
+    float _lifetime{1.0F};
+    float _elapsedTime{0.0F};
+    TimeValue<Vector3> _position{Vector3{0.0F, 0.0F, 0.0F}, Vector3{0.0F, 0.0F, 0.0F}};
+    TimeValue<Vector2> _size{Vector2{1.0F, 1.0F}, Vector2{0.0F, 0.0F}};
+    TimeValue<float> _rotation{0.0F, 0.0F};
+    TimeValue<ColorF> _tint{ColorF(Color::kWHITE), ColorF(Color::kWHITE)};
+    Vector3 _acceleration{0.0F, 0.0F, 0.0F};
+};
+}  // namespace zappy::gui::render

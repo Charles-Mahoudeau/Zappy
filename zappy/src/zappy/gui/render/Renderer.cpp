@@ -39,12 +39,12 @@ void Renderer::update(Camera& camera, game::GameState& state, AssetStore& assets
     display::Window::EndMode3D();
 
     _grid.resize(state.width(), state.height());
-
     display::Window::BeginMode3D(camera);
     _grid.draw(assets);
     drawResources(state, assets);
     drawEggs(state, assets);
     drawPlayers(state, assets);
+    drawVFXs(camera, state, assets);
     display::Window::EndMode3D();
 }
 
@@ -232,6 +232,20 @@ float Renderer::calculAngle(game::Orientation orientation) {
             return 270.0F;
         default:
             return 0.0F;
+    }
+}
+
+void Renderer::drawVFXs(Camera& camera, game::GameState& state, AssetStore& assets) {
+    uint16_t totalParticles = 0;
+
+    for (auto& [name, emitter] : assets.vfxs()) {
+        emitter.update(GetFrameTime() * static_cast<float>(state.timeUnit()));
+    }
+    for (auto& [name, emitter] : assets.vfxs()) {
+        totalParticles += emitter.draw(camera);
+        if (totalParticles >= kParticlesCeiling) {
+            break;
+        }
     }
 }
 
