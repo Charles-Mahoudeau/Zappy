@@ -15,12 +15,13 @@
 
 #include "IEventEmitter.hpp"
 #include "IGrid.hpp"
+#include "zappy/server/Timer.hpp"
 #include "zappy/shared/exception/InvalidState.hpp"
 #include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server::game {
-AEntity::AEntity(IGrid& grid, IEventEmitter& eventEmitter, std::string teamName)
-    : _grid{grid}, _eventEmitter{eventEmitter}, _teamName{std::move(teamName)} {}
+AEntity::AEntity(Timer& timer, IGrid& grid, IEventEmitter& eventEmitter, std::string teamName)
+    : _timer{timer}, _grid{grid}, _eventEmitter{eventEmitter}, _teamName{std::move(teamName)} {}
 
 std::uint64_t AEntity::id() const { return _id; }
 
@@ -36,6 +37,8 @@ math::Vector2u AEntity::position() const {
 void AEntity::setPosition(const math::Vector2u position) { _grid.get().setPosition(_id, position); }
 
 std::string_view AEntity::teamName() const { return _teamName; }
+
+Timer& AEntity::timer() const { return _timer; }
 
 IEventEmitter& AEntity::eventEmitter() const { return _eventEmitter.get(); }
 

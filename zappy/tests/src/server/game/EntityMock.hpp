@@ -25,7 +25,5 @@ class EntityMock : public IEntity {
     MOCK_METHOD(void, setPosition, (math::Vector2u position), (override));
 
     MOCK_METHOD(std::string_view, teamName, (), (const, override));
-
-    MOCK_METHOD(void, update, (), (override));
 };
 }  // namespace zappy::server::game
