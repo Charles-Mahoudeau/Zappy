@@ -75,7 +75,7 @@ void ParticleEmitter::particle() {
                                        RandomValue{0.0F, _volume.y() * 0.5F}.generate(),
                                        RandomValue{0.0F, _volume.z() * 0.5F}.generate()};
 
-    newParticle.setInitValues(_origin, InitSize, initRot, initTint);
+    newParticle.setInitValues(origin, InitSize, initRot, initTint);
     newParticle.setIncrementValues(speed, incSize, incRot, incTint);
     newParticle.setLifetime(lifetime);
     newParticle.setAcceleration(_acceleration);
