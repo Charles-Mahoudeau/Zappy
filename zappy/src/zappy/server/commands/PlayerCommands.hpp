@@ -35,6 +35,7 @@ class PlayerCommands : public ACommandGroup {
 
     static bool inventory(CommandCtx& ctx);
     static bool broadcast(CommandCtx& ctx);
+    static bool fork(CommandCtx& ctx);
     static bool connectNb(CommandCtx& ctx);
 };
 

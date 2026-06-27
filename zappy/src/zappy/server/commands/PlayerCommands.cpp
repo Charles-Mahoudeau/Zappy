@@ -26,6 +26,7 @@
 #include "zappy/server/game/Event.hpp"
 #include "zappy/server/game/entity/Egg.hpp"
 #include "zappy/server/game/entity/Player.hpp"
+#include "zappy/shared/exception/Exception.hpp"
 
 namespace zappy::server::command {
 PlayerCommands::PlayerCommands(CommandCtx context)
@@ -38,7 +39,7 @@ PlayerCommands::PlayerCommands(CommandCtx context)
           {"Inventory", [](auto& ctx) { return PlayerCommands::inventory(ctx); }},
           {"Broadcast", [](auto& ctx) { return PlayerCommands::broadcast(ctx); }},
           {"Connect_nbr", [](auto& ctx) { return PlayerCommands::connectNb(ctx); }},
-          {"Fork", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
+          {"Fork", [](auto& ctx) { return PlayerCommands::fork(ctx); }},
           {"Eject", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
           {"Take", [](auto& ctx) { return player::ObjectCommand::take(ctx); }},
           {"Set", [](auto& ctx) { return player::ObjectCommand::drop(ctx); }},
@@ -95,9 +96,9 @@ bool PlayerCommands::broadcast(CommandCtx& ctx) {
             return;
         }
         const game::entity::Player* emitter = data.player();
-        world.get().pushEvent(game::PlayerBroadcastEvent{.playerId = emitter->id(), .message = text});
+        world.get().pushEvent(game::PlayerBroadcastEvent{.playerId = id, .message = text});
         for (const auto& client : clients.get().viewAll(Client::Type::kPlayer)) {
-            if (client->playerID() == data.player()->id()) {
+            if (client->playerID() == id) {
                 continue;
             }
             const game::entity::Player* receiver = world.get().player(client->playerID());
@@ -108,6 +109,31 @@ bool PlayerCommands::broadcast(CommandCtx& ctx) {
                 "message {},{}\n", world.get().computeDistFromPositions(emitter->position(), receiver->position()),
                 text);
         }
+        data.client()->sendSuccess();
+    });
+    return true;
+}
+
+bool PlayerCommands::fork(CommandCtx& ctx) {
+    auto clients = ctx.clientRegistry;
+    auto world = ctx.world;
+    auto id = ctx.client->playerID();
+    auto logger = ctx.logger;
+
+    ctx.client->setTimeout(42, [clients, world, id, logger]() {
+        const player::PlayerData data(clients, world, id);
+
+        if (!data.valid()) {
+            return;
+        }
+
+        try {
+            std::ignore = world.get().spawnEgg(id, data.player()->teamName());
+        } catch (const exception::Exception& err) {
+            logger.get().error(err.what());
+            data.client()->sendError();
+        }
+        data.client()->sendSuccess();
     });
     return true;
 }
