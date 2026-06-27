@@ -20,7 +20,7 @@ PlayerData::PlayerData(const ICommandGroup::CommandCtx& ctx, std::uint64_t id)
     : PlayerData(ctx.clientRegistry, ctx.world, id) {}
 
 PlayerData::PlayerData(client::ClientRegistry& clients, game::World& world, std::uint64_t id)
-    : _client(clients.findByID(id)) {
+    : _client(clients.findByPlayerId(id)) {
     if (this->_client == nullptr) {
         return;
     }

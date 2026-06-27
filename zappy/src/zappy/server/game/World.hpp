@@ -16,12 +16,14 @@
 #include <string>
 #include <string_view>
 #include <unordered_map>
+#include <vector>
 
 #include "EntityDatabase.hpp"
 #include "Event.hpp"
 #include "Grid.hpp"
 #include "IEntity.hpp"
 #include "IEventEmitter.hpp"
+#include "Inventory.hpp"
 #include "ResourceType.hpp"
 #include "Tile.hpp"
 #include "entity/Player.hpp"
@@ -31,6 +33,22 @@
 namespace zappy::server::game {
 class World : public IEventEmitter {
   public:
+    /// @brief Defines the requirements for an incantation event.
+    struct IncantationRequirements {
+        std::uint8_t players;
+        Inventory resources;
+    };
+
+    /// @brief Represents a snapshot of an incantation event.
+    /// @details This structure captures the position and player IDs involved in an incantation event. This can be used
+    /// to check if the incantation is valid after some delay.
+    struct IncantationSnapshot {
+        math::Vector2u position;
+        std::uint8_t level;
+        std::uint64_t playerId;
+        std::vector<std::uint64_t> playerIds;
+    };
+
     static constexpr std::uint16_t kMajorTickInterval{20};
 
     explicit World(math::Vector2u size, std::optional<io::Logger> logger = std::nullopt);
@@ -140,10 +158,25 @@ class World : public IEventEmitter {
 
     bool playerDrop(entity::Player* player, ResourceType resource);
 
+    /// @brief Begins an incantation event.
+    /// @param playerId The ID of the player initiating the incantation.
+    /// @return A snapshot of the incantation event if successful, std::nullopt otherwise.
+    [[nodiscard]] std::optional<IncantationSnapshot> beginIncantation(std::uint64_t playerId);
+
+    /// @brief Ends an incantation event.
+    /// @param snapshot The snapshot of the incantation event.
+    /// @return True if the incantation was successful, false otherwise.
+    bool endIncantation(const IncantationSnapshot& snapshot);
+
   private:
     /// @brief Returns the resource densities for the world.
     /// @return A map of resource types to their densities.
     [[nodiscard]] static const std::unordered_map<ResourceType, float>& resourceDensities();
+
+    /// @brief Returns the incantation requirements for a given level.
+    /// @param level The level of the incantation.
+    /// @return A reference to the incantation requirements for the given level.
+    [[nodiscard]] static const IncantationRequirements& incantationRequirements(std::uint8_t level);
 
     /// @brief Spawns resources in the world to meet the threshold.
     void spawnResources();
@@ -158,6 +191,12 @@ class World : public IEventEmitter {
     /// @brief Places an egg at a random tile in the world.
     /// @param eggId The ID of the egg to place.
     void placeEggRandom(std::uint64_t eggId);
+
+    /// @brief Checks if the given incantation snapshot meets the requirements.
+    /// @param snapshot The incantation snapshot to check.
+    /// @return An empty expected if the snapshot is valid, or an error message otherwise.
+    [[nodiscard]] std::expected<void, std::string> verifyIncantationRequirements(
+        const IncantationSnapshot& snapshot) const;
 
     std::random_device _randomDevice;
     std::mt19937 _randomEngine{_randomDevice()};
