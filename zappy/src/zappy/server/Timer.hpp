@@ -84,14 +84,16 @@ class Timer {
     static constexpr std::uint16_t kMaxFrequency = 1000;
     static constexpr std::uint16_t kDefaultFrequency = 100;
 
+    [[nodiscard]] int smallestTimeout() const;
+    [[nodiscard]] bool isEventWaitingRemoval(std::uint64_t eventId) const;
+    void applyEventsRemoval();
+
     std::uint64_t _nextId = 1;
     std::chrono::steady_clock::time_point _previousTick = std::chrono::steady_clock::now();
     std::list<Event> _events;
     std::uint16_t _frequency{kDefaultFrequency};
     std::chrono::milliseconds _tickTime{1};
     std::vector<std::uint64_t> _toRemove;
-
-    [[nodiscard]] int smallestTimeout() const;
 };
 
 }  // namespace zappy::server

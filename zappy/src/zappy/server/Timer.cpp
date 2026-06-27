@@ -17,22 +17,18 @@
 namespace zappy::server {
 Timer::Timer() { this->setFrequency(kDefaultFrequency); }
 
-Timer::Timer(std::uint16_t freq) { this->setFrequency(freq); }
+Timer::Timer(const std::uint16_t freq) { this->setFrequency(freq); }
 
 int Timer::update() {
+    applyEventsRemoval();
+
     std::chrono::steady_clock::time_point const now = std::chrono::steady_clock::now();
     const auto nbTick = static_cast<int>((now - this->_previousTick) / this->_tickTime);
 
     if (nbTick <= 0) {
         return 0;
     }
-
     this->_previousTick += this->_tickTime * nbTick;
-
-    for (const std::uint64_t id : _toRemove) {
-        std::erase_if(_events, [id](const Event& event) { return event.id == id; });
-    }
-    _toRemove.clear();
 
     auto it = this->_events.begin();
 
@@ -132,6 +128,9 @@ int Timer::smallestTimeout() const {
     bool foundValidEvent = false;
 
     for (const auto& event : _events) {
+        if (isEventWaitingRemoval(event.id)) {
+            continue;
+        }
         if (event.condition != nullptr && !event.condition()) {
             continue;
         }
@@ -139,5 +138,16 @@ int Timer::smallestTimeout() const {
         foundValidEvent = true;
     }
     return foundValidEvent ? smallest : -1;
+}
+
+bool Timer::isEventWaitingRemoval(const std::uint64_t eventId) const {
+    return std::ranges::contains(_toRemove, eventId);
+}
+
+void Timer::applyEventsRemoval() {
+    for (const std::uint64_t id : _toRemove) {
+        std::erase_if(_events, [id](const Event& event) { return event.id == id; });
+    }
+    _toRemove.clear();
 }
 }  // namespace zappy::server
