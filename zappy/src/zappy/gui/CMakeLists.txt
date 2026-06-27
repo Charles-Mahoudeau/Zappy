@@ -112,5 +112,3 @@ add_custom_command(TARGET zappy_gui POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_CURRENT_SOURCE_DIR}/assets $<TARGET_FILE_DIR:zappy_gui>/assets
 )
-
-target_compile_options(zappy_gui_objects PRIVATE -w)
