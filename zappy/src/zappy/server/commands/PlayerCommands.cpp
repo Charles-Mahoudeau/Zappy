@@ -7,12 +7,12 @@
 
 #include "zappy/server/commands/PlayerCommands.hpp"
 
-#include <functional>
-#include <iterator>
-#include <ranges>
 #include <cstdint>
 #include <format>
+#include <functional>
+#include <iterator>
 #include <optional>
+#include <ranges>
 #include <string_view>
 #include <tuple>
 #include <unordered_map>
@@ -25,8 +25,8 @@
 #include "zappy/server/commands/player/MoveCommand.hpp"
 #include "zappy/server/commands/player/ObjectCommand.hpp"
 #include "zappy/server/commands/player/PlayerData.hpp"
-#include "zappy/server/game/entity/Egg.hpp"
 #include "zappy/server/game/World.hpp"
+#include "zappy/server/game/entity/Egg.hpp"
 
 namespace zappy::server::command {
 PlayerCommands::PlayerCommands(CommandCtx context)
