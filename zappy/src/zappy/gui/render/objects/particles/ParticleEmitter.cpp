@@ -11,14 +11,14 @@
 
 #include <algorithm>
 #include <cmath>
-#include <cstdint>
-#include <numbers>
+#include <cstddef>
 #include <string_view>
 #include <utility>
 
-#include "Billboard.hpp"
+#include "Camera.hpp"
 #include "ColorF.hpp"
 #include "RandomValue.hpp"
+#include "Texture.hpp"
 #include "TimeValue.hpp"
 #include "Vec2D.hpp"
 #include "Vector3.hpp"
@@ -47,7 +47,7 @@ void ParticleEmitter::setStatic(Vector3 origin, Vector3 volume, Vector3 accelera
 }
 
 void ParticleEmitter::update(float dt) {
-    for (size_t i = 0; i < _particles.size(); ++i) {
+    for (std::size_t i = 0; i < _particles.size(); ++i) {
         _particles.at(i).update(dt);
         if (!_particles.at(i).isAlive()) {
             _particles.erase(_particles.begin() + static_cast<std::ptrdiff_t>(i));
@@ -95,10 +95,11 @@ void ParticleEmitter::emit(uint16_t count) {
 void ParticleEmitter::emitRate() { emit(_rate); }
 
 Vector3 ParticleEmitter::getDirection() const {
-    const float maxAngle = (std::clamp(_spread, 0.0F, 90.0F)) * (std::numbers::pi_v<float> / 180.0F);
+    constexpr float kPi = 3.14159265358979323846F;
+    const float maxAngle = std::clamp(_spread, 0.0F, 90.0F) * (kPi / 180.0F);
 
     const float inclination = (static_cast<float>(GetRandomValue(0, 1000)) / 1000.0F) * maxAngle;
-    const float azimuth = (static_cast<float>(GetRandomValue(0, 1000)) / 1000.0F) * 2.0F * std::numbers::pi_v<float>;
+    const float azimuth = (static_cast<float>(GetRandomValue(0, 1000)) / 1000.0F) * 2.0F * kPi;
 
     const float x = std::sin(inclination) * std::cos(azimuth);
     const float y = std::cos(inclination);

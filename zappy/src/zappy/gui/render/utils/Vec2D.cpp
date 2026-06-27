@@ -7,8 +7,6 @@
 
 #include "Vec2D.hpp"
 
-#include <raylib.h>
-
 #include <cmath>
 
 namespace zappy::gui::render {

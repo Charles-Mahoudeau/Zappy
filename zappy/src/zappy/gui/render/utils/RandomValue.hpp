@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <algorithm>
-#include <cmath>
 #include <random>
 
 namespace zappy::gui::render {

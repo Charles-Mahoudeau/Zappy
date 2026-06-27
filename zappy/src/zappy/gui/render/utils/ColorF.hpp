@@ -6,9 +6,8 @@
 */
 
 #pragma once
-#include <raylib.h>
 
-#include <algorithm>
+#include <raylib.h>
 
 namespace zappy::gui::render {
 class Color;

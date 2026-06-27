@@ -7,10 +7,6 @@
 
 #pragma once
 
-#include <raylib.h>
-
-#include "Vector3.hpp"
-
 namespace zappy::gui::render {
 template <typename T>
 class TimeValue {
