@@ -66,7 +66,7 @@ bool PlayerCommands::inventory(CommandCtx& ctx) {
         if (!data.valid()) {
             return;
         }
-        std::ignore = ctx.client->sendMessage("[ {} ]\n", data.player()->inventory().detailledString());
+        std::ignore = data.client()->sendMessage("[ {} ]\n", data.player()->inventory().detailledString());
     });
     return true;
 }

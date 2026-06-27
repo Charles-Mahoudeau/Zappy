@@ -40,7 +40,7 @@ class TeamRegistry {
 
     /// @brief Returns a team from the given address.
     /// @param address The address of player in the searched team.
-    /// @return A pointer to the team with, or nullptr if no such team exists.
+    /// @return A pointer to the team with the given address, or nullptr if no such team exists.
     [[nodiscard]] const Team* team(const network::Address& address) const;
 
     /// @brief Returns a view of all team names.
