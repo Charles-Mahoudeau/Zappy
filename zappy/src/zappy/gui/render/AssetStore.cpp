@@ -134,15 +134,15 @@ void AssetStore::loadVFXs() {
 
     ParticleEmitter impact("assets/particles/Impact.png");
     impact.setStatic(Vector3{}, Vector3{0.5F, 0.5F, 0.5F}, Vector3{0.0F, 0.0F, 0.0F}, 0.0F, 1);
-    impact.setInitParticles(Vector2{0.5F, 0.5F}, 0.0F, ColorF(Color::kWHITE), 50.0F, 0.0F);
+    impact.setInitParticles(Vector2{0.5F, 0.5F}, 0.0F, ColorF{255.0F, 255.0F, 255.0F, 180.0F}, 50.0F, 0.0F);
     impact.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 0.5F, .tint = 0.3F}, 0.1F, 0.0F);
-    impact.setIncrementParticles(Vector2{0.01F, 0.01F}, 0.0F, ColorF{0.0F, 0.0F, 0.0F, -3.0F});
-    impact.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.003F, .rotation = 0.02F, .tint = 0.1F});
+    impact.setIncrementParticles(Vector2{0.02F, 0.02F}, 0.0F, ColorF{0.0F, 0.0F, 0.0F, -1.5F});
+    impact.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.007F, .rotation = 0.02F, .tint = 0.1F});
     _vfxs.insert({"impact", std::move(impact)});
 
     ParticleEmitter signal("assets/particles/Shockwave.png");
     impact.setStatic(Vector3{}, Vector3{0.0F, 0.0F, 0.0F}, Vector3{0.0F, 0.0F, 0.0F}, 0.0F, 1);
-    impact.setInitParticles(Vector2{1.0F, 1.0F}, 0.0F, ColorF(Color::kWHITE), 50.0F, 0.0F);
+    impact.setInitParticles(Vector2{1.0F, 1.0F}, 0.0F, ColorF(Color::kWHITE), 350.0F, 0.0F);
     impact.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 0.5F, .tint = 0.3F}, 0.1F, 0.0F);
     impact.setIncrementParticles(Vector2{0.01F, 0.01F}, 0.0F, ColorF{0.0F, 0.0F, 0.0F, -3.0F});
     impact.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.003F, .rotation = 0.02F, .tint = 0.1F});
