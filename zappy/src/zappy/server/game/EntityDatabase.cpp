@@ -56,6 +56,15 @@ void EntityDatabase::removeAll() {
     _entitiesByType.clear();
 }
 
+const IEntity* EntityDatabase::query(const std::uint64_t id) const {
+    const auto it = _entities.find(id);
+
+    if (it == _entities.end()) {
+        return nullptr;
+    }
+    return it->second.get();
+}
+
 IEntity* EntityDatabase::query(const std::uint64_t id) {
     const auto it = _entities.find(id);
 

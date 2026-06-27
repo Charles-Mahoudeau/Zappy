@@ -16,7 +16,7 @@
 #include <string_view>
 
 namespace zappy::io {
-enum class Level : std::uint8_t { kDebug, kInfo, kWarning, kError, kFatal };
+enum class Level : std::uint8_t { kDebug, kInfo, kWarn, kError, kFatal };
 
 class Logger {
   public:

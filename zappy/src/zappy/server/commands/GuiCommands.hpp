@@ -7,15 +7,20 @@
 
 #pragma once
 
+#include <cstdint>
+#include <optional>
+#include <span>
+#include <string>
 #include <string_view>
 #include <unordered_map>
 
 #include "zappy/server/client/Client.hpp"
 #include "zappy/server/commands/ACommandGroup.hpp"
 #include "zappy/server/commands/ICommandGroup.hpp"
+#include "zappy/server/game/entity/Player.hpp"
+#include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server::command {
-
 class GuiCommands : public ACommandGroup {
   public:
     explicit GuiCommands(CommandCtx context);
@@ -29,9 +34,21 @@ class GuiCommands : public ACommandGroup {
     void execute(Client* client, std::string_view msg) override;
 
   private:
+    static bool msz(const CommandCtx& ctx);
+    static bool bct(const CommandCtx& ctx);
+    static bool mct(const CommandCtx& ctx);
+    static bool tna(const CommandCtx& ctx);
+    static bool ppo(const CommandCtx& ctx);
+    static bool plv(const CommandCtx& ctx);
+    static bool pin(const CommandCtx& ctx);
+    static bool sgt(const CommandCtx& ctx);
+    static bool sst(const CommandCtx& ctx);
+
+    static std::optional<std::uint32_t> parseUint32(const std::string& str);
+    static std::optional<math::Vector2u> parsePosition(std::span<const std::string> params);
+    static std::optional<std::uint32_t> parsePlayerId(std::string_view str);
+    static game::entity::Player* parsePlayer(const CommandCtx& ctx);
+
     std::unordered_map<std::string_view, CommandInvoker> _commands;
-
-    static bool ignore(const CommandCtx& ctx);
 };
-
 }  // namespace zappy::server::command
