@@ -7,13 +7,13 @@
 
 #pragma once
 
-#include "Camera.hpp"
-#include "Color.hpp"
-#include "ColorF.hpp"
-#include "Texture.hpp"
-#include "TimeValue.hpp"
-#include "Vec2D.hpp"
-#include "Vector3.hpp"
+#include "../../Camera.hpp"
+#include "../../utils/Color.hpp"
+#include "../../utils/ColorF.hpp"
+#include "../../utils/TimeValue.hpp"
+#include "../../utils/Vec2D.hpp"
+#include "../../utils/Vector3.hpp"
+#include "../Texture.hpp"
 
 namespace zappy::gui::render {
 class Particle {

@@ -12,7 +12,7 @@
 #include <cstdint>
 #include <optional>
 
-#include "zappy/gui/render/utils/Vector3.hpp"
+#include "utils/Vector3.hpp"
 
 namespace zappy::gui::render {
 

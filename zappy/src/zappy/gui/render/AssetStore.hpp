@@ -16,11 +16,11 @@
 #include <string_view>
 #include <vector>
 
+#include "../game/GameState.hpp"
 #include "objects/Model.hpp"
 #include "objects/Skybox.hpp"
 #include "objects/particles/ParticleEmitter.hpp"
-#include "zappy/gui/game/GameState.hpp"
-#include "zappy/gui/render/utils/Vector3.hpp"
+#include "utils/Vector3.hpp"
 
 namespace zappy::gui::render {
 

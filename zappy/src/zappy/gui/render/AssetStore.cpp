@@ -9,14 +9,19 @@
 
 #include <cstddef>
 #include <initializer_list>
+#include <map>
+#include <memory>
+#include <string>
+#include <utility>
 
+#include "../game/GameState.hpp"
 #include "AssetLoaderRegistry.hpp"
 #include "objects/Model.hpp"
+#include "objects/Texture.hpp"
 #include "objects/particles/ParticleEmitter.hpp"
-#include "zappy/gui/game/GameState.hpp"
-#include "zappy/gui/render/utils/Color.hpp"
-#include "zappy/gui/render/utils/ColorF.hpp"
-#include "zappy/gui/render/utils/Vector3.hpp"
+#include "utils/Color.hpp"
+#include "utils/ColorF.hpp"
+#include "utils/Vector3.hpp"
 
 namespace zappy::gui::render {
 
@@ -29,7 +34,7 @@ void AssetStore::load(const ProgressCallback& onProgress) {
             onProgress(name,
                        (static_cast<float>(_playerModels.size()) + static_cast<float>(_resourcesModels.size()) + 3.0F) /
                            (static_cast<float>(kMaxModels) +
-                            static_cast<float>(std::to_underlying(game::ResourceType::Thystame)) + 1.0F + 3.0F));
+                            static_cast<float>(static_cast<int>(game::ResourceType::Thystame)) + 1.0F + 3.0F));
         }
     }
 }

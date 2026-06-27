@@ -21,8 +21,6 @@
 #include "../../utils/Vector3.hpp"
 #include "../Texture.hpp"
 #include "Particle.hpp"
-#include "zappy/gui/render/objects/Texture.hpp"
-#include "zappy/gui/render/objects/particles/Particle.hpp"
 
 namespace zappy::gui::render {
 
