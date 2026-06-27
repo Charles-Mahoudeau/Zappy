@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <format>
 #include <memory>
 #include <ranges>
@@ -78,6 +79,8 @@ class ClientRegistry {
 
     Client* findByAddress(const network::Address& addr);
 
+    Client* findByID(std::uint64_t id);
+
     /// @brief Broadcast a message to all clients.
     /// @param msg The message to broadcast.
     /// @return True if the message was successfully broadcast to all clients.
@@ -109,7 +112,7 @@ class ClientRegistry {
   private:
     std::vector<const Client*> _toRemove;
     std::vector<std::unique_ptr<Client>> _clients;
-    std::unordered_map<Client::Type, std::vector<const Client*>> _clientsPerType = {
+    std::unordered_map<Client::Type, std::vector<Client*>> _clientsPerType = {
         {Client::Type::kUnknown, {}},
         {Client::Type::kGui, {}},
         {Client::Type::kPlayer, {}},

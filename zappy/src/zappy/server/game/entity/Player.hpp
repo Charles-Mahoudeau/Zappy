@@ -13,6 +13,7 @@
 
 #include "zappy/server/game/AEntity.hpp"
 #include "zappy/server/game/Inventory.hpp"
+#include "zappy/server/game/ResourceType.hpp"
 #include "zappy/shared/math/Direction.hpp"
 #include "zappy/shared/math/Vector2.hpp"
 
@@ -64,6 +65,8 @@ class Player : public AEntity {
     /// @return The new direction.
     math::Direction turnRight();
 
+    void moveForward();
+
     /// @brief Eat one unit of food.
     /// @return True if the player ate food, false otherwise.
     bool eat();
@@ -71,6 +74,10 @@ class Player : public AEntity {
     /// @brief Get the player's inventory.
     /// @return The player's inventory.
     [[nodiscard]] const Inventory& inventory() const;
+
+    void take(ResourceType resource);
+
+    bool drop(ResourceType resource);
 
   private:
     std::uint32_t _lifetimeLeft{kDefaultLifetime};

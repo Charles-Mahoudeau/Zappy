@@ -136,6 +136,10 @@ class World : public IEventEmitter {
     /// @param event The event to add.
     void pushEvent(Event event) override;
 
+    bool playerTake(entity::Player* player, ResourceType resource);
+
+    bool playerDrop(entity::Player* player, ResourceType resource);
+
   private:
     /// @brief Returns the resource densities for the world.
     /// @return A map of resource types to their densities.
