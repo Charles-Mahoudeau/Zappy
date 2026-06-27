@@ -207,16 +207,13 @@ const std::unordered_map<ResourceType, float>& World::resourceDensities() {
 }
 
 void World::spawnResources() {
-    bool hasSpawned = true;  // FIXME: Remove me
-
     for (const auto& [resourceType, quantity] : _resourceThresholds) {
         for (std::uint64_t count = countResources(resourceType); count < quantity; ++count) {
             spawnResource(resourceType);
-            hasSpawned = true;
         }
     }
     _resourcesDirty = false;
-    if (_logger.has_value() && hasSpawned) {
+    if (_logger.has_value()) {
         _logger->info("Resources spawned.");
     }
 }
