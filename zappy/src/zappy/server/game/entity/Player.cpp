@@ -22,6 +22,7 @@
 namespace zappy::server::game::entity {
 Player::Player(Timer& timer, IGrid& grid, IEventEmitter& eventEmitter, std::string teamName)
     : AEntity{timer, grid, eventEmitter, std::move(teamName)} {
+    _inventory.addResource(ResourceType::kFood, kInitialFoodAmount);
     _foodTimerId = timer.scheduleEvery(kTimeUnitsPerFood, [this] {
         if (_foodTicksLeft > 0) {
             --_foodTicksLeft;

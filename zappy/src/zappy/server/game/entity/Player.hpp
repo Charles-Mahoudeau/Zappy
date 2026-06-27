@@ -21,7 +21,7 @@ class Player : public AEntity {
   public:
     static constexpr std::uint8_t kMaxLevel{8};
     static constexpr std::uint8_t kTimeUnitsPerFood{126};
-    static constexpr std::uint8_t kDefaultFoodAmount{10};
+    static constexpr std::uint8_t kInitialFoodAmount{10};
 
     Player(Timer& timer, IGrid& grid, IEventEmitter& eventEmitter, std::string teamName);
     ~Player() override;
