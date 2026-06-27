@@ -11,13 +11,9 @@
 #include <cstdint>
 #include <span>
 #include <string>
-#include <typeindex>
-#include <unordered_map>
-#include <utility>
 #include <vector>
 
 #include "Inventory.hpp"
-#include "zappy/gui/game/GameState.hpp"
 #include "zappy/server/game/EntityDatabase.hpp"
 #include "zappy/server/game/entity/Egg.hpp"
 #include "zappy/server/game/entity/Player.hpp"
