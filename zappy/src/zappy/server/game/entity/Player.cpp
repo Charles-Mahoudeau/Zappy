@@ -50,7 +50,7 @@ Player::~Player() {
     }
 }
 
-Player::Player(Player&& other)
+Player::Player(Player&& other) noexcept
     : AEntity{other},
       _alive{other._alive},
       _level{other._level},
@@ -61,7 +61,7 @@ Player::Player(Player&& other)
     other._foodTimerId = std::nullopt;
 }
 
-Player& Player::operator=(Player&& other) {
+Player& Player::operator=(Player&& other) noexcept {
     if (this == &other) {
         return *this;
     }

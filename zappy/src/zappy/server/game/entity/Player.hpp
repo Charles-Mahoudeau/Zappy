@@ -34,8 +34,8 @@ class Player : public AEntity {
     Player(const Player&) = delete;
     Player& operator=(const Player&) = delete;
 
-    Player(Player&& other);
-    Player& operator=(Player&& other);
+    Player(Player&& other) noexcept;
+    Player& operator=(Player&& other) noexcept;
 
     /// @brief Check if the player is alive.
     /// @return True if the player is alive, false otherwise.
