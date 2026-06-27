@@ -38,8 +38,8 @@ class TeamRegistry {
     /// @return A pointer to the team with the given name, or nullptr if no such team exists.
     [[nodiscard]] const Team* team(std::string_view name) const;
 
-    /// @brief Returns a team with the given address.
-    /// @param address The address of the team to return.
+    /// @brief Returns a team from the given address.
+    /// @param address The address of player in the searched team.
     /// @return A pointer to the team with the given address, or nullptr if no such team exists.
     [[nodiscard]] const Team* team(const network::Address& address) const;
 

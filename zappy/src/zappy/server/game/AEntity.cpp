@@ -38,4 +38,7 @@ void AEntity::setPosition(const math::Vector2u position) { _grid.get().setPositi
 std::string_view AEntity::teamName() const { return _teamName; }
 
 IEventEmitter& AEntity::eventEmitter() const { return _eventEmitter.get(); }
+
+math::Vector2u AEntity::gridSize() const { return this->_grid.get().size(); }
+
 }  // namespace zappy::server::game

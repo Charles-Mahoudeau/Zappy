@@ -26,7 +26,7 @@ void UnknownCommands::execute(Client* client, [[maybe_unused]] const std::string
     CommandCtx ctx = this->commandCtx();
 
     if (!ctx.data.params.empty()) {
-        std::ignore = client->sendMessage("ko\n");
+        client->sendError();
         return;
     }
     const auto& askedTeam = ctx.data.name;
@@ -35,7 +35,7 @@ void UnknownCommands::execute(Client* client, [[maybe_unused]] const std::string
         return;
     }
     if (!UnknownCommands::handlePlayerType(askedTeam, client, ctx)) {
-        std::ignore = client->sendMessage("ko\n");
+        client->sendError();
     }
 }
 
