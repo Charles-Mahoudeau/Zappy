@@ -30,7 +30,7 @@ class RandomValue {
     [[nodiscard]] float generate() const;
 
   private:
-    static std::mt19937& getRng();
+    static std::mt19937& getRng();  // NOSONAR - mt19937 is sufficient for particle VFX, not used for security
 
     float _value{0.0F};
     float _envelope{0.0F};

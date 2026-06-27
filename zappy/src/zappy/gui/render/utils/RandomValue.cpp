@@ -25,14 +25,14 @@ float RandomValue::generate() const {
     const float min = _value - rawEnvelope;
     const float max = _value + rawEnvelope;
     auto [rangeMin, rangeMax] = std::minmax<float>(min, max);
-    auto& rng = getRng();
+    auto& rng = getRng();  // NOSONAR
 
     std::uniform_real_distribution<float> dist{rangeMin, rangeMax};
     return dist(rng);
 }
 
-std::mt19937& RandomValue::getRng() {
-    static thread_local std::mt19937 rng{std::random_device{}()};
+std::mt19937& RandomValue::getRng() {                              // NOSONAR
+    static thread_local std::mt19937 rng{std::random_device{}()};  // NOSONAR
     return rng;
 }
 
