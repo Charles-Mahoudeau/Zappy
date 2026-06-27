@@ -13,6 +13,7 @@
 #include <cstdint>
 #include <expected>
 #include <format>
+#include <functional>
 #include <iostream>
 #include <memory>
 #include <optional>
@@ -315,6 +316,40 @@ std::uint32_t World::computeDistFromPositions(math::Vector2u emitter, math::Vect
     const std::uint32_t dy = wrappedDist(emitter.y, receiver.y, size.y);
 
     return dx + dy;
+}
+
+std::vector<std::reference_wrapper<Tile>> World::playerView(const entity::Player* player) {
+    using enum math::Direction;
+    static const std::unordered_map<math::Direction, std::pair<math::Vector2i, math::Vector2i>> dirs{
+        {kNorth, {{0, -1}, {1, 0}}},
+        {kEast, {{1, 0}, {0, 1}}},
+        {kSouth, {{0, 1}, {-1, 0}}},
+        {kWest, {{-1, 0}, {0, -1}}},
+    };
+
+    std::vector<std::reference_wrapper<Tile>> view;
+
+    const math::Vector2u gridSize = _grid.size();
+    const math::Vector2u origin = player->position();
+    const std::uint8_t rows = player->level();
+
+    const auto& [forward, right] = dirs.find(player->orientation())->second;
+
+    for (std::uint8_t r = 0; r <= rows; ++r) {
+        for (std::int32_t side = -static_cast<std::int32_t>(r); std::cmp_less_equal(side, r); ++side) {
+            const int px = static_cast<int>(origin.x) + (forward.x * r) + (right.x * side);
+            const int py = static_cast<int>(origin.y) + (forward.y * r) + (right.y * side);
+
+            auto wx = static_cast<std::uint32_t>(((px % static_cast<int>(gridSize.x)) + static_cast<int>(gridSize.x)) %
+                                                 static_cast<int>(gridSize.x));
+            auto wy = static_cast<std::uint32_t>(((py % static_cast<int>(gridSize.y)) + static_cast<int>(gridSize.y)) %
+                                                 static_cast<int>(gridSize.y));
+
+            view.push_back(std::ref(_grid.tile(math::Vector2u{wx, wy})));
+        }
+    }
+
+    return view;
 }
 
 }  // namespace zappy::server::game

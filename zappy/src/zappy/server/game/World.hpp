@@ -10,12 +10,14 @@
 #include <cstdint>
 #include <deque>
 #include <expected>
+#include <functional>
 #include <optional>
 #include <random>
 #include <span>
 #include <string>
 #include <string_view>
 #include <unordered_map>
+#include <vector>
 
 #include "EntityDatabase.hpp"
 #include "Event.hpp"
@@ -142,6 +144,8 @@ class World : public IEventEmitter {
     bool playerDrop(entity::Player* player, ResourceType resource);
 
     std::uint32_t computeDistFromPositions(math::Vector2u emitter, math::Vector2u receiver) const;
+
+    std::vector<std::reference_wrapper<Tile>> playerView(const entity::Player* player);
 
   private:
     /// @brief Returns the resource densities for the world.
