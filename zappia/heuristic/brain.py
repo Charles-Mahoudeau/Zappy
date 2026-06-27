@@ -68,6 +68,7 @@ class HeuristicAI:
         self.call_ttl = 0
         self.peers: Dict[int, int] = {}
         self.team_seen: Dict[int, Tuple[int, int]] = {}
+        self.peer_inv: Dict[int, Dict[str, int]] = {}
 
         self.sos_dir: Optional[int] = None
         self.sos_ttl = 0
@@ -112,7 +113,6 @@ class HeuristicAI:
         return self.look[0] if self.look else []
 
     def tile_short(self) -> Dict[str, int]:
-        """Stones still missing ON the current tile for the elevation."""
         tile = self.tile0()
         return {
             s: n - tile.count(s)
@@ -127,6 +127,7 @@ class HeuristicAI:
         return self.players_here() >= self.req_players()
 
     def tile_ready(self) -> bool:
+        """return True if the current tile has all the required stones for incantation."""
         return not self.tile_short() and self.assembled()
 
     def nearest_tile_with(self, resource: str) -> Optional[int]:
@@ -176,11 +177,27 @@ class HeuristicAI:
             return best_id, best_dir, best_missing, sos_dir
         self.team_seen[msg["id"]] = (self.tick, msg["level"])
         if msg["verb"] == "CALL" and msg["level"] == self.level:
-            if best_id is None or msg["id"] < best_id:
-                best_id, best_dir = msg["id"], direction
-                best_missing = [s for s in msg["data"].split(",") if s]
-        if msg["level"] == self.level:
+            best_id, best_dir = msg["id"], direction
+            best_missing = [
+                msg.strip() for msg in msg["data"].split(",") if msg.strip()
+            ]
+
+        if msg["verb"] == "HERE" and msg["level"] == self.level:
             self.peers[msg["id"]] = self.tick
+            inv = {}
+            if msg["data"]:
+                for item in msg["data"].split(","):
+                    if ":" in item:
+                        s, c = item.split(":")
+                        if s in STONES:
+                            try:
+                                inv[s] = int(c)
+                            except ValueError:
+                                pass
+            self.peer_inv[msg["id"]] = inv
+        elif msg["level"] == self.level:
+            self.peers[msg["id"]] = self.tick
+
         return best_id, best_dir, best_missing, sos_dir
 
     def _scan_broadcasts(
@@ -225,6 +242,8 @@ class HeuristicAI:
         self.peers = {
             p: t for p, t in self.peers.items() if self.tick - t <= PEER_WINDOW
         }
+        self.peer_inv = {p: inv for p, inv in self.peer_inv.items() if p in self.peers}
+
         self.team_seen = {
             i: (t, lv)
             for i, (t, lv) in self.team_seen.items()
@@ -238,6 +257,7 @@ class HeuristicAI:
         self.call_missing = []
         self.call_ttl = 0
         self.peers = {}
+        self.peer_inv = {}
 
     def _tick_update(self) -> None:
         self.tick += 1
@@ -262,37 +282,53 @@ class HeuristicAI:
         leader = not stranded and self.req_players() > 1 and self.am_leader()
         return stranded, leader
 
+    def effective_short(self) -> Dict[str, int]:
+        short = self.tile_short()
+
+        for peer_id, inv in self.peer_inv.items():
+            if peer_id in self.peers and self.tick - self.peers[peer_id] <= PEER_WINDOW:
+                for s, count in inv.items():
+                    if s in short and short[s] > 0:
+                        short[s] = max(0, short[s] - count)
+
+        return {s: n for s, n in short.items() if n > 0}
+
     def _broadcast_if_due(self, leader: bool) -> bool:
+        if leader and self.ready_to_incant():
+            return False
         if leader and self.tick % CALL_EVERY == 0:
-            self.send("CALL", ",".join(self.tile_short().keys()))
+            missing = self.effective_short()
+            data = ",".join(f"{s}" for s in missing.keys())
+            self.send("CALL", data)
             return True
         if not leader and self.tick % PEER_PING == 0:
-            self.send("HERE")
+            inv_str = ",".join(
+                f"{s}:{c}" for s, c in self.inv.items() if s in STONES and c > 0
+            )
+            self.send("HERE", inv_str)
             return True
         return False
 
     def _act_low_food(self) -> None:
-        if self.tick % SOS_EVERY == 0:
-            self.send("SOS")
-            return
+        # if self.tick % SOS_EVERY == 0:
+        #     self.send("SOS")
+        #     return
         if self.call_dir is not None:
             self.converge()
             return
         self.farm_food()
 
     def _phase2(self, leader: bool) -> None:
+        if self.req_players() <= 1:
+            self.solo_elevate()
+            return
         if leader and self.ready_to_incant():
             self.try_incantation()
-            return
-        if self.food >= DONOR_FOOD and self.sos_dir is not None and self.deliver_food():
             return
         if not (self.tile_ready() and leader) and self.maybe_eat():
             return
         if self.food < LOW_FOOD:
             self._act_low_food()
-            return
-        if self.req_players() <= 1:
-            self.solo_elevate()
             return
         if not leader:
             self.maybe_fork()
@@ -319,16 +355,12 @@ class HeuristicAI:
         self._phase2(leader)
 
     def is_stranded(self) -> bool:
-        """True only for a player in a permanent dead-end: BELOW the team's top
-        level, with too few teammates at or under its level to ever meet the rite
-        (higher teammates can't drop back to complete the group)."""
         if self.level >= self.team_max():
             return False
         reachable = 1 + sum(1 for _, lv in self.team_seen.values() if lv <= self.level)
         return reachable < self.req_players()
 
     def maybe_fork(self) -> None:
-        """Fork only when the team genuinely needs more members."""
         if self._team_full or self.food < FORK_FOOD or self.tick < FORK_MIN_TICK:
             return
         if self.tick - self._last_fork_tick <= FORK_COOLDOWN:
@@ -341,8 +373,6 @@ class HeuristicAI:
         self._last_fork_tick = self.tick
 
     def suicide(self) -> None:
-        """Drop our whole inventory where we stand, then starve so the launcher
-        respawns us fresh at level 1."""
         if not self._fork_sent:
             if self.food >= 2:
                 self.c.fork()
@@ -391,17 +421,27 @@ class HeuristicAI:
         self.explore()
 
     def am_leader(self) -> bool:
-        """The single lowest-id player at our level is the designated gatherer /
-        beacon."""
         return bool(self.peers) and self.id < min(self.peers)
 
     def rally(self) -> None:
         if self.am_leader():
             self.run_beacon()
             return
+
         if self.call_dir is not None:
-            self.converge()
-        elif not self.maybe_eat():
+            if self.call_dir == 0:
+                self._converge_at_beacon()
+                return
+
+            if not self.call_missing:
+                self.move_for_direction(self.call_dir)
+                return
+            if self._fetch_stone_enroute(self.call_missing):
+                return
+            self.move_for_direction(self.call_dir)
+            return
+
+        if not self.maybe_eat():
             self.explore()
 
     def run_beacon(self) -> None:
@@ -415,15 +455,12 @@ class HeuristicAI:
         self.maybe_eat()
 
     def team_max(self) -> int:
-        """Highest level anyone on the team is currently on (us included)."""
         return max([self.level] + [lv for _, lv in self.team_seen.values()])
 
     def team_size(self) -> int:
-        """How many of us are alive (everyone pings, the dead drop out)."""
         return 1 + len(self.team_seen)
 
     def ready_to_incant(self) -> bool:
-        """Incant only when ALL known same-level peers are assembled on tile."""
         if not self.tile_ready():
             return False
         known_at_level = len(self.peers) + 1
@@ -432,57 +469,54 @@ class HeuristicAI:
         return True
 
     def needed_here(self) -> List[str]:
-        """Stones the beacon's tile still needs that I'm not yet carrying any of."""
         return [s for s in self.call_missing if s in STONES and self.inv.get(s, 0) < 1]
 
     def _converge_at_beacon(self) -> None:
-        """Arrived on the beacon tile: drop carried stones, fetch nearby missing ones."""
         if self.drop_needed_stone():
             return
-        actual_short = list(self.tile_short().keys())
-        if actual_short:
-            for stone in actual_short:
-                idx = self.nearest_tile_with(stone)
-                if idx is not None and idx != 0:
-                    self.move_toward(idx)
-                    return
         self.refresh_look()
 
     def _fetch_stone_enroute(self, missing_stones: List[str]) -> bool:
-        """Pick up or step toward a needed stone while travelling to the beacon.
-        Returns True if an action was taken."""
+        self.refresh_look()
         for stone in missing_stones:
-            if self.tile0().count(stone) > 0 and self.c.take(stone):
+            if stone in self.tile0():
+                self.c.take(stone)
                 self.inv[stone] = self.inv.get(stone, 0) + 1
-                self.refresh_look()
                 return True
+
+        best_idx, best_d = None, 999
         for stone in missing_stones:
             idx = self.nearest_tile_with(stone)
             if idx is not None and idx != 0:
-                self.move_toward(idx)
-                return True
+                dx, dy = index_to_offset(idx)
+                dist = abs(dx) + dy
+                if dist < best_d:
+                    best_d = dist
+                    best_idx = idx
+
+        if best_idx is not None:
+            self.move_toward(best_idx)
+            return True
+
         return False
 
     def converge(self) -> None:
-        """Move toward the rally beacon. Pick up needed stones found en route."""
-        missing_stones = [s for s in self.call_missing if s in STONES]
-        carrying_useful = any(self.inv.get(s, 0) > 0 for s in missing_stones)
+        self.refresh_all()
 
         if self.call_dir == 0:
-            self._converge_at_beacon()
-            return
-
-        if missing_stones and not carrying_useful:
-            if self._fetch_stone_enroute(missing_stones):
+            if self.drop_needed_stone():
                 return
-
-        if self.call_dir is None:
-            self.explore()
+            if self.call_missing and self.go_get(list(self.call_missing)):
+                return
             return
+        if self.call_missing:
+            for stone in self.call_missing:
+                if stone in self.tile0():
+                    self.c.take(stone)
+                    return
         self.move_for_direction(self.call_dir)
 
     def deliver_food(self) -> bool:
-        """Carry surplus food to a starving teammate"""
         if self.sos_dir is None:
             return False
         if self.sos_dir == 0:
@@ -495,12 +529,8 @@ class HeuristicAI:
         return True
 
     def go_get(self, names: List[str]) -> bool:
-        """Grab one of the named stones underfoot, or step toward the nearest one
-        in sight. Returns False if none are visible."""
         for stone in names:
             if self.tile0().count(stone) > 0 and self.c.take(stone):
-                self.inv[stone] = self.inv.get(stone, 0) + 1
-                self.refresh_look()
                 return True
         best, best_d = None, None
         for stone in names:
@@ -516,7 +546,6 @@ class HeuristicAI:
         return False
 
     def drop_needed_stone(self) -> bool:
-        """Drop one carried stone the tile is still short of."""
         for stone, need in self.req_stones().items():
             if self.tile0().count(stone) < need and self.inv.get(stone, 0) > 0:
                 if self.c.set_down(stone):
@@ -559,40 +588,49 @@ class HeuristicAI:
         return True
 
     def explore(self) -> None:
-        if self._explore_steps > 0:
-            self.c.forward()
-            self._explore_steps -= 1
+        for idx in range(1, len(self.look)):
+            if any(item in STONES for item in self.look[idx]):
+                self.move_toward(idx)
+                return
+        rand = secrets.randbelow(10)
+        if rand < 4:
+            self.c.left()
+        elif rand < 8:
+            self.c.right()
         else:
-            if secrets.randbelow(2):
-                self.c.left()
-            else:
-                self.c.right()
-            self._explore_steps = secrets.randbelow(5) + 3
+            self.c.forward()
         self.refresh_look()
 
     def move_toward(self, idx: int) -> None:
         dx, dy = index_to_offset(idx)
+
         if dx == 0 and dy == 0:
             return
-        if dy > 0:
-            self.c.forward()
-        elif dx > 0:
+        if dx > 0:
             self.c.right()
-        else:
+            self.refresh_look()
+            self.c.forward()
+        elif dx < 0:
             self.c.left()
+            self.refresh_look()
+            self.c.forward()
+        else:
+            self.c.forward()
         self.refresh_look()
 
     def go_to_sound(self, k: int) -> int:
+        if k == 0:
+            return 0
         if k == 1:
             self.c.forward()
         elif k in (2, 3, 4, 5):
             self.c.left()
-            k = 1
+            self.c.forward()
         elif k in (6, 7, 8):
             self.c.right()
-            k = 1
+            self.c.forward()
         self.refresh_look()
-        return k
+        return 0
 
     def move_for_direction(self, k: int) -> None:
-        self.call_dir = self.go_to_sound(k)
+        self.go_to_sound(k)

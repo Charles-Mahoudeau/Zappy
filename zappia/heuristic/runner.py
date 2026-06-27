@@ -15,6 +15,7 @@ def _play(client):
 
 
 def run(host, port, team):
+    print(f"Connecting to {host}:{port} as team '{team}'...")
     try:
         while True:
             client = ZappyClient(host=host, port=port, team=team)
