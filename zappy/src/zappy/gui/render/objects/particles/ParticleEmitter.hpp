@@ -61,7 +61,7 @@ class ParticleEmitter {
     [[nodiscard]] float spread() const { return _spread; }
     [[nodiscard]] float speed() const { return _speed.value(); }
     [[nodiscard]] float rate() const { return _rate; }
-    [[nodiscard]] float lifetime() const { return _lifetime; }
+    [[nodiscard]] float lifetime() const { return _lifetime.generate(); }
     [[nodiscard]] Vec2D size() const { return _size.get(); }
     [[nodiscard]] float rotation() const { return _rotation.get(); }
     [[nodiscard]] ColorF tint() const { return _tint.get(); }

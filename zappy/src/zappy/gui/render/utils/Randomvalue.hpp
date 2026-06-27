@@ -28,17 +28,24 @@ class RandomValue {
     [[nodiscard]] float value() const { return _value; }
     [[nodiscard]] float envelope() const { return _envelope; }
 
-    [[nodiscard]] operator float() const {
-        float rawEnvelope = _value * _envelope;
-        float min = _value - rawEnvelope;
-        float max = _value + rawEnvelope;
-        static std::mt19937 rng{std::random_device{}()};
-        std::uniform_real_distribution<float> dist{min, max};
+    [[nodiscard]] float generate() const {
+        const float rawEnvelope = std::abs(_value * _envelope);
+        const float min = _value - rawEnvelope;
+        const float max = _value + rawEnvelope;
+        auto [rangeMin, rangeMax] = std::minmax(min, max);
+        auto& rng = getRng();
+
+        std::uniform_real_distribution<float> dist{rangeMin, rangeMax};
 
         return dist(rng);
     }
 
   private:
+    static std::mt19937& getRng() {
+        static thread_local std::mt19937 rng{std::random_device{}()};
+        return rng;
+    }
+
     float _value{0.0F};
     float _envelope{0.0F};
 };

@@ -63,16 +63,17 @@ uint16_t ParticleEmitter::draw(Camera& camera) {
 
 void ParticleEmitter::particle() {
     Particle newParticle;
-    Vector3 speed = getDirection() * RandomValue{_speed.value(), _speed.envelope()};
-    float lifetime = RandomValue{_lifetime.value(), _lifetime.envelope()};
-    Vec2D InitSize = _size.get() * RandomValue{1.0F, _InitEnvelope.size};
-    Vec2D incSize = _size.increment() * RandomValue{1.0F, _IncrementEnvelope.size};
-    float initRot = RandomValue{_rotation.get(), _InitEnvelope.rotation};
-    float incRot = RandomValue{_rotation.increment(), _IncrementEnvelope.rotation};
-    ColorF initTint = _tint.get() * RandomValue{1.0F, _InitEnvelope.tint};
-    ColorF incTint = _tint.increment() * RandomValue{1.0F, _IncrementEnvelope.tint};
-    Vector3 origin = _origin + Vector3{RandomValue{0.0F, _volume.x() * 0.5F}, RandomValue{0.0F, _volume.y() * 0.5F},
-                                       RandomValue{0.0F, _volume.z() * 0.5F}};
+    Vector3 speed = getDirection() * RandomValue{_speed.value(), _speed.envelope()}.generate();
+    float lifetime = RandomValue{_lifetime.value(), _lifetime.envelope()}.generate();
+    Vec2D InitSize = _size.get() * RandomValue{1.0F, _InitEnvelope.size}.generate();
+    Vec2D incSize = _size.increment() * RandomValue{1.0F, _IncrementEnvelope.size}.generate();
+    float initRot = RandomValue{_rotation.get(), _InitEnvelope.rotation}.generate();
+    float incRot = RandomValue{_rotation.increment(), _IncrementEnvelope.rotation}.generate();
+    ColorF initTint = _tint.get() * RandomValue{1.0F, _InitEnvelope.tint}.generate();
+    ColorF incTint = _tint.increment() * RandomValue{1.0F, _IncrementEnvelope.tint}.generate();
+    Vector3 origin = _origin + Vector3{RandomValue{0.0F, _volume.x() * 0.5F}.generate(),
+                                       RandomValue{0.0F, _volume.y() * 0.5F}.generate(),
+                                       RandomValue{0.0F, _volume.z() * 0.5F}.generate()};
 
     newParticle.setInitValues(_origin, InitSize, initRot, initTint);
     newParticle.setIncrementValues(speed, incSize, incRot, incTint);
