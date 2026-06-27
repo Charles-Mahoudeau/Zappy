@@ -48,6 +48,10 @@ class GUI {
   private:
     void setupCamera();
     void drawLoadingFrame(std::string_view name, float progress);
+    void drawWaitingFrame();
+    bool tryConnect();
+    bool waitForConnection();
+    void runSession();
 
     zappy::network::Address _address;
     zappy::network::BufferedClient _buffer;
