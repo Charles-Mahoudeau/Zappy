@@ -216,7 +216,7 @@ std::optional<World::IncantationSnapshot> World::beginIncantation(const std::uin
     }
 
     IncantationSnapshot snapshot{
-        .position = {},
+        .position = tile.position(),
         .level = incantationPlayer->level(),
         .playerId = incantationPlayer->id(),
         .playerIds = players,
