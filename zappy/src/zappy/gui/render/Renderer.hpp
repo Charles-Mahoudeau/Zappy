@@ -13,7 +13,6 @@
 #include "AssetStore.hpp"
 #include "Camera.hpp"
 #include "Grid.hpp"
-#include "ParticleEmitter.hpp"
 #include "objects/Model.hpp"
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/render/utils/Vector3.hpp"
