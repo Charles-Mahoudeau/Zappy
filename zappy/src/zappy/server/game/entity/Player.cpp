@@ -49,6 +49,32 @@ Player::~Player() {
     }
 }
 
+Player::Player(Player&& other)
+    : AEntity{other},
+      _alive{other._alive},
+      _level{other._level},
+      _orientation{other._orientation},
+      _inventory{std::move(other._inventory)},
+      _foodTimerId{other._foodTimerId} {
+    other._alive = false;
+    other._foodTimerId = std::nullopt;
+}
+
+Player& Player::operator=(Player&& other) {
+    if (this == &other) {
+        return *this;
+    }
+    AEntity::operator=(std::move(other));
+    _alive = other._alive;
+    _level = other._level;
+    _orientation = other._orientation;
+    _inventory = std::move(other._inventory);
+    _foodTimerId = other._foodTimerId;
+    other._alive = false;
+    other._foodTimerId = std::nullopt;
+    return *this;
+}
+
 bool Player::alive() const { return _alive; }
 
 void Player::kill() {
