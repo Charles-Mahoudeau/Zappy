@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <chrono>
 #include <cstddef>
+#include <exception>
 #include <iostream>
 #include <string>
 #include <string_view>

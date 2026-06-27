@@ -10,6 +10,7 @@
 #include <cstddef>
 #include <format>
 #include <string>
+#include <string_view>
 
 namespace zappy::gui::ui {
 
