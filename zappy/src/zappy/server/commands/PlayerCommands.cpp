@@ -8,6 +8,7 @@
 #include "zappy/server/commands/PlayerCommands.hpp"
 
 #include <functional>
+#include <iostream>
 #include <iterator>
 #include <ranges>
 #include <string>
@@ -35,7 +36,7 @@ PlayerCommands::PlayerCommands(CommandCtx context)
           {"Forward", [](auto& ctx) { return player::MoveCommand::forward(ctx); }},
           {"Right", [](auto& ctx) { return player::MoveCommand::right(ctx); }},
           {"Left", [](auto& ctx) { return player::MoveCommand::left(ctx); }},
-          {"Look", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
+          {"Look", [](auto& ctx) { return PlayerCommands::look(ctx); }},
           {"Inventory", [](auto& ctx) { return PlayerCommands::inventory(ctx); }},
           {"Broadcast", [](auto& ctx) { return PlayerCommands::broadcast(ctx); }},
           {"Connect_nbr", [](auto& ctx) { return PlayerCommands::connectNb(ctx); }},
@@ -138,6 +139,30 @@ bool PlayerCommands::fork(CommandCtx& ctx) {
     return true;
 }
 
+bool PlayerCommands::look(CommandCtx& ctx) {
+    auto clients = ctx.clientRegistry;
+    auto world = ctx.world;
+    auto id = ctx.client->playerID();
+    auto logger = ctx.logger;
+
+    ctx.client->setTimeout(1, [clients, world, id, logger]() {
+        const player::PlayerData data(clients, world, id);
+
+        if (!data.valid()) {
+            return;
+        }
+        auto tiles = world.get().playerView(data.player());
+
+        std::string msg = "[";
+
+        for (const auto& tile : tiles) {
+            msg += tile.get().string(world.get().entityDatabase()) + ",";
+        }
+        msg += "]";
+        std::ignore = data.client()->sendMessage("{}\n", msg);
+    });
+    return true;
+}
 bool PlayerCommands::connectNb(CommandCtx& ctx) {
     auto* client = ctx.client;
     const client::Team* team = ctx.teamRegistry.get().team(client->address());
