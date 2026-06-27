@@ -125,36 +125,20 @@ void AssetStore::loadResourceModel(game::ResourceType type) {
 
 void AssetStore::loadVFXs() {
     ParticleEmitter test1("assets/models/resources/textures/thystameBase.png");
-    test1.setStatic(Vector3{}, Vector3{1.0F, 1.0F, 1.0F}, Vector3{0.0F, -0.002F, 0.0F}, 0.0F, 30.0F);
+    test1.setStatic(Vector3{}, Vector3{1.0F, 1.0F, 1.0F}, Vector3{0.0F, -0.002F, 0.0F}, 0.0F, 30);
     test1.setInitParticles(Vector2{1.0F, 1.0F}, 0.0F, ColorF(Color::kWHITE), 150.0F, 0.1F);
     test1.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 0.5F, .tint = 0.3F}, 0.1F, 0.3F);
     test1.setIncrementParticles(Vector2{-0.005F, -0.005F}, 1.0F, ColorF{0.0F, 0.0F, 0.0F, -3.0F});
     test1.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.2F, .rotation = 0.4F, .tint = 0.1F});
     _vfxs.insert({"test1", std::move(test1)});
 
-    ParticleEmitter test2("assets/models/resources/textures/thystameBase.png");
-    test2.setStatic(Vector3{}, Vector3{1.0F, 1.0F, 1.0F}, Vector3{0.0F, -0.002F, 0.0F}, 30.0F, 30.0F);
-    test2.setInitParticles(Vector2{1.0F, 1.0F}, 0.0F, ColorF(Color::kWHITE), 150.0F, 0.1F);
-    test2.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 0.5F, .tint = 0.3F}, 0.1F, 0.3F);
-    test2.setIncrementParticles(Vector2{-0.005F, -0.005F}, 1.0F, ColorF{0.0F, 0.0F, 0.0F, -3.0F});
-    test2.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.2F, .rotation = 0.4F, .tint = 0.1F});
-    _vfxs.insert({"test2", std::move(test2)});
-
-    ParticleEmitter test3("assets/models/resources/textures/thystameBase.png");
-    test3.setStatic(Vector3{}, Vector3{1.0F, 1.0F, 1.0F}, Vector3{0.0F, -0.002F, 0.0F}, 90.0F, 30.0F);
-    test3.setInitParticles(Vector2{1.0F, 1.0F}, 0.0F, ColorF(Color::kWHITE), 150.0F, 0.1F);
-    test3.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 0.5F, .tint = 0.3F}, 0.1F, 0.3F);
-    test3.setIncrementParticles(Vector2{-0.005F, -0.005F}, 1.0F, ColorF{0.0F, 0.0F, 0.0F, -3.0F});
-    test3.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.2F, .rotation = 0.4F, .tint = 0.1F});
-    _vfxs.insert({"test3", std::move(test3)});
-
-    ParticleEmitter test4("assets/models/resources/textures/thystameBase.png");
-    test4.setStatic(Vector3{}, Vector3{1.0F, 1.0F, 1.0F}, Vector3{0.0F, -0.002F, 0.0F}, 180.0F, 30.0F);
-    test4.setInitParticles(Vector2{1.0F, 1.0F}, 0.0F, ColorF(Color::kWHITE), 150.0F, 0.1F);
-    test4.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 0.5F, .tint = 0.3F}, 0.1F, 0.3F);
-    test4.setIncrementParticles(Vector2{-0.005F, -0.005F}, 1.0F, ColorF{0.0F, 0.0F, 0.0F, -3.0F});
-    test4.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.2F, .rotation = 0.4F, .tint = 0.1F});
-    _vfxs.insert({"test4", std::move(test4)});
+    ParticleEmitter impact("assets/models/resources/textures/thystameBase.png");
+    impact.setStatic(Vector3{}, Vector3{0.5F, 0.5F, 0.5F}, Vector3{0.0F, 0.0F, 0.0F}, 0.0F, 1);
+    impact.setInitParticles(Vector2{1.0F, 1.0F}, 0.0F, ColorF(Color::kWHITE), 50.0F, 0.0F);
+    impact.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 0.5F, .tint = 0.3F}, 0.1F, 0.3F);
+    impact.setIncrementParticles(Vector2{0.01F, -0.01F}, 0.0F, ColorF{0.0F, 0.0F, 0.0F, -3.0F});
+    impact.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.003F, .rotation = 0.02F, .tint = 0.1F});
+    _vfxs.insert({"impact", std::move(impact)});
 
     // Temporary test VFXs, will be removed later
 }
