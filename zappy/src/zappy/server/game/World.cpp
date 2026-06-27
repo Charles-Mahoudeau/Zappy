@@ -36,21 +36,13 @@
 #include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server::game {
-World::World(const math::Vector2u size, std::optional<io::Logger> logger) : _grid{size}, _logger{std::move(logger)} {
+World::World(const math::Vector2u size, Timer& timer, std::optional<io::Logger> logger)
+    : _grid{size}, _timer{timer}, _logger{std::move(logger)} {
     generateResourceThresholds();
     if (_logger.has_value()) {
         _logger->info("World initialized.");
     }
-}
-
-void World::update() {
-    // TODO: Use timer class when ready.
-    --_nextMajorTick;
-    if (_nextMajorTick != 0) {
-        return;
-    }
-    spawnResources();
-    _nextMajorTick = kMajorTickInterval;
+    _timer.get().scheduleEvery(kFoodRegenerationInterval, [this] { spawnResources(); });
 }
 
 math::Vector2u World::size() const { return _grid.size(); }
@@ -205,6 +197,7 @@ const std::unordered_map<ResourceType, float>& World::resourceDensities() {
         {kFood, 0.5F},     {kLinemate, 0.3F}, {kDeraumere, 0.15F}, {kSibur, 0.1F},
         {kMendiane, 0.1F}, {kPhiras, 0.08F},  {kThystame, 0.05F},
     };
+
     return resourceDensities;
 }
 

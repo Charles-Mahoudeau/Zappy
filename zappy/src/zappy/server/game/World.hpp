@@ -25,15 +25,16 @@
 #include "ResourceType.hpp"
 #include "Tile.hpp"
 #include "entity/Player.hpp"
+#include "zappy/server/Timer.hpp"
 #include "zappy/shared/io/Logger.hpp"
 #include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server::game {
 class World : public IEventEmitter {
   public:
-    static constexpr std::uint16_t kMajorTickInterval{20};
+    static constexpr std::uint16_t kFoodRegenerationInterval{20};
 
-    explicit World(math::Vector2u size, std::optional<io::Logger> logger = std::nullopt);
+    explicit World(math::Vector2u size, Timer& timer, std::optional<io::Logger> logger = std::nullopt);
     ~World() override = default;
 
     World(const World&) = delete;
@@ -41,9 +42,6 @@ class World : public IEventEmitter {
 
     World(World&&) = delete;
     World& operator=(World&&) = delete;
-
-    /// @brief Updates the world state.
-    void update();
 
     /// @brief Returns the size of the world.
     /// @return The size of the world.
@@ -159,9 +157,9 @@ class World : public IEventEmitter {
     std::mt19937 _randomEngine{_randomDevice()};
     EntityDatabase _entityDatabase;
     Grid _grid;
+    std::reference_wrapper<Timer> _timer;
     std::optional<io::Logger> _logger;
     std::unordered_map<ResourceType, std::uint64_t> _resourceThresholds;
-    std::uint16_t _nextMajorTick{kMajorTickInterval};
     std::deque<Event> _events;
 };
 
