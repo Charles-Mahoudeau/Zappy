@@ -38,6 +38,12 @@ void Renderer::update(Camera& camera, game::GameState& state, AssetStore& assets
     assets.skybox().draw(camera.position());
     display::Window::EndMode3D();
 
+    static float timeIncrement = 0.0F;
+    timeIncrement += GetFrameTime() * static_cast<float>(state.timeUnit());
+    if (timeIncrement >= 75.0F) {
+        timeIncrement = 0.0F;
+        assets.emit("impact", Vector3{0.0F, 0.0F, 0.0F});
+    }
     _grid.resize(state.width(), state.height());
     display::Window::BeginMode3D(camera);
     _grid.draw(assets);
