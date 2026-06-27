@@ -42,8 +42,10 @@ World::World(const math::Vector2u size, Timer& timer, std::optional<io::Logger> 
     if (_logger.has_value()) {
         _logger->info("World initialized.");
     }
-    _timer.get().scheduleEvery(kFoodRegenerationInterval, [this] { spawnResources(); });
+    _resourceSpawnTimerId = _timer.get().scheduleEvery(kFoodRegenerationInterval, [this] { spawnResources(); });
 }
+
+World::~World() { _timer.get().unschedule(_resourceSpawnTimerId); }
 
 math::Vector2u World::size() const { return _grid.size(); }
 

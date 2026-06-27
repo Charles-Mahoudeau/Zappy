@@ -35,7 +35,7 @@ class World : public IEventEmitter {
     static constexpr std::uint16_t kFoodRegenerationInterval{20};
 
     explicit World(math::Vector2u size, Timer& timer, std::optional<io::Logger> logger = std::nullopt);
-    ~World() override = default;
+    ~World() override;
 
     World(const World&) = delete;
     World& operator=(const World&) = delete;
@@ -160,6 +160,7 @@ class World : public IEventEmitter {
     std::reference_wrapper<Timer> _timer;
     std::optional<io::Logger> _logger;
     std::unordered_map<ResourceType, std::uint64_t> _resourceThresholds;
+    std::uint64_t _resourceSpawnTimerId;
     std::deque<Event> _events;
 };
 
