@@ -8,6 +8,7 @@
 #include "zappy/server/client/ClientRegistry.hpp"
 
 #include <algorithm>
+#include <cstdint>
 #include <memory>
 #include <string_view>
 #include <utility>
@@ -71,10 +72,19 @@ void ClientRegistry::updateTypeGroup() {
 }
 
 Client* ClientRegistry::findByAddress(const network::Address& addr) {
-    if (auto iter = std::ranges::find_if(
+    if (const auto iter = std::ranges::find_if(
             this->_clients, [&addr](const std::unique_ptr<Client>& client) { return client->address() == addr; });
         iter != this->_clients.end()) {
         return iter.base()->get();
+    }
+    return nullptr;
+}
+
+Client* ClientRegistry::findByPlayerId(std::uint64_t playerId) {
+    if (const auto it = std::ranges::find_if(
+            _clients, [&playerId](const std::unique_ptr<Client>& client) { return playerId == client->playerID(); });
+        it != this->_clients.end()) {
+        return it.base()->get();
     }
     return nullptr;
 }
