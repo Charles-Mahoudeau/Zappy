@@ -190,7 +190,7 @@ void World::remove(const std::uint64_t entityId) {
 bool World::hasEvents() const { return !_events.empty(); }
 
 Event World::popEvent() {
-    Event event{std::move(_events.back())};
+    Event event{std::move(_events.front())};
 
     _events.pop_front();
     return event;
