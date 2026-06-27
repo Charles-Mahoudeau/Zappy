@@ -155,11 +155,12 @@ std::expected<std::uint64_t, std::string> World::hatchRandomEgg(const std::strin
         _entityDatabase.insert(std::make_unique<entity::Player>(_grid, *this, std::string{teamName}));
 
     parentTile->addEntity(playerId);
+    const entity::Player* player = this->player(playerId);
     pushEvent(PlayerConnectionEvent{
         .playerId = playerId,
         .position = parentTile->position(),
-        .orientation = math::Direction::kNorth,
-        .level = 0,
+        .orientation = player->orientation(),
+        .level = player->level(),
         .teamName = std::string{teamName},
     });
     pushEvent(EggConnectionEvent{
