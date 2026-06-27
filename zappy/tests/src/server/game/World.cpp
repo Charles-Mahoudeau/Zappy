@@ -22,9 +22,11 @@
 namespace {
 class WorldTest : public testing::Test {
   public:
+    [[nodiscard]] zappy::server::Timer& timer() { return _timer; }
     [[nodiscard]] zappy::io::Logger logger(const std::string_view testName) const { return _logger.derive(testName); }
 
   private:
+    zappy::server::Timer _timer;
     zappy::io::Logger _logger{"World"};
 };
 }  // namespace
@@ -32,6 +34,7 @@ class WorldTest : public testing::Test {
 TEST_F(WorldTest, Size) {
     const zappy::server::game::World world1{
         {69, 42},
+        timer(),
         logger("Size"),
     };
 
@@ -39,19 +42,21 @@ TEST_F(WorldTest, Size) {
 
     const zappy::server::game::World world2{
         {3, 10},
+        timer(),
         logger("Size"),
     };
 
     EXPECT_EQ(world2.size(), (zappy::math::Vector2u{3, 10}));
 
-    EXPECT_THROW((zappy::server::game::World{{0, 0}}), zappy::exception::OutOfRange);
-    EXPECT_THROW((zappy::server::game::World{{1, 0}}), zappy::exception::OutOfRange);
-    EXPECT_THROW((zappy::server::game::World{{0, 1}}), zappy::exception::OutOfRange);
+    EXPECT_THROW((zappy::server::game::World{{0, 0}, timer()}), zappy::exception::OutOfRange);
+    EXPECT_THROW((zappy::server::game::World{{1, 0}, timer()}), zappy::exception::OutOfRange);
+    EXPECT_THROW((zappy::server::game::World{{0, 1}, timer()}), zappy::exception::OutOfRange);
 }
 
 TEST_F(WorldTest, ResourceCounting) {
     zappy::server::game::World world{
         {10, 10},
+        timer(),
         logger("ResourceCounting"),
     };
 
@@ -63,6 +68,7 @@ TEST_F(WorldTest, ResourceCounting) {
 TEST_F(WorldTest, EggSpawning) {
     zappy::server::game::World world{
         {10, 10},
+        timer(),
         logger("EggSpawning"),
     };
 
@@ -74,6 +80,7 @@ TEST_F(WorldTest, EggSpawning) {
 TEST_F(WorldTest, TeamCount) {
     zappy::server::game::World world{
         {10, 10},
+        timer(),
         logger("EggSpawning"),
     };
 
@@ -90,6 +97,7 @@ TEST_F(WorldTest, TeamCount) {
 TEST_F(WorldTest, PlayerAccess) {
     zappy::server::game::World world{
         {10, 10},
+        timer(),
         logger("PlayerAccess"),
     };
 
