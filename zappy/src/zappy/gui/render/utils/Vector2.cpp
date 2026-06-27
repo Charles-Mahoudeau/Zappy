@@ -7,6 +7,8 @@
 
 #include "Vector2.hpp"
 
+#include <raylib.h>
+
 #include <cmath>
 
 namespace zappy::gui::render {
