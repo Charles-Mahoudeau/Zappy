@@ -42,7 +42,8 @@ World::World(const math::Vector2u size, Timer& timer, std::optional<io::Logger> 
     if (_logger.has_value()) {
         _logger->info("World initialized.");
     }
-    _resourceSpawnTimerId = _timer.get().scheduleEvery(kFoodRegenerationInterval, [this] { spawnResources(); });
+    _resourceSpawnTimerId = _timer.get().scheduleEvery(
+        kFoodRegenerationInterval, [this] { spawnResources(); }, [this] { return _resourcesDirty; });
 }
 
 World::~World() { _timer.get().unschedule(_resourceSpawnTimerId); }
@@ -88,6 +89,8 @@ void World::spawnResource(const ResourceType type) {
         .inventory = tile.inventory(),
     });
 }
+
+void World::markResourcesDirty() { _resourcesDirty = true; }
 
 void World::spawnStartEggs(const std::span<const std::string_view> teams, const std::uint8_t playersPerTeam) {
     for (const std::string_view teamName : teams) {
@@ -204,7 +207,7 @@ const std::unordered_map<ResourceType, float>& World::resourceDensities() {
 }
 
 void World::spawnResources() {
-    bool hasSpawned = false;
+    bool hasSpawned = true;  // FIXME: Remove me
 
     for (const auto& [resourceType, quantity] : _resourceThresholds) {
         for (std::uint64_t count = countResources(resourceType); count < quantity; ++count) {
@@ -212,6 +215,7 @@ void World::spawnResources() {
             hasSpawned = true;
         }
     }
+    _resourcesDirty = false;
     if (_logger.has_value() && hasSpawned) {
         _logger->info("Resources spawned.");
     }

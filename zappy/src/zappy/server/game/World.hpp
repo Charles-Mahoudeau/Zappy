@@ -82,6 +82,9 @@ class World : public IEventEmitter {
     /// @return The ID of the spawned resource.
     void spawnResource(ResourceType type);
 
+    /// @brief Marks the resources as dirty, indicating that they need to be regenerated.
+    void markResourcesDirty();
+
     /// @brief Spawns the initial eggs in the world.
     void spawnStartEggs(std::span<const std::string_view> teams, std::uint8_t playersPerTeam);
 
@@ -161,6 +164,7 @@ class World : public IEventEmitter {
     std::optional<io::Logger> _logger;
     std::unordered_map<ResourceType, std::uint64_t> _resourceThresholds;
     std::uint64_t _resourceSpawnTimerId;
+    bool _resourcesDirty{true};
     std::deque<Event> _events;
 };
 
