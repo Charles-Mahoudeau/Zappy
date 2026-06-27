@@ -13,6 +13,7 @@
 #include <expected>
 
 #include "server/game/WorldMock.hpp"
+#include "zappy/server/Timer.hpp"
 #include "zappy/server/game/Grid.hpp"
 
 namespace zappy::server::game::entity {
