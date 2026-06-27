@@ -126,10 +126,10 @@ void AssetStore::loadResourceModel(game::ResourceType type) {
 void AssetStore::loadVFXs() {
     ParticleEmitter impact("assets/particles/Impact.png");
     impact.setStatic(Vector3{}, Vector3{0.5F, 0.5F, 0.5F}, Vector3{0.0F, 0.0F, 0.0F}, 0.0F, 1);
-    impact.setInitParticles(Vector2{0.5F, 0.5F}, 0.0F, ColorF{255.0F, 255.0F, 255.0F, 180.0F}, 45.0F, 0.0F);
+    impact.setInitParticles(Vector2{0.5F, 0.5F}, 0.0F, ColorF{180.0F, 180.0F, 180.0F, 180.0F}, 45.0F, 0.0F);
     impact.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 360.0F, .tint = 0.3F}, 0.1F,
                            0.0F);
-    impact.setIncrementParticles(Vector2{0.045F, 0.045F}, 0.0F, ColorF{0.0F, 0.0F, 0.0F, -4.0F});
+    impact.setIncrementParticles(Vector2{0.045F, 0.045F}, 0.0F, ColorF{-4.0F, -4.0F, -4.0F, -4.0F});
     impact.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.01F, .rotation = 0.02F, .tint = 0.1F});
     _vfxs.insert({"impact", std::move(impact)});
 
@@ -137,7 +137,7 @@ void AssetStore::loadVFXs() {
     signal.setStatic(Vector3{}, Vector3{0.0F, 0.0F, 0.0F}, Vector3{0.0F, 0.0F, 0.0F}, 0.0F, 1);
     signal.setInitParticles(Vector2{1.0F, 1.0F}, 0.0F, ColorF{220.0F, 255.0F, 255.0F, 255.0F}, 600.0F, 0.0F);
     signal.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 0.0F, .tint = 0.3F}, 0.1F, 0.0F);
-    signal.setIncrementParticles(Vector2{0.08F, 0.08F}, 0.0F, ColorF{0.0F, 0.0F, 0.0F, -1.2F});
+    signal.setIncrementParticles(Vector2{0.08F, 0.08F}, 0.0F, ColorF{-1.2F, -1.2F, -1.2F, -1.2F});
     signal.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.01F, .rotation = 0.0F, .tint = 0.1F});
     _vfxs.insert({"signal", std::move(signal)});
 
@@ -146,16 +146,16 @@ void AssetStore::loadVFXs() {
     eggCrack.setInitParticles(Vector2{0.8F, 0.8F}, 0.0F, ColorF{245.0F, 220.0F, 180.0F, 255.0F}, 90.0F, 0.06F);
     eggCrack.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.2F, .rotation = 360.0F, .tint = 10.0F}, 3.0F,
                              0.03F);
-    eggCrack.setIncrementParticles(Vector2{-0.01F, -0.01F}, 0.0F, ColorF{-0.05F, -0.05F, -0.05F, -1.0F});
+    eggCrack.setIncrementParticles(Vector2{-0.01F, -0.01F}, 0.0F, ColorF{-1.0F, -1.0F, -1.0F, -1.0F});
     eggCrack.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.002F, .rotation = 3.0F, .tint = 0.1F});
     _vfxs.insert({"eggCrack", std::move(eggCrack)});
 
     ParticleEmitter smoke("assets/particles/Smoke.png");
     smoke.setStatic(Vector3{}, Vector3{1.0F, 1.0F, 1.0F}, Vector3{0.0F, 0.0008F, 0.0F}, 180.0F, 12);
-    smoke.setInitParticles(Vector2{0.8F, 0.8F}, 0.0F, ColorF{255.0F, 230.0F, 230.0F, 100.0F}, 150.0F, 0.03F);
+    smoke.setInitParticles(Vector2{0.8F, 0.8F}, 0.0F, ColorF{100.0F, 90.0F, 90.0F, 100.0F}, 150.0F, 0.03F);
     smoke.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.2F, .rotation = 360.0F, .tint = 10.0F}, 0.1F,
                           0.03F);
-    smoke.setIncrementParticles(Vector2{0.01F, 0.01F}, 0.0F, ColorF{0.0F, 0.0F, 0.0F, -1.0F});
+    smoke.setIncrementParticles(Vector2{0.01F, 0.01F}, 0.0F, ColorF{-1.0F, -1.0F, -1.0F, -1.0F});
     smoke.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.004F, .rotation = 2.0F, .tint = 0.3F});
     _vfxs.insert({"smoke", std::move(smoke)});
 }
