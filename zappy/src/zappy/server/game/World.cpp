@@ -450,7 +450,8 @@ std::expected<void, std::string> World::verifyIncantationRequirements(const Inca
             return std::unexpected{"participant is not at the right position"};
         }
     }
-    if (const Tile& incantationTile = _grid.tile(snapshot.position); incantationTile.inventory() < resourcesNecessary) {
+    if (const Tile& incantationTile = _grid.tile(snapshot.position);
+        !incantationTile.inventory().canAfford(resourcesNecessary)) {
         return std::unexpected{"not enough resources"};
     }
     return {};
