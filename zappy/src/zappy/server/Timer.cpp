@@ -100,7 +100,7 @@ std::uint64_t Timer::scheduleLater(const int timeout, std::function<void()> noti
         .timeout = timeout,
         .notifier = std::move(notifier),
         .condition = nullptr,
-        .repeatedTimeout = timeout,
+        .repeatedTimeout = -1,
     });
     ++_nextId;
     return id;
