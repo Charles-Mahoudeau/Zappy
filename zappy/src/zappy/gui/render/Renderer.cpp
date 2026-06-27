@@ -30,8 +30,6 @@ namespace zappy::gui::render {
 void Renderer::update(Camera& camera, game::GameState& state, AssetStore& assets) {
     static constexpr float kSkyboxFovy = 60.0F;
 
-    static float testTime = 0.0F;
-
     camera.update();
 
     Camera skyboxCamera{camera.position(), camera.target(), camera.up(), kSkyboxFovy,
@@ -41,15 +39,6 @@ void Renderer::update(Camera& camera, game::GameState& state, AssetStore& assets
     display::Window::EndMode3D();
 
     _grid.resize(state.width(), state.height());
-
-    testTime += GetFrameTime() * static_cast<float>(state.timeUnit());
-    if (testTime >= 200.0F) {
-        testTime = 0.0F;
-        assets.emit("test1", Vector3{-5.0F, 0.0F, 0.0F});
-        assets.emit("test2", Vector3{5.0F, 0.0F, 0.0F});
-        assets.emit("test3", Vector3{0.0F, 0.0F, -5.0F});
-        assets.emit("test4", Vector3{0.0F, 0.0F, 5.0F});
-    }
     display::Window::BeginMode3D(camera);
     _grid.draw(assets);
     drawResources(state, assets);
