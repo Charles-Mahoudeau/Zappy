@@ -133,7 +133,7 @@ void AssetStore::loadVFXs() {
     _vfxs.insert({"test1", std::move(test1)});
 
     ParticleEmitter impact("assets/particles/Impact.png");
-    impact.setStatic(Vector3{}, Vector3{0.5F, 0.5F, 0.5F}, Vector3{0.0F, 0.0F, 0.0F}, 0.0F, 1);
+    impact.setStatic(Vector3{}, Vector3{0.5F, 0.5F, 0.5F}, Vector3{0.0F, 0.0F, 0.0F}, 0.0F, 2);
     impact.setInitParticles(Vector2{0.5F, 0.5F}, 0.0F, ColorF{255.0F, 255.0F, 255.0F, 180.0F}, 45.0F, 0.0F);
     impact.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 0.5F, .tint = 0.3F}, 0.1F, 0.0F);
     impact.setIncrementParticles(Vector2{0.03F, 0.03F}, 0.0F, ColorF{0.0F, 0.0F, 0.0F, -1.5F});
