@@ -143,7 +143,7 @@ void AssetStore::loadVFXs() {
 
     ParticleEmitter eggCrack("assets/particles/Shard.png");
     eggCrack.setStatic(Vector3{}, Vector3{1.0F, 1.0F, 1.0F}, Vector3{0.0F, -0.002F, 0.0F}, 100.0F, 16);
-    eggCrack.setInitParticles(Vector2{0.8F, 0.8F}, 0.0F, ColorF{255.0F, 240.0F, 200.0F, 255.0F}, 90.0F, 0.06F);
+    eggCrack.setInitParticles(Vector2{0.8F, 0.8F}, 0.0F, ColorF{245.0F, 220.0F, 180.0F, 255.0F}, 90.0F, 0.06F);
     eggCrack.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.2F, .rotation = 360.0F, .tint = 10.0F}, 3.0F,
                              0.03F);
     eggCrack.setIncrementParticles(Vector2{-0.01F, -0.01F}, 0.0F, ColorF{0.0F, 0.0F, 0.0F, -1.0F});
