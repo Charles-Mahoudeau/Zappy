@@ -466,7 +466,7 @@ void World::generateResourceThresholds() {
 std::uint32_t World::computeDistFromPositions(math::Vector2u emitter, math::Vector2u receiver) const {
     const auto size = _grid.size();
 
-    const auto wrappedDist = [](std::uint32_t a, std::uint32_t b, std::uint32_t length) -> std::uint32_t {
+    const auto wrappedDist = [](std::uint32_t a, std::uint32_t b, std::uint32_t length) {
         const std::uint32_t diff = a > b ? a - b : b - a;
         return std::min(diff, length - diff);
     };
