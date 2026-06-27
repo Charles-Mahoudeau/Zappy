@@ -102,6 +102,25 @@ std::string Inventory::string() const {
     return stringStream.str();
 }
 
+std::string Inventory::list() const {
+    std::stringstream stringStream;
+    static const std::vector<std::string> resourcesName = {"food",     "linemate", "deraumere", "sibur",
+                                                           "mendiane", "phiras",   "thystame"};
+
+    for (std::uint8_t i = 0; i < std::to_underlying(ResourceType::kCount); ++i) {
+        const auto it = _resources.find(ResourceType{i});
+
+        if (it == this->_resources.end()) {
+            continue;
+        }
+
+        for (std::uint16_t nb = 0; nb < it->second; nb++) {
+            stringStream << " " << resourcesName.at(i);
+        }
+    }
+    return stringStream.str();
+}
+
 bool Inventory::isValidResourceType(const ResourceType type) {
     return std::to_underlying(type) < std::to_underlying(ResourceType::kCount);
 }
