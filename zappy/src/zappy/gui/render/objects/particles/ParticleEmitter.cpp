@@ -22,7 +22,7 @@
 #include "RandomValue.hpp"
 #include "Texture.hpp"
 #include "TimeValue.hpp"
-#include "Vec2D.hpp"
+#include "Vector2.hpp"
 #include "Vector3.hpp"
 
 namespace zappy::gui::render {
@@ -34,7 +34,7 @@ void ParticleEmitter::setSpread(float spread) { _spread = spread; }
 void ParticleEmitter::setRate(uint16_t rate) { _rate = rate; }
 void ParticleEmitter::setSpeed(float speed, float envelope) { _speed = RandomValue{speed, envelope}; }
 void ParticleEmitter::setLifetime(float lifetime, float envelope) { _lifetime = RandomValue{lifetime, envelope}; }
-void ParticleEmitter::setSize(Vec2D size, Vec2D increment) { _size = TimeValue<Vec2D>{size, increment}; }
+void ParticleEmitter::setSize(Vector2 size, Vector2 increment) { _size = TimeValue<Vector2>{size, increment}; }
 void ParticleEmitter::setRotation(float rotation, float increment) {
     _rotation = TimeValue<float>{rotation, increment};
 }
@@ -71,8 +71,8 @@ void ParticleEmitter::particle() {
     Particle newParticle;
     const Vector3 speed = getDirection() * RandomValue{_speed.value(), _speed.envelope()}.generate();
     const float lifetime = RandomValue{_lifetime.value(), _lifetime.envelope()}.generate();
-    const Vec2D initSize = _size.get() * RandomValue{1.0F, _initEnvelope.size}.generate();
-    const Vec2D incSize = _size.increment() * RandomValue{1.0F, _incrementEnvelope.size}.generate();
+    const Vector2 initSize = _size.get() * RandomValue{1.0F, _initEnvelope.size}.generate();
+    const Vector2 incSize = _size.increment() * RandomValue{1.0F, _incrementEnvelope.size}.generate();
     const float initRot = RandomValue{_rotation.get(), _initEnvelope.rotation}.generate();
     const float incRot = RandomValue{_rotation.increment(), _incrementEnvelope.rotation}.generate();
     const ColorF initTint = _tint.get() * RandomValue{1.0F, _initEnvelope.tint}.generate();
@@ -109,16 +109,16 @@ Vector3 ParticleEmitter::getDirection() const {
     return Vector3{x, y, z};
 }
 
-void ParticleEmitter::setInitParticles(Vec2D size, float rotation, ColorF tint, float lifetime, float speed) {
-    _size = TimeValue<Vec2D>{size, Vec2D{0.0F, 0.0F}};
+void ParticleEmitter::setInitParticles(Vector2 size, float rotation, ColorF tint, float lifetime, float speed) {
+    _size = TimeValue<Vector2>{size, Vector2{0.0F, 0.0F}};
     _rotation = TimeValue<float>{rotation, 0.0F};
     _tint = TimeValue<ColorF>{tint, ColorF{0.0F, 0.0F, 0.0F, 0.0F}};
     _lifetime.setValue(lifetime);
     _speed.setValue(speed);
 }
 
-void ParticleEmitter::setIncrementParticles(Vec2D sizeIncrement, float rotationIncrement, ColorF tintIncrement) {
-    _size = TimeValue<Vec2D>{_size.get(), sizeIncrement};
+void ParticleEmitter::setIncrementParticles(Vector2 sizeIncrement, float rotationIncrement, ColorF tintIncrement) {
+    _size = TimeValue<Vector2>{_size.get(), sizeIncrement};
     _rotation = TimeValue<float>{_rotation.get(), rotationIncrement};
     _tint = TimeValue<ColorF>{_tint.get(), tintIncrement};
 }
@@ -131,8 +131,8 @@ void ParticleEmitter::setInitEnvelope(ParticleEnvelope envelope, float lifetime,
 
 void ParticleEmitter::setIncrementEnvelope(ParticleEnvelope envelope) { _incrementEnvelope = envelope; }
 
-void ParticleEmitter::setStaticParticles(Vec2D size, float rotation, ColorF tint, float lifetime, float speed) {
-    _size = TimeValue<Vec2D>{size, Vec2D{0.0F, 0.0F}};
+void ParticleEmitter::setStaticParticles(Vector2 size, float rotation, ColorF tint, float lifetime, float speed) {
+    _size = TimeValue<Vector2>{size, Vector2{0.0F, 0.0F}};
     _rotation = TimeValue<float>{rotation, 0.0F};
     _tint = TimeValue<ColorF>{tint, ColorF{0.0F, 0.0F, 0.0F, 0.0F}};
     _lifetime.setValue(lifetime);

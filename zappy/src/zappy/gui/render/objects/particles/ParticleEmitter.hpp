@@ -17,7 +17,7 @@
 #include "../../utils/ColorF.hpp"
 #include "../../utils/RandomValue.hpp"
 #include "../../utils/TimeValue.hpp"
-#include "../../utils/Vec2D.hpp"
+#include "../../utils/Vector2.hpp"
 #include "../../utils/Vector3.hpp"
 #include "../Texture.hpp"
 #include "Particle.hpp"
@@ -46,17 +46,17 @@ class ParticleEmitter {
     void setSpeed(float speed, float envelope = 0.0F);
     void setRate(uint16_t rate);
     void setLifetime(float lifetime, float envelope = 0.0F);
-    void setSize(Vec2D size, Vec2D increment);
+    void setSize(Vector2 size, Vector2 increment);
     void setRotation(float rotation, float increment);
     void setTint(ColorF tint, ColorF increment);
 
     void setStatic(Vector3 origin, Vector3 volume, Vector3 acceleration, float spread, uint16_t rate);
-    void setInitParticles(Vec2D size, float rotation, ColorF tint, float lifetime, float speed);
-    void setIncrementParticles(Vec2D sizeIncrement, float rotationIncrement, ColorF tintIncrement);
+    void setInitParticles(Vector2 size, float rotation, ColorF tint, float lifetime, float speed);
+    void setIncrementParticles(Vector2 sizeIncrement, float rotationIncrement, ColorF tintIncrement);
     void setInitEnvelope(ParticleEnvelope envelope, float lifetime, float speed);
     void setIncrementEnvelope(ParticleEnvelope envelope);
 
-    void setStaticParticles(Vec2D size, float rotation, ColorF tint, float lifetime, float speed);
+    void setStaticParticles(Vector2 size, float rotation, ColorF tint, float lifetime, float speed);
 
     [[nodiscard]] Vector3 origin() const { return _origin; }
     [[nodiscard]] Vector3 volume() const { return _volume; }
@@ -64,7 +64,7 @@ class ParticleEmitter {
     [[nodiscard]] float speed() const { return _speed.value(); }
     [[nodiscard]] uint16_t rate() const { return _rate; }
     [[nodiscard]] float lifetime() const { return _lifetime.generate(); }
-    [[nodiscard]] Vec2D size() const { return _size.get(); }
+    [[nodiscard]] Vector2 size() const { return _size.get(); }
     [[nodiscard]] float rotation() const { return _rotation.get(); }
     [[nodiscard]] ColorF tint() const { return _tint.get(); }
 
@@ -88,7 +88,7 @@ class ParticleEmitter {
     RandomValue _speed{0.0F, 0.0F};
     RandomValue _lifetime{1.0F, 0.0F};
     uint16_t _rate{1};
-    TimeValue<Vec2D> _size{Vec2D{1.0F, 1.0F}, Vec2D{0.0F, 0.0F}};
+    TimeValue<Vector2> _size{Vector2{1.0F, 1.0F}, Vector2{0.0F, 0.0F}};
     TimeValue<float> _rotation{0.0F, 0.0F};
     TimeValue<ColorF> _tint{ColorF(Color::kWHITE), ColorF(Color::kWHITE)};
     ParticleEnvelope _initEnvelope;

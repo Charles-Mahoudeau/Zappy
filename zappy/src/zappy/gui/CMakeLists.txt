@@ -42,14 +42,13 @@ add_library(zappy_gui_objects OBJECT
         render/objects/particles/ParticleEmitter.hpp
         render/objects/particles/Particle.cpp
         render/objects/particles/Particle.hpp
-        render/utils/Vec2D.cpp
-        render/utils/Vec2D.hpp
+        render/utils/Vector2.cpp
+        render/utils/Vector2.hpp
         render/utils/Color.hpp
         render/utils/ColorF.hpp
         render/utils/ColorF.cpp
         render/utils/Ray.hpp
         render/utils/Rectangle.hpp
-        render/utils/Vector2.hpp
         render/utils/Vector3.hpp
         render/utils/RandomValue.cpp
         render/utils/RandomValue.hpp
