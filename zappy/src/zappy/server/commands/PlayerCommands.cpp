@@ -60,8 +60,12 @@ bool PlayerCommands::ignore(const CommandCtx& ctx) {
 }
 
 bool PlayerCommands::inventory(CommandCtx& ctx) {
-    ctx.client->setTimeout(1, [&ctx, id = ctx.client->playerID()]() {
-        const player::PlayerData data(ctx, id);
+    auto clients = ctx.clientRegistry;
+    auto world = ctx.world;
+    auto id = ctx.client->playerID();
+
+    ctx.client->setTimeout(1, [clients, world, id]() {
+        const player::PlayerData data(clients, world, id);
 
         if (!data.valid()) {
             return;

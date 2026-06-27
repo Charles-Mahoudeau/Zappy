@@ -31,25 +31,28 @@ bool ObjectCommand::drop(ICommandGroup::CommandCtx& ctx) {
 
 bool ObjectCommand::action(ICommandGroup::CommandCtx& ctx,
                            std::function<bool(game::ResourceType resource, game::entity::Player* player)> event) {
-    ctx.client->setTimeout(
-        7, [&ctx, id = ctx.client->playerID(), params = std::move(ctx.data.params), event = std::move(event)]() {
-            player::PlayerData data(ctx, id);
+    auto clients = ctx.clientRegistry;
+    auto world = ctx.world;
+    auto id = ctx.client->playerID();
 
-            if (!data.valid()) {
-                return;
-            }
-            if (params.size() != 1) {
-                data.client()->sendError();
-                return;
-            }
-            auto resource = game::ResourceHelper::strToRessource(params.at(0));
+    ctx.client->setTimeout(7, [clients, world, id, params = std::move(ctx.data.params), event = std::move(event)]() {
+        player::PlayerData data(clients, world, id);
 
-            if (!resource.has_value() || !event(resource.value(), data.player())) {
-                data.client()->sendError();
-            } else {
-                data.client()->sendSuccess();
-            }
-        });
+        if (!data.valid()) {
+            return;
+        }
+        if (params.size() != 1) {
+            data.client()->sendError();
+            return;
+        }
+        auto resource = game::ResourceHelper::strToRessource(params.at(0));
+
+        if (!resource.has_value() || !event(resource.value(), data.player())) {
+            data.client()->sendError();
+        } else {
+            data.client()->sendSuccess();
+        }
+    });
     return true;
 }
 

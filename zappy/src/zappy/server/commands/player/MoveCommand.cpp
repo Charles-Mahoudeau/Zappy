@@ -20,13 +20,17 @@ bool MoveCommand::right(ICommandGroup::CommandCtx& ctx) { return MoveCommand::mo
 bool MoveCommand::left(ICommandGroup::CommandCtx& ctx) { return MoveCommand::move(ctx, Move::kLeft); }
 
 bool MoveCommand::move(ICommandGroup::CommandCtx& ctx, Move move) {
-    ctx.client->setTimeout(7, [&ctx, id = ctx.client->playerID(), move]() {
+    auto clients = ctx.clientRegistry;
+    auto world = ctx.world;
+    auto id = ctx.client->playerID();
+
+    ctx.client->setTimeout(7, [clients, world, id, move]() {
         static std::unordered_map<Move, std::function<void(game::entity::Player * player)>> map{
             {Move::kForward, [](game::entity::Player* player) { player->moveForward(); }},
             {Move::kLeft, [](game::entity::Player* player) { player->turnLeft(); }},
             {Move::kRight, [](game::entity::Player* player) { player->turnRight(); }},
         };
-        PlayerData data(ctx, id);
+        PlayerData data(clients, world, id);
 
         if (!data.valid()) {
             return;
