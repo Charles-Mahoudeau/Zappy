@@ -147,7 +147,7 @@ bool PlayerCommands::look(CommandCtx& ctx) {
     auto world = ctx.world;
     auto id = ctx.client->playerID();
 
-    ctx.client->setTimeout(1, [clients, world, id]() {
+    ctx.client->setTimeout(42, [clients, world, id]() {
         const player::PlayerData data(clients, world, id);
 
         if (!data.valid()) {
