@@ -8,11 +8,11 @@
 #include "Player.hpp"
 
 #include <cstdint>
+#include <exception>
 #include <expected>
 #include <functional>
 #include <iostream>
 #include <optional>
-#include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -42,7 +42,7 @@ Player::~Player() {
     if (_foodTimerId.has_value()) {
         try {
             timer().unschedule(_foodTimerId.value());
-        } catch (const std::bad_alloc&) {
+        } catch (const std::exception&) {
             std::cerr << "You tried to destroy a Player (maybe to save some memory), but you did not have enough "
                          "memory to do so. That's quite amusing, isn't it?"
                       << std::endl;
@@ -51,7 +51,7 @@ Player::~Player() {
 }
 
 Player::Player(Player&& other) noexcept
-    : AEntity{other},
+    : AEntity{static_cast<AEntity&&>(other)},
       _alive{other._alive},
       _level{other._level},
       _orientation{other._orientation},
@@ -65,7 +65,6 @@ Player& Player::operator=(Player&& other) noexcept {
     if (this == &other) {
         return *this;
     }
-    AEntity::operator=(std::move(other));
     _alive = other._alive;
     _level = other._level;
     _orientation = other._orientation;
@@ -73,6 +72,7 @@ Player& Player::operator=(Player&& other) noexcept {
     _foodTimerId = other._foodTimerId;
     other._alive = false;
     other._foodTimerId = std::nullopt;
+    AEntity::operator=(std::move(other));
     return *this;
 }
 
