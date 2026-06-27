@@ -9,6 +9,7 @@
 
 #include <raylib.h>
 
+#include <algorithm>
 #include <cmath>
 #include <random>
 
@@ -29,10 +30,13 @@ class RandomValue {
     [[nodiscard]] float envelope() const { return _envelope; }
 
     [[nodiscard]] float generate() const {
+        if (_envelope == 0.0F) {
+            return _value;
+        }
         const float rawEnvelope = std::abs(_value * _envelope);
         const float min = _value - rawEnvelope;
         const float max = _value + rawEnvelope;
-        auto [rangeMin, rangeMax] = std::minmax(min, max);
+        auto [rangeMin, rangeMax] = std::minmax<float>(min, max);
         auto& rng = getRng();
 
         std::uniform_real_distribution<float> dist{rangeMin, rangeMax};
