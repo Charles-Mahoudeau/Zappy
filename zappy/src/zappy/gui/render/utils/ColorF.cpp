@@ -7,6 +7,8 @@
 
 #include "ColorF.hpp"
 
+#include <algorithm>
+
 #include "Color.hpp"
 
 namespace zappy::gui::render {

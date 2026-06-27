@@ -16,6 +16,7 @@
 #include "ColorF.hpp"
 #include "RandomValue.hpp"
 #include "TimeValue.hpp"
+#include "Vec2D.hpp"
 #include "Vector3.hpp"
 
 namespace zappy::gui::render {

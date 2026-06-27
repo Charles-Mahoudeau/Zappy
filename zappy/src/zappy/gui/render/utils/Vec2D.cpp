@@ -45,7 +45,7 @@ Vec2D& Vec2D::operator*=(float scalar) {
 }
 
 Vec2D& Vec2D::operator/=(float scalar) {
-    if (scalar == 0) {
+    if (scalar == 0.0F) {
         return *this;
     }
     _vec2.x /= scalar;
@@ -60,7 +60,7 @@ Vec2D Vec2D::operator-(const Vec2D& other) const { return Vec2D{_vec2.x - other.
 Vec2D Vec2D::operator*(float scalar) const { return Vec2D{_vec2.x * scalar, _vec2.y * scalar}; }
 
 Vec2D Vec2D::operator/(float scalar) const {
-    if (scalar == 0) {
+    if (scalar == 0.0F) {
         return *this;
     }
     return Vec2D{_vec2.x / scalar, _vec2.y / scalar};
@@ -76,8 +76,8 @@ float Vec2D::lengthSquared() const { return (_vec2.x * _vec2.x) + (_vec2.y * _ve
 
 Vec2D Vec2D::normalized() const {
     const float len = length();
-    if (len == 0) {
-        return Vec2D{0, 0};
+    if (len == 0.0F) {
+        return Vec2D{0.0F, 0.0F};
     }
     return *this / len;
 }

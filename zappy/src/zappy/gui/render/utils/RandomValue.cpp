@@ -7,6 +7,10 @@
 
 #include "RandomValue.hpp"
 
+#include <algorithm>
+#include <cmath>
+#include <random>
+
 namespace zappy::gui::render {
 
 RandomValue::RandomValue(float val, float envelope) : _value{val} { setEnvelope(envelope); }

@@ -26,6 +26,8 @@ class Particle {
     ~Particle() = default;
 
     Particle& operator=(const Particle&) = default;
+    Particle& operator=(Particle&&) noexcept = default;
+
     [[nodiscard]] Vector3 position() const { return _position; }
     [[nodiscard]] Vec2D size() const { return _size; }
     [[nodiscard]] float lifetime() const { return _lifetime; }
