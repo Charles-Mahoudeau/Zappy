@@ -22,6 +22,7 @@ add_executable(unit_tests
         src/gui/network/ProtocolParser.cpp
         src/gui/network/GuiFunctional.cpp
         src/gui/ui/ChatPanel.cpp
+        src/gui/ui/DotAnimator.cpp
         src/gui/ui/GuiTheme.cpp
         src/gui/ui/InfoPanel.cpp
         src/gui/ui/Leaderboard.cpp
