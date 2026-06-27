@@ -196,7 +196,7 @@ bool World::hasEvents() const { return !_events.empty(); }
 Event World::popEvent() {
     Event event{std::move(_events.back())};
 
-    _events.pop_front();
+    _events.pop_back();
     return event;
 }
 
