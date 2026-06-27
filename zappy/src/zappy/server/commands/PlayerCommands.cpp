@@ -8,6 +8,7 @@
 #include "zappy/server/commands/PlayerCommands.hpp"
 
 #include <cstdint>
+#include <format>
 #include <optional>
 #include <string_view>
 #include <utility>
