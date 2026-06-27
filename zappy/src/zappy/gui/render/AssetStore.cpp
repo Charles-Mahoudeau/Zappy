@@ -150,7 +150,7 @@ void AssetStore::loadVFXs() {
     eggCrack.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.002F, .rotation = 3.0F, .tint = 0.3F});
     _vfxs.insert({"eggCrack", std::move(eggCrack)});
 
-    ParticleEmitter smoke("assets/particles/Shard.png");
+    ParticleEmitter smoke("assets/particles/Smoke.png");
     smoke.setStatic(Vector3{}, Vector3{1.0F, 1.0F, 1.0F}, Vector3{0.0F, 0.0012F, 0.0F}, 250.0F, 11);
     smoke.setInitParticles(Vector2{0.8F, 0.8F}, 0.0F, ColorF{230.0F, 230.0F, 230.0F, 120.0F}, 150.0F, 0.03F);
     smoke.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.2F, .rotation = 360.0F, .tint = 10.0F}, 0.1F,
