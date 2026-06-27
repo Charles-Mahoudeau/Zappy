@@ -16,6 +16,7 @@
 #include <string>
 #include <string_view>
 #include <tuple>
+#include <variant>
 
 #include "game/Event.hpp"
 #include "game/EventHelper.hpp"
@@ -82,11 +83,24 @@ void Core::processCommandGroup() {
     }
 }
 
-void Core::processWorldEvents() const {
+void Core::processWorldEvents() {
     const io::Logger logger = _logger.derive("WorldSync");
 
     while (_world->hasEvents()) {
         const game::Event event = _world->popEvent();
+
+        if (std::holds_alternative<game::PlayerDeathEvent>(event)) {
+            const auto& [playerId] = std::get<game::PlayerDeathEvent>(event);
+
+            if (const Client* client = _clientRegistry.findByPlayerId(playerId); client != nullptr) {
+                std::ignore = client->sendMessage("dead\n");
+                _clientRegistry.markForRemoval(client);
+                // Schedule useless event to trigger garbage collection
+                _timer.scheduleLater(0, [] {});
+            }
+            _world->remove(playerId);
+        }
+
         const std::string eventStr = game::EventHelper::toWire(event);
 
         std::ignore = _clientRegistry.broadcast(Client::Type::kGui, eventStr);
