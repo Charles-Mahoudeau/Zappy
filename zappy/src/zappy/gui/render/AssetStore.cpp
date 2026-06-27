@@ -132,11 +132,11 @@ void AssetStore::loadVFXs() {
     test1.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.2F, .rotation = 0.4F, .tint = 0.1F});
     _vfxs.insert({"test1", std::move(test1)});
 
-    ParticleEmitter impact("assets/models/resources/textures/thystameBase.png");
+    ParticleEmitter impact("assets/particles/impact.png");
     impact.setStatic(Vector3{}, Vector3{0.5F, 0.5F, 0.5F}, Vector3{0.0F, 0.0F, 0.0F}, 0.0F, 1);
     impact.setInitParticles(Vector2{1.0F, 1.0F}, 0.0F, ColorF(Color::kWHITE), 50.0F, 0.0F);
-    impact.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 0.5F, .tint = 0.3F}, 0.1F, 0.3F);
-    impact.setIncrementParticles(Vector2{0.01F, -0.01F}, 0.0F, ColorF{0.0F, 0.0F, 0.0F, -3.0F});
+    impact.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 0.5F, .tint = 0.3F}, 0.1F, 0.0F);
+    impact.setIncrementParticles(Vector2{0.01F, 0.01F}, 0.0F, ColorF{0.0F, 0.0F, 0.0F, -3.0F});
     impact.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.003F, .rotation = 0.02F, .tint = 0.1F});
     _vfxs.insert({"impact", std::move(impact)});
 
