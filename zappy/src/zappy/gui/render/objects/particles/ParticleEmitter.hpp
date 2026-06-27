@@ -86,7 +86,7 @@ class ParticleEmitter {
     float _spread{0.0F};
     RandomValue _speed{0.0F, 0.0F};
     RandomValue _lifetime{1.0F, 0.0F};
-    uint16_t _rate{1.0F};
+    uint16_t _rate{1};
     TimeValue<Vec2D> _size{Vec2D{1.0F, 1.0F}, Vec2D{0.0F, 0.0F}};
     TimeValue<float> _rotation{0.0F, 0.0F};
     TimeValue<ColorF> _tint{ColorF(Color::kWHITE), ColorF(Color::kWHITE)};
