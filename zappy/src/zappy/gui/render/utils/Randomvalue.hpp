@@ -33,7 +33,7 @@ class RandomValue {
         if (_envelope == 0.0F) {
             return _value;
         }
-        const float rawEnvelope = std::abs(_value * _envelope);
+        const float rawEnvelope = std::abs(_envelope / 2.0F);
         const float min = _value - rawEnvelope;
         const float max = _value + rawEnvelope;
         auto [rangeMin, rangeMax] = std::minmax<float>(min, max);
