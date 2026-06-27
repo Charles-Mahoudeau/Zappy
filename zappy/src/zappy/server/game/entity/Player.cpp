@@ -24,10 +24,6 @@ Player::Player(Timer& timer, IGrid& grid, IEventEmitter& eventEmitter, std::stri
     : AEntity{timer, grid, eventEmitter, std::move(teamName)} {
     _inventory.addResource(ResourceType::kFood, kInitialFoodAmount);
     _foodTimerId = timer.scheduleEvery(kTimeUnitsPerFood, [this] {
-        if (_foodTicksLeft > 0) {
-            --_foodTicksLeft;
-            return;
-        }
         if (!eat()) {
             kill();
         }
@@ -111,7 +107,6 @@ bool Player::eat() {
         return false;
     }
     _inventory.removeResource(ResourceType::kFood);
-    _foodTicksLeft += kTimeUnitsPerFood;
     eventEmitter().pushEvent(PlayerInventoryEvent{
         .playerId = id(),
         .position = position(),

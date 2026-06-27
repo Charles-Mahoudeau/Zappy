@@ -67,7 +67,6 @@ class Player : public AEntity {
     bool eat();
 
     bool _alive{true};
-    std::uint32_t _foodTicksLeft{0};
     std::uint8_t _level{1};
     math::Direction _orientation{math::direction::random()};
     Inventory _inventory;
