@@ -17,10 +17,10 @@
 #include <string_view>
 #include <tuple>
 #include <variant>
+#include <vector>
 
 #include "game/Event.hpp"
 #include "game/EventHelper.hpp"
-#include "zappy/gui/game/GameState.hpp"
 #include "zappy/server/CliParser.hpp"
 #include "zappy/server/client/Client.hpp"
 #include "zappy/server/commands/GuiCommands.hpp"
@@ -28,6 +28,7 @@
 #include "zappy/server/commands/PlayerCommands.hpp"
 #include "zappy/server/commands/UnknownCommands.hpp"
 #include "zappy/server/game/World.hpp"
+#include "zappy/server/game/entity/Player.hpp"
 #include "zappy/shared/exception/Exception.hpp"
 #include "zappy/shared/exception/InvalidState.hpp"
 #include "zappy/shared/io/Logger.hpp"

@@ -14,10 +14,8 @@
 #include <utility>
 #include <vector>
 
-#include "zappy/gui/game/GameState.hpp"
 #include "zappy/server/Timer.hpp"
 #include "zappy/server/client/Client.hpp"
-#include "zappy/server/game/World.hpp"
 #include "zappy/server/net/SocketRegistry.hpp"
 #include "zappy/shared/network/Address.hpp"
 
