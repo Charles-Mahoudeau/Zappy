@@ -413,7 +413,7 @@ bool World::endIncantation(const IncantationSnapshot& snapshot) {
         std::ignore = incantationPlayer->levelUp();
     }
     markResourcesDirty();
-    pushEvent(IncantatioaternosnEndEvent{
+    pushEvent(IncantationEndEvent{
         .position = snapshot.position,
         .success = true,
     });
