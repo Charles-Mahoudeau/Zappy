@@ -34,6 +34,9 @@ class PlayerCommands : public ACommandGroup {
 
     static bool ignore(const CommandCtx& ctx);
     static bool inventory(CommandCtx& ctx);
+    static bool broadcast(CommandCtx& ctx);
+    static bool fork(CommandCtx& ctx);
+    static bool look(CommandCtx& ctx);
     static bool connectNb(CommandCtx& ctx);
     static bool incantation(const CommandCtx& ctx);
 

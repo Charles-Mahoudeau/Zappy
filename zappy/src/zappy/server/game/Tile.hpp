@@ -9,9 +9,11 @@
 
 #include <cstdint>
 #include <span>
+#include <string>
 #include <vector>
 
 #include "Inventory.hpp"
+#include "zappy/server/game/EntityDatabase.hpp"
 #include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server::game {
@@ -61,6 +63,8 @@ class Tile {
     /// @brief Returns a reference to the inventory of the tile.
     /// @return A reference to the inventory of the tile.
     Inventory& inventory();
+
+    std::string string(const EntityDatabase& db);
 
   private:
     math::Vector2u _position;
