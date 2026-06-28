@@ -38,6 +38,7 @@
 #include "zappy/shared/exception/Exception.hpp"
 #include "zappy/shared/exception/InvalidArgument.hpp"
 #include "zappy/shared/exception/OutOfRange.hpp"
+#include "zappy/shared/helper/StringHash.hpp"
 #include "zappy/shared/io/Logger.hpp"
 #include "zappy/shared/math/Direction.hpp"
 #include "zappy/shared/math/Vector2.hpp"
@@ -552,7 +553,7 @@ std::expected<void, std::string> World::verifyIncantationRequirements(const Inca
 }
 
 bool World::checkWin() {
-    std::unordered_map<std::string, std::uint8_t> teamWinningPlayers;
+    std::unordered_map<std::string, std::uint8_t, helper::StringHash, std::equal_to<>> teamWinningPlayers;
 
     for (const entity::Player* player : _entityDatabase.viewAll<entity::Player>()) {
         if (player == nullptr) {
