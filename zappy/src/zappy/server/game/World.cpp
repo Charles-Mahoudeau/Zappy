@@ -553,6 +553,10 @@ std::expected<void, std::string> World::verifyIncantationRequirements(const Inca
 }
 
 bool World::checkWin() {
+    if (_winningTeam.has_value()) {
+        return true;
+    }
+
     std::unordered_map<std::string, std::uint8_t, helper::StringHash, std::equal_to<>> teamWinningPlayers;
 
     for (const entity::Player* player : _entityDatabase.viewAll<entity::Player>()) {
