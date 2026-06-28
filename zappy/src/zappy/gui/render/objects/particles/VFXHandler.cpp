@@ -40,7 +40,7 @@ void VFXHandler::createVFXs() {
     signal.setStatic(Vector3{}, Vector3{0.0F, 0.0F, 0.0F}, Vector3{0.0F, 0.0F, 0.0F}, 0.0F, 1);
     signal.setInitParticles(Vector2{1.0F, 1.0F}, 0.0F, ColorF{220.0F, 255.0F, 255.0F, 255.0F}, 500.0F, 0.0F);
     signal.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 0.0F, .tint = 0.3F}, 0.1F, 0.0F);
-    signal.setIncrementParticles(Vector2{0.08F, 0.08F}, 0.0F, ColorF{-1.7F, -1.7F, -1.7F, -1.7F});
+    signal.setIncrementParticles(Vector2{0.09F, 0.09F}, 0.0F, ColorF{-1.6F, -1.6F, -1.6F, -1.6F});
     signal.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.01F, .rotation = 0.0F, .tint = 0.1F});
     _vfxs.insert({"signal", std::move(signal)});
 
@@ -89,7 +89,7 @@ void VFXHandler::createVFXs() {
     sparkles.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.005F, .rotation = 0.002F, .tint = 0.25F});
     _vfxs.insert({"sparkles", std::move(sparkles)});
 
-    ParticleEmitter bubbles("assets/particles/ShockWave.png");
+    ParticleEmitter bubbles("assets/particles/Shockwave.png");
     bubbles.setStatic(Vector3{}, Vector3{4.0F, 4.0F, 4.0F}, Vector3{0.0F, 0.00005F, 0.0F}, 180.0F, 10);
     bubbles.setInitParticles(Vector2{1.3F, 1.3F}, 45.0F, ColorF{255.0F, 255.0F, 130.0F, 150.0F}, 130.0F, 0.001F);
     bubbles.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 0.0F, .tint = 15.0F}, 0.1F,
@@ -112,8 +112,8 @@ void VFXHandler::createVFXs() {
     slash.setInitParticles(Vector2{0.7F, 0.3F}, 0.0F, ColorF{150.0F, 255.0F, 220.0F, 50.0F}, 150.0F, 0.0002F);
     slash.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.0F, .rotation = 0.0F, .tint = 35.0F}, 0.1F,
                           0.00002F);
-    slash.setIncrementParticles(Vector2{0.001F, 0.012F}, 0.0F, ColorF{-2.2F, -2.2F, -2.2F, -2.5F});
-    slash.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.004F, .rotation = 0.0F, .tint = 1.0F});
+    slash.setIncrementParticles(Vector2{0.001F, 0.022F}, 0.0F, ColorF{-2.2F, -2.2F, -2.2F, -2.5F});
+    slash.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.009F, .rotation = 0.0F, .tint = 1.0F});
     _vfxs.insert({"slash", std::move(slash)});
 }
 

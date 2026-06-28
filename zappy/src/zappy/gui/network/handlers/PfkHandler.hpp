@@ -11,7 +11,6 @@
 #include <sstream>
 #include <string>
 
-#include "zappy/gui/game/EventHandler.hpp"
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/network/handlers/ParseHelpers.hpp"
 #include "zappy/shared/exception/ParseException.hpp"
@@ -27,8 +26,7 @@ class PfkHandler {
         if (!(ss >> idToken)) {
             throw exception::ParseException{"pfk: missing player id"};
         }
-        auto player = parseId(idToken);
-        _state.get().playerEvent(player, game::EventType::LayEgg);
+        (void)parseId(idToken);
     }
 
   private:
