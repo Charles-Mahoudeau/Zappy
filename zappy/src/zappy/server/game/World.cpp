@@ -48,11 +48,12 @@ namespace zappy::server::game {
 World::World(const math::Vector2u size, Timer& timer, std::optional<io::Logger> logger)
     : _grid{size}, _timer{timer}, _logger{std::move(logger)} {
     generateResourceThresholds();
+    spawnResources();
+    _resourceSpawnTimerId = _timer.get().scheduleEvery(
+        kFoodRegenerationInterval, [this] { spawnResources(); }, [this] { return _resourcesDirty; });
     if (_logger.has_value()) {
         _logger->info("World initialized.");
     }
-    _resourceSpawnTimerId = _timer.get().scheduleEvery(
-        kFoodRegenerationInterval, [this] { spawnResources(); }, [this] { return _resourcesDirty; });
 }
 
 World::~World() { _timer.get().unschedule(_resourceSpawnTimerId); }
