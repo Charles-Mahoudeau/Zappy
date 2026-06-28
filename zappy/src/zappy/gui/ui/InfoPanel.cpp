@@ -66,16 +66,14 @@ void InfoPanel::update(render::Vector2 mousePos, bool clicked, const render::Cam
         _state = Leaderboard;
     }
 
-    if (_state == Player && KeySystem::isKeyPressed(KeySystem::Key::KEY_LEFT) &&
-        _selectedPlayerId.has_value()) {
+    if (_state == Player && KeySystem::isKeyPressed(KeySystem::Key::KEY_LEFT) && _selectedPlayerId.has_value()) {
         if (const auto next = adjacentPlayerId(state, _selectedPlayerId.value(), -1); next.has_value()) {
             _selectedPlayerId = next;
             _state = Player;
         }
         return;
     }
-    if (_state == Player && KeySystem::isKeyPressed(KeySystem::Key::KEY_RIGHT) &&
-        _selectedPlayerId.has_value()) {
+    if (_state == Player && KeySystem::isKeyPressed(KeySystem::Key::KEY_RIGHT) && _selectedPlayerId.has_value()) {
         if (const auto next = adjacentPlayerId(state, _selectedPlayerId.value(), 1); next.has_value()) {
             _selectedPlayerId = next;
             _state = Player;
