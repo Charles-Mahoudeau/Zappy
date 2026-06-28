@@ -43,7 +43,6 @@ class PbcHandler {
         if (plr.has_value()) {
             pos = render::Vector3{static_cast<float>(plr->x), 0.0F, static_cast<float>(plr->y)};
         }
-        _state.get().removePlayer(playerId);
         _state.get().broadcastEvent(game::EventType::Broadcast, pos);
     }
 
