@@ -100,6 +100,7 @@ void CliParser::handleFlag(std::string_view flag, const std::vector<std::string_
         {"n",
          {.nbParam = std::nullopt,
           .handle = [](const auto& flagParams, auto& param) { param.teamsName = flagParams; }}},
+        {"v", {.nbParam = 0, .handle = [](const auto&, auto& param) { param.verbose = true; }}},
     };
 
     auto it = flags.find(flag);

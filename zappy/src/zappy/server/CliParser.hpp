@@ -33,6 +33,7 @@ class CliParser {
         std::vector<std::string_view> teamsName;
         std::uint32_t nbPlayerPerTeam = 0;
         std::uint16_t frequencies = 0;
+        bool verbose = false;
     };
 
     const CliParameters& parameters();

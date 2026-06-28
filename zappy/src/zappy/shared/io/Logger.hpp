@@ -62,7 +62,7 @@ class Logger {
     std::string _prefix;
     std::shared_ptr<std::ofstream> _file;
     bool _duplicateToStdout;
-    Level _level{Level::kDebug};
+    Level _level{Level::kInfo};
 };
 
 template <typename... Args>
