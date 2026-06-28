@@ -35,7 +35,7 @@ void VFXHandler::createVFXs() {
     ParticleEmitter eggCrack("assets/particles/Shard.png");
     eggCrack.setStatic(Vector3{}, Vector3{1.0F, 1.0F, 1.0F}, Vector3{0.0F, -0.002F, 0.0F}, 100.0F, 16);
     eggCrack.setInitParticles(Vector2{0.8F, 0.8F}, 0.0F, ColorF{245.0F, 220.0F, 180.0F, 255.0F}, 90.0F, 0.06F);
-    eggCrack.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.2F, .rotation = 360.0F, .tint = 10.0F}, 3.0F,
+    eggCrack.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.2F, .rotation = 360.0F, .tint = 30.0F}, 3.0F,
                              0.03F);
     eggCrack.setIncrementParticles(Vector2{-0.01F, -0.01F}, 0.0F, ColorF{-1.0F, -1.0F, -1.0F, -1.0F});
     eggCrack.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.002F, .rotation = 3.0F, .tint = 0.1F});
@@ -52,9 +52,9 @@ void VFXHandler::createVFXs() {
 
     ParticleEmitter sparkles("assets/particles/Twinkle.png");
     sparkles.setStatic(Vector3{}, Vector3{3.0F, 3.5F, 3.0F}, Vector3{0.0F, 0.00003F, 0.0F}, 180.0F, 14);
-    sparkles.setInitParticles(Vector2{0.5F, 0.5F}, 45.0F, ColorF{255.0F, 130.0F, 255.0F, 50.0F}, 130.0F, 0.00001F);
+    sparkles.setInitParticles(Vector2{0.5F, 0.5F}, 45.0F, ColorF{255.0F, 130.0F, 255.0F, 50.0F}, 130.0F, 0.001F);
     sparkles.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 0.0F, .tint = 15.0F}, 0.1F,
-                             0.03F);
+                             0.001F);
     sparkles.setIncrementParticles(Vector2{-0.007F, -0.007F}, 0.0F, ColorF{-1.0F, -1.0F, -1.0F, -2.0F});
     sparkles.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.005F, .rotation = 0.002F, .tint = 0.25F});
     _vfxs.insert({"sparkles", std::move(sparkles)});
@@ -69,11 +69,11 @@ void VFXHandler::createVFXs() {
     _vfxs.insert({"skull", std::move(skull)});
 
     ParticleEmitter slash("assets/particles/Slash.png");
-    slash.setStatic(Vector3{}, Vector3{3.0F, 3.5F, 3.0F}, Vector3{0.0F, 0.00003F, 0.0F}, 180.0F, 14);
-    slash.setInitParticles(Vector2{0.5F, 0.5F}, 45.0F, ColorF{255.0F, 130.0F, 255.0F, 50.0F}, 130.0F, 0.0001F);
-    slash.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 0.0F, .tint = 15.0F}, 0.1F,
+    slash.setStatic(Vector3{}, Vector3{2.0F, 4.0F, 2.0F}, Vector3{0.0F, 0.0001F, 0.0F}, 180.0F, 14);
+    slash.setInitParticles(Vector2{0.1F, 1.0F}, 0.0F, ColorF{150.0F, 255.0F, 220.0F, 50.0F}, 130.0F, 0.0001F);
+    slash.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.0F, .rotation = 0.0F, .tint = 20.0F}, 0.1F,
                           0.03F);
-    slash.setIncrementParticles(Vector2{-0.007F, -0.007F}, 0.0F, ColorF{-1.0F, -1.0F, -1.0F, -2.0F});
+    slash.setIncrementParticles(Vector2{0.007F, 0.001F}, 0.0F, ColorF{-2.0F, -2.0F, -2.0F, -2.5F});
     slash.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.005F, .rotation = 0.002F, .tint = 0.25F});
     _vfxs.insert({"slash", std::move(slash)});
 }
