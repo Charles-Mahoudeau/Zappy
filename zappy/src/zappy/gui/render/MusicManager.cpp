@@ -102,6 +102,11 @@ bool MusicManager::initAudioDevice() {
 
 void MusicManager::setCurrentMusicIndex(unsigned int index) {
     const auto musicSize = static_cast<unsigned int>(_musics.size());
+    if (!_available || musicSize == 0) {
+        _currentMusic.reset();
+        _playing = false;
+        return;
+    }
     if (index < musicSize) {
         stop();
         _currentMusicIndex = index;
