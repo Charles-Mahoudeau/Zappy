@@ -251,8 +251,9 @@ std::uint32_t World::computeBroadcastDirection(const math::Vector2u emitterPos, 
     const auto size = _grid.size();
 
     // Shortest signed delta from receiver to emitter (toroidal wrapping)
-    const auto shortestDelta = [](const int a, const int b, const int len) -> int {
+    const auto shortestDelta = [](const int a, const int b, const int len) {
         int d = b - a;
+
         if (2 * std::abs(d) > len) {
             d += (d > 0) ? -len : len;
         }
