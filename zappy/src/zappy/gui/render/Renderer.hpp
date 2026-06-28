@@ -31,6 +31,9 @@ class Renderer {
 
     void update(Camera& camera, game::GameState& state, AssetStore& assets);
 
+    static void setCameraToOrthographic(Camera& camera, const game::GameState& state);
+    static void setCameraToPerspective(Camera& camera, const game::GameState& state);
+
   private:
     static void drawResources(const game::GameState& state, const AssetStore& assets);
     static void drawTileResources(const game::Resources& tile, const Vector3& position, const AssetStore& assets);

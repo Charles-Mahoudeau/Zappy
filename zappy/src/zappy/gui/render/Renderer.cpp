@@ -26,12 +26,20 @@
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/render/utils/Color.hpp"
 #include "zappy/gui/render/utils/Vector3.hpp"
+#include "zappy/gui/ui/KeySystem.hpp"
 
 namespace zappy::gui::render {
 
 void Renderer::update(Camera& camera, game::GameState& state, AssetStore& assets) {
     static constexpr float kSkyboxFovy = 60.0F;
 
+    if (ui::KeySystem::isKeyPressed(ui::KeySystem::Key::KEY_F)) {
+        if (camera.projection() == CameraProjection::CAMERA_PERSPECTIVE) {
+            setCameraToOrthographic(camera, state);
+        } else {
+            setCameraToPerspective(camera, state);
+        }
+    }
     camera.update();
 
     Camera skyboxCamera{camera.position(), camera.target(), camera.up(), kSkyboxFovy,
@@ -56,6 +64,36 @@ void Renderer::update(Camera& camera, game::GameState& state, AssetStore& assets
     drawPlayers(state, assets);
     drawVFXs(camera, state, assets);
     display::Window::EndMode3D();
+}
+
+void Renderer::setCameraToOrthographic(Camera& camera, const game::GameState& state) {
+    const float width = static_cast<float>(state.width()) * render::Grid::kSpacing;
+    const float height = static_cast<float>(state.height()) * render::Grid::kSpacing;
+    const float span = std::max({width, height, 1.0F});
+    const float centerX = width / 2.0F;
+    const float centerZ = height / 2.0F;
+    const float offset = span;
+    const float fovy = span * 1.5F;
+
+    camera = render::Camera{render::Vector3(centerX + offset, span * 0.85F, centerZ + offset),
+                            render::Vector3(centerX, 0.0F, centerZ), render::Vector3(0, 1.0F, 0), fovy,
+                            render::CameraProjection::CAMERA_ORTHOGRAPHIC};
+    camera.setCameraMode(render::CameraMode::CAMERA_CUSTOM);
+}
+
+void Renderer::setCameraToPerspective(Camera& camera, const game::GameState& state) {
+    const float width = static_cast<float>(state.width()) * render::Grid::kSpacing;
+    const float height = static_cast<float>(state.height()) * render::Grid::kSpacing;
+    const float span = std::max({width, height, 1.0F});
+    const float centerX = width / 2.0F;
+    const float centerZ = height / 2.0F;
+    const float offset = span;
+    const float fovy = 60.0F;
+
+    camera = render::Camera{render::Vector3(centerX + offset, span * 0.85F, centerZ + offset),
+                            render::Vector3(centerX, 0.0F, centerZ), render::Vector3(0, 1.0F, 0), fovy,
+                            render::CameraProjection::CAMERA_PERSPECTIVE};
+    camera.setCameraMode(render::CameraMode::CAMERA_FREE);
 }
 
 void Renderer::drawResources(const game::GameState& state, const AssetStore& assets) {
