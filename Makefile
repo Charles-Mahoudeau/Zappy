@@ -26,6 +26,7 @@ zappy_ai:
 
 clean:
 	rm -rf build
+	rm -rf assets
 
 fclean: clean
 	rm -f zappy_server zappy_gui zappy_ai

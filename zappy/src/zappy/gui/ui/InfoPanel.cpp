@@ -7,9 +7,12 @@
 
 #include "InfoPanel.hpp"
 
+#include <algorithm>
+#include <cstddef>
 #include <cstdint>
 #include <optional>
 #include <utility>
+#include <vector>
 
 #include "Leaderboard.hpp"
 #include "PlayerInfo.hpp"
@@ -19,8 +22,29 @@
 #include "zappy/gui/render/Camera.hpp"
 #include "zappy/gui/render/utils/Rectangle.hpp"
 #include "zappy/gui/render/utils/Vector2.hpp"
+#include "zappy/gui/ui/KeySystem.hpp"
 
 namespace zappy::gui::ui {
+
+namespace {
+std::optional<std::uint32_t> adjacentPlayerId(const game::GameState& state, std::uint32_t current, int direction) {
+    std::vector<std::uint32_t> ids;
+    ids.reserve(state.players().size());
+    for (const auto& [id, player] : state.players()) {
+        ids.push_back(id);
+    }
+    if (ids.empty()) {
+        return std::nullopt;
+    }
+    std::ranges::sort(ids);
+
+    const auto found = std::ranges::find(ids, current);
+    const std::size_t index = (found == ids.end()) ? 0 : static_cast<std::size_t>(found - ids.begin());
+    const std::size_t size = ids.size();
+    const std::size_t next = (direction < 0) ? (index + size - 1) % size : (index + 1) % size;
+    return ids.at(next);
+}
+}  // namespace
 
 std::optional<std::uint32_t> InfoPanel::pickPlayer(render::Vector2 mousePos, const render::Camera& camera,
                                                    const game::GameState& state) {
@@ -42,6 +66,20 @@ void InfoPanel::update(render::Vector2 mousePos, bool clicked, const render::Cam
         _state = Leaderboard;
     }
 
+    if (_state == Player && KeySystem::isKeyPressed(KeySystem::Key::KEY_LEFT) && _selectedPlayerId.has_value()) {
+        if (const auto next = adjacentPlayerId(state, _selectedPlayerId.value(), -1); next.has_value()) {
+            _selectedPlayerId = next;
+            _state = Player;
+        }
+        return;
+    }
+    if (_state == Player && KeySystem::isKeyPressed(KeySystem::Key::KEY_RIGHT) && _selectedPlayerId.has_value()) {
+        if (const auto next = adjacentPlayerId(state, _selectedPlayerId.value(), 1); next.has_value()) {
+            _selectedPlayerId = next;
+            _state = Player;
+        }
+        return;
+    }
     if (!clicked) {
         return;
     }

@@ -9,7 +9,6 @@
 
 #include <raylib.h>
 
-#include <algorithm>
 #include <chrono>
 #include <cstddef>
 #include <iostream>
@@ -24,7 +23,6 @@
 #include "zappy/gui/render/Renderer.hpp"
 #include "zappy/gui/render/utils/Color.hpp"
 #include "zappy/gui/render/utils/Rectangle.hpp"
-#include "zappy/gui/render/utils/Vector3.hpp"
 #include "zappy/gui/ui/DotAnimator.hpp"
 #include "zappy/gui/ui/Widgets.hpp"
 #include "zappy/shared/exception/Exception.hpp"
@@ -62,21 +60,6 @@ void GUI::pump() {
     while (_buffer.hasMessages()) {
         _parser.dispatch(_buffer.popMessage());
     }
-}
-
-void GUI::setupCamera() {
-    const float width = static_cast<float>(_state.width()) * render::Grid::kSpacing;
-    const float height = static_cast<float>(_state.height()) * render::Grid::kSpacing;
-    const float span = std::max({width, height, 1.0F});
-    const float centerX = width / 2.0F;
-    const float centerZ = height / 2.0F;
-    const float offset = span;
-    const float fovy = span * 1.5F;
-
-    _camera = render::Camera{render::Vector3(centerX + offset, span * 0.85F, centerZ + offset),
-                             render::Vector3(centerX, 0.0F, centerZ), render::Vector3(0, 1.0F, 0), fovy,
-                             render::CameraProjection::CAMERA_ORTHOGRAPHIC};
-    _camera.setCameraMode(render::CameraMode::CAMERA_CUSTOM);
 }
 
 void GUI::drawLoadingFrame(std::string_view name, float progress) {
@@ -145,13 +128,18 @@ bool GUI::waitForConnection() {
         }
 
         _dotAnimator.update(GetFrameTime());
+        if (_musicManager.currentMusicIndex() == 0) {
+            _musicManager.setCurrentMusicIndex(1);
+        }
+        _musicManager.setSpeed(1.0F);
+        _musicManager.update();
         drawWaitingFrame();
     }
     return false;
 }
 
 void GUI::runSession() {
-    setupCamera();
+    render::Renderer::setCameraToOrthographic(_camera, _state);
 
     _poller.clear();
     _poller.add(_buffer.fd(), zappy::io::Poller::kPollRead | zappy::io::Poller::kPollError, [this](std::byte events) {
@@ -165,6 +153,10 @@ void GUI::runSession() {
         while (!_window.shouldClose()) {
             _poller.poll(kPollTimeoutMs);
             _window.beginFrame();
+            if (_musicManager.currentMusicIndex() == 1) {
+                _musicManager.setCurrentMusicIndex(0);
+            }
+            _musicManager.update(_state.timeUnit());
             _hud.update(_camera, _state);
             _camera.followPlayer(_hud.focusedPlayerWorldPosition(_state), !_hud.isMouseOverChatPanel());
 
@@ -178,12 +170,6 @@ void GUI::runSession() {
 }
 
 int GUI::init(const GuiCliParser& cli) {
-    // TODO: Not HERE but:
-    // InitAudioDevice();
-    // if (!IsAudioDeviceReady()) {
-    //     throw exception::InvalidState{"Failed to initialize audio device"};
-    // }
-
     _address = zappy::network::Address{std::string{cli.host()}, cli.port()};
 
     _window = display::Window{kWindowWidth, kWindowHeight, "Zappy"};
@@ -192,6 +178,7 @@ int GUI::init(const GuiCliParser& cli) {
     drawLoadingFrame("", 0.0F);
 
     _assets.load([this](std::string_view name, float progress) { drawLoadingFrame(name, progress); });
+    _musicManager.specialInit();
 
     return 0;
 }

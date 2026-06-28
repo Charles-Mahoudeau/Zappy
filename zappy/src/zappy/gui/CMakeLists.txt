@@ -28,6 +28,8 @@ add_library(zappy_gui_objects OBJECT
         render/Renderer.hpp
         render/Grid.cpp
         render/Grid.hpp
+        render/MusicManager.cpp
+        render/MusicManager.hpp
         render/Camera.cpp
         render/Camera.hpp
         render/objects/Texture.cpp
@@ -42,6 +44,8 @@ add_library(zappy_gui_objects OBJECT
         render/objects/particles/ParticleEmitter.hpp
         render/objects/particles/Particle.cpp
         render/objects/particles/Particle.hpp
+        render/objects/Music.cpp
+        render/objects/Music.hpp
         render/utils/Vector2.cpp
         render/utils/Vector2.hpp
         render/utils/Color.hpp
@@ -80,6 +84,8 @@ add_library(zappy_gui_objects OBJECT
         ui/VictoryScreen.hpp
         ui/Widgets.cpp
         ui/Widgets.hpp
+        ui/KeySystem.cpp
+        ui/KeySystem.hpp
 )
 target_include_directories(zappy_gui_objects PUBLIC
     ${CMAKE_SOURCE_DIR}/src
