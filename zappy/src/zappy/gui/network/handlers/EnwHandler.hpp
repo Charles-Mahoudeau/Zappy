@@ -39,7 +39,7 @@ class EnwHandler {
         const auto eggId = parseId(eggToken);
         const auto playerId = parseId(playerToken);
         _state.get().addEgg(eggId, playerId, x, y);
-        _state.get().eggEvent(eggId, game::EventType::EggHatch);
+        _state.get().eggEvent(eggId, game::EventType::LayEgg);
     }
 
   private:
