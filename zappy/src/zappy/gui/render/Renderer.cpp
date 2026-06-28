@@ -49,6 +49,7 @@ void Renderer::update(Camera& camera, game::GameState& state, AssetStore& assets
         assets.emit("smoke", Vector3{0.0F, 0.0F, 4.0F});
         assets.emit("skull", Vector3{5.0F, 0.0F, 5.0F});
         assets.emit("slash", Vector3{9.0F, 0.0F, 9.0F});
+        assets.emit("foodDebris", Vector3{0.0F, 0.0F, 9.0F});
     }
     _grid.resize(state.width(), state.height());
     display::Window::BeginMode3D(camera);
