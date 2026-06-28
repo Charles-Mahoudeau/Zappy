@@ -577,7 +577,9 @@ bool World::checkWin() {
                 pushEvent(GameEndEvent{
                     .teamName = *_winningTeam,
                 });
-                _logger->info("Game won by team '{}'.", *_winningTeam);
+                if (_logger.has_value()) {
+                    _logger->info("Game won by team '{}'.", *_winningTeam);
+                }
                 return true;
             }
         }
