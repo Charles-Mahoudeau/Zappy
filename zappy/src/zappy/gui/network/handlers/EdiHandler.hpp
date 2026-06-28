@@ -40,9 +40,9 @@ class EdiHandler {
 
         if (egg.has_value()) {
             pos = render::Vector3{static_cast<float>(egg->x), 0.0F, static_cast<float>(egg->y)};
+            _state.get().removeEgg(eggId);
+            _state.get().broadcastEvent(game::EventType::EggDeath, pos);
         }
-        _state.get().removeEgg(eggId);
-        _state.get().broadcastEvent(game::EventType::EggDeath, pos);
     }
 
   private:

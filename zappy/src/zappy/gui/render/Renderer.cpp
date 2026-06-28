@@ -39,8 +39,13 @@ void Renderer::update(Camera& camera, game::GameState& state, AssetStore& assets
     assets.skybox().draw(camera.position());
     display::Window::EndMode3D();
 
-    game::EventResponse eventRes = _eventHandler.handleEvent(state.getEvent());
-    assets.playVFX(eventRes.emitters, eventRes.position);
+    std::vector<game::Event> events = state.getEvents();
+
+    for (auto& event : events) {
+        game::EventResponse eventRes = _eventHandler.handleEvent(event);
+        assets.playVFX(eventRes.emitters, eventRes.position);
+    }
+    state.clearEvents();
 
     _grid.resize(state.width(), state.height());
     display::Window::BeginMode3D(camera);

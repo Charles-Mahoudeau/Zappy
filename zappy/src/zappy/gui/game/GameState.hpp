@@ -105,7 +105,8 @@ class GameState {
     [[nodiscard]] const std::deque<std::string>& broadcasts() const;
 
     void broadcastEvent(EventType type, render::Vector3 position = {0.0F, 0.0F, 0.0F});
-    [[nodiscard]] Event& getEvent();
+    [[nodiscard]] const std::vector<Event>& getEvents() const;
+    void clearEvents();
 
   private:
     std::size_t _width{0};
@@ -119,7 +120,7 @@ class GameState {
     std::size_t _tilesReceived{0};
     std::vector<bool> _tileSet;
     std::deque<std::string> _broadcasts;
-    Event _event{};
+    std::vector<Event> _events;
 };
 
 }  // namespace zappy::gui::game
