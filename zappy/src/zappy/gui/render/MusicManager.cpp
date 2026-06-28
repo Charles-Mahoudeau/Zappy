@@ -10,9 +10,7 @@
 
 namespace zappy::gui::render {
 
-MusicManager::MusicManager() {
-    InitAudioDevice();
-    _available = IsAudioDeviceReady();
+MusicManager::MusicManager() : _available{initAudioDevice()} {
     if (!_available) {
         std::cerr << "MusicManager: audio device unavailable, music disabled" << std::endl;
     }
@@ -96,6 +94,11 @@ void MusicManager::addMusic(std::string_view path, bool loop, float volume) {
 }
 
 bool MusicManager::isPlaying() const { return _playing; }
+
+bool MusicManager::initAudioDevice() {
+    InitAudioDevice();
+    return IsAudioDeviceReady();
+}
 
 void MusicManager::setCurrentMusicIndex(unsigned int index) {
     const auto musicSize = static_cast<unsigned int>(_musics.size());
