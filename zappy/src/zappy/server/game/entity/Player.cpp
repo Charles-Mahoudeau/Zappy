@@ -115,6 +115,22 @@ void Player::setPosition(const math::Vector2u position) {
     });
 }
 
+void Player::moveForward() {
+    using enum math::Direction;
+    static std::unordered_map<math::Direction, std::function<void(const math::Vector2u, math::Vector2u&)>> map{
+        {kNorth, [](math::Vector2u grid, math::Vector2u& pos) { pos.y = (pos.y + grid.y - 1) % grid.y; }},
+        {kEast, [](math::Vector2u grid, math::Vector2u& pos) { pos.x = (pos.x + 1) % grid.x; }},
+        {kSouth, [](math::Vector2u grid, math::Vector2u& pos) { pos.y = (pos.y + 1) % grid.y; }},
+        {kWest, [](math::Vector2u grid, math::Vector2u& pos) { pos.x = (pos.x + grid.x - 1) % grid.x; }},
+    };
+
+    math::Vector2u pos = this->position();
+
+    map.find(this->_orientation)->second(this->gridSize(), pos);
+
+    this->setPosition(pos);
+}
+
 math::Direction Player::orientation() const { return _orientation; }
 
 math::Direction Player::turnLeft() {
@@ -135,22 +151,6 @@ math::Direction Player::turnRight() {
         .orientation = _orientation,
     });
     return _orientation;
-}
-
-void Player::moveForward() {
-    using enum math::Direction;
-    static std::unordered_map<math::Direction, std::function<void(const math::Vector2u, math::Vector2u&)>> map{
-        {kNorth, [](math::Vector2u grid, math::Vector2u& pos) { pos.y = (pos.y + 1) % grid.y; }},
-        {kEast, [](math::Vector2u grid, math::Vector2u& pos) { pos.x = (pos.x + 1) % grid.x; }},
-        {kSouth, [](math::Vector2u grid, math::Vector2u& pos) { pos.y = (pos.y + grid.y - 1) % grid.y; }},
-        {kWest, [](math::Vector2u grid, math::Vector2u& pos) { pos.x = (pos.x + grid.x - 1) % grid.x; }},
-    };
-
-    math::Vector2u pos = this->position();
-
-    map.find(this->_orientation)->second(this->gridSize(), pos);
-
-    this->setPosition(pos);
 }
 
 const Inventory& Player::inventory() const { return _inventory; }
