@@ -181,7 +181,7 @@ void AssetStore::emit(std::string_view path, Vector3 pos) { _vfxHandler.emit(pat
 
 void AssetStore::playVFX(std::vector<std::string_view>& emitters, Vector3 pos) {
     for (const auto& emitterName : emitters) {
-        Vector3 worldPos = Grid::tileToWorld(pos.x(), pos.z(), pos.y());
+        const Vector3 worldPos = Grid::tileToWorld(pos.x(), pos.z(), pos.y());
         emit(emitterName, worldPos);
     }
 }

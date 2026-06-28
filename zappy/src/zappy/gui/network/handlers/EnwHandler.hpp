@@ -16,7 +16,6 @@
 #include "zappy/gui/game/EventHandler.hpp"
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/network/handlers/ParseHelpers.hpp"
-#include "zappy/gui/render/utils/Vector3.hpp"
 #include "zappy/shared/exception/ParseException.hpp"
 
 namespace zappy::gui::network::handlers {
@@ -37,9 +36,10 @@ class EnwHandler {
         if (!ss.eof()) {
             throw exception::ParseException{"enw: unexpected trailing tokens"};
         }
-        auto eggId = parseId(eggToken);
+        const auto eggId = parseId(eggToken);
+        const auto playerId = parseId(playerToken);
+        _state.get().addEgg(eggId, playerId, x, y);
         _state.get().eggEvent(eggId, game::EventType::EggHatch);
-        _state.get().addEgg(parseId(eggToken), parseId(playerToken), x, y);
     }
 
   private:
