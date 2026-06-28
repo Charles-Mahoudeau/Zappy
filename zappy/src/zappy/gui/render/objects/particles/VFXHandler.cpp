@@ -28,11 +28,11 @@ void VFXHandler::createVFXs() {
 
     ParticleEmitter twinkle("assets/particles/Twinkle.png");
     twinkle.setStatic(Vector3{}, Vector3{0.5F, 0.5F, 0.5F}, Vector3{0.0F, 0.0F, 0.0F}, 0.0F, 1);
-    twinkle.setInitParticles(Vector2{0.1F, 0.1F}, 0.0F, ColorF{90.0F, 255.0F, 120.0F, 230.0F}, 45.0F, 0.0F);
+    twinkle.setInitParticles(Vector2{0.2F, 0.2F}, 0.0F, ColorF{90.0F, 255.0F, 120.0F, 230.0F}, 300.0F, 0.0F);
     twinkle.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 360.0F, .tint = 0.3F}, 0.1F,
                             0.0F);
-    twinkle.setIncrementParticles(Vector2{0.1F, 0.1F}, 3.0F, ColorF{-3.7F, -3.7F, -3.7F, -3.7F});
-    twinkle.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.01F, .rotation = 2.0F, .tint = 0.1F});
+    twinkle.setIncrementParticles(Vector2{0.1F, 0.1F}, 2.0F, ColorF{-3.0F, -4.0F, -3.0F, -3.0F});
+    twinkle.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.01F, .rotation = 0.7F, .tint = 0.1F});
     _vfxs.insert({"twinkle", std::move(twinkle)});
 
     ParticleEmitter signal("assets/particles/Shockwave.png");
