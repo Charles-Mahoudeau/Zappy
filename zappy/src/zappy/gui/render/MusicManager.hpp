@@ -55,6 +55,7 @@ class MusicManager {
     std::deque<Music> _musics;
     unsigned int _currentMusicIndex{0};
     bool _playing{false};
+    bool _available{false};
 };
 
 class MusicManagerException : public zappy::exception::Exception {
