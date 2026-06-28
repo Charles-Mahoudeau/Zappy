@@ -38,6 +38,7 @@
 #include "zappy/shared/exception/Exception.hpp"
 #include "zappy/shared/exception/InvalidArgument.hpp"
 #include "zappy/shared/exception/OutOfRange.hpp"
+#include "zappy/shared/helper/StringHash.hpp"
 #include "zappy/shared/io/Logger.hpp"
 #include "zappy/shared/math/Direction.hpp"
 #include "zappy/shared/math/Vector2.hpp"
@@ -327,8 +328,13 @@ bool World::endIncantation(const IncantationSnapshot& snapshot) {
         .position = snapshot.position,
         .success = true,
     });
+    checkWin();
     return true;
 }
+
+bool World::hasWon() const { return _winningTeam != std::nullopt; }
+
+std::optional<std::string> World::winningTeam() const { return _winningTeam; }
 
 const std::unordered_map<ResourceType, float>& World::resourceDensities() {
     using enum ResourceType;
@@ -546,4 +552,38 @@ std::expected<void, std::string> World::verifyIncantationRequirements(const Inca
     return {};
 }
 
+bool World::checkWin() {
+    if (_winningTeam.has_value()) {
+        return true;
+    }
+
+    std::unordered_map<std::string, std::uint8_t, helper::StringHash, std::equal_to<>> teamWinningPlayers;
+
+    for (const entity::Player* player : _entityDatabase.viewAll<entity::Player>()) {
+        if (player == nullptr) {
+            continue;
+        }
+        if (player->level() >= entity::Player::kMaxLevel) {
+            std::string teamName{player->teamName()};
+
+            if (const std::uint8_t total = ++teamWinningPlayers[teamName]; total >= kMaxLevelPlayersToWin) {
+                _winningTeam = std::move(teamName);
+                if (!_winningTeam.has_value()) {
+                    _logger->warn(
+                        "Somehow, just after setting the value of an optional, it does not has a value. This is a "
+                        "bug. A team should have won, but C++ has changed its fate.");
+                    return false;
+                }
+                pushEvent(GameEndEvent{
+                    .teamName = *_winningTeam,
+                });
+                if (_logger.has_value() && _winningTeam.has_value()) {
+                    _logger->info("Game won by team '{}'.", *_winningTeam);
+                }
+                return true;
+            }
+        }
+    }
+    return false;
+}
 }  // namespace zappy::server::game

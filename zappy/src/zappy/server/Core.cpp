@@ -17,6 +17,7 @@
 #include <string_view>
 #include <tuple>
 #include <variant>
+#include <vector>
 
 #include "game/Event.hpp"
 #include "game/EventHelper.hpp"
@@ -27,6 +28,7 @@
 #include "zappy/server/commands/PlayerCommands.hpp"
 #include "zappy/server/commands/UnknownCommands.hpp"
 #include "zappy/server/game/World.hpp"
+#include "zappy/server/game/entity/Player.hpp"
 #include "zappy/shared/exception/Exception.hpp"
 #include "zappy/shared/exception/InvalidState.hpp"
 #include "zappy/shared/io/Logger.hpp"
@@ -70,6 +72,9 @@ void Core::processCommandGroup() {
             continue;
         }
         while (std::optional<std::string> request = client->nextRequest()) {
+            if (_world->hasWon() && client->type() == Client::Type::kPlayer) {
+                continue;
+            }
             auto it = _cmdGroups.find(client->type());
 
             if (it == _cmdGroups.end()) {
@@ -106,17 +111,35 @@ void Core::processWorldEvents() {
 
         std::ignore = _clientRegistry.broadcast(Client::Type::kGui, eventStr);
         logger.debug("Forwarding: {}", eventStr.substr(0, eventStr.size() - 1));
+        if (std::holds_alternative<game::GameEndEvent>(event)) {
+            _logger.info("Game ended, server will go in zombie state.");
+        }
     }
 }
 
 void Core::nextTick() {
+    if (_world->hasWon()) {
+        _serv.poll(-1);
+        std::ignore = _clientRegistry.update();
+        return;
+    }
+
     int timeout = this->_timer.timeoutUntilSchedule();
 
     while (this->_serv.poll(timeout)) {
         timeout = this->_timer.timeoutUntilNextTick();
     }
     this->_timer.update();
-    this->_clientRegistry.update();
+    for (const std::vector<std::uint64_t> disconnectedPlayerIds = _clientRegistry.update();
+         std::uint64_t playerId : disconnectedPlayerIds) {
+        game::entity::Player* player = _world->player(playerId);
+
+        if (player == nullptr) {
+            continue;
+        }
+        player->kill();
+        _logger.info("Killed player #{}, client disconnected.", playerId);
+    }
 }
 
 bool Core::initTeams(const std::span<const std::string_view> names) {
