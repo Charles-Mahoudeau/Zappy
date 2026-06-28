@@ -563,6 +563,12 @@ bool World::checkWin() {
 
             if (const std::uint8_t total = ++teamWinningPlayers[teamName]; total >= kMaxLevelPlayersToWin) {
                 _winningTeam = std::move(teamName);
+                if (!_winningTeam.has_value()) {
+                    _logger->warn(
+                        "Somehow, just after setting the value of an optional, it does not has a value. This is a "
+                        "bug. A team should have won, but C++ has changed its fate.");
+                    return false;
+                }
                 pushEvent(GameEndEvent{
                     .teamName = *_winningTeam,
                 });
