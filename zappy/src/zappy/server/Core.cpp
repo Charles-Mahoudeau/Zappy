@@ -72,6 +72,9 @@ void Core::processCommandGroup() {
             continue;
         }
         while (std::optional<std::string> request = client->nextRequest()) {
+            if (_world->hasWon() && client->type() == Client::Type::kPlayer) {
+                continue;
+            }
             auto it = _cmdGroups.find(client->type());
 
             if (it == _cmdGroups.end()) {
@@ -108,10 +111,19 @@ void Core::processWorldEvents() {
 
         std::ignore = _clientRegistry.broadcast(Client::Type::kGui, eventStr);
         logger.debug("Forwarding: {}", eventStr.substr(0, eventStr.size() - 1));
+        if (std::holds_alternative<game::GameEndEvent>(event)) {
+            _logger.info("Game ended, server will go in zombie state.");
+        }
     }
 }
 
 void Core::nextTick() {
+    if (_world->hasWon()) {
+        _serv.poll(-1);
+        _clientRegistry.update();
+        return;
+    }
+
     int timeout = this->_timer.timeoutUntilSchedule();
 
     while (this->_serv.poll(timeout)) {
