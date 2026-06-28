@@ -67,6 +67,15 @@ void VFXHandler::createVFXs() {
     skull.setIncrementParticles(Vector2{-0.005F, 0.008F}, 0.0F, ColorF{-1.5F, -1.7F, -1.7F, -2.0F});
     skull.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.01F, .rotation = 0.00F, .tint = 0.0F});
     _vfxs.insert({"skull", std::move(skull)});
+
+    ParticleEmitter slash("assets/particles/Slash.png");
+    slash.setStatic(Vector3{}, Vector3{3.0F, 3.5F, 3.0F}, Vector3{0.0F, 0.00003F, 0.0F}, 180.0F, 14);
+    slash.setInitParticles(Vector2{0.5F, 0.5F}, 45.0F, ColorF{255.0F, 130.0F, 255.0F, 50.0F}, 130.0F, 0.0001F);
+    slash.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 0.0F, .tint = 15.0F}, 0.1F,
+                          0.03F);
+    slash.setIncrementParticles(Vector2{-0.007F, -0.007F}, 0.0F, ColorF{-1.0F, -1.0F, -1.0F, -2.0F});
+    slash.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.005F, .rotation = 0.002F, .tint = 0.25F});
+    _vfxs.insert({"slash", std::move(slash)});
 }
 
 const std::map<std::string, ParticleEmitter>& VFXHandler::vfxs() const { return _vfxs; }
