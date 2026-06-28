@@ -156,8 +156,7 @@ std::size_t GameState::playersAtMaxLevel(const std::string& team) const {
 const std::unordered_map<std::uint32_t, Egg>& GameState::eggs() const { return _eggs; }
 
 std::optional<Egg> GameState::getEgg(std::int32_t eggId) const {
-    auto it = _eggs.find(eggId);
-    if (it != _eggs.end()) {
+    if (auto it = _eggs.find(eggId); it != _eggs.end()) {
         return it->second;
     }
     return std::nullopt;
