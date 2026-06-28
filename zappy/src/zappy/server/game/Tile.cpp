@@ -45,17 +45,23 @@ const Inventory& Tile::inventory() const { return _inventory; }
 
 Inventory& Tile::inventory() { return _inventory; }
 
-std::string Tile::string(const EntityDatabase& db) {
+std::string Tile::string(const EntityDatabase& db) const {
     std::string str;
 
     for (const auto& entityId : this->_entities) {
         if (db.is<entity::Player>(entityId)) {
-            str += " player";
+            if (!str.empty()) str += " ";
+            str += "player";
         } else if (db.is<entity::Egg>(entityId)) {
-            str += " egg";
+            if (!str.empty()) str += " ";
+            str += "egg";
         }
     }
-    str += this->_inventory.list();
+    const std::string inv = this->_inventory.list();
+    if (!inv.empty()) {
+        // list() always prepends a space; drop it only when str is still empty
+        str += str.empty() ? inv.substr(1) : inv;
+    }
     return str;
 }
 
