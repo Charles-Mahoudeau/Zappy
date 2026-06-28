@@ -151,13 +151,22 @@ void AssetStore::loadVFXs() {
     _vfxs.insert({"eggCrack", std::move(eggCrack)});
 
     ParticleEmitter smoke("assets/particles/Smoke.png");
-    smoke.setStatic(Vector3{}, Vector3{4.0F, 4.0F, 4.0F}, Vector3{0.0F, 0.0002F, 0.0F}, 250.0F, 16);
-    smoke.setInitParticles(Vector2{1.2F, 1.2F}, 0.0F, ColorF{60.0F, 55.0F, 50.0F, 50.0F}, 150.0F, 0.03F);
+    smoke.setStatic(Vector3{}, Vector3{4.0F, 4.0F, 4.0F}, Vector3{0.0F, 0.0002F, 0.0F}, 180.0F, 16);
+    smoke.setInitParticles(Vector2{1.2F, 1.2F}, 0.0F, ColorF{60.0F, 55.0F, 50.0F, 50.0F}, 200.0F, 0.03F);
     smoke.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.2F, .rotation = 360.0F, .tint = 10.0F}, 0.1F,
                           0.03F);
     smoke.setIncrementParticles(Vector2{0.01F, 0.01F}, 0.0F, ColorF{-0.5F, -0.5F, -0.5F, -0.75F});
     smoke.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.004F, .rotation = 2.0F, .tint = 0.3F});
     _vfxs.insert({"smoke", std::move(smoke)});
+
+    ParticleEmitter sparkles("assets/particles/Twinkle.png");
+    sparkles.setStatic(Vector3{}, Vector3{4.0F, 4.0F, 4.0F}, Vector3{0.0F, 0.0002F, 0.0F}, 180.0F, 10);
+    sparkles.setInitParticles(Vector2{0.7F, 0.7F}, 0.0F, ColorF{255.0F, 130.0F, 255.0F, 50.0F}, 130.0F, 0.001F);
+    sparkles.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 45.0F, .tint = 15.0F}, 0.1F,
+                             0.03F);
+    sparkles.setIncrementParticles(Vector2{-0.007F, -0.007F}, 0.0F, ColorF{-1.0F, -1.0F, -1.0F, -2.0F});
+    sparkles.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.004F, .rotation = 0.01F, .tint = 0.25F});
+    _vfxs.insert({"sparkles", std::move(sparkles)});
 }
 
 void AssetStore::loadEggModel() {

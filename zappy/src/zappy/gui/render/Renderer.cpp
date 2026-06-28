@@ -45,7 +45,7 @@ void Renderer::update(Camera& camera, game::GameState& state, AssetStore& assets
         assets.emit("impact", Vector3{0.0F, 0.0F, 0.0F});
         assets.emit("signal", Vector3{3.0F, 0.0F, 0.0F});
         assets.emit("eggCrack", Vector3{6.0F, 0.0F, 0.0F});
-        assets.emit("eggCrack", Vector3{0.0F, 3.0F, 0.0F});
+        assets.emit("sparkles", Vector3{9.0F, 0.0F, 0.0F});
         assets.emit("smoke", Vector3{0.0F, 0.0F, 4.0F});
     }
     _grid.resize(state.width(), state.height());
