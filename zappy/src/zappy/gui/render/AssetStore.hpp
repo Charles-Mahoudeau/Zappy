@@ -19,7 +19,7 @@
 #include "../game/GameState.hpp"
 #include "objects/Model.hpp"
 #include "objects/Skybox.hpp"
-#include "objects/particles/ParticleEmitter.hpp"
+#include "objects/particles/VFXHandler.hpp"
 #include "utils/Vector3.hpp"
 
 namespace zappy::gui::render {
@@ -74,7 +74,7 @@ class AssetStore {
     Skybox _skybox;
     std::vector<Model> _playerModels;
     std::map<game::ResourceType, Model> _resourcesModels;
-    std::map<std::string, ParticleEmitter> _vfxs;
+    VFXHandler _vfxHandler;
     std::unique_ptr<Model> _eggModel;
     std::unique_ptr<Model> _islandModel;
     std::unique_ptr<Model> _bridgeModel;

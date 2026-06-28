@@ -42,6 +42,8 @@ add_library(zappy_gui_objects OBJECT
         render/objects/particles/ParticleEmitter.hpp
         render/objects/particles/Particle.cpp
         render/objects/particles/Particle.hpp
+        render/objects/particles/VFXHandler.cpp
+        render/objects/particles/VFXHandler.hpp
         render/utils/Vector2.cpp
         render/utils/Vector2.hpp
         render/utils/Color.hpp

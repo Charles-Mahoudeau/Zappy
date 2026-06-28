@@ -67,6 +67,7 @@ void VFXHandler::createVFXs() {
     skull.setIncrementParticles(Vector2{-0.005F, 0.008F}, 0.0F, ColorF{-1.5F, -1.7F, -1.7F, -2.0F});
     skull.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.01F, .rotation = 0.00F, .tint = 0.0F});
     _vfxs.insert({"skull", std::move(skull)});
+
 }
 
 const std::map<std::string, ParticleEmitter>& VFXHandler::vfxs() const { return _vfxs; }
