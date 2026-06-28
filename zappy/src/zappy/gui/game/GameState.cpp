@@ -134,15 +134,16 @@ std::optional<Player> GameState::getPlayer(std::int32_t id) const {
     return it->second;
 }
 
-void GameState::playerEvent(std::int32_t playerId, EventType type) {
+bool GameState::playerEvent(std::int32_t playerId, EventType type) {
     auto plr = getPlayer(playerId);
     render::Vector3 pos;
 
     if (plr.has_value()) {
         pos = render::Vector3{static_cast<float>(plr->x), 0.0F, static_cast<float>(plr->y)};
         broadcastEvent(type, pos);
+        return true;
     }
-    _players.erase(playerId);
+    return false;
 }
 
 const std::vector<std::string>& GameState::teams() const { return _teams; }
@@ -162,15 +163,18 @@ std::optional<Egg> GameState::getEgg(std::int32_t eggId) const {
     return std::nullopt;
 }
 
-void GameState::eggEvent(std::int16_t eggId, EventType type) {
+bool GameState::eggEvent(std::int16_t eggId, EventType type) {
     auto egg = getEgg(eggId);
     render::Vector3 pos;
 
     if (egg.has_value()) {
         pos = render::Vector3{static_cast<float>(egg->x), 0.0F, static_cast<float>(egg->y)};
         broadcastEvent(type, pos);
+        return true;
     }
+    return false;
 }
+
 std::uint32_t GameState::timeUnit() const { return _timeUnit; }
 
 bool GameState::isGameOver() const { return _winner.has_value(); }

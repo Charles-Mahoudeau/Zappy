@@ -94,12 +94,12 @@ class GameState {
     [[nodiscard]] const Resources& tile(std::size_t x, std::size_t y) const;
     [[nodiscard]] const std::unordered_map<std::uint32_t, Player>& players() const;
     [[nodiscard]] std::optional<Player> getPlayer(std::int32_t id) const;
-    void playerEvent(std::int32_t playerId, EventType type);
+    bool playerEvent(std::int32_t playerId, EventType type);
     [[nodiscard]] const std::vector<std::string>& teams() const;
     [[nodiscard]] std::size_t playersAtMaxLevel(const std::string& team) const;
     [[nodiscard]] const std::unordered_map<std::uint32_t, Egg>& eggs() const;
     [[nodiscard]] std::optional<Egg> getEgg(std::int32_t eggId) const;
-    void eggEvent(std::int16_t eggId, EventType type);
+    bool eggEvent(std::int16_t eggId, EventType type);
     [[nodiscard]] std::uint32_t timeUnit() const;
     [[nodiscard]] bool isGameOver() const;
     [[nodiscard]] const std::optional<std::string>& winner() const;
