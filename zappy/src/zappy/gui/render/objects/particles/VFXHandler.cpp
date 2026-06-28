@@ -64,7 +64,7 @@ void VFXHandler::createVFXs() {
     sparkles.setInitParticles(Vector2{0.5F, 0.5F}, 45.0F, ColorF{255.0F, 130.0F, 255.0F, 150.0F}, 130.0F, 0.001F);
     sparkles.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 0.0F, .tint = 15.0F}, 0.1F,
                              0.001F);
-    sparkles.setIncrementParticles(Vector2{-0.007F, -0.007F}, 0.0F, ColorF{-1.0F, -1.0F, -1.0F, -2.0F});
+    sparkles.setIncrementParticles(Vector2{-0.007F, -0.007F}, 0.0F, ColorF{-1.0F, -1.0F, -0.05F, -2.0F});
     sparkles.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.005F, .rotation = 0.002F, .tint = 0.25F});
     _vfxs.insert({"sparkles", std::move(sparkles)});
 
