@@ -155,7 +155,7 @@ void AssetStore::loadVFXs() {
     smoke.setInitParticles(Vector2{1.2F, 1.2F}, 0.0F, ColorF{60.0F, 55.0F, 50.0F, 50.0F}, 150.0F, 0.03F);
     smoke.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.2F, .rotation = 360.0F, .tint = 10.0F}, 0.1F,
                           0.03F);
-    smoke.setIncrementParticles(Vector2{0.01F, 0.01F}, 0.0F, ColorF{-1.0F, -1.0F, -1.0F, -1.0F});
+    smoke.setIncrementParticles(Vector2{0.01F, 0.01F}, 0.0F, ColorF{-0.5F, -0.5F, -0.5F, -0.75F});
     smoke.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.004F, .rotation = 2.0F, .tint = 0.3F});
     _vfxs.insert({"smoke", std::move(smoke)});
 }
