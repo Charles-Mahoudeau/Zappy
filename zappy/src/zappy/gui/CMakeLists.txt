@@ -80,6 +80,8 @@ add_library(zappy_gui_objects OBJECT
         ui/VictoryScreen.hpp
         ui/Widgets.cpp
         ui/Widgets.hpp
+        ui/KeySystem.cpp
+        ui/KeySystem.hpp
 )
 target_include_directories(zappy_gui_objects PUBLIC
     ${CMAKE_SOURCE_DIR}/src

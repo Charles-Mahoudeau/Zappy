@@ -15,6 +15,7 @@
 #include <utility>
 
 #include "zappy/gui/render/utils/Vector3.hpp"
+#include "zappy/gui/ui/KeySystem.hpp"
 #include "zappy/gui/ui/Mouse.hpp"
 
 namespace zappy::gui::render {
@@ -86,10 +87,12 @@ void Camera::applyManualZoomInput() {
 
     float zoomDelta = ui::Mouse::scrollDelta();
     const float keyZoom = kKeyZoomSpeed * GetFrameTime();
-    if (IsKeyDown(KEY_EQUAL) || IsKeyDown(KEY_KP_ADD)) {
+    if (ui::KeySystem::isKeyPressed(ui::KeySystem::Key::KEY_EQUAL) ||
+        ui::KeySystem::isKeyPressed(ui::KeySystem::Key::KEY_KP_ADD)) {
         zoomDelta += keyZoom;
     }
-    if (IsKeyDown(KEY_MINUS) || IsKeyDown(KEY_KP_SUBTRACT)) {
+    if (ui::KeySystem::isKeyPressed(ui::KeySystem::Key::KEY_MINUS) ||
+        ui::KeySystem::isKeyPressed(ui::KeySystem::Key::KEY_KP_SUBTRACT)) {
         zoomDelta -= keyZoom;
     }
     if (zoomDelta != 0.0F) {
@@ -116,9 +119,13 @@ void Camera::followPlayer(std::optional<Vector3> worldPosition, bool acceptManua
     const float fovyGoal = worldPosition.has_value() ? (_manualFovy * kFocusFovyFactor) : _manualFovy;
 
     const Vector3 currentTarget = target();
+
+    setFovy(std::lerp(fovy(), fovyGoal, blend));
+    if (projection() == CameraProjection::CAMERA_PERSPECTIVE && !worldPosition.has_value()) {
+        return;
+    }
     setTarget(Vector3{std::lerp(currentTarget.x(), targetGoal.x(), blend), 0.0F,
                       std::lerp(currentTarget.z(), targetGoal.z(), blend)});
-    setFovy(std::lerp(fovy(), fovyGoal, blend));
 }
 
 void Camera::update() { UpdateCamera(&_camera, std::to_underlying(_cameraMode)); }

@@ -7,6 +7,8 @@
 
 #include "InfoPanel.hpp"
 
+#include <raylib.h>
+
 #include <cstdint>
 #include <optional>
 #include <utility>
@@ -19,6 +21,7 @@
 #include "zappy/gui/render/Camera.hpp"
 #include "zappy/gui/render/utils/Rectangle.hpp"
 #include "zappy/gui/render/utils/Vector2.hpp"
+#include "zappy/gui/ui/KeySystem.hpp"
 
 namespace zappy::gui::ui {
 
@@ -42,6 +45,16 @@ void InfoPanel::update(render::Vector2 mousePos, bool clicked, const render::Cam
         _state = Leaderboard;
     }
 
+    if (KeySystem::isKeyPressed(KeySystem::Key::KEY_LEFT) && _selectedPlayerId.has_value()) {
+        _selectedPlayerId = (_selectedPlayerId.value() - 1) % state.players().size();
+        _state = Player;
+        return;
+    }
+    if (KeySystem::isKeyPressed(KeySystem::Key::KEY_RIGHT) && _selectedPlayerId.has_value()) {
+        _selectedPlayerId = (_selectedPlayerId.value() + 1) % state.players().size();
+        _state = Player;
+        return;
+    }
     if (!clicked) {
         return;
     }

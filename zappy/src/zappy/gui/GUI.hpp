@@ -47,7 +47,6 @@ class GUI {
     [[nodiscard]] const game::GameState& state() const;
 
   private:
-    void setupCamera();
     void drawLoadingFrame(std::string_view name, float progress);
     void drawWaitingFrame();
     bool tryConnect();
@@ -64,7 +63,7 @@ class GUI {
 
     display::Window _window;
     ui::GuiTheme _theme;
-    render::Camera _camera;  // May be placed in renderer ?
+    render::Camera _camera;
     render::AssetStore _assets;
     render::Renderer _renderer;
     ui::Hud _hud;

@@ -64,21 +64,6 @@ void GUI::pump() {
     }
 }
 
-void GUI::setupCamera() {
-    const float width = static_cast<float>(_state.width()) * render::Grid::kSpacing;
-    const float height = static_cast<float>(_state.height()) * render::Grid::kSpacing;
-    const float span = std::max({width, height, 1.0F});
-    const float centerX = width / 2.0F;
-    const float centerZ = height / 2.0F;
-    const float offset = span;
-    const float fovy = span * 1.5F;
-
-    _camera = render::Camera{render::Vector3(centerX + offset, span * 0.85F, centerZ + offset),
-                             render::Vector3(centerX, 0.0F, centerZ), render::Vector3(0, 1.0F, 0), fovy,
-                             render::CameraProjection::CAMERA_ORTHOGRAPHIC};
-    _camera.setCameraMode(render::CameraMode::CAMERA_CUSTOM);
-}
-
 void GUI::drawLoadingFrame(std::string_view name, float progress) {
     _dotAnimator.advance();
     const std::string text = _dotAnimator.text("Loading");
@@ -151,7 +136,7 @@ bool GUI::waitForConnection() {
 }
 
 void GUI::runSession() {
-    setupCamera();
+    render::Renderer::setCameraToOrthographic(_camera, _state);
 
     _poller.clear();
     _poller.add(_buffer.fd(), zappy::io::Poller::kPollRead | zappy::io::Poller::kPollError, [this](std::byte events) {
