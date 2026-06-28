@@ -12,6 +12,7 @@
 #include <sstream>
 #include <string>
 
+#include "zappy/gui/game/EventHandler.hpp"
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/network/handlers/ParseHelpers.hpp"
 #include "zappy/shared/exception/ParseException.hpp"
@@ -28,7 +29,16 @@ class PlvHandler {
         if (!(ss >> idToken >> level)) {
             throw exception::ParseException{"plv: malformed arguments"};
         }
-        _state.get().setPlayerLevel(parseId(idToken), level);
+
+        auto playerId = parseId(idToken);
+        auto plr = _state.get().getPlayer(playerId);
+        render::Vector3 pos;
+
+        if (plr.has_value()) {
+            pos = render::Vector3{static_cast<float>(plr->x), 0.0F, static_cast<float>(plr->y)};
+        }
+        _state.get().setPlayerLevel(playerId, level);
+        _state.get().broadcastEvent(game::EventType::Death, pos);
     }
 
   private:
