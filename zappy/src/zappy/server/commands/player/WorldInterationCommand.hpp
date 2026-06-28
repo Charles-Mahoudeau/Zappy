@@ -18,6 +18,7 @@ class WorldInterationCommand {
   public:
     static bool take(ICommandGroup::CommandCtx& ctx);
     static bool drop(ICommandGroup::CommandCtx& ctx);
+    static bool eject(ICommandGroup::CommandCtx& ctx);
 
   private:
     static bool action(ICommandGroup::CommandCtx& ctx,
