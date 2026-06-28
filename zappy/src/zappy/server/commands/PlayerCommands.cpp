@@ -107,7 +107,7 @@ bool PlayerCommands::broadcast(CommandCtx& ctx) {
             }
             if (const game::entity::Player* receiver = world.get().player(client->playerID()); receiver != nullptr) {
                 std::ignore = client->sendMessage(
-                    "message {},{}\n", world.get().computeDistFromPositions(emitter->position(), receiver->position()),
+                    "message {}, {}\n", world.get().computeDistFromPositions(emitter->position(), receiver->position()),
                     text);
             }
         }
