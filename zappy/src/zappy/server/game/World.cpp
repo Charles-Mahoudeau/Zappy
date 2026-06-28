@@ -281,7 +281,10 @@ std::optional<World::IncantationSnapshot> World::beginIncantation(const std::uin
 
     for (const std::uint64_t entityId : tile.entities()) {
         if (_entityDatabase.is<entity::Player>(entityId)) {
-            players.push_back(entityId);
+            const entity::Player* participant = _entityDatabase.query<entity::Player>(entityId);
+            if (participant != nullptr && participant->level() == incantationPlayer->level()) {
+                players.push_back(entityId);
+            }
         }
     }
 
