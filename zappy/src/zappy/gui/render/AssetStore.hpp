@@ -48,6 +48,7 @@ class AssetStore {
     void loadBridgeModel();
 
     void emit(std::string_view path, Vector3 pos);
+    void playVFX(std::vector<std::string_view>& emitters, Vector3 pos);
 
     [[nodiscard]] const Skybox& skybox() const;
     [[nodiscard]] Model& playerModel(std::size_t index);

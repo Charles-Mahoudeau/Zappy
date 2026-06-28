@@ -14,6 +14,7 @@
 #include "Camera.hpp"
 #include "Grid.hpp"
 #include "objects/Model.hpp"
+#include "zappy/gui/game/EventHandler.hpp"
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/render/utils/Vector3.hpp"
 
@@ -66,6 +67,7 @@ class Renderer {
     static constexpr int kMoveAnim = 1;
     std::unordered_map<std::uint32_t, PlayerVisual> _playerVisuals;
 
+    game::EventHandler _eventHandler;
     static void drawVFXs(Camera& camera, game::GameState& state, AssetStore& assets);
     static constexpr uint16_t kParticlesCeiling = 1500;
     Grid _grid;

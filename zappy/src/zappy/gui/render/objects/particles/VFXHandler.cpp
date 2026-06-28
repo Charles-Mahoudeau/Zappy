@@ -105,5 +105,5 @@ void VFXHandler::playVFX(std::vector<std::string_view>& emitters, Vector3 pos) {
     for (const auto& emitterName : emitters) {
         emit(emitterName, pos);
     }
-
+}
 }  // namespace zappy::gui::render

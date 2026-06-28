@@ -21,6 +21,7 @@
 #include "Camera.hpp"
 #include "objects/Model.hpp"
 #include "zappy/gui/display/Window.hpp"
+#include "zappy/gui/game/EventHandler.hpp"
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/render/utils/Color.hpp"
 #include "zappy/gui/render/utils/Vector3.hpp"
@@ -37,6 +38,9 @@ void Renderer::update(Camera& camera, game::GameState& state, AssetStore& assets
     display::Window::BeginMode3D(skyboxCamera);
     assets.skybox().draw(camera.position());
     display::Window::EndMode3D();
+
+    game::EventResponse eventRes = _eventHandler.handleEvent(state.getEvent());
+    assets.playVFX(eventRes.emitters, eventRes.position);
 
     static float timeIncrement = 0.0F;
     timeIncrement += GetFrameTime() * static_cast<float>(state.timeUnit());

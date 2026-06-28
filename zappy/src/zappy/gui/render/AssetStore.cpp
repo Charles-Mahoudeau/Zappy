@@ -12,7 +12,9 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <utility>
+#include <vector>
 
 #include "../game/GameState.hpp"
 #include "AssetLoaderRegistry.hpp"
@@ -178,4 +180,10 @@ const std::map<std::string, ParticleEmitter>& AssetStore::vfxs() const { return 
 std::map<std::string, ParticleEmitter>& AssetStore::vfxs() { return _vfxHandler.vfxs(); }
 
 void AssetStore::emit(std::string_view path, Vector3 pos) { _vfxHandler.emit(path, pos); }
+
+void AssetStore::playVFX(std::vector<std::string_view>& emitters, Vector3 pos) {
+    for (const auto& emitterName : emitters) {
+        emit(emitterName, pos);
+    }
+}
 }  // namespace zappy::gui::render

@@ -8,6 +8,7 @@ add_library(zappy_gui_objects OBJECT
         display/Window.hpp
         game/GameState.cpp
         game/GameState.hpp
+        game/EventHandler.cpp
         GUI.cpp
         GUI.hpp
         GuiCliParser.cpp
