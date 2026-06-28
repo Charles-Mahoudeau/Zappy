@@ -24,7 +24,7 @@
 #include "zappy/server/commands/ACommandGroup.hpp"
 #include "zappy/server/commands/ICommandGroup.hpp"
 #include "zappy/server/commands/player/MoveCommand.hpp"
-#include "zappy/server/commands/player/ObjectCommand.hpp"
+#include "zappy/server/commands/player/WorldInterationCommand.hpp"
 #include "zappy/server/commands/player/PlayerData.hpp"
 #include "zappy/server/game/Event.hpp"
 #include "zappy/server/game/Tile.hpp"
@@ -46,8 +46,8 @@ PlayerCommands::PlayerCommands(CommandCtx context)
           {"Connect_nbr", [](auto& ctx) { return PlayerCommands::connectNb(ctx); }},
           {"Fork", [](auto& ctx) { return PlayerCommands::fork(ctx); }},
           {"Eject", [](auto& ctx) { return PlayerCommands::eject(ctx); }},
-          {"Take", [](auto& ctx) { return player::ObjectCommand::take(ctx); }},
-          {"Set", [](auto& ctx) { return player::ObjectCommand::drop(ctx); }},
+          {"Take", [](auto& ctx) { return player::WorldInterationCommand::take(ctx); }},
+          {"Set", [](auto& ctx) { return player::WorldInterationCommand::drop(ctx); }},
           {"Incantation", [](const CommandCtx& ctx) { return incantation(ctx); }},
       }) {}
 

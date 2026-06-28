@@ -1,8 +1,8 @@
 /*
 ** EPITECH PROJECT, 2026
-** ObjectCommand
+** WorldInterationCommand
 ** File description:
-** ObjectCommand header
+** WorldInterationCommand header
 */
 
 #pragma once
@@ -14,7 +14,7 @@
 #include "zappy/server/game/entity/Player.hpp"
 namespace zappy::server::command::player {
 
-class ObjectCommand {
+class WorldInterationCommand {
   public:
     static bool take(ICommandGroup::CommandCtx& ctx);
     static bool drop(ICommandGroup::CommandCtx& ctx);

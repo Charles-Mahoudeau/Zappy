@@ -1,35 +1,34 @@
 /*
 ** EPITECH PROJECT, 2026
-** ObjectCommand
+** WorldInterationCommand
 ** File description:
-** ObjectCommand code
+** WorldInterationCommand code
 */
-
-#include "zappy/server/commands/player/ObjectCommand.hpp"
 
 #include <functional>
 #include <utility>
 
 #include "zappy/server/commands/ICommandGroup.hpp"
+#include "zappy/server/commands/player/WorldInterationCommand.hpp"
 #include "zappy/server/commands/player/PlayerData.hpp"
 #include "zappy/server/game/ResourceType.hpp"
 #include "zappy/server/game/entity/Player.hpp"
 
 namespace zappy::server::command::player {
 
-bool ObjectCommand::take(ICommandGroup::CommandCtx& ctx) {
-    return ObjectCommand::action(ctx, [&ctx](game::ResourceType resource, game::entity::Player* player) {
+bool WorldInterationCommand::take(ICommandGroup::CommandCtx& ctx) {
+    return WorldInterationCommand::action(ctx, [&ctx](game::ResourceType resource, game::entity::Player* player) {
         return ctx.world.get().playerTake(player, resource);
     });
 }
 
-bool ObjectCommand::drop(ICommandGroup::CommandCtx& ctx) {
-    return ObjectCommand::action(ctx, [&ctx](game::ResourceType resource, game::entity::Player* player) {
+bool WorldInterationCommand::drop(ICommandGroup::CommandCtx& ctx) {
+    return WorldInterationCommand::action(ctx, [&ctx](game::ResourceType resource, game::entity::Player* player) {
         return ctx.world.get().playerDrop(player, resource);
     });
 }
 
-bool ObjectCommand::action(ICommandGroup::CommandCtx& ctx,
+bool WorldInterationCommand::action(ICommandGroup::CommandCtx& ctx,
                            std::function<bool(game::ResourceType resource, game::entity::Player* player)> event) {
     auto clients = ctx.clientRegistry;
     auto world = ctx.world;
