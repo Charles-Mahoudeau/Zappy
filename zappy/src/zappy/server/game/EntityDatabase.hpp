@@ -57,6 +57,19 @@ class EntityDatabase {
     /// @brief Get an entity from the database.
     /// @param id The id of the entity to get.
     /// @return A pointer to the entity, or nullptr if the entity does not exist.
+    [[nodiscard]] const IEntity* query(std::uint64_t id) const;
+
+    /// @brief Get an entity of a given type from the database.
+    /// @tparam T The type of the entity to get.
+    /// @param id The id of the entity to get.
+    /// @return A pointer to the entity, or nullptr if the entity does not exist or if the entity is not of the given
+    /// type.
+    template <IsEntity T>
+    [[nodiscard]] const T* query(std::uint64_t id) const;
+
+    /// @brief Get an entity from the database.
+    /// @param id The id of the entity to get.
+    /// @return A pointer to the entity, or nullptr if the entity does not exist.
     [[nodiscard]] IEntity* query(std::uint64_t id);
 
     /// @brief Get an entity of a given type from the database.
@@ -119,6 +132,13 @@ class EntityDatabase {
     template <IsEntity T>
     EntityIdView filter(std::span<std::uint64_t> ids) const;
 
+    /// @brief Checks if the specified entity is of type T.
+    /// @tparam T The type to check.
+    /// @param id The ID of the entity to check.
+    /// @return True if the entity is of type T, false otherwise.
+    template <IsEntity T>
+    [[nodiscard]] bool is(std::uint64_t id) const;
+
   private:
     /// @brief Generate a unique ID for a new entity.
     /// @return A unique ID for a new entity.
@@ -145,6 +165,19 @@ void EntityDatabase::removeAll() {
         _entities.erase(id);
     }
     _entitiesByType.erase(it);
+}
+
+template <IsEntity T>
+const T* EntityDatabase::query(const std::uint64_t id) const {
+    const IEntity* entity = query(id);
+
+    if (entity == nullptr) {
+        return nullptr;
+    }
+    if (typeid(T) != typeIndex(*entity)) {
+        return nullptr;
+    }
+    return static_cast<const T*>(entity);
 }
 
 template <IsEntity T>
@@ -209,5 +242,15 @@ EntityDatabase::EntityIdView EntityDatabase::filter(std::span<std::uint64_t> ids
     return entities |
            std::views::filter([ids](const auto& pair) { return std::ranges::find(ids, pair.first) != ids.end(); }) |
            std::views::keys;
+}
+
+template <IsEntity T>
+bool EntityDatabase::is(const std::uint64_t id) const {
+    const auto it = _entitiesByType.find(typeid(T));
+
+    if (it == _entitiesByType.end()) {
+        return false;
+    }
+    return it->second.contains(id);
 }
 }  // namespace zappy::server::game

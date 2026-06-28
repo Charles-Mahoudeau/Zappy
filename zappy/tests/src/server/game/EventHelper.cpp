@@ -33,7 +33,7 @@ TEST(EventHelperToWire, TileInventoryEmptyInventory) {
         .inventory = std::cref(inventory),
     };
 
-    EXPECT_EQ(EventHelper::toWire(event), "bct 3 7 0 0 0 0 0 0 0");
+    EXPECT_EQ(EventHelper::toWire(event), "bct 3 7 0 0 0 0 0 0 0\n");
 }
 
 TEST(EventHelperToWire, TileInventoryWithResources) {
@@ -49,7 +49,7 @@ TEST(EventHelperToWire, TileInventoryWithResources) {
         .inventory = std::cref(inventory),
     };
 
-    EXPECT_EQ(EventHelper::toWire(event), "bct 0 0 5 2 0 0 0 0 1");
+    EXPECT_EQ(EventHelper::toWire(event), "bct 0 0 5 2 0 0 0 0 1\n");
 }
 
 // ─── PlayerConnectionEvent ───────────────────────────────────────────────────
@@ -64,7 +64,7 @@ TEST(EventHelperToWire, PlayerConnectionNorth) {
     };
 
     // orientation kNorth = 0, wire = 0 + 1 = 1
-    EXPECT_EQ(EventHelper::toWire(event), "pnw #1 4 2 1 1 alpha");
+    EXPECT_EQ(EventHelper::toWire(event), "pnw #1 4 2 1 1 alpha\n");
 }
 
 TEST(EventHelperToWire, PlayerConnectionEast) {
@@ -77,7 +77,7 @@ TEST(EventHelperToWire, PlayerConnectionEast) {
     };
 
     // orientation kEast = 1, wire = 1 + 1 = 2
-    EXPECT_EQ(EventHelper::toWire(event), "pnw #42 0 0 2 3 beta");
+    EXPECT_EQ(EventHelper::toWire(event), "pnw #42 0 0 2 3 beta\n");
 }
 
 TEST(EventHelperToWire, PlayerConnectionSouth) {
@@ -90,7 +90,7 @@ TEST(EventHelperToWire, PlayerConnectionSouth) {
     };
 
     // orientation kSouth = 2, wire = 2 + 1 = 3
-    EXPECT_EQ(EventHelper::toWire(event), "pnw #7 10 5 3 8 team1");
+    EXPECT_EQ(EventHelper::toWire(event), "pnw #7 10 5 3 8 team1\n");
 }
 
 TEST(EventHelperToWire, PlayerConnectionWest) {
@@ -103,7 +103,7 @@ TEST(EventHelperToWire, PlayerConnectionWest) {
     };
 
     // orientation kWest = 3, wire = 3 + 1 = 4
-    EXPECT_EQ(EventHelper::toWire(event), "pnw #99 1 1 4 2 gamma");
+    EXPECT_EQ(EventHelper::toWire(event), "pnw #99 1 1 4 2 gamma\n");
 }
 
 // ─── PlayerPositionEvent ─────────────────────────────────────────────────────
@@ -116,7 +116,7 @@ TEST(EventHelperToWire, PlayerPosition) {
     };
 
     // kSouth = 2, wire = 3
-    EXPECT_EQ(EventHelper::toWire(event), "ppo #5 8 3 3");
+    EXPECT_EQ(EventHelper::toWire(event), "ppo #5 8 3 3\n");
 }
 
 TEST(EventHelperToWire, PlayerPositionOriginNorth) {
@@ -126,7 +126,7 @@ TEST(EventHelperToWire, PlayerPositionOriginNorth) {
         .orientation = Direction::kNorth,
     };
 
-    EXPECT_EQ(EventHelper::toWire(event), "ppo #0 0 0 1");
+    EXPECT_EQ(EventHelper::toWire(event), "ppo #0 0 0 1\n");
 }
 
 // ─── PlayerLevelEvent ────────────────────────────────────────────────────────
@@ -137,7 +137,7 @@ TEST(EventHelperToWire, PlayerLevel) {
         .level = 4,
     };
 
-    EXPECT_EQ(EventHelper::toWire(event), "plv #12 4");
+    EXPECT_EQ(EventHelper::toWire(event), "plv #12 4\n");
 }
 
 TEST(EventHelperToWire, PlayerLevelMax) {
@@ -146,7 +146,7 @@ TEST(EventHelperToWire, PlayerLevelMax) {
         .level = 8,
     };
 
-    EXPECT_EQ(EventHelper::toWire(event), "plv #0 8");
+    EXPECT_EQ(EventHelper::toWire(event), "plv #0 8\n");
 }
 
 // ─── PlayerInventoryEvent ────────────────────────────────────────────────────
@@ -159,7 +159,7 @@ TEST(EventHelperToWire, PlayerInventoryEmpty) {
         .inventory = std::cref(inventory),
     };
 
-    EXPECT_EQ(EventHelper::toWire(event), "pin #3 2 6 0 0 0 0 0 0 0");
+    EXPECT_EQ(EventHelper::toWire(event), "pin #3 2 6 0 0 0 0 0 0 0\n");
 }
 
 TEST(EventHelperToWire, PlayerInventoryWithResources) {
@@ -173,7 +173,7 @@ TEST(EventHelperToWire, PlayerInventoryWithResources) {
         .inventory = std::cref(inventory),
     };
 
-    EXPECT_EQ(EventHelper::toWire(event), "pin #17 5 9 10 0 3 0 0 0 0");
+    EXPECT_EQ(EventHelper::toWire(event), "pin #17 5 9 10 0 3 0 0 0 0\n");
 }
 
 // ─── PlayerExpulsionEvent ────────────────────────────────────────────────────
@@ -183,7 +183,7 @@ TEST(EventHelperToWire, PlayerExpulsion) {
         .playerId = 21,
     };
 
-    EXPECT_EQ(EventHelper::toWire(event), "pex #21");
+    EXPECT_EQ(EventHelper::toWire(event), "pex #21\n");
 }
 
 // ─── PlayerBroadcastEvent ────────────────────────────────────────────────────
@@ -195,7 +195,7 @@ TEST(EventHelperToWire, PlayerBroadcast) {
     };
 
     // NOTE: the implementation currently formats this as "pex #id message"
-    EXPECT_EQ(EventHelper::toWire(event), "pbc #8 hello world");
+    EXPECT_EQ(EventHelper::toWire(event), "pbc #8 hello world\n");
 }
 
 TEST(EventHelperToWire, PlayerBroadcastEmptyMessage) {
@@ -204,7 +204,7 @@ TEST(EventHelperToWire, PlayerBroadcastEmptyMessage) {
         .message = "",
     };
 
-    EXPECT_EQ(EventHelper::toWire(event), "pbc #0 ");
+    EXPECT_EQ(EventHelper::toWire(event), "pbc #0 \n");
 }
 
 // ─── IncantationBeginEvent ───────────────────────────────────────────────────
@@ -216,7 +216,7 @@ TEST(EventHelperToWire, IncantationBeginSinglePlayer) {
         .playerIds = {10},
     };
 
-    EXPECT_EQ(EventHelper::toWire(event), "pic 4 4 2 #10");
+    EXPECT_EQ(EventHelper::toWire(event), "pic 4 4 2 #10\n");
 }
 
 TEST(EventHelperToWire, IncantationBeginMultiplePlayers) {
@@ -226,7 +226,7 @@ TEST(EventHelperToWire, IncantationBeginMultiplePlayers) {
         .playerIds = {3, 7, 11},
     };
 
-    EXPECT_EQ(EventHelper::toWire(event), "pic 1 2 5 #3 #7 #11");
+    EXPECT_EQ(EventHelper::toWire(event), "pic 1 2 5 #3 #7 #11\n");
 }
 
 TEST(EventHelperToWire, IncantationBeginNoPlayers) {
@@ -236,7 +236,7 @@ TEST(EventHelperToWire, IncantationBeginNoPlayers) {
         .playerIds = {},
     };
 
-    EXPECT_EQ(EventHelper::toWire(event), "pic 0 0 1");
+    EXPECT_EQ(EventHelper::toWire(event), "pic 0 0 1\n");
 }
 
 // ─── IncantationEndEvent ─────────────────────────────────────────────────────
@@ -247,7 +247,7 @@ TEST(EventHelperToWire, IncantationEndSuccess) {
         .success = true,
     };
 
-    EXPECT_EQ(EventHelper::toWire(event), "pie 6 3 1");
+    EXPECT_EQ(EventHelper::toWire(event), "pie 6 3 1\n");
 }
 
 TEST(EventHelperToWire, IncantationEndFailure) {
@@ -256,7 +256,7 @@ TEST(EventHelperToWire, IncantationEndFailure) {
         .success = false,
     };
 
-    EXPECT_EQ(EventHelper::toWire(event), "pie 0 0 0");
+    EXPECT_EQ(EventHelper::toWire(event), "pie 0 0 0\n");
 }
 
 // ─── PlayerEggLayingEvent ────────────────────────────────────────────────────
@@ -266,7 +266,7 @@ TEST(EventHelperToWire, PlayerEggLaying) {
         .playerId = 55,
     };
 
-    EXPECT_EQ(EventHelper::toWire(event), "pfk #55");
+    EXPECT_EQ(EventHelper::toWire(event), "pfk #55\n");
 }
 
 // ─── PlayerResourceDropEvent ─────────────────────────────────────────────────
@@ -278,7 +278,7 @@ TEST(EventHelperToWire, PlayerResourceDropFood) {
     };
 
     // kFood = 0
-    EXPECT_EQ(EventHelper::toWire(event), "pdr #2 0");
+    EXPECT_EQ(EventHelper::toWire(event), "pdr #2 0\n");
 }
 
 TEST(EventHelperToWire, PlayerResourceDropThystame) {
@@ -288,7 +288,7 @@ TEST(EventHelperToWire, PlayerResourceDropThystame) {
     };
 
     // kThystame = 6
-    EXPECT_EQ(EventHelper::toWire(event), "pdr #9 6");
+    EXPECT_EQ(EventHelper::toWire(event), "pdr #9 6\n");
 }
 
 // ─── PlayerResourceCollectEvent ──────────────────────────────────────────────
@@ -300,7 +300,7 @@ TEST(EventHelperToWire, PlayerResourceCollectLinemate) {
     };
 
     // kLinemate = 1
-    EXPECT_EQ(EventHelper::toWire(event), "pgt #14 1");
+    EXPECT_EQ(EventHelper::toWire(event), "pgt #14 1\n");
 }
 
 TEST(EventHelperToWire, PlayerResourceCollectPhiras) {
@@ -310,7 +310,7 @@ TEST(EventHelperToWire, PlayerResourceCollectPhiras) {
     };
 
     // kPhiras = 5
-    EXPECT_EQ(EventHelper::toWire(event), "pgt #0 5");
+    EXPECT_EQ(EventHelper::toWire(event), "pgt #0 5\n");
 }
 
 // ─── PlayerDeathEvent ────────────────────────────────────────────────────────
@@ -320,7 +320,7 @@ TEST(EventHelperToWire, PlayerDeath) {
         .playerId = 33,
     };
 
-    EXPECT_EQ(EventHelper::toWire(event), "pdi #33");
+    EXPECT_EQ(EventHelper::toWire(event), "pdi #33\n");
 }
 
 // ─── EggLaidEvent ────────────────────────────────────────────────────────────
@@ -332,7 +332,7 @@ TEST(EventHelperToWire, EggLaidWithPlayer) {
         .position = {2, 8},
     };
 
-    EXPECT_EQ(EventHelper::toWire(event), "enw #100 #4 2 8");
+    EXPECT_EQ(EventHelper::toWire(event), "enw #100 #4 2 8\n");
 }
 
 TEST(EventHelperToWire, EggLaidWithoutPlayer) {
@@ -343,7 +343,7 @@ TEST(EventHelperToWire, EggLaidWithoutPlayer) {
     };
 
     // value_or(-1) casts std::nullopt -> -1
-    EXPECT_EQ(EventHelper::toWire(event), "enw #200 #-1 0 0");
+    EXPECT_EQ(EventHelper::toWire(event), "enw #200 #-1 0 0\n");
 }
 
 // ─── EggConnectionEvent ──────────────────────────────────────────────────────
@@ -353,7 +353,7 @@ TEST(EventHelperToWire, EggConnection) {
         .eggId = 77,
     };
 
-    EXPECT_EQ(EventHelper::toWire(event), "ebo #77");
+    EXPECT_EQ(EventHelper::toWire(event), "ebo #77\n");
 }
 
 // ─── EggDeathEvent ───────────────────────────────────────────────────────────
@@ -363,7 +363,7 @@ TEST(EventHelperToWire, EggDeath) {
         .eggId = 88,
     };
 
-    EXPECT_EQ(EventHelper::toWire(event), "edi #88");
+    EXPECT_EQ(EventHelper::toWire(event), "edi #88\n");
 }
 
 // ─── GameEndEvent ────────────────────────────────────────────────────────────
@@ -373,5 +373,5 @@ TEST(EventHelperToWire, GameEnd) {
         .teamName = "winners",
     };
 
-    EXPECT_EQ(EventHelper::toWire(event), "seg winners");
+    EXPECT_EQ(EventHelper::toWire(event), "seg winners\n");
 }

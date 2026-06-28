@@ -18,6 +18,7 @@
 #include "zappy/gui/render/AssetStore.hpp"
 #include "zappy/gui/render/Camera.hpp"
 #include "zappy/gui/render/Renderer.hpp"
+#include "zappy/gui/ui/DotAnimator.hpp"
 #include "zappy/gui/ui/GuiTheme.hpp"
 #include "zappy/gui/ui/Hud.hpp"
 #include "zappy/shared/io/Poller.hpp"
@@ -48,6 +49,10 @@ class GUI {
   private:
     void setupCamera();
     void drawLoadingFrame(std::string_view name, float progress);
+    void drawWaitingFrame();
+    bool tryConnect();
+    bool waitForConnection();
+    void runSession();
 
     zappy::network::Address _address;
     zappy::network::BufferedClient _buffer;
@@ -63,7 +68,7 @@ class GUI {
     render::AssetStore _assets;
     render::Renderer _renderer;
     ui::Hud _hud;
-    int _loadingDots{0};
+    ui::DotAnimator _dotAnimator;
 };
 
 }  // namespace zappy::gui

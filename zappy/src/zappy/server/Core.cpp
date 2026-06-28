@@ -11,9 +11,15 @@
 #include <format>
 #include <iostream>
 #include <memory>
+#include <optional>
 #include <span>
+#include <string>
 #include <string_view>
+#include <tuple>
+#include <variant>
 
+#include "game/Event.hpp"
+#include "game/EventHelper.hpp"
 #include "zappy/server/CliParser.hpp"
 #include "zappy/server/client/Client.hpp"
 #include "zappy/server/commands/GuiCommands.hpp"
@@ -49,8 +55,9 @@ void Core::init(const std::span<std::string_view> argv) {
 void Core::run() {
     while (true) {
         try {
-            this->nextTick();
-            this->processCommandGroup();
+            nextTick();
+            processCommandGroup();
+            processWorldEvents();
         } catch (const exception::Exception& err) {
             std::cerr << "Error: " << err.what() << "\n";
         }
@@ -62,16 +69,43 @@ void Core::processCommandGroup() {
         if (client->inTimeout()) {
             continue;
         }
+        while (std::optional<std::string> request = client->nextRequest()) {
+            auto it = _cmdGroups.find(client->type());
 
-        auto req = client->nextRequest();
-        if (!req.has_value()) {
-            continue;
+            if (it == _cmdGroups.end()) {
+                continue;
+            }
+
+            const std::unique_ptr<command::ICommandGroup>& commands = it->second;
+
+            (*commands)(client, *request);
+        }
+    }
+}
+
+void Core::processWorldEvents() {
+    const io::Logger logger = _logger.derive("WorldSync");
+
+    while (_world->hasEvents()) {
+        const game::Event event = _world->popEvent();
+
+        if (std::holds_alternative<game::PlayerDeathEvent>(event)) {
+            const auto& [playerId] = std::get<game::PlayerDeathEvent>(event);
+
+            if (const Client* client = _clientRegistry.findByPlayerId(playerId); client != nullptr) {
+                std::ignore = client->sendMessage("dead\n");
+                _clientRegistry.markForRemoval(client);
+                _timer.scheduleLater(0, [] {
+                    // Schedule useless event to trigger garbage collection
+                });
+            }
+            _world->remove(playerId);
         }
 
-        if (auto iter = this->_cmdGroups.find(client->type()); iter != this->_cmdGroups.end()) {
-            const auto& commands = iter->second;
-            (*commands)(client, req.value());
-        }
+        const std::string eventStr = game::EventHelper::toWire(event);
+
+        std::ignore = _clientRegistry.broadcast(Client::Type::kGui, eventStr);
+        logger.debug("Forwarding: {}", eventStr.substr(0, eventStr.size() - 1));
     }
 }
 
@@ -118,15 +152,15 @@ bool Core::initTimer(const std::uint16_t frequency) {
         _logger.info("Using default timer frequency.");
         return true;
     }
-    _timer.setFrequencies(frequency);
+    _timer.setFrequency(frequency);
     _logger.info("Timer initialized.");
     return true;
 }
 
 bool Core::initWorld(math::Vector2u size, std::span<const std::string_view> teams, std::uint16_t nbPlayerPerTeam) {
     try {
-        _world = std::make_unique<game::World>(size, _logger.derive("World"));
-        this->_world->spawnStartEggs(teams, nbPlayerPerTeam);
+        _world = std::make_unique<game::World>(size, _timer, _logger.derive("World"));
+        _world->spawnStartEggs(teams, nbPlayerPerTeam);
     } catch (const exception::Exception& e) {
         _logger.error(std::format("Failed to initialize world: {}", e.what()));
         return false;

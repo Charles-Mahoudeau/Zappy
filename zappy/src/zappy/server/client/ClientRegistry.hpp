@@ -7,8 +7,11 @@
 
 #pragma once
 
+#include <cstdint>
+#include <format>
 #include <memory>
 #include <ranges>
+#include <string_view>
 #include <unordered_map>
 #include <vector>
 
@@ -18,7 +21,6 @@
 #include "zappy/shared/network/Address.hpp"
 
 namespace zappy::server::client {
-
 class ClientRegistry {
   public:
     ClientRegistry() = default;
@@ -75,12 +77,48 @@ class ClientRegistry {
      */
     auto viewAll(Client::Type type);
 
+    /// @brief Get a client by its address.
+    /// @param addr The address to search for.
+    /// @return A pointer to the client with the specified address, or nullptr if not found.
     Client* findByAddress(const network::Address& addr);
+
+    /// @brief Get a client by its player ID.
+    /// @param playerId The player ID to search for.
+    /// @return A pointer to the client with the specified player ID, or nullptr if not found.
+    Client* findByPlayerId(std::uint64_t playerId);
+
+    /// @brief Broadcast a message to all clients.
+    /// @param msg The message to broadcast.
+    /// @return True if the message was successfully broadcast to all clients.
+    [[nodiscard]] bool broadcast(std::string_view msg) const;
+
+    /// @brief Broadcast a formatted message to all clients.
+    /// @tparam Args The types of the arguments to format.
+    /// @param fmt The format string.
+    /// @param args The arguments to format.
+    /// @return True if the message was successfully broadcast to all clients.
+    template <typename... Args>
+    [[nodiscard]] bool broadcast(std::format_string<Args...> fmt, Args&&... args) const;
+
+    /// @brief Broadcast a message to all clients.
+    /// @param type The type of clients to broadcast to.
+    /// @param msg The message to broadcast.
+    /// @return True if the message was successfully broadcast to all clients.
+    [[nodiscard]] bool broadcast(Client::Type type, std::string_view msg) const;
+
+    /// @brief Broadcast a formatted message to all clients.
+    /// @tparam Args The types of the arguments to format.
+    /// @param type The type of clients to broadcast to.
+    /// @param fmt The format string.
+    /// @param args The arguments to format.
+    /// @return True if the message was successfully broadcast to all clients.
+    template <typename... Args>
+    [[nodiscard]] bool broadcast(Client::Type type, std::format_string<Args...> fmt, Args&&... args) const;
 
   private:
     std::vector<const Client*> _toRemove;
     std::vector<std::unique_ptr<Client>> _clients;
-    std::unordered_map<Client::Type, std::vector<const Client*>> _clientsPerType = {
+    std::unordered_map<Client::Type, std::vector<Client*>> _clientsPerType = {
         {Client::Type::kUnknown, {}},
         {Client::Type::kGui, {}},
         {Client::Type::kPlayer, {}},
@@ -95,4 +133,13 @@ inline auto ClientRegistry::viewAll() {
 
 inline auto ClientRegistry::viewAll(Client::Type type) { return this->_clientsPerType.at(type) | std::views::all; }
 
+template <typename... Args>
+bool ClientRegistry::broadcast(std::format_string<Args...> fmt, Args&&... args) const {
+    return broadcast(std::format(fmt, std::forward<Args>(args)...));
+}
+
+template <typename... Args>
+bool ClientRegistry::broadcast(const Client::Type type, std::format_string<Args...> fmt, Args&&... args) const {
+    return broadcast(type, std::format(fmt, std::forward<Args>(args)...));
+}
 }  // namespace zappy::server::client

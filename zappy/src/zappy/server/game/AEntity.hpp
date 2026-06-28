@@ -15,12 +15,13 @@
 #include "IEntity.hpp"
 #include "IEventEmitter.hpp"
 #include "IGrid.hpp"
+#include "zappy/server/Timer.hpp"
 #include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server::game {
 class AEntity : public IEntity {
   public:
-    AEntity(IGrid& grid, IEventEmitter& eventEmitter, std::string teamName);
+    AEntity(Timer& timer, IGrid& grid, IEventEmitter& eventEmitter, std::string teamName);
     ~AEntity() override = default;
 
     AEntity(const AEntity&) = default;
@@ -50,10 +51,13 @@ class AEntity : public IEntity {
     [[nodiscard]] std::string_view teamName() const override;
 
   protected:
+    [[nodiscard]] Timer& timer() const;
     [[nodiscard]] IEventEmitter& eventEmitter() const;
+    [[nodiscard]] math::Vector2u gridSize() const;
 
   private:
     std::uint64_t _id{};
+    std::reference_wrapper<Timer> _timer;
     std::reference_wrapper<IGrid> _grid;
     std::reference_wrapper<IEventEmitter> _eventEmitter;
     std::string _teamName;

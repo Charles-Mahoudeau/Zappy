@@ -40,6 +40,7 @@ class Core {
     [[noreturn]] void run();
 
     void processCommandGroup();
+    void processWorldEvents();
 
     void nextTick();
 

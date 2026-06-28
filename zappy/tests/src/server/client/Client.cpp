@@ -118,7 +118,7 @@ TEST_F(ServerClientTest, GetNextRequestBlockedWhileTimeoutPending) {
     Client client{socketRegistry, addr, timer};
     client.addRequest("delayed");
 
-    timer.setFrequencies(50);
+    timer.setFrequency(50);
 
     client.setTimeout(3);
 
@@ -211,7 +211,7 @@ TEST_F(ServerClientTest, SendMessageWithRegisteredSocketDoesNotThrow) {
 TEST_F(ServerClientTest, setTimeoutTest) {
     Client client{socketRegistry, addr, timer};
 
-    timer.setFrequencies(100);
+    timer.setFrequency(100);
 
     EXPECT_FALSE(client.inTimeout());
     client.setTimeout(1);
@@ -224,7 +224,7 @@ TEST_F(ServerClientTest, setTimeoutTest) {
 TEST_F(ServerClientTest, removeTimeout) {
     Client client{socketRegistry, addr, timer};
 
-    timer.setFrequencies(10);
+    timer.setFrequency(10);
 
     EXPECT_FALSE(client.inTimeout());
     client.setTimeout(1);

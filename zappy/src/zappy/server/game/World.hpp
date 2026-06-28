@@ -10,40 +10,58 @@
 #include <cstdint>
 #include <deque>
 #include <expected>
+#include <functional>
 #include <optional>
 #include <random>
 #include <span>
 #include <string>
 #include <string_view>
 #include <unordered_map>
+#include <vector>
 
 #include "EntityDatabase.hpp"
 #include "Event.hpp"
 #include "Grid.hpp"
 #include "IEntity.hpp"
 #include "IEventEmitter.hpp"
+#include "Inventory.hpp"
 #include "ResourceType.hpp"
 #include "Tile.hpp"
 #include "entity/Player.hpp"
+#include "zappy/server/Timer.hpp"
 #include "zappy/shared/io/Logger.hpp"
 #include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server::game {
 class World : public IEventEmitter {
   public:
+    /// @brief Defines the requirements for an incantation event.
+    struct IncantationRequirements {
+        std::uint8_t players;
+        Inventory resources;
+    };
+
+    /// @brief Represents a snapshot of an incantation event.
+    /// @details This structure captures the position and player IDs involved in an incantation event. This can be used
+    /// to check if the incantation is valid after some delay.
+    struct IncantationSnapshot {
+        math::Vector2u position;
+        std::uint8_t level;
+        std::uint64_t playerId;
+        std::vector<std::uint64_t> playerIds;
+    };
+
+    static constexpr std::uint16_t kFoodRegenerationInterval{20};
     static constexpr std::uint16_t kMajorTickInterval{20};
 
-    explicit World(math::Vector2u size, std::optional<io::Logger> logger = std::nullopt);
-    ~World() override = default;
+    explicit World(math::Vector2u size, Timer& timer, std::optional<io::Logger> logger = std::nullopt);
+    ~World() override;
 
     World(const World&) = delete;
     World& operator=(const World&) = delete;
 
     World(World&&) = delete;
     World& operator=(World&&) = delete;
-
-    /// @brief Updates the world state.
-    void update();
 
     /// @brief Returns the size of the world.
     /// @return The size of the world.
@@ -53,9 +71,9 @@ class World : public IEventEmitter {
     /// @return A reference to the entity database.
     [[nodiscard]] const EntityDatabase& entityDatabase() const;
 
-    /// @brief Returns a reference to the entity database.
-    /// @return A reference to the entity database.
-    [[nodiscard]] EntityDatabase& entityDatabase();
+    /// @brief Returns a reference to the grid.
+    /// @return A reference to the grid.
+    [[nodiscard]] const Grid& grid() const;
 
     /// @brief Returns the number of entities of type T in the world.
     /// @tparam T The type of entity to count.
@@ -84,6 +102,9 @@ class World : public IEventEmitter {
     /// @return The ID of the spawned resource.
     void spawnResource(ResourceType type);
 
+    /// @brief Marks the resources as dirty, indicating that they need to be regenerated.
+    void markResourcesDirty();
+
     /// @brief Spawns the initial eggs in the world.
     void spawnStartEggs(std::span<const std::string_view> teams, std::uint8_t playersPerTeam);
 
@@ -98,7 +119,7 @@ class World : public IEventEmitter {
     /// @brief get the number of Egg in the given team
     /// @param teamName The name of the team to hatch the egg for.
     /// @return The number of egg in the team
-    std::uint64_t eggCount(std::string_view teamName);
+    [[nodiscard]] std::uint64_t eggCount(std::string_view teamName) const;
 
     /// @brief Returns a view of all players in the specified team.
     /// @param teamName The name of the team to get the players from.
@@ -109,6 +130,16 @@ class World : public IEventEmitter {
     /// @param teamName The name of the team to get the players from.
     /// @return A view of all players in the specified team.
     [[nodiscard]] EntityDatabase::EntityView<entity::Player> players(std::string_view teamName);
+
+    /// @brief Returns a view of the player with the given ID.
+    /// @param id The ID of the player to get.
+    /// @return A pointer to the player with the given ID, or nullptr if no such player exists.
+    [[nodiscard]] const entity::Player* player(std::uint64_t id) const;
+
+    /// @brief Returns a view of the player with the given ID.
+    /// @param id The ID of the player to get.
+    /// @return A pointer to the player with the given ID, or nullptr if no such player exists.
+    [[nodiscard]] entity::Player* player(std::uint64_t id);
 
     /// @brief Removes the specified entity from the world.
     /// @param entityId The ID of the entity to remove.
@@ -126,10 +157,29 @@ class World : public IEventEmitter {
     /// @param event The event to add.
     void pushEvent(Event event) override;
 
+    bool playerTake(entity::Player* player, ResourceType resource);
+
+    bool playerDrop(entity::Player* player, ResourceType resource);
+
+    /// @brief Begins an incantation event.
+    /// @param playerId The ID of the player initiating the incantation.
+    /// @return A snapshot of the incantation event if successful, std::nullopt otherwise.
+    [[nodiscard]] std::optional<IncantationSnapshot> beginIncantation(std::uint64_t playerId);
+
+    /// @brief Ends an incantation event.
+    /// @param snapshot The snapshot of the incantation event.
+    /// @return True if the incantation was successful, false otherwise.
+    bool endIncantation(const IncantationSnapshot& snapshot);
+
   private:
     /// @brief Returns the resource densities for the world.
     /// @return A map of resource types to their densities.
     [[nodiscard]] static const std::unordered_map<ResourceType, float>& resourceDensities();
+
+    /// @brief Returns the incantation requirements for a given level.
+    /// @param level The level of the incantation.
+    /// @return A reference to the incantation requirements for the given level.
+    [[nodiscard]] static const IncantationRequirements& incantationRequirements(std::uint8_t level);
 
     /// @brief Spawns resources in the world to meet the threshold.
     void spawnResources();
@@ -141,13 +191,25 @@ class World : public IEventEmitter {
     /// @brief Generates the resource thresholds for the world.
     void generateResourceThresholds();
 
+    /// @brief Places an egg at a random tile in the world.
+    /// @param eggId The ID of the egg to place.
+    void placeEggRandom(std::uint64_t eggId);
+
+    /// @brief Checks if the given incantation snapshot meets the requirements.
+    /// @param snapshot The incantation snapshot to check.
+    /// @return An empty expected if the snapshot is valid, or an error message otherwise.
+    [[nodiscard]] std::expected<void, std::string> verifyIncantationRequirements(
+        const IncantationSnapshot& snapshot) const;
+
     std::random_device _randomDevice;
     std::mt19937 _randomEngine{_randomDevice()};
     EntityDatabase _entityDatabase;
     Grid _grid;
+    std::reference_wrapper<Timer> _timer;
     std::optional<io::Logger> _logger;
     std::unordered_map<ResourceType, std::uint64_t> _resourceThresholds;
-    std::uint16_t _nextMajorTick{kMajorTickInterval};
+    std::uint64_t _resourceSpawnTimerId;
+    bool _resourcesDirty{true};
     std::deque<Event> _events;
 };
 

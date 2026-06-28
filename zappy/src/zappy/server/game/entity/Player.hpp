@@ -9,10 +9,15 @@
 
 #include <cstdint>
 #include <expected>
+#include <optional>
 #include <string>
 
+#include "zappy/server/Timer.hpp"
 #include "zappy/server/game/AEntity.hpp"
+#include "zappy/server/game/IEventEmitter.hpp"
+#include "zappy/server/game/IGrid.hpp"
 #include "zappy/server/game/Inventory.hpp"
+#include "zappy/server/game/ResourceType.hpp"
 #include "zappy/shared/math/Direction.hpp"
 #include "zappy/shared/math/Vector2.hpp"
 
@@ -20,18 +25,17 @@ namespace zappy::server::game::entity {
 class Player : public AEntity {
   public:
     static constexpr std::uint8_t kMaxLevel{8};
-    static constexpr std::uint8_t kDefaultLifeUnits{10};
     static constexpr std::uint8_t kTimeUnitsPerFood{126};
-    static constexpr std::uint16_t kDefaultLifetime{kDefaultLifeUnits * kTimeUnitsPerFood};
+    static constexpr std::uint8_t kInitialFoodAmount{10};
 
-    using AEntity::AEntity;
+    Player(Timer& timer, IGrid& grid, IEventEmitter& eventEmitter, std::string teamName);
+    ~Player() override;
 
-    /// @brief Update the player.
-    void update() override;
+    Player(const Player&) = delete;
+    Player& operator=(const Player&) = delete;
 
-    /// @brief Get the player's lifetime left.
-    /// @return The player's lifetime left.
-    [[nodiscard]] std::uint32_t lifetimeLeft() const;
+    Player(Player&& other) noexcept;
+    Player& operator=(Player&& other) noexcept;
 
     /// @brief Check if the player is alive.
     /// @return True if the player is alive, false otherwise.
@@ -54,7 +58,7 @@ class Player : public AEntity {
 
     /// @brief Get the player's direction.
     /// @return The player's direction.
-    [[nodiscard]] math::Direction direction() const;
+    [[nodiscard]] math::Direction orientation() const;
 
     /// @brief Turn the player to the left.
     /// @return The new direction.
@@ -64,14 +68,25 @@ class Player : public AEntity {
     /// @return The new direction.
     math::Direction turnRight();
 
+    void moveForward();
+
+    /// @brief Get the player's inventory.
+    /// @return The player's inventory.
+    [[nodiscard]] const Inventory& inventory() const;
+
+    void take(ResourceType resource);
+
+    bool drop(ResourceType resource);
+
+  private:
     /// @brief Eat one unit of food.
     /// @return True if the player ate food, false otherwise.
     bool eat();
 
-  private:
-    std::uint32_t _lifetimeLeft{kDefaultLifetime};
+    bool _alive{true};
     std::uint8_t _level{1};
-    math::Direction _direction{math::direction::random()};
+    math::Direction _orientation{math::direction::random()};
     Inventory _inventory;
+    std::optional<std::uint64_t> _foodTimerId;
 };
 }  // namespace zappy::server::game::entity

@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <compare>
 #include <cstdint>
 #include <string>
 #include <unordered_map>
@@ -16,7 +17,18 @@
 namespace zappy::server::game {
 class Inventory {
   public:
+    struct ResourcesInit {
+        std::uint16_t food{0};
+        std::uint16_t linemate{0};
+        std::uint16_t deraumere{0};
+        std::uint16_t sibur{0};
+        std::uint16_t mendiane{0};
+        std::uint16_t phiras{0};
+        std::uint16_t thystame{0};
+    };
+
     Inventory() = default;
+    explicit Inventory(const ResourcesInit& resourcesInit);
     ~Inventory() = default;
 
     Inventory(const Inventory&) = default;
@@ -49,9 +61,21 @@ class Inventory {
     /// @brief Clear the inventory.
     void clear();
 
+    /// @brief Check if the inventory can afford another inventory.
+    /// @param other The inventory to check.
+    /// @return True if the inventory can afford the other inventory, false otherwise.
+    [[nodiscard]] bool canAfford(const Inventory& other) const;
+
     /// @brief Get the string representation of the inventory.
     /// @return The string representation of the inventory.
     [[nodiscard]] std::string string() const;
+
+    [[nodiscard]] std::string detailedString() const;
+
+    Inventory& operator+=(const Inventory& other);
+    Inventory& operator-=(const Inventory& other);
+
+    [[nodiscard]] std::partial_ordering operator<=>(const Inventory& other) const;
 
   private:
     /// @brief Check if a resource type is valid.

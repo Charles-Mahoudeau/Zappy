@@ -10,6 +10,9 @@
 #include <raylib.h>
 
 #include <cstdint>
+#include <optional>
+
+#include "utils/Vector3.hpp"
 
 namespace zappy::gui::render {
 
@@ -50,7 +53,7 @@ class Camera {
     void setCameraMode(CameraMode mode);
     void zoom(float delta);
 
-    void applyManualZoomInput();
+    void followPlayer(std::optional<Vector3> worldPosition, bool acceptManualZoomInput = true);
 
     void update();
 
@@ -60,8 +63,14 @@ class Camera {
     operator const Camera3D&() const { return _camera; }
 
   private:
+    void applyManualZoomInput();
+
     Camera3D _camera{};
     CameraMode _cameraMode{CameraMode::CAMERA_CUSTOM};
     float _maxFovy{500.0F};
+
+    bool _focusInitialized{false};
+    Vector3 _defaultTarget;
+    float _manualFovy{0.0F};
 };
 }  // namespace zappy::gui::render
