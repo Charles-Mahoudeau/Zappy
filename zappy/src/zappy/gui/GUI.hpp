@@ -17,6 +17,7 @@
 #include "zappy/gui/network/ProtocolParser.hpp"
 #include "zappy/gui/render/AssetStore.hpp"
 #include "zappy/gui/render/Camera.hpp"
+#include "zappy/gui/render/MusicManager.hpp"
 #include "zappy/gui/render/Renderer.hpp"
 #include "zappy/gui/ui/DotAnimator.hpp"
 #include "zappy/gui/ui/GuiTheme.hpp"
@@ -66,6 +67,7 @@ class GUI {
     render::Camera _camera;
     render::AssetStore _assets;
     render::Renderer _renderer;
+    render::MusicManager _musicManager;
     ui::Hud _hud;
     ui::DotAnimator _dotAnimator;
 };

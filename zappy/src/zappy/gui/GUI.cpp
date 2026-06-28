@@ -128,6 +128,11 @@ bool GUI::waitForConnection() {
         }
 
         _dotAnimator.update(GetFrameTime());
+        if (_musicManager.currentMusicIndex() == 0) {
+            _musicManager.setCurrentMusicIndex(1);
+        }
+        _musicManager.setSpeed(1.0F);
+        _musicManager.update();
         drawWaitingFrame();
     }
     return false;
@@ -148,6 +153,10 @@ void GUI::runSession() {
         while (!_window.shouldClose()) {
             _poller.poll(kPollTimeoutMs);
             _window.beginFrame();
+            if (_musicManager.currentMusicIndex() == 1) {
+                _musicManager.setCurrentMusicIndex(0);
+            }
+            _musicManager.update(_state.timeUnit());
             _hud.update(_camera, _state);
             _camera.followPlayer(_hud.focusedPlayerWorldPosition(_state), !_hud.isMouseOverChatPanel());
 
@@ -161,12 +170,6 @@ void GUI::runSession() {
 }
 
 int GUI::init(const GuiCliParser& cli) {
-    // TODO: Not HERE but:
-    // InitAudioDevice();
-    // if (!IsAudioDeviceReady()) {
-    //     throw exception::InvalidState{"Failed to initialize audio device"};
-    // }
-
     _address = zappy::network::Address{std::string{cli.host()}, cli.port()};
 
     _window = display::Window{kWindowWidth, kWindowHeight, "Zappy"};
@@ -175,6 +178,7 @@ int GUI::init(const GuiCliParser& cli) {
     drawLoadingFrame("", 0.0F);
 
     _assets.load([this](std::string_view name, float progress) { drawLoadingFrame(name, progress); });
+    _musicManager.specialInit();
 
     return 0;
 }
