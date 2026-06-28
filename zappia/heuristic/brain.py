@@ -42,6 +42,7 @@ TEAM_TARGET = 8
 FORK_FOOD = 5
 FORK_MIN_TICK = 25
 FORK_COOLDOWN = 15
+CONNECT_CHECK_EVERY = 5
 
 PROTO = "ZP"
 SEP = ";"
@@ -77,6 +78,7 @@ class HeuristicAI:
         self._fork_sent = False
         self._stranded_ticks = 0
         self._team_full = False
+        self._slots = 0
         self._last_fork_tick = -(FORK_COOLDOWN + 1)
         self._explore_steps = secrets.randbelow(7)
 
@@ -86,15 +88,27 @@ class HeuristicAI:
             self.step()
 
     def refresh_look(self) -> None:
-        self.look = self.c.look()
+        want_inv = self.ticks_since_inv >= INV_REFRESH_EVERY
+        want_slots = self.tick % CONNECT_CHECK_EVERY == 1 or not self._team_full
+        look, inv, slots = self.c.sense(want_inv, want_slots)
+        self.look = look
+        if inv is not None:
+            self.inv = inv
+            self.ticks_since_inv = 0
+        if slots is not None:
+            self._slots = slots
 
     def refresh_inv(self) -> None:
         self.inv = self.c.inventory()
         self.ticks_since_inv = 0
 
     def refresh_all(self) -> None:
-        self.refresh_inv()
-        self.refresh_look()
+        look, inv, slots = self.c.sense(want_inv=True, want_slots=True)
+        self.look = look
+        self.inv = inv if inv is not None else self.inv
+        self.ticks_since_inv = 0
+        if slots is not None:
+            self._slots = slots
 
     @property
     def food(self) -> int:
@@ -268,8 +282,6 @@ class HeuristicAI:
             self.c.pending_level = None
             self.reset_rally()
             self.refresh_all()
-        if self.ticks_since_inv >= INV_REFRESH_EVERY:
-            self.refresh_inv()
         self.handle_messages()
 
     def _compute_roles(self) -> Tuple[bool, bool]:
@@ -339,8 +351,7 @@ class HeuristicAI:
         if self._broadcast_if_due(leader):
             return
 
-        slots = self.c.connect_nbr()
-        self._team_full = self.team_size() + slots >= TEAM_TARGET
+        self._team_full = self.team_size() + self._slots >= TEAM_TARGET
 
         if not self._team_full:
             self.maybe_fork()
@@ -499,7 +510,7 @@ class HeuristicAI:
         return False
 
     def converge(self) -> None:
-        self.refresh_all()
+        self.refresh_look()
 
         if self.call_dir == 0:
             if self.drop_needed_stone():
@@ -510,7 +521,8 @@ class HeuristicAI:
         if self.call_missing:
             for stone in self.call_missing:
                 if stone in self.tile0():
-                    self.c.take(stone)
+                    if self.c.take(stone):
+                        self.inv[stone] = self.inv.get(stone, 0) + 1
                     return
         self.move_for_direction(self.call_dir)
 
@@ -531,6 +543,7 @@ class HeuristicAI:
             if self.call_dir == 0 and stone in self.tile0():
                 continue
             if self.tile0().count(stone) > 0 and self.c.take(stone):
+                self.inv[stone] = self.inv.get(stone, 0) + 1
                 return True
         best, best_d = None, None
         for stone in names:
@@ -577,15 +590,14 @@ class HeuristicAI:
             return True
         return False
 
-    def forage(self) -> bool:
+    def forage(self) -> None:
         if self.maybe_eat():
-            return True
+            return
         idx = self.nearest_tile_with("food")
         if idx not in (None, 0):
             self.move_toward(idx)
-            return True
+            return
         self.explore()
-        return True
 
     def explore(self) -> None:
         for idx in range(1, len(self.look)):
@@ -630,7 +642,7 @@ class HeuristicAI:
             self.c.right()
             self.c.forward()
         self.refresh_look()
-        return 0
+        return k
 
     def move_for_direction(self, k: int) -> None:
         self.go_to_sound(k)
