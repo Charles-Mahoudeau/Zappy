@@ -120,7 +120,7 @@ void Core::processWorldEvents() {
 void Core::nextTick() {
     if (_world->hasWon()) {
         _serv.poll(-1);
-        _clientRegistry.update();
+        std::ignore = _clientRegistry.update();
         return;
     }
 
