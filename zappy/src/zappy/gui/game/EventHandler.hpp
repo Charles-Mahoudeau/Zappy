@@ -50,11 +50,14 @@ class EventHandler {
     }
 
   private:
-    std::map<EventType, std::vector<std::string_view>> _eventHandlers{
-        {EventType::Broadcast, {"singal"}},     {EventType::Incantation, {"sparkles"}},
-        {EventType::Death, {"smoke", "skull"}}, {EventType::EggHatch, {"eggCrack"}},
-        {EventType::LevelUp, {"slash"}},        {EventType::Eat, {"foodDebris"}},
-        {EventType::Push, {"impact"}},          {EventType::EggDeath, {"smoke"}}};
+    std::map<EventType, std::vector<std::string_view>> _eventHandlers{{EventType::Broadcast, {"signal"}},
+                                                                      {EventType::Incantation, {"sparkles", "absorb"}},
+                                                                      {EventType::Death, {"smoke", "skull"}},
+                                                                      {EventType::EggHatch, {"eggCrack", "smoke"}},
+                                                                      {EventType::LevelUp, {"slash", "twinkle"}},
+                                                                      {EventType::Eat, {"foodDebris"}},
+                                                                      {EventType::Push, {"impact"}},
+                                                                      {EventType::EggDeath, {"smoke"}}};
 };
 
 }  // namespace zappy::gui::game

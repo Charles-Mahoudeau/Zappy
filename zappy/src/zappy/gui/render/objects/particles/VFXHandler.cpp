@@ -22,17 +22,35 @@ void VFXHandler::createVFXs() {
     impact.setInitParticles(Vector2{0.5F, 0.5F}, 0.0F, ColorF{180.0F, 180.0F, 180.0F, 180.0F}, 45.0F, 0.0F);
     impact.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 360.0F, .tint = 0.3F}, 0.1F,
                            0.0F);
-    impact.setIncrementParticles(Vector2{0.045F, 0.045F}, 0.0F, ColorF{-4.0F, -4.0F, -4.0F, -4.0F});
+    impact.setIncrementParticles(Vector2{0.07F, 0.07F}, 0.0F, ColorF{-4.0F, -4.0F, -4.0F, -4.0F});
     impact.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.01F, .rotation = 0.02F, .tint = 0.1F});
     _vfxs.insert({"impact", std::move(impact)});
 
+    ParticleEmitter twinkle("assets/particles/Twinkle.png");
+    twinkle.setStatic(Vector3{}, Vector3{0.5F, 0.5F, 0.5F}, Vector3{0.0F, 0.0F, 0.0F}, 0.0F, 1);
+    twinkle.setInitParticles(Vector2{0.1F, 0.1F}, 0.0F, ColorF{90.0F, 255.0F, 120.0F, 230.0F}, 45.0F, 0.0F);
+    twinkle.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 360.0F, .tint = 0.3F}, 0.1F,
+                            0.0F);
+    twinkle.setIncrementParticles(Vector2{0.1F, 0.1F}, 3.0F, ColorF{-3.7F, -3.7F, -3.7F, -3.7F});
+    twinkle.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.01F, .rotation = 2.0F, .tint = 0.1F});
+    _vfxs.insert({"twinkle", std::move(twinkle)});
+
     ParticleEmitter signal("assets/particles/Shockwave.png");
     signal.setStatic(Vector3{}, Vector3{0.0F, 0.0F, 0.0F}, Vector3{0.0F, 0.0F, 0.0F}, 0.0F, 1);
-    signal.setInitParticles(Vector2{1.0F, 1.0F}, 0.0F, ColorF{220.0F, 255.0F, 255.0F, 255.0F}, 600.0F, 0.0F);
+    signal.setInitParticles(Vector2{1.0F, 1.0F}, 0.0F, ColorF{220.0F, 255.0F, 255.0F, 255.0F}, 500.0F, 0.0F);
     signal.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 0.0F, .tint = 0.3F}, 0.1F, 0.0F);
-    signal.setIncrementParticles(Vector2{0.08F, 0.08F}, 0.0F, ColorF{-1.2F, -1.2F, -1.2F, -1.2F});
+    signal.setIncrementParticles(Vector2{0.06F, 0.06F}, 0.0F, ColorF{-1.7F, -1.7F, -1.7F, -1.7F});
     signal.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.01F, .rotation = 0.0F, .tint = 0.1F});
     _vfxs.insert({"signal", std::move(signal)});
+
+    ParticleEmitter deSignal("assets/particles/Impact.png");
+    deSignal.setStatic(Vector3{}, Vector3{0.0F, 0.0F, 0.0F}, Vector3{0.0F, 0.0F, 0.0F}, 0.0F, 1);
+    deSignal.setInitParticles(Vector2{5.0F, 5.0F}, 0.0F, ColorF{15.0F, 1.0F, 20.0F, 0.0F}, 500.0F, 0.0F);
+    deSignal.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 0.0F, .tint = 0.3F}, 0.1F,
+                             0.0F);
+    deSignal.setIncrementParticles(Vector2{-0.05F, -0.05F}, 0.0F, ColorF{2.5F, 1.5F, 3.0F, 3.0F});
+    deSignal.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.01F, .rotation = 0.0F, .tint = 0.1F});
+    _vfxs.insert({"absorb", std::move(deSignal)});
 
     ParticleEmitter eggCrack("assets/particles/Shard.png");
     eggCrack.setStatic(Vector3{}, Vector3{1.0F, 1.0F, 1.0F}, Vector3{0.0F, -0.002F, 0.0F}, 100.0F, 16);
@@ -62,11 +80,11 @@ void VFXHandler::createVFXs() {
     _vfxs.insert({"smoke", std::move(smoke)});
 
     ParticleEmitter sparkles("assets/particles/Twinkle.png");
-    sparkles.setStatic(Vector3{}, Vector3{3.0F, 3.5F, 3.0F}, Vector3{0.0F, 0.00003F, 0.0F}, 180.0F, 14);
-    sparkles.setInitParticles(Vector2{0.5F, 0.5F}, 45.0F, ColorF{255.0F, 130.0F, 255.0F, 150.0F}, 130.0F, 0.001F);
+    sparkles.setStatic(Vector3{}, Vector3{5.0F, 6.0F, 5.0F}, Vector3{0.0F, 0.00003F, 0.0F}, 180.0F, 21);
+    sparkles.setInitParticles(Vector2{1.3F, 1.3F}, 45.0F, ColorF{255.0F, 130.0F, 255.0F, 150.0F}, 130.0F, 0.001F);
     sparkles.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 0.0F, .tint = 15.0F}, 0.1F,
                              0.001F);
-    sparkles.setIncrementParticles(Vector2{-0.007F, -0.007F}, 0.0F, ColorF{-1.0F, -1.0F, -0.05F, -2.0F});
+    sparkles.setIncrementParticles(Vector2{-0.01F, -0.01F}, 0.0F, ColorF{-1.0F, -1.0F, -0.05F, -2.0F});
     sparkles.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.005F, .rotation = 0.002F, .tint = 0.25F});
     _vfxs.insert({"sparkles", std::move(sparkles)});
 
@@ -80,7 +98,7 @@ void VFXHandler::createVFXs() {
     _vfxs.insert({"skull", std::move(skull)});
 
     ParticleEmitter slash("assets/particles/Slash.png");
-    slash.setStatic(Vector3{}, Vector3{2.0F, 4.0F, 2.0F}, Vector3{0.0F, 0.0001F, 0.0F}, 0.0F, 12);
+    slash.setStatic(Vector3{}, Vector3{4.0F, 6.0F, 4.0F}, Vector3{0.0F, 0.0001F, 0.0F}, 0.0F, 17);
     slash.setInitParticles(Vector2{0.7F, 0.3F}, 0.0F, ColorF{150.0F, 255.0F, 220.0F, 50.0F}, 150.0F, 0.0002F);
     slash.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.0F, .rotation = 0.0F, .tint = 35.0F}, 0.1F,
                           0.00002F);

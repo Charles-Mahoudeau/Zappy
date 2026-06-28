@@ -16,7 +16,6 @@
 #include "zappy/gui/game/EventHandler.hpp"
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/network/handlers/ParseHelpers.hpp"
-#include "zappy/gui/render/utils/Vector3.hpp"
 #include "zappy/shared/exception/ParseException.hpp"
 
 namespace zappy::gui::network::handlers {
@@ -35,16 +34,9 @@ class PbcHandler {
         if (message.empty()) {
             throw exception::ParseException{"pbc: missing message"};
         }
-        _state.get().addBroadcast(std::move(message));
-
         auto playerId = parseId(idToken);
-        auto plr = _state.get().getPlayer(playerId);
-        render::Vector3 pos;
-
-        if (plr.has_value()) {
-            pos = render::Vector3{static_cast<float>(plr->x), 0.0F, static_cast<float>(plr->y)};
-        }
-        _state.get().broadcastEvent(game::EventType::Broadcast, pos);
+        _state.get().playerEvent(playerId, game::EventType::Broadcast);
+        _state.get().addBroadcast(std::move(message));
     }
 
   private:
