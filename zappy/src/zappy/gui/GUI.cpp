@@ -9,7 +9,6 @@
 
 #include <raylib.h>
 
-#include <algorithm>
 #include <chrono>
 #include <cstddef>
 #include <iostream>
@@ -24,7 +23,6 @@
 #include "zappy/gui/render/Renderer.hpp"
 #include "zappy/gui/render/utils/Color.hpp"
 #include "zappy/gui/render/utils/Rectangle.hpp"
-#include "zappy/gui/render/utils/Vector3.hpp"
 #include "zappy/gui/ui/DotAnimator.hpp"
 #include "zappy/gui/ui/Widgets.hpp"
 #include "zappy/shared/exception/Exception.hpp"

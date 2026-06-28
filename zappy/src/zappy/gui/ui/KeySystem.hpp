@@ -7,12 +7,14 @@
 
 #pragma once
 
+#include <cstdint>
+
 namespace zappy::gui::ui {
 class KeySystem {
   public:
     KeySystem() = delete;
 
-    enum class Key {
+    enum class Key : std::uint16_t {
         KEY_NULL = 0,  // Key: NULL, used for no key pressed
         // Alphanumeric keys
         KEY_APOSTROPHE = 39,     // Key: '

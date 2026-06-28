@@ -7,8 +7,6 @@
 
 #include "InfoPanel.hpp"
 
-#include <raylib.h>
-
 #include <cstdint>
 #include <optional>
 #include <utility>
