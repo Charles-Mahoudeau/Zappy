@@ -19,6 +19,8 @@ MusicManager::MusicManager() {
 }
 
 MusicManager::~MusicManager() {
+    _currentMusic.reset();
+    _musics.clear();
     if (IsAudioDeviceReady()) {
         CloseAudioDevice();
     }
