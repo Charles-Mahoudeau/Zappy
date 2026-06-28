@@ -194,6 +194,7 @@ bool PlayerCommands::eject(CommandCtx& ctx) {
             }
             if (world.get().entityDatabase().is<game::entity::Egg>(entityId)) {
                 world.get().remove(entityId);
+                world.get().pushEvent(game::EggDeathEvent{.eggId = entityId});
                 content = true;
             }
         }
