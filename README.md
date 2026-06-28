@@ -14,3 +14,19 @@
 * Ewan Czarny
 * Noe Caillaud
 * Thomas Boucard
+
+## Installation
+
+### 1. Build the project
+
+```shell
+make
+```
+
+### 2. Run the project
+
+```shell
+./zappy_server -p 4242 -x 10 -y 10 -n team1 team2 -c 5 -f 100
+./zappy_gui -h 127.0.0.1 -p 4242   
+./zappy_ai -h 127.0.0.1 -p 4242 -n team1 
+```
