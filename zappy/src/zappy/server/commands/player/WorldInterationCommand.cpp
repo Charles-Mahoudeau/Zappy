@@ -12,6 +12,7 @@
 #include <utility>
 
 #include "zappy/server/client/Client.hpp"
+#include "zappy/server/client/ClientRegistry.hpp"
 #include "zappy/server/commands/ICommandGroup.hpp"
 #include "zappy/server/commands/player/PlayerData.hpp"
 #include "zappy/server/game/Event.hpp"
@@ -73,36 +74,41 @@ bool WorldInterationCommand::eject(ICommandGroup::CommandCtx& ctx) {
         if (!data.valid()) {
             return;
         }
-        const game::entity::Player* pusher = data.player();
-        world.get().pushEvent(game::PlayerExpulsionEvent{.playerId = pusher->id()});
-        const game::Tile& tile = world.get().grid().tile(data.player()->position());
         bool content = false;
+        const game::entity::Player* pusher = data.player();
 
-        for (std::uint16_t entityId : tile.entities()) {
-            auto* pushed = world.get().player(entityId);
+        world.get().pushEvent(game::PlayerExpulsionEvent{.playerId = pusher->id()});
 
-            if (pushed != nullptr && pushed != pusher) {
-                pushed->move(pusher->orientation());
-                if (const Client* pushedClient = clients.get().findByPlayerId(pushed->id()); pushedClient != nullptr) {
-                    std::ignore =
-                        pushedClient->sendMessage("eject: {}\n", static_cast<std::uint8_t>(pusher->orientation()) + 1);
-                }
-                content = true;
-                continue;
-            }
-            if (world.get().entityDatabase().is<game::entity::Egg>(entityId)) {
-                world.get().remove(entityId);
-                world.get().pushEvent(game::EggDeathEvent{.eggId = entityId});
+        for (std::uint16_t entityId : world.get().grid().tile(data.player()->position()).entities()) {
+            if (WorldInterationCommand::ejectPushPlayer(pusher, world.get().player(entityId), clients) ||
+                WorldInterationCommand::ejectDestroyEgg(world, entityId)) {
                 content = true;
             }
         }
-        if (content) {
-            data.client()->sendSuccess();
-        } else {
-            data.client()->sendError();
-        }
+        content ? data.client()->sendSuccess() : data.client()->sendError();
     });
     return true;
+}
+
+bool WorldInterationCommand::ejectPushPlayer(const game::entity::Player* pusher, game::entity::Player* pushed,
+                                             client::ClientRegistry& clientRegistry) {
+    if (pushed != nullptr && pushed != pusher) {
+        if (const Client* pushedClient = clientRegistry.findByPlayerId(pushed->id()); pushedClient != nullptr) {
+            pushed->move(pusher->orientation());
+            std::ignore =
+                pushedClient->sendMessage("eject: {}\n", static_cast<std::uint8_t>(pusher->orientation()) + 1);
+            return true;
+        }
+    }
+    return false;
+}
+bool WorldInterationCommand::ejectDestroyEgg(game::World& world, std::uint64_t entityId) {
+    if (world.entityDatabase().is<game::entity::Egg>(entityId)) {
+        world.remove(entityId);
+        world.pushEvent(game::EggDeathEvent{.eggId = entityId});
+        return true;
+    }
+    return false;
 }
 
 }  // namespace zappy::server::command::player

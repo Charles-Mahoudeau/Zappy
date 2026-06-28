@@ -7,10 +7,13 @@
 
 #pragma once
 
+#include <cstdint>
 #include <functional>
 
+#include "zappy/server/client/ClientRegistry.hpp"
 #include "zappy/server/commands/ICommandGroup.hpp"
 #include "zappy/server/game/ResourceType.hpp"
+#include "zappy/server/game/World.hpp"
 #include "zappy/server/game/entity/Player.hpp"
 namespace zappy::server::command::player {
 
@@ -23,6 +26,10 @@ class WorldInterationCommand {
   private:
     static bool action(ICommandGroup::CommandCtx& ctx,
                        std::function<bool(game::ResourceType resource, game::entity::Player* player)>);
+
+    static bool ejectPushPlayer(const game::entity::Player* pusher, game::entity::Player* pushed,
+                                client::ClientRegistry& clientRegistry);
+    static bool ejectDestroyEgg(game::World& world, std::uint64_t entityId);
 };
 
 }  // namespace zappy::server::command::player
