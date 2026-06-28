@@ -70,6 +70,9 @@ void Core::processCommandGroup() {
             continue;
         }
         while (std::optional<std::string> request = client->nextRequest()) {
+            if (_world->hasWon() && client->type() == Client::Type::kPlayer) {
+                continue;
+            }
             auto it = _cmdGroups.find(client->type());
 
             if (it == _cmdGroups.end()) {
