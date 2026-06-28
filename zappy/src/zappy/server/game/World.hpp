@@ -162,7 +162,8 @@ class World : public IEventEmitter {
 
     bool playerDrop(entity::Player* player, ResourceType resource);
 
-    std::uint32_t computeDistFromPositions(math::Vector2u emitter, math::Vector2u receiver) const;
+    std::uint32_t computeBroadcastDirection(math::Vector2u emitterPos, math::Vector2u receiverPos,
+                                            math::Direction receiverOrientation) const;
 
     std::vector<std::reference_wrapper<Tile>> playerView(const entity::Player* player);
 

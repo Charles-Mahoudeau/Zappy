@@ -15,6 +15,7 @@
 #include <format>
 #include <functional>
 #include <memory>
+#include <numbers>
 #include <optional>
 #include <random>
 #include <ranges>
@@ -474,18 +475,63 @@ void World::generateResourceThresholds() {
     }
 }
 
-std::uint32_t World::computeDistFromPositions(math::Vector2u emitter, math::Vector2u receiver) const {
+std::uint32_t World::computeBroadcastDirection(const math::Vector2u emitterPos, const math::Vector2u receiverPos,
+                                               const math::Direction receiverOrientation) const {
+    // Same tile → direction 0
+    if (emitterPos.x == receiverPos.x && emitterPos.y == receiverPos.y) {
+        return 0;
+    }
+
     const auto size = _grid.size();
 
-    const auto wrappedDist = [](std::uint32_t a, std::uint32_t b, std::uint32_t length) {
-        const std::uint32_t diff = a > b ? a - b : b - a;
-        return std::min(diff, length - diff);
+    // Shortest signed delta from receiver to emitter (toroidal wrapping)
+    const auto shortestDelta = [](const int a, const int b, const int len) -> int {
+        int d = b - a;
+        if (2 * std::abs(d) > len) {
+            d += (d > 0) ? -len : len;
+        }
+        return d;
     };
 
-    const std::uint32_t dx = wrappedDist(emitter.x, receiver.x, size.x);
-    const std::uint32_t dy = wrappedDist(emitter.y, receiver.y, size.y);
+    const int ddx =
+        shortestDelta(static_cast<int>(receiverPos.x), static_cast<int>(emitterPos.x), static_cast<int>(size.x));
+    const int ddy =
+        shortestDelta(static_cast<int>(receiverPos.y), static_cast<int>(emitterPos.y), static_cast<int>(size.y));
 
-    return dx + dy;
+    // Absolute angle from North, clockwise: atan2(east_component, north_component)
+    // North = y decreasing → north_component = -ddy
+    const double angle = std::atan2(static_cast<double>(ddx), static_cast<double>(-ddy));
+
+    // Receiver orientation angle from North, clockwise (kNorth=0, kEast=1, kSouth=2, kWest=3)
+    const double receiverAngle =
+        static_cast<double>(std::to_underlying(receiverOrientation)) * (std::numbers::pi / 2.0);
+
+    // Local angle relative to receiver's frame, normalized to (-π, π]
+    double localAngle = angle - receiverAngle;
+    while (localAngle > std::numbers::pi) {
+        localAngle -= 2.0 * std::numbers::pi;
+    }
+    while (localAngle <= -std::numbers::pi) {
+        localAngle += 2.0 * std::numbers::pi;
+    }
+
+    // Map to 8 sectors (each π/4 wide), sector 1 centred on 0 (straight ahead).
+    // atan2(ddx, -ddy) gives angle from North, increasing CLOCKWISE.
+    // So positive localAngle = clockwise = RIGHT side,
+    //    negative localAngle = counter-clockwise = LEFT side.
+    // Trigonometric (CCW) numbering per subject:
+    //   2 1 8
+    //   3 P 7
+    //   4 5 6
+    const double h = std::numbers::pi / 8.0;                        // half-sector = π/8
+    if (localAngle >= -h && localAngle < h) return 1;               // front
+    if (localAngle >= -3.0 * h && localAngle < -h) return 2;        // front-left  (CCW)
+    if (localAngle >= -5.0 * h && localAngle < -3.0 * h) return 3;  // left
+    if (localAngle >= -7.0 * h && localAngle < -5.0 * h) return 4;  // back-left
+    if (localAngle < -7.0 * h || localAngle >= 7.0 * h) return 5;   // behind
+    if (localAngle >= 5.0 * h && localAngle < 7.0 * h) return 6;    // back-right  (CW)
+    if (localAngle >= 3.0 * h && localAngle < 5.0 * h) return 7;    // right
+    return 8;                                                       // [h, 3h) = front-right
 }
 
 std::vector<std::reference_wrapper<Tile>> World::playerView(const entity::Player* player) {
