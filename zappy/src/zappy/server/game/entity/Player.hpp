@@ -68,7 +68,7 @@ class Player : public AEntity {
     /// @return The new direction.
     math::Direction turnRight();
 
-    void moveForward();
+    void move(math::Direction direction);
 
     /// @brief Get the player's inventory.
     /// @return The player's inventory.
