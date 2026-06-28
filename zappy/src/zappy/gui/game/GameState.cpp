@@ -143,4 +143,8 @@ bool GameState::isReady() const { return _width > 0 && _height > 0 && _tilesRece
 
 const std::deque<std::string>& GameState::broadcasts() const { return _broadcasts; }
 
+void GameState::setEvent(Event event) { _event = event; }
+
+[[nodiscard]] Event GameState::getEvent() const { return _event; }
+
 }  // namespace zappy::gui::game

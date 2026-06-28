@@ -15,6 +15,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "EventHandler.hpp"
+
 namespace zappy::gui::game {
 
 enum class ResourceType : std::uint8_t {
@@ -99,6 +101,9 @@ class GameState {
     [[nodiscard]] bool isReady() const;
     [[nodiscard]] const std::deque<std::string>& broadcasts() const;
 
+    void setEvent(Event event);
+    [[nodiscard]] Event getEvent() const;
+
   private:
     std::size_t _width{0};
     std::size_t _height{0};
@@ -111,6 +116,7 @@ class GameState {
     std::size_t _tilesReceived{0};
     std::vector<bool> _tileSet;
     std::deque<std::string> _broadcasts;
+    Event _event{Event::None};
 };
 
 }  // namespace zappy::gui::game
