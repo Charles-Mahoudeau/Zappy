@@ -31,7 +31,16 @@ class EboHandler {
         if (!ss.eof()) {
             throw exception::ParseException{"ebo: unexpected trailing tokens"};
         }
-        _state.get().removeEgg(parseId(eggToken));
+
+        auto eggId = parseId(eggToken);
+        auto egg = _state.get().getEgg(eggId);
+        render::Vector3 pos;
+
+        if (egg.has_value()) {
+            pos = render::Vector3{static_cast<float>(egg->x), 0.0F, static_cast<float>(egg->y)};
+            _state.get().removeEgg(eggId);
+            _state.get().broadcastEvent(game::EventType::EggHatch, pos);
+        }
     }
 
   private:
