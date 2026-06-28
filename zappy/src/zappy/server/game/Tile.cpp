@@ -50,15 +50,18 @@ std::string Tile::string(const EntityDatabase& db) const {
 
     for (const auto& entityId : this->_entities) {
         if (db.is<entity::Player>(entityId)) {
-            if (!str.empty()) str += " ";
+            if (!str.empty()) {
+                str += " ";
+            }
             str += "player";
         } else if (db.is<entity::Egg>(entityId)) {
-            if (!str.empty()) str += " ";
+            if (!str.empty()) {
+                str += " ";
+            }
             str += "egg";
         }
     }
-    const std::string inv = this->_inventory.list();
-    if (!inv.empty()) {
+    if (const std::string inv = this->_inventory.list(); !inv.empty()) {
         // list() always prepends a space; drop it only when str is still empty
         str += str.empty() ? inv.substr(1) : inv;
     }
