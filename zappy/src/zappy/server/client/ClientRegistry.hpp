@@ -31,7 +31,7 @@ class ClientRegistry {
     ClientRegistry& operator=(const ClientRegistry&) = delete;
     ClientRegistry& operator=(ClientRegistry&&) = delete;
 
-    void makeNewClient(net::SocketRegistry& socketRegistery, network::Address addr, Timer& timer);
+    void makeNewClient(net::SocketRegistry& socketRegistry, network::Address addr, Timer& timer);
 
     /**
      * @brief Update all managed clients and remove any that are no longer alive.
@@ -46,8 +46,10 @@ class ClientRegistry {
      *      leaving the container in a valid state.
      *
      * Call this once per server tick.
+     *
+     * @return A list of player IDs that were removed.
      */
-    void update();
+    [[nodiscard]] std::vector<uint64_t> update();
 
     /**
      * @brief Mark a specific client for removal.

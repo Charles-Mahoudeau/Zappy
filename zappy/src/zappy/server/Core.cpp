@@ -17,6 +17,7 @@
 #include <string_view>
 #include <tuple>
 #include <variant>
+#include <vector>
 
 #include "game/Event.hpp"
 #include "game/EventHelper.hpp"
@@ -27,6 +28,7 @@
 #include "zappy/server/commands/PlayerCommands.hpp"
 #include "zappy/server/commands/UnknownCommands.hpp"
 #include "zappy/server/game/World.hpp"
+#include "zappy/server/game/entity/Player.hpp"
 #include "zappy/shared/exception/Exception.hpp"
 #include "zappy/shared/exception/InvalidState.hpp"
 #include "zappy/shared/io/Logger.hpp"
@@ -118,7 +120,7 @@ void Core::processWorldEvents() {
 void Core::nextTick() {
     if (_world->hasWon()) {
         _serv.poll(-1);
-        _clientRegistry.update();
+        std::ignore = _clientRegistry.update();
         return;
     }
 
@@ -128,7 +130,16 @@ void Core::nextTick() {
         timeout = this->_timer.timeoutUntilNextTick();
     }
     this->_timer.update();
-    this->_clientRegistry.update();
+    for (const std::vector<std::uint64_t> disconnectedPlayerIds = _clientRegistry.update();
+         std::uint64_t playerId : disconnectedPlayerIds) {
+        game::entity::Player* player = _world->player(playerId);
+
+        if (player == nullptr) {
+            continue;
+        }
+        player->kill();
+        _logger.info("Killed player #{}, client disconnected.", playerId);
+    }
 }
 
 bool Core::initTeams(const std::span<const std::string_view> names) {
