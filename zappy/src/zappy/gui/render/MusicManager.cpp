@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <format>
 #include <functional>
 #include <iostream>
 #include <string>
@@ -97,7 +98,7 @@ void MusicManager::setCurrentMusicIndex(unsigned int index) {
         stop();
         _currentMusicIndex = index;
         _currentMusic = std::ref(_musics.at(_currentMusicIndex));
-        _currentMusic.value().get().play();
+        play();
     } else {
         throw MusicManagerException{
             std::format("Invalid music index: {}. Must be between 0 and {}", index, musicSize - 1)};
