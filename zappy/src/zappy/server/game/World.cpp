@@ -327,8 +327,13 @@ bool World::endIncantation(const IncantationSnapshot& snapshot) {
         .position = snapshot.position,
         .success = true,
     });
+    checkWin();
     return true;
 }
+
+bool World::hasWon() const { return _winningTeam != std::nullopt; }
+
+std::optional<std::string> World::winningTeam() const { return _winningTeam; }
 
 const std::unordered_map<ResourceType, float>& World::resourceDensities() {
     using enum ResourceType;
@@ -546,4 +551,26 @@ std::expected<void, std::string> World::verifyIncantationRequirements(const Inca
     return {};
 }
 
+bool World::checkWin() {
+    std::unordered_map<std::string, std::uint8_t> teamWinningPlayers;
+
+    for (const entity::Player* player : _entityDatabase.viewAll<entity::Player>()) {
+        if (player == nullptr) {
+            continue;
+        }
+        if (player->level() >= entity::Player::kMaxLevel) {
+            std::string teamName{player->teamName()};
+
+            if (const std::uint8_t total = ++teamWinningPlayers[teamName]; total >= kMaxLevelPlayersToWin) {
+                _winningTeam = std::move(teamName);
+                pushEvent(GameEndEvent{
+                    .teamName = *_winningTeam,
+                });
+                _logger->info("Game won by team '{}'.", *_winningTeam);
+                return true;
+            }
+        }
+    }
+    return false;
+}
 }  // namespace zappy::server::game
