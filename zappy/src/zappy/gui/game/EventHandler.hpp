@@ -9,7 +9,7 @@
 
 #include <cstdint>
 #include <map>
-#include <string>
+#include <string_view>
 #include <vector>
 
 namespace zappy::gui::game {
@@ -21,19 +21,22 @@ class EventHandler {
     EventHandler() = default;
     ~EventHandler() = default;
 
-    std::vector<std::string>& handleEvent(Event& event) {
+    std::vector<std::string_view>& handleEvent(Event& event) {
         auto it = _eventHandlers.find(event);
 
         event = Event::None;
         if (it != _eventHandlers.end()) {
             return it->second;
         }
-        static std::vector<std::string> emptyVector;
+        static std::vector<std::string_view> emptyVector;
         return emptyVector;
     }
 
   private:
-    std::map<Event, std::vector<std::string>> _eventHandlers;
+    std::map<Event, std::vector<std::string_view>> _eventHandlers{
+        {Event::Broadcast, {"singal"}},  {Event::Incantation, {"sparkles"}}, {Event::Death, {"smoke", "skull"}},
+        {Event::EggHatch, {"eggCrack"}}, {Event::LevelUp, {"slash"}},        {Event::Eat, {"foodDebris"}},
+        {Event::Push, {"impact"}}};
 };
 
 }  // namespace zappy::gui::game
