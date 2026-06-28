@@ -34,7 +34,9 @@ std::vector<std::uint64_t> ClientRegistry::update() {
 
     for (const auto& client : this->_clients) {
         if (!client->update()) {
-            disconnectedPlayerIds.push_back(client->playerID());
+            if (client->type() == Client::Type::kPlayer) {
+                disconnectedPlayerIds.push_back(client->playerID());
+            }
             this->_toRemove.emplace_back(client.get());
         }
     }
