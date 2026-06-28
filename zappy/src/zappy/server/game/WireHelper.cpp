@@ -17,23 +17,23 @@
 #include "entity/Egg.hpp"
 
 namespace zappy::server::game {
-std::string WireHelper::tileToBctCommand(const Tile& tile) {
+std::string WireHelper::tileToCommands(const Tile& tile) {
     return std::format("bct {} {} {}\n", tile.position().x, tile.position().y, tile.inventory().string());
 }
 
-std::string WireHelper::worldToBctCommands(const World& world) {
+std::string WireHelper::worldToTileCommands(const World& world) {
     std::stringstream result;
     const math::Vector2u worldSize = world.size();
 
     for (std::uint32_t x = 0; x < worldSize.x; ++x) {
         for (std::uint32_t y = 0; y < worldSize.y; ++y) {
-            result << tileToBctCommand(world.grid().tile({x, y}));
+            result << tileToCommands(world.grid().tile({x, y}));
         }
     }
     return result.str();
 }
 
-std::string WireHelper::worldToEnwCommands(const World& world) {
+std::string WireHelper::worldToEggCommands(const World& world) {
     std::stringstream result;
 
     for (const entity::Egg* egg : world.entityDatabase().viewAll<entity::Egg>()) {
@@ -46,6 +46,22 @@ std::string WireHelper::worldToEnwCommands(const World& world) {
         } else {
             result << std::format("enw #{} #-1 {} {}\n", egg->id(), egg->position().x, egg->position().y);
         }
+    }
+    return result.str();
+}
+
+std::string WireHelper::worldToPlayerCommands(const World& world) {
+    std::stringstream result;
+
+    for (const entity::Player* player : world.entityDatabase().viewAll<entity::Player>()) {
+        if (player == nullptr) {
+            continue;
+        }
+        result << std::format("pnw #{} {} {} {} {} {}\n", player->id(), player->position().x, player->position().y,
+                              std::to_underlying(player->orientation()) + 1, player->level(), player->teamName());
+        result << std::format("pin #{} {} {} {}\n", player->id(), player->position().x, player->position().y,
+                              player->inventory().string());
+        result << std::format("plv #{} {}\n", player->id(), player->level());
     }
     return result.str();
 }
