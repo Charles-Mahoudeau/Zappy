@@ -32,15 +32,15 @@ void VFXHandler::createVFXs() {
     twinkle.setInitParticles(Vector2{0.2F, 0.2F}, 0.0F, ColorF{90.0F, 255.0F, 120.0F, 230.0F}, 350.0F, 0.0F);
     twinkle.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 360.0F, .tint = 0.3F}, 0.1F,
                             0.0F);
-    twinkle.setIncrementParticles(Vector2{0.1F, 0.1F}, 2.0F, ColorF{-2.0F, -3.0F, -2.0F, -2.0F});
-    twinkle.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.01F, .rotation = 0.7F, .tint = 0.1F});
+    twinkle.setIncrementParticles(Vector2{0.08F, 0.08F}, 2.0F, ColorF{-1.0F, -2.0F, -1.0F, -2.0F});
+    twinkle.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.01F, .rotation = 0.0F, .tint = 0.1F});
     _vfxs.insert({"twinkle", std::move(twinkle)});
 
     ParticleEmitter signal("assets/particles/Shockwave.png");
     signal.setStatic(Vector3{}, Vector3{0.0F, 0.0F, 0.0F}, Vector3{0.0F, 0.0F, 0.0F}, 0.0F, 1);
     signal.setInitParticles(Vector2{1.0F, 1.0F}, 0.0F, ColorF{220.0F, 255.0F, 255.0F, 255.0F}, 500.0F, 0.0F);
     signal.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 0.0F, .tint = 0.3F}, 0.1F, 0.0F);
-    signal.setIncrementParticles(Vector2{0.06F, 0.06F}, 0.0F, ColorF{-1.7F, -1.7F, -1.7F, -1.7F});
+    signal.setIncrementParticles(Vector2{0.08F, 0.08F}, 0.0F, ColorF{-1.7F, -1.7F, -1.7F, -1.7F});
     signal.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.01F, .rotation = 0.0F, .tint = 0.1F});
     _vfxs.insert({"signal", std::move(signal)});
 
@@ -82,12 +82,21 @@ void VFXHandler::createVFXs() {
 
     ParticleEmitter sparkles("assets/particles/Twinkle.png");
     sparkles.setStatic(Vector3{}, Vector3{5.0F, 6.0F, 5.0F}, Vector3{0.0F, 0.00003F, 0.0F}, 180.0F, 21);
-    sparkles.setInitParticles(Vector2{1.3F, 1.3F}, 45.0F, ColorF{255.0F, 130.0F, 255.0F, 150.0F}, 130.0F, 0.001F);
+    sparkles.setInitParticles(Vector2{0.7F, 0.7F}, 45.0F, ColorF{255.0F, 130.0F, 255.0F, 150.0F}, 130.0F, 0.001F);
     sparkles.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 0.0F, .tint = 15.0F}, 0.1F,
                              0.001F);
     sparkles.setIncrementParticles(Vector2{-0.01F, -0.01F}, 0.0F, ColorF{-1.0F, -1.0F, -0.05F, -2.0F});
     sparkles.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.005F, .rotation = 0.002F, .tint = 0.25F});
     _vfxs.insert({"sparkles", std::move(sparkles)});
+
+    ParticleEmitter bubbles("assets/particles/ShockWave.png");
+    bubbles.setStatic(Vector3{}, Vector3{4.0F, 4.0F, 4.0F}, Vector3{0.0F, 0.00005F, 0.0F}, 180.0F, 10);
+    bubbles.setInitParticles(Vector2{1.3F, 1.3F}, 45.0F, ColorF{255.0F, 255.0F, 130.0F, 150.0F}, 130.0F, 0.001F);
+    bubbles.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 0.0F, .tint = 15.0F}, 0.1F,
+                            0.001F);
+    bubbles.setIncrementParticles(Vector2{-0.01F, -0.01F}, 0.0F, ColorF{-1.0F, -1.0F, -0.05F, -2.0F});
+    bubbles.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.005F, .rotation = 0.0F, .tint = 0.25F});
+    _vfxs.insert({"bubbles", std::move(bubbles)});
 
     ParticleEmitter skull("assets/particles/Skull.png");
     skull.setStatic(Vector3{}, Vector3{0.5F, 0.5F, 0.5F}, Vector3{0.0F, -0.00009F, 0.0F}, 0.0F, 1);
