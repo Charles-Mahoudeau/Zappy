@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <functional>
 #include <map>
 #include <string>
 #include <string_view>
@@ -30,11 +31,11 @@ class VFXHandler {
     void emit(std::string_view path, Vector3 pos);
     void playVFX(std::vector<std::string_view>& emitters, Vector3 pos);
 
-    [[nodiscard]] const std::map<std::string, ParticleEmitter>& vfxs() const;
-    [[nodiscard]] std::map<std::string, ParticleEmitter>& vfxs();
+    [[nodiscard]] const std::map<std::string, ParticleEmitter, std::less<>>& vfxs() const;
+    [[nodiscard]] std::map<std::string, ParticleEmitter, std::less<>>& vfxs();
 
   private:
-    std::map<std::string, ParticleEmitter> _vfxs;
+    std::map<std::string, ParticleEmitter, std::less<>> _vfxs;
 };
 
 }  // namespace zappy::gui::render
