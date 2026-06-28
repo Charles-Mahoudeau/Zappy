@@ -74,7 +74,7 @@ bool PlayerCommands::inventory(CommandCtx& ctx) {
         if (!data.valid()) {
             return;
         }
-        std::ignore = data.client()->sendMessage("[ {} ]\n", data.player()->inventory().detailedString());
+        std::ignore = data.client()->sendMessage("[{}]\n", data.player()->inventory().detailedString());
     });
     return true;
 }
@@ -102,9 +102,11 @@ bool PlayerCommands::broadcast(CommandCtx& ctx) {
                 continue;
             }
             if (const game::entity::Player* receiver = world.get().player(client->playerID()); receiver != nullptr) {
-                std::ignore = client->sendMessage(
-                    "message {}, {}\n", world.get().computeDistFromPositions(emitter->position(), receiver->position()),
-                    text);
+                std::ignore =
+                    client->sendMessage("message {}, {}\n",
+                                        world.get().computeBroadcastDirection(emitter->position(), receiver->position(),
+                                                                              receiver->orientation()),
+                                        text);
             }
         }
         data.client()->sendSuccess();
@@ -142,7 +144,7 @@ bool PlayerCommands::look(CommandCtx& ctx) {
     auto world = ctx.world;
     auto id = ctx.client->playerID();
 
-    ctx.client->setTimeout(42, [clients, world, id]() {
+    ctx.client->setTimeout(7, [clients, world, id]() {
         const player::PlayerData data(clients, world, id);
 
         if (!data.valid()) {
@@ -186,31 +188,34 @@ bool PlayerCommands::incantation(const CommandCtx& ctx) {
         return false;
     }
 
-    const auto broadcastMessage = [&clientRegistry = ctx.clientRegistry.get(), &logger = ctx.logger.get()](
+    const auto broadcastMessage = [&clientRegistry = ctx.clientRegistry.get(), &logger = ctx.logger.get(),
+                                   timeLimit = kIncantationTimeLimit](
                                       const game::World::IncantationSnapshot& incantationSnapshot,
-                                      const std::string_view message) {
+                                      const std::string_view message, const bool freeze) {
         for (const std::uint64_t playerId : incantationSnapshot.playerIds) {
-            const Client* client = clientRegistry.findByPlayerId(playerId);
+            Client* client = clientRegistry.findByPlayerId(playerId);
 
             if (client == nullptr) {
                 logger.warn("Client associated with player ID {} not found", playerId);
                 continue;
             }
             std::ignore = client->sendMessage(message);
+            if (freeze) {
+                client->setTimeout(timeLimit);
+            }
         }
     };
 
     ctx.timer.get().scheduleLater(kIncantationTimeLimit, [&world = ctx.world.get(), &logger = ctx.logger.get(),
                                                           snapshot = *snapshot, broadcastMessage] {
         if (!world.endIncantation(snapshot)) {
-            broadcastMessage(snapshot, "ko\n");
+            broadcastMessage(snapshot, "ko\n", false);
             return;
         }
-        broadcastMessage(snapshot, std::format("Current level: {}\n", snapshot.level + 1));
+        broadcastMessage(snapshot, std::format("Current level: {}\n", snapshot.level + 1), false);
         logger.info("Incantation started by player #{} has reached level {}.", snapshot.playerId, snapshot.level + 1);
     });
-    ctx.client->setTimeout(kIncantationTimeLimit);
-    broadcastMessage(*snapshot, "Elevation underway\n");
+    broadcastMessage(*snapshot, "Elevation underway\n", true);
     return true;
 }
 }  // namespace zappy::server::command

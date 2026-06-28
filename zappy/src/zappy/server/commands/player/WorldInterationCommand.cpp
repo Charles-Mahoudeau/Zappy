@@ -7,6 +7,7 @@
 
 #include "zappy/server/commands/player/WorldInterationCommand.hpp"
 
+#include <array>
 #include <cstdint>
 #include <functional>
 #include <utility>
@@ -95,7 +96,25 @@ bool WorldInterationCommand::ejectPushPlayer(const game::entity::Player* pusher,
     if (pushed != nullptr && pushed != pusher) {
         if (const Client* pushedClient = clientRegistry.findByPlayerId(pushed->id()); pushedClient != nullptr) {
             pushed->move(pusher->orientation());
-            std::ignore = pushedClient->sendMessage("eject: {}\n", std::to_underlying(pusher->orientation()) + 1);
+
+            // K = direction of tile the pushed player is coming FROM, in the pushed player's frame.
+            // "Coming from" = opposite of push direction.
+            // With CCW (trigonometric) tile numbering: 1=front, 2=front-left, 3=left, 4=back-left,
+            //   5=back, 6=back-right, 7=right, 8=front-right.
+            // For cardinal directions only K ∈ {1, 3, 5, 7}.
+            // diff = (comingFromIdx - pushedIdx + 4) % 4, where comingFrom = (pusherIdx+2)%4
+            //   diff=0 → front   → K=1
+            //   diff=1 → right   → K=7
+            //   diff=2 → back    → K=5
+            //   diff=3 → left    → K=3
+            static constexpr std::array kEjectTable = {1, 7, 5, 3};
+            const int pusherIdx = std::to_underlying(pusher->orientation());
+            const int pushedIdx = std::to_underlying(pushed->orientation());
+            const int comingFromIdx = (pusherIdx + 2) % 4;
+            const int diff = (comingFromIdx - pushedIdx + 4) % 4;
+            const int K = kEjectTable.at(diff);
+
+            std::ignore = pushedClient->sendMessage("eject: {}\n", K);
             return true;
         }
     }

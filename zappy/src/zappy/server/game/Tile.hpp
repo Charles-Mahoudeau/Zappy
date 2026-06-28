@@ -64,7 +64,7 @@ class Tile {
     /// @return A reference to the inventory of the tile.
     Inventory& inventory();
 
-    std::string string(const EntityDatabase& db);
+    std::string string(const EntityDatabase& db) const;
 
   private:
     math::Vector2u _position;
