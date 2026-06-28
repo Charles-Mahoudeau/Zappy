@@ -88,10 +88,10 @@ void Camera::applyManualZoomInput() {
 
     float zoomDelta = ui::Mouse::scrollDelta();
     const float keyZoom = kKeyZoomSpeed * GetFrameTime();
-    if (ui::KeySystem::isKeyPressed(KEY_EQUAL) || ui::KeySystem::isKeyPressed(KEY_KP_ADD)) {
+    if (ui::KeySystem::IsKeyDown(KEY_EQUAL) || ui::KeySystem::IsKeyDown(KEY_KP_ADD)) {
         zoomDelta += keyZoom;
     }
-    if (ui::KeySystem::isKeyPressed(KEY_MINUS) || ui::KeySystem::isKeyPressed(KEY_KP_SUBTRACT)) {
+    if (ui::KeySystem::IsKeyDown(KEY_MINUS) || ui::KeySystem::IsKeyDown(KEY_KP_SUBTRACT)) {
         zoomDelta -= keyZoom;
     }
     if (zoomDelta != 0.0F) {
