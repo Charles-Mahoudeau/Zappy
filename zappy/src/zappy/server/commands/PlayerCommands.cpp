@@ -27,6 +27,7 @@
 #include "zappy/server/commands/player/ObjectCommand.hpp"
 #include "zappy/server/commands/player/PlayerData.hpp"
 #include "zappy/server/game/Event.hpp"
+#include "zappy/server/game/Tile.hpp"
 #include "zappy/server/game/World.hpp"
 #include "zappy/server/game/entity/Egg.hpp"
 #include "zappy/server/game/entity/Player.hpp"
@@ -44,7 +45,7 @@ PlayerCommands::PlayerCommands(CommandCtx context)
           {"Broadcast", [](auto& ctx) { return PlayerCommands::broadcast(ctx); }},
           {"Connect_nbr", [](auto& ctx) { return PlayerCommands::connectNb(ctx); }},
           {"Fork", [](auto& ctx) { return PlayerCommands::fork(ctx); }},
-          {"Eject", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
+          {"Eject", [](auto& ctx) { return PlayerCommands::eject(ctx); }},
           {"Take", [](auto& ctx) { return player::ObjectCommand::take(ctx); }},
           {"Set", [](auto& ctx) { return player::ObjectCommand::drop(ctx); }},
           {"Incantation", [](const CommandCtx& ctx) { return incantation(ctx); }},
@@ -162,6 +163,49 @@ bool PlayerCommands::look(CommandCtx& ctx) {
     });
     return true;
 }
+
+bool PlayerCommands::eject(CommandCtx& ctx) {
+    auto clients = ctx.clientRegistry;
+    auto world = ctx.world;
+    auto id = ctx.client->playerID();
+
+    ctx.client->setTimeout(7, [clients, world, id]() {
+        const player::PlayerData data(clients, world, id);
+
+        if (!data.valid()) {
+            return;
+        }
+        const game::entity::Player* pusher = data.player();
+        world.get().pushEvent(game::PlayerExpulsionEvent{.playerId = pusher->id()});
+        const game::Tile& tile = world.get().grid().tile(data.player()->position());
+        bool content = false;
+
+        for (std::uint16_t entityId : tile.entities()) {
+            auto* pushed = world.get().player(entityId);
+
+            if (pushed != nullptr && pushed != pusher) {
+                pushed->move(pusher->orientation());
+                if (const Client* pushedClient = clients.get().findByPlayerId(pushed->id()); pushedClient != nullptr) {
+                    std::ignore =
+                        pushedClient->sendMessage("eject: {}\n", static_cast<std::uint8_t>(pusher->orientation()) + 1);
+                }
+                content = true;
+                continue;
+            }
+            if (world.get().entityDatabase().is<game::entity::Egg>(entityId)) {
+                world.get().remove(entityId);
+                content = true;
+            }
+        }
+        if (content) {
+            data.client()->sendSuccess();
+        } else {
+            data.client()->sendError();
+        }
+    });
+    return true;
+}
+
 bool PlayerCommands::connectNb(CommandCtx& ctx) {
     auto* client = ctx.client;
     const client::Team* team = ctx.teamRegistry.get().team(client->address());
