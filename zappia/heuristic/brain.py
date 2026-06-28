@@ -69,7 +69,7 @@ class HeuristicAI:
         self.call_dir: Optional[int] = None
         self.call_missing: List[str] = []
         self.call_ttl = 0
-        
+
         self.enemy_call_dir: Optional[int] = None
         self.enemy_call_ttl = 0
         self.sabotage_ticks = 0
@@ -185,7 +185,7 @@ class HeuristicAI:
         msg: dict,
         best_id: Optional[int],
         best_dir: Optional[int],
-        best_missing: List[str]
+        best_missing: List[str],
     ) -> Tuple[Optional[int], Optional[int], List[str]]:
         self.team_seen[msg["id"]] = (self.tick, msg["level"])
         if msg["verb"] == "CALL" and msg["level"] == self.level:
@@ -217,12 +217,12 @@ class HeuristicAI:
     ) -> Tuple[Optional[int], Optional[int], List[str], Optional[int]]:
         best_id, best_dir, best_missing = None, None, []
         enemy_dir = None
-        
+
         for direction, text in self.c.broadcasts:
             msg = self._decode(text)
             if not msg or msg["id"] == self.id:
                 continue
-            
+
             if msg["team"] != self.c.team:
                 if stranded and msg["verb"] == "CALL" and not msg["data"]:
                     enemy_dir = direction
@@ -231,7 +231,7 @@ class HeuristicAI:
             best_id, best_dir, best_missing = self._process_broadcast_msg(
                 direction, msg, best_id, best_dir, best_missing
             )
-            
+
         return best_id, best_dir, best_missing, enemy_dir
 
     def _update_call_state(
@@ -250,7 +250,7 @@ class HeuristicAI:
     def handle_messages(self, stranded: bool) -> None:
         best_id, best_dir, best_missing, enemy_dir = self._scan_broadcasts(stranded)
         self.c.broadcasts.clear()
-        
+
         self.peers = {
             p: t for p, t in self.peers.items() if self.tick - t <= PEER_WINDOW
         }
@@ -261,7 +261,7 @@ class HeuristicAI:
             for i, (t, lv) in self.team_seen.items()
             if self.tick - t <= PEER_WINDOW
         }
-        
+
         self._update_call_state(best_id, best_dir, best_missing)
 
         if enemy_dir is not None:
@@ -353,7 +353,7 @@ class HeuristicAI:
         if stranded:
             self.sabotage()
             return
-            
+
         if self._broadcast_if_due(leader):
             return
 
