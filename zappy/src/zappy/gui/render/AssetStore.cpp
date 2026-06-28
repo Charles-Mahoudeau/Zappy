@@ -161,8 +161,8 @@ void AssetStore::loadVFXs() {
 
     ParticleEmitter sparkles("assets/particles/Twinkle.png");
     sparkles.setStatic(Vector3{}, Vector3{4.0F, 4.0F, 4.0F}, Vector3{0.0F, 0.0002F, 0.0F}, 180.0F, 10);
-    sparkles.setInitParticles(Vector2{0.7F, 0.7F}, 0.0F, ColorF{255.0F, 130.0F, 255.0F, 50.0F}, 130.0F, 0.001F);
-    sparkles.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 45.0F, .tint = 15.0F}, 0.1F,
+    sparkles.setInitParticles(Vector2{0.7F, 0.7F}, 45.0F, ColorF{255.0F, 130.0F, 255.0F, 50.0F}, 130.0F, 0.001F);
+    sparkles.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 0.0F, .tint = 15.0F}, 0.1F,
                              0.03F);
     sparkles.setIncrementParticles(Vector2{-0.007F, -0.007F}, 0.0F, ColorF{-1.0F, -1.0F, -1.0F, -2.0F});
     sparkles.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.004F, .rotation = 0.01F, .tint = 0.25F});
