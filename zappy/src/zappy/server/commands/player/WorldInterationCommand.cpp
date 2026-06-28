@@ -95,8 +95,7 @@ bool WorldInterationCommand::ejectPushPlayer(const game::entity::Player* pusher,
     if (pushed != nullptr && pushed != pusher) {
         if (const Client* pushedClient = clientRegistry.findByPlayerId(pushed->id()); pushedClient != nullptr) {
             pushed->move(pusher->orientation());
-            std::ignore =
-                pushedClient->sendMessage("eject: {}\n", static_cast<std::uint8_t>(pusher->orientation()) + 1);
+            std::ignore = pushedClient->sendMessage("eject: {}\n", std::to_underlying(pusher->orientation()) + 1);
             return true;
         }
     }
