@@ -37,7 +37,7 @@ class PinHandler {
             throw exception::ParseException{"pin: unexpected trailing tokens"};
         }
         _state.get().setPlayerInventory(parseId(idToken), x, y, inventory);
-        _state.get().broadcastEvent(game::EventType::Inventory,
+        _state.get().broadcastEvent(game::EventType::Eat,
                                     render::Vector3{static_cast<float>(x), 0.0F, static_cast<float>(y)});
     }
 

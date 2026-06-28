@@ -38,7 +38,7 @@ class PlvHandler {
             pos = render::Vector3{static_cast<float>(plr->x), 0.0F, static_cast<float>(plr->y)};
         }
         _state.get().setPlayerLevel(playerId, level);
-        _state.get().broadcastEvent(game::EventType::Death, pos);
+        _state.get().broadcastEvent(game::EventType::LevelUp, pos);
     }
 
   private:
