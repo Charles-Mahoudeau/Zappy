@@ -11,7 +11,6 @@
 #include <deque>
 #include <functional>
 #include <optional>
-#include <stdexcept>
 #include <string_view>
 
 #include "objects/Music.hpp"

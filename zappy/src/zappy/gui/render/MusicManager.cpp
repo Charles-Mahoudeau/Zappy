@@ -7,7 +7,6 @@
 #include <format>
 #include <functional>
 #include <iostream>
-#include <string>
 
 namespace zappy::gui::render {
 
