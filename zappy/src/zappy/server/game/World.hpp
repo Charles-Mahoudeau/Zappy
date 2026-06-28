@@ -53,6 +53,7 @@ class World : public IEventEmitter {
 
     static constexpr std::uint16_t kFoodRegenerationInterval{20};
     static constexpr std::uint16_t kMajorTickInterval{20};
+    static constexpr std::uint8_t kMaxLevelPlayersToWin{6};
 
     explicit World(math::Vector2u size, Timer& timer, std::optional<io::Logger> logger = std::nullopt);
     ~World() override;
@@ -175,6 +176,14 @@ class World : public IEventEmitter {
     /// @return True if the incantation was successful, false otherwise.
     bool endIncantation(const IncantationSnapshot& snapshot);
 
+    /// @brief Returns true if the game has been won by a team.
+    /// @return True if the game has been won, false otherwise.
+    [[nodiscard]] bool hasWon() const;
+
+    /// @brief Returns the name of the winning team, if any.
+    /// @return The name of the winning team, or std::nullopt if no team has won.
+    [[nodiscard]] std::optional<std::string> winningTeam() const;
+
   private:
     /// @brief Returns the resource densities for the world.
     /// @return A map of resource types to their densities.
@@ -209,6 +218,10 @@ class World : public IEventEmitter {
     [[nodiscard]] std::expected<void, std::string> verifyIncantationRequirements(
         const IncantationSnapshot& snapshot) const;
 
+    /// @brief Checks if the game has been won.
+    /// @return True if the game has been won, false otherwise.
+    bool checkWin();
+
     std::random_device _randomDevice;
     std::mt19937 _randomEngine{_randomDevice()};
     EntityDatabase _entityDatabase;
@@ -218,6 +231,7 @@ class World : public IEventEmitter {
     std::unordered_map<ResourceType, std::uint64_t> _resourceThresholds;
     std::uint64_t _resourceSpawnTimerId;
     bool _resourcesDirty{true};
+    std::optional<std::string> _winningTeam;
     std::deque<Event> _events;
 };
 
