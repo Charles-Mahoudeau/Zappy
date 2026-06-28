@@ -115,7 +115,7 @@ void Player::setPosition(const math::Vector2u position) {
     });
 }
 
-void Player::moveForward() {
+void Player::move(math::Direction direction) {
     using enum math::Direction;
     static std::unordered_map<math::Direction, std::function<void(const math::Vector2u, math::Vector2u&)>> map{
         {kNorth, [](math::Vector2u grid, math::Vector2u& pos) { pos.y = (pos.y + grid.y - 1) % grid.y; }},
@@ -126,7 +126,7 @@ void Player::moveForward() {
 
     math::Vector2u pos = this->position();
 
-    map.find(this->_orientation)->second(this->gridSize(), pos);
+    map.find(direction)->second(this->gridSize(), pos);
 
     this->setPosition(pos);
 }
@@ -180,4 +180,5 @@ bool Player::eat() {
     });
     return true;
 };
+
 }  // namespace zappy::server::game::entity

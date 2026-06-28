@@ -26,7 +26,7 @@ bool MoveCommand::move(ICommandGroup::CommandCtx& ctx, Move move) {
 
     ctx.client->setTimeout(7, [clients, world, id, move]() {
         static std::unordered_map<Move, std::function<void(game::entity::Player * player)>> map{
-            {Move::kForward, [](game::entity::Player* player) { player->moveForward(); }},
+            {Move::kForward, [](game::entity::Player* player) { player->move(player->orientation()); }},
             {Move::kLeft, [](game::entity::Player* player) { player->turnLeft(); }},
             {Move::kRight, [](game::entity::Player* player) { player->turnRight(); }},
         };
