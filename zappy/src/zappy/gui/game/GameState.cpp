@@ -126,7 +126,7 @@ const Resources& GameState::tile(std::size_t x, std::size_t y) const {
 
 const std::unordered_map<std::uint32_t, Player>& GameState::players() const { return _players; }
 
-std::optional<Player> GameState::getPlayer(std::int32_t id) const {
+std::optional<Player> GameState::getPlayer(std::uint32_t id) const {
     auto it = _players.find(id);
     if (it == _players.end()) {
         return std::nullopt;
@@ -134,7 +134,7 @@ std::optional<Player> GameState::getPlayer(std::int32_t id) const {
     return it->second;
 }
 
-bool GameState::playerEvent(std::int32_t playerId, EventType type) {
+bool GameState::playerEvent(std::uint32_t playerId, EventType type) {
     auto plr = getPlayer(playerId);
     render::Vector3 pos;
 

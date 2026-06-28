@@ -93,8 +93,8 @@ class GameState {
     [[nodiscard]] const std::vector<Resources>& tiles() const;
     [[nodiscard]] const Resources& tile(std::size_t x, std::size_t y) const;
     [[nodiscard]] const std::unordered_map<std::uint32_t, Player>& players() const;
-    [[nodiscard]] std::optional<Player> getPlayer(std::int32_t id) const;
-    bool playerEvent(std::int32_t playerId, EventType type);
+    [[nodiscard]] std::optional<Player> getPlayer(std::uint32_t id) const;
+    bool playerEvent(std::uint32_t playerId, EventType type);
     [[nodiscard]] const std::vector<std::string>& teams() const;
     [[nodiscard]] std::size_t playersAtMaxLevel(const std::string& team) const;
     [[nodiscard]] const std::unordered_map<std::uint32_t, Egg>& eggs() const;
