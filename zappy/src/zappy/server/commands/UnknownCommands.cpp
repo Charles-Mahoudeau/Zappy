@@ -8,6 +8,7 @@
 #include "zappy/server/commands/UnknownCommands.hpp"
 
 #include <format>
+#include <optional>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -54,11 +55,15 @@ bool UnknownCommands::handleGuiType(std::string_view askedTeam, Client* client, 
 
     gameState << std::format("msz {} {}\n", worldSize.x, worldSize.y);
     gameState << std::format("sgt {}\n", ctx.timer.get().frequency());
-    gameState << game::WireHelper::worldToBctCommands(ctx.world.get());
+    gameState << game::WireHelper::worldToTileCommands(world);
     for (const std::string& teamName : ctx.teamRegistry.get().teamNames()) {
         gameState << std::format("tna {}\n", teamName);
     }
-    gameState << game::WireHelper::worldToEnwCommands(ctx.world.get());
+    gameState << game::WireHelper::worldToPlayerCommands(world);
+    gameState << game::WireHelper::worldToEggCommands(world);
+    if (std::optional<std::string> winningTeam = world.winningTeam()) {
+        gameState << std::format("seg {}\n", *winningTeam);
+    }
     std::ignore = client->sendMessage(gameState.str());
     return true;
 }

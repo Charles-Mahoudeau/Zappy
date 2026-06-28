@@ -87,7 +87,7 @@ bool GuiCommands::bct(const CommandCtx& ctx) {
     try {
         const game::Tile& tile = ctx.world.get().grid().tile(*position);
 
-        std::ignore = ctx.client->sendMessage(game::WireHelper::tileToBctCommand(tile));
+        std::ignore = ctx.client->sendMessage(game::WireHelper::tileToCommands(tile));
         return true;
     } catch (const exception::OutOfRange& e) {
         ctx.logger.get().warn("Tile out of range: {}.", e.what());
@@ -96,7 +96,7 @@ bool GuiCommands::bct(const CommandCtx& ctx) {
 }
 
 bool GuiCommands::mct(const CommandCtx& ctx) {
-    std::ignore = ctx.client->sendMessage(game::WireHelper::worldToBctCommands(ctx.world));
+    std::ignore = ctx.client->sendMessage(game::WireHelper::worldToTileCommands(ctx.world));
     return true;
 }
 
