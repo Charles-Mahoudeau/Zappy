@@ -39,9 +39,8 @@ class PicHandler {
             ids.push_back(parseId(idToken));
         }
         for (const auto id : ids) {
+            _state.get().playerEvent(id, game::EventType::Incantation);
             _state.get().setPlayerIncanting(id, true);
-            _state.get().broadcastEvent(game::EventType::Incantation,
-                                        render::Vector3{static_cast<float>(x), 0.0F, static_cast<float>(y)});
         }
     }
 

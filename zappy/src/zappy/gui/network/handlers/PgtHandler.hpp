@@ -27,7 +27,8 @@ class PgtHandler {
         if (std::uint32_t resource = 0; !(ss >> idToken >> resource)) {
             throw exception::ParseException{"pgt: malformed arguments"};
         }
-        (void)parseId(idToken);
+        auto player = parseId(idToken);
+        _state.get().playerEvent(player, game::EventType::Eat);
     }
 
   private:
