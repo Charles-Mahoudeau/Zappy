@@ -96,6 +96,7 @@ class GameState {
     [[nodiscard]] const std::vector<std::string>& teams() const;
     [[nodiscard]] std::size_t playersAtMaxLevel(const std::string& team) const;
     [[nodiscard]] const std::unordered_map<std::uint32_t, Egg>& eggs() const;
+    [[nodiscard]] std::optional<Egg> getEgg(std::uint32_t eggId) const;
     [[nodiscard]] std::uint32_t timeUnit() const;
     [[nodiscard]] bool isGameOver() const;
     [[nodiscard]] const std::optional<std::string>& winner() const;

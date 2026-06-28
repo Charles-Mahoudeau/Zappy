@@ -12,6 +12,7 @@
 #include <sstream>
 #include <string>
 
+#include "zappy/gui/game/EventHandler.hpp"
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/network/handlers/ParseHelpers.hpp"
 #include "zappy/shared/exception/ParseException.hpp"
@@ -31,7 +32,16 @@ class EdiHandler {
         if (!ss.eof()) {
             throw exception::ParseException{"edi: unexpected trailing tokens"};
         }
-        _state.get().removeEgg(parseId(eggToken));
+
+        auto eggId = parseId(eggToken);
+        auto egg = _state.get().getEgg(eggId);
+        render::Vector3 pos{0.0F, 0.0F, 0.0F};
+
+        if (egg.has_value()) {
+            pos = render::Vector3{static_cast<float>(egg->x), 0.0F, static_cast<float>(egg->y)};
+        }
+        _state.get().removeEgg(eggId);
+        _state.get().broadcastEvent(game::EventType::EggDeath, pos);
     }
 
   private:

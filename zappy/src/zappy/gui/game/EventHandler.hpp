@@ -16,7 +16,7 @@
 
 namespace zappy::gui::game {
 
-enum class EventType : std::uint8_t { None, Broadcast, Incantation, Death, EggHatch, LevelUp, Eat, Push };
+enum class EventType : std::uint8_t { None, Broadcast, Incantation, Death, EggHatch, LevelUp, Eat, Push, EggDeath };
 
 struct Event {
     EventType type{EventType::None};
@@ -49,7 +49,7 @@ class EventHandler {
         {EventType::Broadcast, {"singal"}},     {EventType::Incantation, {"sparkles"}},
         {EventType::Death, {"smoke", "skull"}}, {EventType::EggHatch, {"eggCrack"}},
         {EventType::LevelUp, {"slash"}},        {EventType::Eat, {"foodDebris"}},
-        {EventType::Push, {"impact"}}};
+        {EventType::Push, {"impact"}},          {EventType::EggDeath, {"smoke"}}};
 };
 
 }  // namespace zappy::gui::game

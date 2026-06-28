@@ -134,6 +134,14 @@ std::size_t GameState::playersAtMaxLevel(const std::string& team) const {
 
 const std::unordered_map<std::uint32_t, Egg>& GameState::eggs() const { return _eggs; }
 
+std::optional<zappy::gui::game::Egg> GameState::getEgg(std::uint32_t eggId) const {
+    auto it = _eggs.find(eggId);
+    if (it != _eggs.end()) {
+        return it->second;
+    }
+    return std::nullopt;
+}
+
 std::uint32_t GameState::timeUnit() const { return _timeUnit; }
 
 bool GameState::isGameOver() const { return _winner.has_value(); }
