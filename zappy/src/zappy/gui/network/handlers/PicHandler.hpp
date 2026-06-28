@@ -13,6 +13,7 @@
 #include <string>
 #include <vector>
 
+#include "zappy/gui/game/EventHandler.hpp"
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/network/handlers/ParseHelpers.hpp"
 #include "zappy/shared/exception/ParseException.hpp"
@@ -24,7 +25,11 @@ class PicHandler {
     explicit PicHandler(game::GameState& state) : _state(state) {}
 
     void operator()(std::istringstream& ss) const {
-        if (std::uint32_t x = 0, y = 0, level = 0; !(ss >> x >> y >> level)) {
+        std::uint32_t x = 0;
+        std::uint32_t y = 0;
+        std::uint32_t level = 0;
+
+        if (!(ss >> x >> y >> level)) {
             throw exception::ParseException{"pic: malformed arguments"};
         }
         std::vector<std::uint32_t> ids;
@@ -34,6 +39,8 @@ class PicHandler {
         }
         for (const auto id : ids) {
             _state.get().setPlayerIncanting(id, true);
+            _state.get().broadcastEvent(game::EventType::Incantation,
+                                        render::Vector3{static_cast<float>(x), 0.0F, static_cast<float>(y)});
         }
     }
 

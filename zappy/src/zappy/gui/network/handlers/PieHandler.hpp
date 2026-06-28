@@ -30,7 +30,7 @@ class PieHandler {
         for (const auto& [id, player] : _state.get().players()) {
             if (player.x == x && player.y == y && player.isIncanting) {
                 _state.get().setPlayerIncanting(id, false);
-                _state.get().broadcastEvent(game::EventType::Incantation,
+                _state.get().broadcastEvent(game::EventType::Incantation,  // temporary VFX
                                             render::Vector3{static_cast<float>(x), 0.0F, static_cast<float>(y)});
             }
         }
