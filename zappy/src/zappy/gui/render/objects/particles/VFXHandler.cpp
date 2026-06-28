@@ -42,8 +42,8 @@ void VFXHandler::createVFXs() {
     _vfxs.insert({"eggCrack", std::move(eggCrack)});
 
     ParticleEmitter foodDebris("assets/particles/Shard.png");
-    foodDebris.setStatic(Vector3{}, Vector3{1.1F, 1.1F, 1.1F}, Vector3{0.0F, -0.0004F, 0.0F}, 100.0F, 14);
-    foodDebris.setInitParticles(Vector2{0.3F, 0.3F}, 0.0F, ColorF{255.0F, 170.0F, 170.0F, 190.0F}, 90.0F, 0.003F);
+    foodDebris.setStatic(Vector3{}, Vector3{1.1F, 1.1F, 1.1F}, Vector3{0.0F, -0.0001F, 0.0F}, 100.0F, 14);
+    foodDebris.setInitParticles(Vector2{0.3F, 0.3F}, 0.0F, ColorF{255.0F, 170.0F, 170.0F, 60.0F}, 90.0F, 0.003F);
     foodDebris.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.16F, .rotation = 360.0F, .tint = 70.0F},
                                3.0F, 0.03F);
     foodDebris.setIncrementParticles(Vector2{-0.003F, -0.003F}, 0.0F, ColorF{-1.0F, -1.0F, -1.0F, -1.0F});
@@ -61,7 +61,7 @@ void VFXHandler::createVFXs() {
 
     ParticleEmitter sparkles("assets/particles/Twinkle.png");
     sparkles.setStatic(Vector3{}, Vector3{3.0F, 3.5F, 3.0F}, Vector3{0.0F, 0.00003F, 0.0F}, 180.0F, 14);
-    sparkles.setInitParticles(Vector2{0.5F, 0.5F}, 45.0F, ColorF{255.0F, 130.0F, 255.0F, 50.0F}, 130.0F, 0.001F);
+    sparkles.setInitParticles(Vector2{0.5F, 0.5F}, 45.0F, ColorF{255.0F, 130.0F, 255.0F, 150.0F}, 130.0F, 0.001F);
     sparkles.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 0.0F, .tint = 15.0F}, 0.1F,
                              0.001F);
     sparkles.setIncrementParticles(Vector2{-0.007F, -0.007F}, 0.0F, ColorF{-1.0F, -1.0F, -1.0F, -2.0F});
