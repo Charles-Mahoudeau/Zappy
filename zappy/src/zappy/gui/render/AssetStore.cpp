@@ -170,11 +170,11 @@ void AssetStore::loadVFXs() {
 
     ParticleEmitter skull("assets/particles/Skull.png");
     skull.setStatic(Vector3{}, Vector3{0.5F, 0.5F, 0.5F}, Vector3{0.0F, -0.0003F, 0.0F}, 0.0F, 1);
-    skull.setInitParticles(Vector2{2.0F, 1.2F}, 0.0F, ColorF{255.0F, 100.0F, 100.0F, 255.0F}, 45.0F, 0.09F);
-    skull.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.3F, .rotation = 0.0F, .tint = 0.3F}, 0.1F,
-                          0.0F);
-    skull.setIncrementParticles(Vector2{0.005F, 0.013F}, 0.0F, ColorF{-4.0F, -4.0F, -4.0F, -4.0F});
-    skull.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.01F, .rotation = 0.02F, .tint = 0.1F});
+    skull.setInitParticles(Vector2{2.0F, 1.2F}, 0.0F, ColorF{255.0F, 140.0F, 140.0F, 255.0F}, 120.0F, 0.01F);
+    skull.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.05F, .rotation = 0.0F, .tint = 0.1F}, 0.1F,
+                          0.01F);
+    skull.setIncrementParticles(Vector2{-0.005F, 0.013F}, 0.0F, ColorF{-4.0F, -3.0F, -3.0F, -3.0F});
+    skull.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.01F, .rotation = 0.00F, .tint = 0.0F});
     _vfxs.insert({"skull", std::move(skull)});
 }
 
