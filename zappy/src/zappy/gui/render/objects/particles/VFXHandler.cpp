@@ -42,12 +42,12 @@ void VFXHandler::createVFXs() {
     _vfxs.insert({"eggCrack", std::move(eggCrack)});
 
     ParticleEmitter foodDebris("assets/particles/Shard.png");
-    foodDebris.setStatic(Vector3{}, Vector3{1.5F, 1.5F, 1.5F}, Vector3{0.0F, -0.001F, 0.0F}, 100.0F, 14);
-    foodDebris.setInitParticles(Vector2{0.4F, 0.4F}, 0.0F, ColorF{255.0F, 170.0F, 170.0F, 255.0F}, 90.0F, 0.003F);
-    foodDebris.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.2F, .rotation = 360.0F, .tint = 50.0F}, 3.0F,
-                               0.03F);
-    foodDebris.setIncrementParticles(Vector2{-0.007F, -0.007F}, 0.0F, ColorF{-1.0F, -1.0F, -1.0F, -1.0F});
-    foodDebris.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.002F, .rotation = 3.0F, .tint = 0.1F});
+    foodDebris.setStatic(Vector3{}, Vector3{1.1F, 1.1F, 1.1F}, Vector3{0.0F, -0.0004F, 0.0F}, 100.0F, 14);
+    foodDebris.setInitParticles(Vector2{0.3F, 0.3F}, 0.0F, ColorF{255.0F, 170.0F, 170.0F, 190.0F}, 90.0F, 0.003F);
+    foodDebris.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.16F, .rotation = 360.0F, .tint = 70.0F},
+                               3.0F, 0.03F);
+    foodDebris.setIncrementParticles(Vector2{-0.003F, -0.003F}, 0.0F, ColorF{-1.0F, -1.0F, -1.0F, -1.0F});
+    foodDebris.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.0015F, .rotation = 3.0F, .tint = 0.1F});
     _vfxs.insert({"foodDebris", std::move(foodDebris)});
 
     ParticleEmitter smoke("assets/particles/Smoke.png");
