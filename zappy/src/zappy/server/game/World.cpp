@@ -241,30 +241,112 @@ bool World::playerDrop(entity::Player* player, ResourceType resource) {
     return true;
 }
 
-void World::placeEggRandom(std::uint64_t eggId) { this->placeEggAt(eggId, randomTile()); }
-
-void World::placeEggAt(std::uint64_t eggId, Tile& tile) {
-    const entity::Egg* egg = _entityDatabase.query<entity::Egg>(eggId);
-
-    if (egg == nullptr) {
-        throw exception::InvalidArgument{"trying to place an egg that does not exist"};
+std::uint32_t World::computeBroadcastDirection(const math::Vector2u emitterPos, const math::Vector2u receiverPos,
+                                               const math::Direction receiverOrientation) const {
+    // Same tile → direction 0
+    if (emitterPos.x == receiverPos.x && emitterPos.y == receiverPos.y) {
+        return 0;
     }
 
-    tile.addEntity(eggId);
-    pushEvent(EggLaidEvent{
-        .playerId = egg->parentPlayerId(),
-        .eggId = eggId,
-        .position = tile.position(),
-    });
-    if (_logger.has_value()) {
-        std::string playerInfo;
+    const auto size = _grid.size();
 
-        if (egg->parentPlayerId().has_value()) {
-            playerInfo = std::format(" by player #{}", egg->parentPlayerId().value());
+    // Shortest signed delta from receiver to emitter (toroidal wrapping)
+    const auto shortestDelta = [](const int a, const int b, const int len) -> int {
+        int d = b - a;
+        if (2 * std::abs(d) > len) {
+            d += (d > 0) ? -len : len;
         }
-        _logger->info(std::format("Spawned egg #{} for team {}{} at ({}, {})", eggId, egg->teamName(), playerInfo,
-                                  tile.position().x, tile.position().y));
+        return d;
+    };
+
+    const int ddx =
+        shortestDelta(static_cast<int>(receiverPos.x), static_cast<int>(emitterPos.x), static_cast<int>(size.x));
+    const int ddy =
+        shortestDelta(static_cast<int>(receiverPos.y), static_cast<int>(emitterPos.y), static_cast<int>(size.y));
+
+    // Absolute angle from North, clockwise: atan2(east_component, north_component)
+    // North = y decreasing → north_component = -ddy
+    const double angle = std::atan2(static_cast<double>(ddx), static_cast<double>(-ddy));
+
+    // Receiver orientation angle from North, clockwise (kNorth=0, kEast=1, kSouth=2, kWest=3)
+    const double receiverAngle =
+        static_cast<double>(std::to_underlying(receiverOrientation)) * (std::numbers::pi / 2.0);
+
+    // Local angle relative to receiver's frame, normalized to (-π, π]
+    double localAngle = angle - receiverAngle;
+    while (localAngle > std::numbers::pi) {
+        localAngle -= 2.0 * std::numbers::pi;
     }
+    while (localAngle <= -std::numbers::pi) {
+        localAngle += 2.0 * std::numbers::pi;
+    }
+
+    // Map to 8 sectors (each π/4 wide), sector 1 centred on 0 (straight ahead).
+    // atan2(ddx, -ddy) gives angle from North, increasing CLOCKWISE.
+    // So positive localAngle = clockwise = RIGHT side,
+    //    negative localAngle = counter-clockwise = LEFT side.
+    // Trigonometric (CCW) numbering per subject:
+    //   2 1 8
+    //   3 P 7
+    //   4 5 6
+    constexpr double h = std::numbers::pi / 8.0;  // half-sector = π/8
+
+    if (localAngle >= -h && localAngle < h) {
+        return 1;  // front
+    }
+    if (localAngle >= -3.0 * h && localAngle < -h) {
+        return 2;  // front-left  (CCW)
+    }
+    if (localAngle >= -5.0 * h && localAngle < -3.0 * h) {
+        return 3;  // left
+    }
+    if (localAngle >= -7.0 * h && localAngle < -5.0 * h) {
+        return 4;  // back-left
+    }
+    if (localAngle < -7.0 * h || localAngle >= 7.0 * h) {
+        return 5;  // behind
+    }
+    if (localAngle >= 5.0 * h && localAngle < 7.0 * h) {
+        return 6;  // back-right  (CW)
+    }
+    if (localAngle >= 3.0 * h && localAngle < 5.0 * h) {
+        return 7;  // right
+    }
+    return 8;  // [h, 3h) = front-right
+}
+
+std::vector<std::reference_wrapper<Tile>> World::playerView(const entity::Player* player) {
+    using enum math::Direction;
+    static const std::unordered_map<math::Direction, std::pair<math::Vector2i, math::Vector2i>> dirs{
+        {kNorth, {{0, -1}, {1, 0}}},
+        {kEast, {{1, 0}, {0, 1}}},
+        {kSouth, {{0, 1}, {-1, 0}}},
+        {kWest, {{-1, 0}, {0, -1}}},
+    };
+
+    std::vector<std::reference_wrapper<Tile>> view;
+
+    const math::Vector2u gridSize = _grid.size();
+    const math::Vector2u origin = player->position();
+    const std::uint8_t rows = player->level();
+
+    const auto& [forward, right] = dirs.find(player->orientation())->second;
+
+    for (std::uint8_t r = 0; r <= rows; ++r) {
+        for (std::int32_t side = -static_cast<std::int32_t>(r); std::cmp_less_equal(side, r); ++side) {
+            const int px = static_cast<int>(origin.x) + (forward.x * r) + (right.x * side);
+            const int py = static_cast<int>(origin.y) + (forward.y * r) + (right.y * side);
+
+            auto wx = static_cast<std::uint32_t>(((px % static_cast<int>(gridSize.x)) + static_cast<int>(gridSize.x)) %
+                                                 static_cast<int>(gridSize.x));
+            auto wy = static_cast<std::uint32_t>(((py % static_cast<int>(gridSize.y)) + static_cast<int>(gridSize.y)) %
+                                                 static_cast<int>(gridSize.y));
+
+            view.push_back(std::ref(_grid.tile(math::Vector2u{wx, wy})));
+        }
+    }
+
+    return view;
 }
 
 std::optional<World::IncantationSnapshot> World::beginIncantation(const std::uint64_t playerId) {
@@ -330,7 +412,7 @@ bool World::endIncantation(const IncantationSnapshot& snapshot) {
         std::ignore = incantationPlayer->levelUp();
     }
     markResourcesDirty();
-    pushEvent(IncantationEndEvent{
+    pushEvent(IncantatioaternosnEndEvent{
         .position = snapshot.position,
         .success = true,
     });
@@ -475,112 +557,30 @@ void World::generateResourceThresholds() {
     }
 }
 
-std::uint32_t World::computeBroadcastDirection(const math::Vector2u emitterPos, const math::Vector2u receiverPos,
-                                               const math::Direction receiverOrientation) const {
-    // Same tile → direction 0
-    if (emitterPos.x == receiverPos.x && emitterPos.y == receiverPos.y) {
-        return 0;
+void World::placeEggRandom(std::uint64_t eggId) { this->placeEggAt(eggId, randomTile()); }
+
+void World::placeEggAt(std::uint64_t eggId, Tile& tile) {
+    const entity::Egg* egg = _entityDatabase.query<entity::Egg>(eggId);
+
+    if (egg == nullptr) {
+        throw exception::InvalidArgument{"trying to place an egg that does not exist"};
     }
 
-    const auto size = _grid.size();
+    tile.addEntity(eggId);
+    pushEvent(EggLaidEvent{
+        .playerId = egg->parentPlayerId(),
+        .eggId = eggId,
+        .position = tile.position(),
+    });
+    if (_logger.has_value()) {
+        std::string playerInfo;
 
-    // Shortest signed delta from receiver to emitter (toroidal wrapping)
-    const auto shortestDelta = [](const int a, const int b, const int len) -> int {
-        int d = b - a;
-        if (2 * std::abs(d) > len) {
-            d += (d > 0) ? -len : len;
+        if (egg->parentPlayerId().has_value()) {
+            playerInfo = std::format(" by player #{}", egg->parentPlayerId().value());
         }
-        return d;
-    };
-
-    const int ddx =
-        shortestDelta(static_cast<int>(receiverPos.x), static_cast<int>(emitterPos.x), static_cast<int>(size.x));
-    const int ddy =
-        shortestDelta(static_cast<int>(receiverPos.y), static_cast<int>(emitterPos.y), static_cast<int>(size.y));
-
-    // Absolute angle from North, clockwise: atan2(east_component, north_component)
-    // North = y decreasing → north_component = -ddy
-    const double angle = std::atan2(static_cast<double>(ddx), static_cast<double>(-ddy));
-
-    // Receiver orientation angle from North, clockwise (kNorth=0, kEast=1, kSouth=2, kWest=3)
-    const double receiverAngle =
-        static_cast<double>(std::to_underlying(receiverOrientation)) * (std::numbers::pi / 2.0);
-
-    // Local angle relative to receiver's frame, normalized to (-π, π]
-    double localAngle = angle - receiverAngle;
-    while (localAngle > std::numbers::pi) {
-        localAngle -= 2.0 * std::numbers::pi;
+        _logger->info(std::format("Spawned egg #{} for team {}{} at ({}, {})", eggId, egg->teamName(), playerInfo,
+                                  tile.position().x, tile.position().y));
     }
-    while (localAngle <= -std::numbers::pi) {
-        localAngle += 2.0 * std::numbers::pi;
-    }
-
-    // Map to 8 sectors (each π/4 wide), sector 1 centred on 0 (straight ahead).
-    // atan2(ddx, -ddy) gives angle from North, increasing CLOCKWISE.
-    // So positive localAngle = clockwise = RIGHT side,
-    //    negative localAngle = counter-clockwise = LEFT side.
-    // Trigonometric (CCW) numbering per subject:
-    //   2 1 8
-    //   3 P 7
-    //   4 5 6
-    constexpr double h = std::numbers::pi / 8.0;  // half-sector = π/8
-
-    if (localAngle >= -h && localAngle < h) {
-        return 1;  // front
-    }
-    if (localAngle >= -3.0 * h && localAngle < -h) {
-        return 2;  // front-left  (CCW)
-    }
-    if (localAngle >= -5.0 * h && localAngle < -3.0 * h) {
-        return 3;  // left
-    }
-    if (localAngle >= -7.0 * h && localAngle < -5.0 * h) {
-        return 4;  // back-left
-    }
-    if (localAngle < -7.0 * h || localAngle >= 7.0 * h) {
-        return 5;  // behind
-    }
-    if (localAngle >= 5.0 * h && localAngle < 7.0 * h) {
-        return 6;  // back-right  (CW)
-    }
-    if (localAngle >= 3.0 * h && localAngle < 5.0 * h) {
-        return 7;  // right
-    }
-    return 8;  // [h, 3h) = front-right
-}
-
-std::vector<std::reference_wrapper<Tile>> World::playerView(const entity::Player* player) {
-    using enum math::Direction;
-    static const std::unordered_map<math::Direction, std::pair<math::Vector2i, math::Vector2i>> dirs{
-        {kNorth, {{0, -1}, {1, 0}}},
-        {kEast, {{1, 0}, {0, 1}}},
-        {kSouth, {{0, 1}, {-1, 0}}},
-        {kWest, {{-1, 0}, {0, -1}}},
-    };
-
-    std::vector<std::reference_wrapper<Tile>> view;
-
-    const math::Vector2u gridSize = _grid.size();
-    const math::Vector2u origin = player->position();
-    const std::uint8_t rows = player->level();
-
-    const auto& [forward, right] = dirs.find(player->orientation())->second;
-
-    for (std::uint8_t r = 0; r <= rows; ++r) {
-        for (std::int32_t side = -static_cast<std::int32_t>(r); std::cmp_less_equal(side, r); ++side) {
-            const int px = static_cast<int>(origin.x) + (forward.x * r) + (right.x * side);
-            const int py = static_cast<int>(origin.y) + (forward.y * r) + (right.y * side);
-
-            auto wx = static_cast<std::uint32_t>(((px % static_cast<int>(gridSize.x)) + static_cast<int>(gridSize.x)) %
-                                                 static_cast<int>(gridSize.x));
-            auto wy = static_cast<std::uint32_t>(((py % static_cast<int>(gridSize.y)) + static_cast<int>(gridSize.y)) %
-                                                 static_cast<int>(gridSize.y));
-
-            view.push_back(std::ref(_grid.tile(math::Vector2u{wx, wy})));
-        }
-    }
-
-    return view;
 }
 
 std::expected<void, std::string> World::verifyIncantationRequirements(const IncantationSnapshot& snapshot) const {
