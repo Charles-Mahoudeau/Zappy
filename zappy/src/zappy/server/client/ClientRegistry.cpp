@@ -52,6 +52,9 @@ void ClientRegistry::markForRemoval(const Client* clientPtr) {
     if (clientPtr == nullptr) {
         return;
     }
+    if (std::ranges::find(this->_toRemove, clientPtr) != this->_toRemove.end()) {
+        return;
+    }
     this->_toRemove.emplace_back(clientPtr);
 }
 
