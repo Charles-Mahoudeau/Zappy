@@ -161,6 +161,10 @@ class World : public IEventEmitter {
 
     bool playerDrop(entity::Player* player, ResourceType resource);
 
+    std::uint32_t computeDistFromPositions(math::Vector2u emitter, math::Vector2u receiver) const;
+
+    std::vector<std::reference_wrapper<Tile>> playerView(const entity::Player* player);
+
     /// @brief Begins an incantation event.
     /// @param playerId The ID of the player initiating the incantation.
     /// @return A snapshot of the incantation event if successful, std::nullopt otherwise.
@@ -194,6 +198,10 @@ class World : public IEventEmitter {
     /// @brief Places an egg at a random tile in the world.
     /// @param eggId The ID of the egg to place.
     void placeEggRandom(std::uint64_t eggId);
+
+    /// @brief Places an egg on a tile in the world.
+    /// @param eggId The ID of the egg to place.
+    void placeEggAt(std::uint64_t eggId, Tile& tile);
 
     /// @brief Checks if the given incantation snapshot meets the requirements.
     /// @param snapshot The incantation snapshot to check.

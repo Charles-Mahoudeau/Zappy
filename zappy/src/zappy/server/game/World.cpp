@@ -13,6 +13,7 @@
 #include <cstdint>
 #include <expected>
 #include <format>
+#include <functional>
 #include <memory>
 #include <optional>
 #include <random>
@@ -33,6 +34,7 @@
 #include "entity/Player.hpp"
 #include "zappy/server/Timer.hpp"
 #include "zappy/server/game/Grid.hpp"
+#include "zappy/server/game/Inventory.hpp"
 #include "zappy/shared/exception/Exception.hpp"
 #include "zappy/shared/exception/InvalidArgument.hpp"
 #include "zappy/shared/exception/OutOfRange.hpp"
@@ -72,7 +74,8 @@ std::uint64_t World::spawnEgg(std::uint64_t playerId, const std::string_view tea
     const std::uint64_t eggId =
         _entityDatabase.insert(std::make_unique<entity::Egg>(_timer, _grid, *this, std::string{teamName}, playerId));
 
-    placeEggRandom(eggId);
+    Tile& tile = this->_grid.tile(this->_entityDatabase.query(playerId)->position());
+    this->placeEggAt(eggId, tile);
     return eggId;
 }
 
@@ -152,11 +155,12 @@ std::expected<std::uint64_t, std::string> World::hatchRandomEgg(const std::strin
         _entityDatabase.insert(std::make_unique<entity::Player>(_timer, _grid, *this, std::string{teamName}));
 
     parentTile->addEntity(playerId);
+    const entity::Player* player = this->player(playerId);
     pushEvent(PlayerConnectionEvent{
         .playerId = playerId,
         .position = parentTile->position(),
-        .orientation = math::Direction::kNorth,
-        .level = 0,
+        .orientation = player->orientation(),
+        .level = player->level(),
         .teamName = std::string{teamName},
     });
     pushEvent(EggConnectionEvent{
@@ -232,6 +236,32 @@ bool World::playerDrop(entity::Player* player, ResourceType resource) {
     }
 
     return true;
+}
+
+void World::placeEggRandom(std::uint64_t eggId) { this->placeEggAt(eggId, randomTile()); }
+
+void World::placeEggAt(std::uint64_t eggId, Tile& tile) {
+    const entity::Egg* egg = _entityDatabase.query<entity::Egg>(eggId);
+
+    if (egg == nullptr) {
+        throw exception::InvalidArgument{"trying to place an egg that does not exist"};
+    }
+
+    tile.addEntity(eggId);
+    pushEvent(EggLaidEvent{
+        .playerId = egg->parentPlayerId(),
+        .eggId = eggId,
+        .position = tile.position(),
+    });
+    if (_logger.has_value()) {
+        std::string playerInfo;
+
+        if (egg->parentPlayerId().has_value()) {
+            playerInfo = std::format(" by player #{}", egg->parentPlayerId().value());
+        }
+        _logger->info(std::format("Spawned egg #{} for team {}{} at ({}, {})", eggId, egg->teamName(), playerInfo,
+                                  tile.position().x, tile.position().y));
+    }
 }
 
 std::optional<World::IncantationSnapshot> World::beginIncantation(const std::uint64_t playerId) {
@@ -433,30 +463,52 @@ void World::generateResourceThresholds() {
     }
 }
 
-void World::placeEggRandom(const std::uint64_t eggId) {
-    const entity::Egg* egg = _entityDatabase.query<entity::Egg>(eggId);
+std::uint32_t World::computeDistFromPositions(math::Vector2u emitter, math::Vector2u receiver) const {
+    const auto size = _grid.size();
 
-    if (egg == nullptr) {
-        throw exception::InvalidArgument{"trying to place an egg that does not exist"};
-    }
+    const auto wrappedDist = [](std::uint32_t a, std::uint32_t b, std::uint32_t length) {
+        const std::uint32_t diff = a > b ? a - b : b - a;
+        return std::min(diff, length - diff);
+    };
 
-    Tile& tile = randomTile();
+    const std::uint32_t dx = wrappedDist(emitter.x, receiver.x, size.x);
+    const std::uint32_t dy = wrappedDist(emitter.y, receiver.y, size.y);
 
-    tile.addEntity(eggId);
-    pushEvent(EggLaidEvent{
-        .playerId = egg->parentPlayerId(),
-        .eggId = eggId,
-        .position = tile.position(),
-    });
-    if (_logger.has_value()) {
-        std::string playerInfo;
+    return dx + dy;
+}
 
-        if (egg->parentPlayerId().has_value()) {
-            playerInfo = std::format(" by player #{}", egg->parentPlayerId().value());
+std::vector<std::reference_wrapper<Tile>> World::playerView(const entity::Player* player) {
+    using enum math::Direction;
+    static const std::unordered_map<math::Direction, std::pair<math::Vector2i, math::Vector2i>> dirs{
+        {kNorth, {{0, -1}, {1, 0}}},
+        {kEast, {{1, 0}, {0, 1}}},
+        {kSouth, {{0, 1}, {-1, 0}}},
+        {kWest, {{-1, 0}, {0, -1}}},
+    };
+
+    std::vector<std::reference_wrapper<Tile>> view;
+
+    const math::Vector2u gridSize = _grid.size();
+    const math::Vector2u origin = player->position();
+    const std::uint8_t rows = player->level();
+
+    const auto& [forward, right] = dirs.find(player->orientation())->second;
+
+    for (std::uint8_t r = 0; r <= rows; ++r) {
+        for (std::int32_t side = -static_cast<std::int32_t>(r); std::cmp_less_equal(side, r); ++side) {
+            const int px = static_cast<int>(origin.x) + (forward.x * r) + (right.x * side);
+            const int py = static_cast<int>(origin.y) + (forward.y * r) + (right.y * side);
+
+            auto wx = static_cast<std::uint32_t>(((px % static_cast<int>(gridSize.x)) + static_cast<int>(gridSize.x)) %
+                                                 static_cast<int>(gridSize.x));
+            auto wy = static_cast<std::uint32_t>(((py % static_cast<int>(gridSize.y)) + static_cast<int>(gridSize.y)) %
+                                                 static_cast<int>(gridSize.y));
+
+            view.push_back(std::ref(_grid.tile(math::Vector2u{wx, wy})));
         }
-        _logger->info(std::format("Spawned egg #{} for team {}{} at ({}, {})", eggId, egg->teamName(), playerInfo,
-                                  tile.position().x, tile.position().y));
     }
+
+    return view;
 }
 
 std::expected<void, std::string> World::verifyIncantationRequirements(const IncantationSnapshot& snapshot) const {
@@ -493,4 +545,5 @@ std::expected<void, std::string> World::verifyIncantationRequirements(const Inca
     }
     return {};
 }
+
 }  // namespace zappy::server::game
