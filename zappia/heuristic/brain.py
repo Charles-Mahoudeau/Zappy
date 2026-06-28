@@ -32,6 +32,7 @@ DONOR_KEEP = 20
 INV_REFRESH_EVERY = 4
 CALL_EVERY = 3
 CALL_MEMORY = 5
+ENEMY_MEMORY = 5
 
 PEER_WINDOW = 40
 PEER_PING = 10
@@ -41,6 +42,8 @@ FORK_FOOD = 5
 FORK_MIN_TICK = 25
 FORK_COOLDOWN = 15
 CONNECT_CHECK_EVERY = 5
+
+SABOTAGE_TIMEOUT = 200
 
 PROTO = "ZP"
 SEP = ";"
@@ -66,6 +69,11 @@ class HeuristicAI:
         self.call_dir: Optional[int] = None
         self.call_missing: List[str] = []
         self.call_ttl = 0
+        
+        self.enemy_call_dir: Optional[int] = None
+        self.enemy_call_ttl = 0
+        self.sabotage_ticks = 0
+
         self.peers: Dict[int, int] = {}
         self.team_seen: Dict[int, Tuple[int, int]] = {}
         self.peer_inv: Dict[int, Dict[str, int]] = {}
@@ -137,7 +145,6 @@ class HeuristicAI:
         return self.players_here() >= self.req_players()
 
     def tile_ready(self) -> bool:
-        """return True if the current tile has all the required stones for incantation."""
         return not self.tile_short() and self.assembled()
 
     def nearest_tile_with(self, resource: str) -> Optional[int]:
@@ -178,7 +185,7 @@ class HeuristicAI:
         msg: dict,
         best_id: Optional[int],
         best_dir: Optional[int],
-        best_missing: List[str],
+        best_missing: List[str]
     ) -> Tuple[Optional[int], Optional[int], List[str]]:
         self.team_seen[msg["id"]] = (self.tick, msg["level"])
         if msg["verb"] == "CALL" and msg["level"] == self.level:
@@ -206,17 +213,26 @@ class HeuristicAI:
         return best_id, best_dir, best_missing
 
     def _scan_broadcasts(
-        self,
-    ) -> Tuple[Optional[int], Optional[int], List[str]]:
+        self, stranded: bool
+    ) -> Tuple[Optional[int], Optional[int], List[str], Optional[int]]:
         best_id, best_dir, best_missing = None, None, []
+        enemy_dir = None
+        
         for direction, text in self.c.broadcasts:
             msg = self._decode(text)
-            if not msg or msg["team"] != self.c.team or msg["id"] == self.id:
+            if not msg or msg["id"] == self.id:
                 continue
+            
+            if msg["team"] != self.c.team:
+                if stranded and msg["verb"] == "CALL" and not msg["data"]:
+                    enemy_dir = direction
+                continue
+
             best_id, best_dir, best_missing = self._process_broadcast_msg(
                 direction, msg, best_id, best_dir, best_missing
             )
-        return best_id, best_dir, best_missing
+            
+        return best_id, best_dir, best_missing, enemy_dir
 
     def _update_call_state(
         self, best_id: Optional[int], best_dir: Optional[int], best_missing: List[str]
@@ -231,9 +247,10 @@ class HeuristicAI:
             self.call_id = self.call_dir = None
             self.call_missing = []
 
-    def handle_messages(self) -> None:
-        best_id, best_dir, best_missing = self._scan_broadcasts()
+    def handle_messages(self, stranded: bool) -> None:
+        best_id, best_dir, best_missing, enemy_dir = self._scan_broadcasts(stranded)
         self.c.broadcasts.clear()
+        
         self.peers = {
             p: t for p, t in self.peers.items() if self.tick - t <= PEER_WINDOW
         }
@@ -244,7 +261,16 @@ class HeuristicAI:
             for i, (t, lv) in self.team_seen.items()
             if self.tick - t <= PEER_WINDOW
         }
+        
         self._update_call_state(best_id, best_dir, best_missing)
+
+        if enemy_dir is not None:
+            self.enemy_call_dir = enemy_dir
+            self.enemy_call_ttl = ENEMY_MEMORY
+        elif self.enemy_call_ttl > 0:
+            self.enemy_call_ttl -= 1
+        else:
+            self.enemy_call_dir = None
 
     def reset_rally(self) -> None:
         self.call_id = self.call_dir = None
@@ -253,7 +279,7 @@ class HeuristicAI:
         self.peers = {}
         self.peer_inv = {}
 
-    def _tick_update(self) -> None:
+    def _tick_update(self, stranded: bool) -> None:
         self.tick += 1
         self.ticks_since_inv += 1
         if self.c.pending_level is not None:
@@ -261,7 +287,7 @@ class HeuristicAI:
             self.c.pending_level = None
             self.reset_rally()
             self.refresh_all()
-        self.handle_messages()
+        self.handle_messages(stranded)
 
     def _compute_roles(self) -> Tuple[bool, bool]:
         raw_stranded = self.req_players() > 1 and self.is_stranded()
@@ -321,12 +347,13 @@ class HeuristicAI:
         self.rally()
 
     def step(self) -> None:
-        self._tick_update()
         stranded, leader = self._compute_roles()
+        self._tick_update(stranded)
 
         if stranded:
-            self.suicide()
+            self.sabotage()
             return
+            
         if self._broadcast_if_due(leader):
             return
 
@@ -360,12 +387,28 @@ class HeuristicAI:
         self.c.fork()
         self._last_fork_tick = self.tick
 
-    def suicide(self) -> None:
-        if not self._fork_sent:
-            if self.food >= 2:
-                self.c.fork()
+    def sabotage(self) -> None:
+        if self.food <= 2 and not self._fork_sent:
+            self.c.fork()
             self._fork_sent = True
             return
+
+        if self.enemy_call_dir is not None:
+            self.sabotage_ticks = 0
+            if self.enemy_call_dir == 0:
+                self.c.eject()
+            else:
+                self.go_to_sound(self.enemy_call_dir)
+            return
+
+        self.sabotage_ticks += 1
+        if self.sabotage_ticks >= SABOTAGE_TIMEOUT:
+            self.suicide()
+            return
+
+        self.refresh_look()
+
+    def suicide(self) -> None:
         for stone in STONES:
             if self.inv.get(stone, 0) > 0:
                 if self.c.set_down(stone):
