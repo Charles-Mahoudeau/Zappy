@@ -15,6 +15,9 @@
 #include <unordered_map>
 #include <vector>
 
+#include "EventHandler.hpp"
+#include "zappy/gui/render/utils/Vector3.hpp"
+
 namespace zappy::gui::game {
 
 enum class ResourceType : std::uint8_t {
@@ -90,14 +93,22 @@ class GameState {
     [[nodiscard]] const std::vector<Resources>& tiles() const;
     [[nodiscard]] const Resources& tile(std::size_t x, std::size_t y) const;
     [[nodiscard]] const std::unordered_map<std::uint32_t, Player>& players() const;
+    [[nodiscard]] std::optional<Player> getPlayer(std::uint32_t id) const;
+    bool playerEvent(std::uint32_t playerId, EventType type);
     [[nodiscard]] const std::vector<std::string>& teams() const;
     [[nodiscard]] std::size_t playersAtMaxLevel(const std::string& team) const;
     [[nodiscard]] const std::unordered_map<std::uint32_t, Egg>& eggs() const;
+    [[nodiscard]] std::optional<Egg> getEgg(std::int32_t eggId) const;
+    bool eggEvent(std::int32_t eggId, EventType type);
     [[nodiscard]] std::uint32_t timeUnit() const;
     [[nodiscard]] bool isGameOver() const;
     [[nodiscard]] const std::optional<std::string>& winner() const;
     [[nodiscard]] bool isReady() const;
     [[nodiscard]] const std::deque<std::string>& broadcasts() const;
+
+    void broadcastEvent(EventType type, render::Vector3 position = {0.0F, 0.0F, 0.0F});
+    [[nodiscard]] const std::vector<Event>& getEvents() const;
+    void clearEvents();
 
   private:
     std::size_t _width{0};
@@ -111,6 +122,7 @@ class GameState {
     std::size_t _tilesReceived{0};
     std::vector<bool> _tileSet;
     std::deque<std::string> _broadcasts;
+    std::vector<Event> _events;
 };
 
 }  // namespace zappy::gui::game

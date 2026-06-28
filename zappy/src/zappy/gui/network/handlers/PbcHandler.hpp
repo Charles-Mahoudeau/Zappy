@@ -13,6 +13,7 @@
 #include <string>
 #include <utility>
 
+#include "zappy/gui/game/EventHandler.hpp"
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/network/handlers/ParseHelpers.hpp"
 #include "zappy/shared/exception/ParseException.hpp"
@@ -29,11 +30,12 @@ class PbcHandler {
         if (!(ss >> idToken)) {
             throw exception::ParseException{"pbc: missing player id"};
         }
-        (void)parseId(idToken);
         std::getline(ss >> std::ws, message);
         if (message.empty()) {
             throw exception::ParseException{"pbc: missing message"};
         }
+        auto playerId = parseId(idToken);
+        _state.get().playerEvent(playerId, game::EventType::Broadcast);
         _state.get().addBroadcast(std::move(message));
     }
 

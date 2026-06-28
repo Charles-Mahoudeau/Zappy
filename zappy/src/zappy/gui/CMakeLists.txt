@@ -8,6 +8,7 @@ add_library(zappy_gui_objects OBJECT
         display/Window.hpp
         game/GameState.cpp
         game/GameState.hpp
+        game/EventHandler.hpp
         GUI.cpp
         GUI.hpp
         GuiCliParser.cpp
@@ -44,6 +45,8 @@ add_library(zappy_gui_objects OBJECT
         render/objects/particles/ParticleEmitter.hpp
         render/objects/particles/Particle.cpp
         render/objects/particles/Particle.hpp
+        render/objects/particles/VFXHandler.cpp
+        render/objects/particles/VFXHandler.hpp
         render/objects/Music.cpp
         render/objects/Music.hpp
         render/utils/Vector2.cpp

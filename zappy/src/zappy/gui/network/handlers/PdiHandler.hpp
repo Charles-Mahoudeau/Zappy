@@ -11,6 +11,7 @@
 #include <sstream>
 #include <string>
 
+#include "zappy/gui/game/EventHandler.hpp"
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/network/handlers/ParseHelpers.hpp"
 #include "zappy/shared/exception/ParseException.hpp"
@@ -26,7 +27,10 @@ class PdiHandler {
         if (!(ss >> idToken)) {
             throw exception::ParseException{"pdi: missing player id"};
         }
-        _state.get().removePlayer(parseId(idToken));
+
+        auto playerId = parseId(idToken);
+        _state.get().playerEvent(playerId, game::EventType::Death);
+        _state.get().removePlayer(playerId);
     }
 
   private:

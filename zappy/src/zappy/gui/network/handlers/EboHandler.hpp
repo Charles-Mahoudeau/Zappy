@@ -12,6 +12,7 @@
 #include <sstream>
 #include <string>
 
+#include "zappy/gui/game/EventHandler.hpp"
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/network/handlers/ParseHelpers.hpp"
 #include "zappy/shared/exception/ParseException.hpp"
@@ -31,7 +32,10 @@ class EboHandler {
         if (!ss.eof()) {
             throw exception::ParseException{"ebo: unexpected trailing tokens"};
         }
-        _state.get().removeEgg(parseId(eggToken));
+
+        auto eggId = parseId(eggToken);
+        _state.get().eggEvent(eggId, game::EventType::EggHatch);
+        _state.get().removeEgg(eggId);
     }
 
   private:

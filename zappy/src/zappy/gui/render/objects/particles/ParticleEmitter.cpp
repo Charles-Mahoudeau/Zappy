@@ -8,6 +8,7 @@
 #include "ParticleEmitter.hpp"
 
 #include <raylib.h>
+#include <rlgl.h>
 
 #include <algorithm>
 #include <cmath>
@@ -16,6 +17,7 @@
 #include <numbers>
 #include <string_view>
 #include <utility>
+#include <vector>
 
 #include "Camera.hpp"
 #include "ColorF.hpp"
@@ -26,7 +28,7 @@
 #include "Vector3.hpp"
 
 namespace zappy::gui::render {
-ParticleEmitter::ParticleEmitter(std::string_view path) : _texture(path) {}
+ParticleEmitter::ParticleEmitter(std::string_view path) : _texture{path, false, true} {}
 
 void ParticleEmitter::setOrigin(Vector3 origin) { _origin = origin; }
 void ParticleEmitter::setVolume(Vector3 volume) { _volume = volume; }
@@ -59,11 +61,17 @@ void ParticleEmitter::update(float dt) {
 }
 
 uint16_t ParticleEmitter::draw(Camera& camera) {
+    rlDisableDepthMask();
+    BeginBlendMode(BLEND_ALPHA_PREMULTIPLY);
+
     for (auto& particle : _particles) {
         if (particle.lifetime() > 0.0F) {
             particle.draw(camera, _texture);
         }
     }
+
+    EndBlendMode();
+    rlEnableDepthMask();
     return static_cast<uint16_t>(_particles.size());
 }
 
@@ -75,8 +83,10 @@ void ParticleEmitter::particle() {
     const Vector2 incSize = _size.increment() * RandomValue{1.0F, _incrementEnvelope.size}.generate();
     const float initRot = RandomValue{_rotation.get(), _initEnvelope.rotation}.generate();
     const float incRot = RandomValue{_rotation.increment(), _incrementEnvelope.rotation}.generate();
-    const ColorF initTint = _tint.get() * RandomValue{1.0F, _initEnvelope.tint}.generate();
-    const ColorF incTint = _tint.increment() * RandomValue{1.0F, _incrementEnvelope.tint}.generate();
+    const float initTintFactor = RandomValue{1.0F, _initEnvelope.tint / 255.0F}.generate();
+    const float incTintFactor = RandomValue{1.0F, _incrementEnvelope.tint / 255.0F}.generate();
+    const ColorF initTint = _tint.get() * initTintFactor;
+    const ColorF incTint = _tint.increment() * incTintFactor;
     const Vector3 origin = _origin + Vector3{RandomValue{0.0F, _volume.x() * 0.5F}.generate(),
                                              RandomValue{0.0F, _volume.y() * 0.5F}.generate(),
                                              RandomValue{0.0F, _volume.z() * 0.5F}.generate()};

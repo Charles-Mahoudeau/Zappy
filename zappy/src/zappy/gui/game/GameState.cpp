@@ -17,6 +17,8 @@
 #include <utility>
 #include <vector>
 
+#include "EventHandler.hpp"
+#include "zappy/gui/render/utils/Vector3.hpp"
 #include "zappy/shared/exception/InvalidArgument.hpp"
 
 namespace zappy::gui::game {
@@ -124,6 +126,26 @@ const Resources& GameState::tile(std::size_t x, std::size_t y) const {
 
 const std::unordered_map<std::uint32_t, Player>& GameState::players() const { return _players; }
 
+std::optional<Player> GameState::getPlayer(std::uint32_t id) const {
+    auto it = _players.find(id);
+    if (it == _players.end()) {
+        return std::nullopt;
+    }
+    return it->second;
+}
+
+bool GameState::playerEvent(std::uint32_t playerId, EventType type) {
+    auto plr = getPlayer(playerId);
+    render::Vector3 pos;
+
+    if (plr.has_value()) {
+        pos = render::Vector3{static_cast<float>(plr->x), 0.0F, static_cast<float>(plr->y)};
+        broadcastEvent(type, pos);
+        return true;
+    }
+    return false;
+}
+
 const std::vector<std::string>& GameState::teams() const { return _teams; }
 
 std::size_t GameState::playersAtMaxLevel(const std::string& team) const {
@@ -132,6 +154,25 @@ std::size_t GameState::playersAtMaxLevel(const std::string& team) const {
 }
 
 const std::unordered_map<std::uint32_t, Egg>& GameState::eggs() const { return _eggs; }
+
+std::optional<Egg> GameState::getEgg(std::int32_t eggId) const {
+    if (auto it = _eggs.find(eggId); it != _eggs.end()) {
+        return it->second;
+    }
+    return std::nullopt;
+}
+
+bool GameState::eggEvent(std::int32_t eggId, EventType type) {
+    auto egg = getEgg(eggId);
+    render::Vector3 pos;
+
+    if (egg.has_value()) {
+        pos = render::Vector3{static_cast<float>(egg->x), 0.0F, static_cast<float>(egg->y)};
+        broadcastEvent(type, pos);
+        return true;
+    }
+    return false;
+}
 
 std::uint32_t GameState::timeUnit() const { return _timeUnit; }
 
@@ -142,5 +183,13 @@ const std::optional<std::string>& GameState::winner() const { return _winner; }
 bool GameState::isReady() const { return _width > 0 && _height > 0 && _tilesReceived >= _width * _height; }
 
 const std::deque<std::string>& GameState::broadcasts() const { return _broadcasts; }
+
+void GameState::broadcastEvent(EventType type, render::Vector3 position) {
+    _events.emplace_back(Event{.type = type, .position = position});
+}
+
+[[nodiscard]] const std::vector<Event>& GameState::getEvents() const { return _events; }
+
+void GameState::clearEvents() { _events.clear(); }
 
 }  // namespace zappy::gui::game

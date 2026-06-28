@@ -19,7 +19,8 @@
 #include "../game/GameState.hpp"
 #include "objects/Model.hpp"
 #include "objects/Skybox.hpp"
-#include "objects/particles/ParticleEmitter.hpp"
+#include "objects/particles/VFXHandler.hpp"
+#include "particles/ParticleEmitter.hpp"
 #include "utils/Vector3.hpp"
 
 namespace zappy::gui::render {
@@ -48,13 +49,14 @@ class AssetStore {
     void loadBridgeModel();
 
     void emit(std::string_view path, Vector3 pos);
+    void playVFX(std::vector<std::string_view>& emitters, Vector3 pos);
 
     [[nodiscard]] const Skybox& skybox() const;
     [[nodiscard]] Model& playerModel(std::size_t index);
     [[nodiscard]] std::size_t playerModelCount() const;
     [[nodiscard]] const std::map<game::ResourceType, Model>& resourceModels() const;
-    [[nodiscard]] const std::map<std::string, ParticleEmitter>& vfxs() const;
-    [[nodiscard]] std::map<std::string, ParticleEmitter>& vfxs();
+    [[nodiscard]] const std::map<std::string, ParticleEmitter, std::less<>>& vfxs() const;
+    [[nodiscard]] std::map<std::string, ParticleEmitter, std::less<>>& vfxs();
     [[nodiscard]] const Model& eggModel() const { return *_eggModel; }
     [[nodiscard]] const Model& islandModel() const { return *_islandModel; }
     [[nodiscard]] const Model& bridgeModel() const { return *_bridgeModel; }
@@ -74,7 +76,7 @@ class AssetStore {
     Skybox _skybox;
     std::vector<Model> _playerModels;
     std::map<game::ResourceType, Model> _resourcesModels;
-    std::map<std::string, ParticleEmitter> _vfxs;
+    VFXHandler _vfxHandler;
     std::unique_ptr<Model> _eggModel;
     std::unique_ptr<Model> _islandModel;
     std::unique_ptr<Model> _bridgeModel;

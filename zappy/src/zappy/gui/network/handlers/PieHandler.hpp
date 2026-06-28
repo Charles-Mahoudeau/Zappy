@@ -11,6 +11,7 @@
 #include <functional>
 #include <sstream>
 
+#include "zappy/gui/game/EventHandler.hpp"
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/shared/exception/ParseException.hpp"
 
@@ -29,6 +30,7 @@ class PieHandler {
         for (const auto& [id, player] : _state.get().players()) {
             if (player.x == x && player.y == y && player.isIncanting) {
                 _state.get().setPlayerIncanting(id, false);
+                _state.get().playerEvent(id, game::EventType::LevelUp);
             }
         }
     }

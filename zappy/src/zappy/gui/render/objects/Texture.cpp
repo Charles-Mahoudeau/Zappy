@@ -14,12 +14,25 @@
 #include <string_view>
 
 namespace zappy::gui::render {
-Texture::Texture(std::string_view path, bool flipVertical) {
+Texture::Texture(std::string_view path, bool flipVertical, bool premultiplyAlpha) {
     const std::string pathStr{path};
-
-    _texture = loadTexture(pathStr.c_str(), flipVertical);
+    Image img = LoadImage(pathStr.c_str());
+    if (flipVertical) {
+        ImageFlipVertical(&img);
+    }
+    if (premultiplyAlpha) {
+        ImageAlphaPremultiply(&img);
+    }
+    _texture = LoadTextureFromImage(img);
+    UnloadImage(img);
     if (!isValid()) {
         throw TextureException{"Failed to load texture from path: " + pathStr};
+    }
+}
+
+Texture::Texture(Texture2D texture) : _texture{texture} {
+    if (!isValid()) {
+        throw TextureException{"Failed to load texture from Texture2D"};
     }
 }
 
@@ -44,11 +57,11 @@ int Texture::height() const { return _texture.height; }
 
 bool Texture::isValid() const { return IsTextureValid(_texture); }
 
-void Texture::reload(std::string_view path, bool flipVertical) {
+void Texture::reload(std::string_view path, bool flipVertical, bool premultiplyAlpha) {
     const std::string pathStr{path};
 
     UnloadTexture(_texture);
-    _texture = loadTexture(pathStr.c_str(), flipVertical);
+    _texture = loadTexture(pathStr.c_str(), flipVertical, premultiplyAlpha);
     if (!isValid()) {
         throw TextureException{"Failed to reload texture from path: " + pathStr};
     }
@@ -67,12 +80,17 @@ void Texture::swap(Texture& other) noexcept {
     other._texture = tmp;
 }
 
-Texture2D Texture::loadTexture(const char* path, bool flipVertical) {
-    if (!flipVertical) {
+Texture2D Texture::loadTexture(const char* path, bool flipVertical, bool premultiplyAlpha) {
+    if (!flipVertical && !premultiplyAlpha) {
         return LoadTexture(path);
     }
     Image image = LoadImage(path);
-    ImageFlipVertical(&image);
+    if (flipVertical) {
+        ImageFlipVertical(&image);
+    }
+    if (premultiplyAlpha) {
+        ImageAlphaPremultiply(&image);
+    }
     const Texture2D texture = LoadTextureFromImage(image);
     UnloadImage(image);
     return texture;

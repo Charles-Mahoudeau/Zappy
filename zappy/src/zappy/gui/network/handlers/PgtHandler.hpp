@@ -12,6 +12,7 @@
 #include <sstream>
 #include <string>
 
+#include "zappy/gui/game/EventHandler.hpp"
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/network/handlers/ParseHelpers.hpp"
 #include "zappy/shared/exception/ParseException.hpp"
@@ -27,7 +28,8 @@ class PgtHandler {
         if (std::uint32_t resource = 0; !(ss >> idToken >> resource)) {
             throw exception::ParseException{"pgt: malformed arguments"};
         }
-        (void)parseId(idToken);
+        auto player = parseId(idToken);
+        _state.get().playerEvent(player, game::EventType::Eat);
     }
 
   private:
