@@ -43,7 +43,7 @@ void VFXHandler::createVFXs() {
 
     ParticleEmitter foodDebris("assets/particles/Shard.png");
     foodDebris.setStatic(Vector3{}, Vector3{2.5F, 2.5F, 2.5F}, Vector3{0.0F, -0.0015F, 0.0F}, 100.0F, 14);
-    foodDebris.setInitParticles(Vector2{0.8F, 0.8F}, 0.0F, ColorF{160.0F, 160.0F, 160.0F, 255.0F}, 90.0F, 0.06F);
+    foodDebris.setInitParticles(Vector2{0.4F, 0.4F}, 0.0F, ColorF{170.0F, 170.0F, 170.0F, 255.0F}, 90.0F, 0.003F);
     foodDebris.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.2F, .rotation = 360.0F, .tint = 100.0F},
                                3.0F, 0.03F);
     foodDebris.setIncrementParticles(Vector2{-0.01F, -0.01F}, 0.0F, ColorF{-1.0F, -1.0F, -1.0F, -1.0F});
@@ -79,7 +79,7 @@ void VFXHandler::createVFXs() {
 
     ParticleEmitter slash("assets/particles/Slash.png");
     slash.setStatic(Vector3{}, Vector3{2.0F, 4.0F, 2.0F}, Vector3{0.0F, 0.0001F, 0.0F}, 0.0F, 12);
-    slash.setInitParticles(Vector2{0.7F, 0.3F}, 0.0F, ColorF{150.0F, 255.0F, 220.0F, 50.0F}, 100.0F, 0.0002F);
+    slash.setInitParticles(Vector2{0.7F, 0.3F}, 0.0F, ColorF{150.0F, 255.0F, 220.0F, 50.0F}, 150.0F, 0.0002F);
     slash.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.0F, .rotation = 0.0F, .tint = 35.0F}, 0.1F,
                           0.00002F);
     slash.setIncrementParticles(Vector2{0.001F, 0.012F}, 0.0F, ColorF{-2.2F, -2.2F, -2.2F, -2.5F});
