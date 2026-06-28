@@ -186,30 +186,34 @@ bool PlayerCommands::incantation(const CommandCtx& ctx) {
         return false;
     }
 
-    const auto broadcastMessage = [&clientRegistry = ctx.clientRegistry.get(), &logger = ctx.logger.get()](
+    const auto broadcastMessage = [&clientRegistry = ctx.clientRegistry.get(), &logger = ctx.logger.get(),
+                                   timeLimit = kIncantationTimeLimit](
                                       const game::World::IncantationSnapshot& incantationSnapshot,
-                                      const std::string_view message) {
+                                      const std::string_view message, const bool freeze) {
         for (const std::uint64_t playerId : incantationSnapshot.playerIds) {
-            const Client* client = clientRegistry.findByPlayerId(playerId);
+            Client* client = clientRegistry.findByPlayerId(playerId);
 
             if (client == nullptr) {
                 logger.warn("Client associated with player ID {} not found", playerId);
                 continue;
             }
             std::ignore = client->sendMessage(message);
+            if (freeze) {
+                client->setTimeout(timeLimit);
+            }
         }
     };
 
-    ctx.client->setTimeout(kIncantationTimeLimit, [&world = ctx.world.get(), &logger = ctx.logger.get(),
-                                                   snapshot = *snapshot, broadcastMessage] {
+    ctx.timer.get().scheduleLater(kIncantationTimeLimit, [&world = ctx.world.get(), &logger = ctx.logger.get(),
+                                                          snapshot = *snapshot, broadcastMessage] {
         if (!world.endIncantation(snapshot)) {
-            broadcastMessage(snapshot, "ko\n");
+            broadcastMessage(snapshot, "ko\n", false);
             return;
         }
-        broadcastMessage(snapshot, std::format("Current level: {}\n", snapshot.level + 1));
+        broadcastMessage(snapshot, std::format("Current level: {}\n", snapshot.level + 1), false);
         logger.info("Incantation started by player #{} has reached level {}.", snapshot.playerId, snapshot.level + 1);
     });
-    broadcastMessage(*snapshot, "Elevation underway\n");
+    broadcastMessage(*snapshot, "Elevation underway\n", true);
     return true;
 }
 }  // namespace zappy::server::command
