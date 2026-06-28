@@ -45,10 +45,6 @@ class IEntity {
     /// @brief Get the entity's team name.
     /// @return The entity's team name.
     [[nodiscard]] virtual std::string_view teamName() const = 0;
-
-    /// @brief Update the entity.
-    /// @note Call this once for each game tick.
-    virtual void update() = 0;
 };
 
 template <typename T>

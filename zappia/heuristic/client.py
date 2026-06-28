@@ -8,6 +8,7 @@ STONES = ["linemate", "deraumere", "sibur", "mendiane", "phiras", "thystame"]
 DEFAULT_TIMEOUT = 15.0
 FORK_TIMEOUT = 30.0
 INCANT_TIMEOUT = 60.0
+MAX_INFLIGHT = 10
 
 LEVEL_TEXT = "Current level:"
 
@@ -157,8 +158,11 @@ class ZappyClient:
             return False
         self._send_raw(self.team)
         slots_line = self._readline(5.0)
+        if slots_line is None or slots_line == "ko":
+            self._die()
+            return False
         dims_line = self._readline(5.0)
-        if slots_line is None or dims_line is None:
+        if dims_line is None:
             self._die()
             return False
         try:
@@ -176,17 +180,59 @@ class ZappyClient:
         if lvl is not None:
             self.pending_level = lvl
 
+    def _read_response(self, timeout: float = DEFAULT_TIMEOUT) -> Optional[str]:
+        resp = self._next_response(timeout)
+        while resp is not None and resp.startswith((LEVEL_TEXT, "Elevation underway")):
+            self._record_level(resp)
+            resp = self._next_response(timeout)
+        return resp
+
     def _command(self, cmd: str, timeout: float = DEFAULT_TIMEOUT) -> Optional[str]:
         if not self.alive:
             return None
         self._send_raw(cmd)
-        resp = self._next_response(timeout)
-        while resp is not None and (
-            resp.startswith((LEVEL_TEXT, "Elevation underway"))
-        ):
-            self._record_level(resp)
-            resp = self._next_response(timeout)
-        return resp
+        return self._read_response(timeout)
+
+    def pipeline(
+        self, cmds: List[str], timeout: float = DEFAULT_TIMEOUT
+    ) -> List[Optional[str]]:
+        if not self.alive or not cmds:
+            return []
+        cmds = cmds[:MAX_INFLIGHT]
+        for cmd in cmds:
+            self._send_raw(cmd)
+        out = [self._read_response(timeout) for _ in cmds]
+        out += [None] * (len(cmds) - len(out))
+        return out
+
+    def sense(self, want_inv: bool = False, want_slots: bool = False):
+        cmds = ["Look"]
+        if want_inv:
+            cmds.append("Inventory")
+        if want_slots:
+            cmds.append("Connect_nbr")
+        r = self.pipeline(cmds)
+        r += [None] * (len(cmds) - len(r))
+        look_raw = r[0]
+        look = parse_look(look_raw) if look_raw and look_raw.startswith("[") else []
+        inv = None
+        slots = None
+        idx = 1
+        if want_inv:
+            inv_raw = r[idx]
+            inv = (
+                parse_inventory(inv_raw)
+                if inv_raw and inv_raw.startswith("[")
+                else dict.fromkeys(RESOURCES, 0)
+            )
+            idx += 1
+        if want_slots:
+            slots_raw = r[idx]
+            try:
+                slots = int(slots_raw) if slots_raw is not None else 0
+            except (TypeError, ValueError):
+                slots = 0
+        return look, inv, slots
 
     def forward(self) -> bool:
         return self._command("Forward") == "ok"

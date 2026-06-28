@@ -77,9 +77,15 @@ class ClientRegistry {
      */
     auto viewAll(Client::Type type);
 
+    /// @brief Get a client by its address.
+    /// @param addr The address to search for.
+    /// @return A pointer to the client with the specified address, or nullptr if not found.
     Client* findByAddress(const network::Address& addr);
 
-    Client* findByID(std::uint64_t id);
+    /// @brief Get a client by its player ID.
+    /// @param playerId The player ID to search for.
+    /// @return A pointer to the client with the specified player ID, or nullptr if not found.
+    Client* findByPlayerId(std::uint64_t playerId);
 
     /// @brief Broadcast a message to all clients.
     /// @param msg The message to broadcast.

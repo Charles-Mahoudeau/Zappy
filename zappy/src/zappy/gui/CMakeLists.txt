@@ -60,6 +60,8 @@ add_library(zappy_gui_objects OBJECT
         ui/ChatPanel.hpp
         ui/Draggable.cpp
         ui/Draggable.hpp
+        ui/DotAnimator.cpp
+        ui/DotAnimator.hpp
         ui/GuiTheme.cpp
         ui/GuiTheme.hpp
         ui/Hud.cpp

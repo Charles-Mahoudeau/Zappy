@@ -21,7 +21,7 @@ class IFileDescriptor;
 class Poller {
   public:
     static constexpr std::byte kPollNone{0};
-    static constexpr std::byte kPollError{POLLERR | POLLHUP};
+    static constexpr std::byte kPollError{POLLERR | POLLHUP | POLLNVAL};
     static constexpr std::byte kPollRead{POLLIN};
     static constexpr std::byte kPollWrite{POLLOUT};
 
