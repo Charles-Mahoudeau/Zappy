@@ -99,7 +99,7 @@ class GameState {
     [[nodiscard]] std::size_t playersAtMaxLevel(const std::string& team) const;
     [[nodiscard]] const std::unordered_map<std::uint32_t, Egg>& eggs() const;
     [[nodiscard]] std::optional<Egg> getEgg(std::int32_t eggId) const;
-    bool eggEvent(std::int16_t eggId, EventType type);
+    bool eggEvent(std::int32_t eggId, EventType type);
     [[nodiscard]] std::uint32_t timeUnit() const;
     [[nodiscard]] bool isGameOver() const;
     [[nodiscard]] const std::optional<std::string>& winner() const;

@@ -163,7 +163,7 @@ std::optional<Egg> GameState::getEgg(std::int32_t eggId) const {
     return std::nullopt;
 }
 
-bool GameState::eggEvent(std::int16_t eggId, EventType type) {
+bool GameState::eggEvent(std::int32_t eggId, EventType type) {
     auto egg = getEgg(eggId);
     render::Vector3 pos;
 
