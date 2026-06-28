@@ -17,6 +17,7 @@
 #include <utility>
 #include <vector>
 
+#include "EventHandler.hpp"
 #include "zappy/gui/render/utils/Vector3.hpp"
 #include "zappy/shared/exception/InvalidArgument.hpp"
 

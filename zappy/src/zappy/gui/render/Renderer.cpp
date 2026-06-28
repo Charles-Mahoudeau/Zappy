@@ -16,6 +16,7 @@
 #include <iterator>
 #include <numbers>
 #include <utility>
+#include <vector>
 
 #include "AssetStore.hpp"
 #include "Camera.hpp"
@@ -42,7 +43,7 @@ void Renderer::update(Camera& camera, game::GameState& state, AssetStore& assets
     std::vector<game::Event> events = state.getEvents();
 
     for (auto& event : events) {
-        game::EventResponse eventRes = _eventHandler.handleEvent(event);
+        const game::EventResponse eventRes = _eventHandler.handleEvent(event);
         assets.playVFX(eventRes.emitters, eventRes.position);
     }
     state.clearEvents();

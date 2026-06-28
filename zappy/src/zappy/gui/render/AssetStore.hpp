@@ -20,6 +20,7 @@
 #include "objects/Model.hpp"
 #include "objects/Skybox.hpp"
 #include "objects/particles/VFXHandler.hpp"
+#include "particles/ParticleEmitter.hpp"
 #include "utils/Vector3.hpp"
 
 namespace zappy::gui::render {
