@@ -32,7 +32,10 @@ Logger::Logger(std::string_view name, const std::filesystem::path& logFile, cons
 Logger::Logger(std::string_view name) : _prefix{std::format("[{}]", name)}, _file{nullptr}, _duplicateToStdout{true} {}
 
 Logger Logger::derive(std::string_view name) const {
-    return Logger{std::format("{} [{}]", _prefix, name), _file, _duplicateToStdout};
+    Logger logger{std::format("{} [{}]", _prefix, name), _file, _duplicateToStdout};
+
+    logger.setLevel(_level);
+    return logger;
 }
 
 void Logger::setLevel(const Level level) noexcept { _level = level; }
