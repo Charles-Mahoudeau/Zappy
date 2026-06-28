@@ -32,8 +32,6 @@ DONOR_KEEP = 20
 INV_REFRESH_EVERY = 4
 CALL_EVERY = 3
 CALL_MEMORY = 5
-SOS_EVERY = 6
-SOS_MEMORY = 10
 
 PEER_WINDOW = 40
 PEER_PING = 10
@@ -71,9 +69,6 @@ class HeuristicAI:
         self.peers: Dict[int, int] = {}
         self.team_seen: Dict[int, Tuple[int, int]] = {}
         self.peer_inv: Dict[int, Dict[str, int]] = {}
-
-        self.sos_dir: Optional[int] = None
-        self.sos_ttl = 0
 
         self._fork_sent = False
         self._stranded_ticks = 0
@@ -184,12 +179,7 @@ class HeuristicAI:
         best_id: Optional[int],
         best_dir: Optional[int],
         best_missing: List[str],
-        sos_dir: Optional[int],
-    ) -> Tuple[Optional[int], Optional[int], List[str], Optional[int]]:
-        if msg["verb"] == "SOS":
-            if sos_dir is None or direction == 0:
-                sos_dir = direction
-            return best_id, best_dir, best_missing, sos_dir
+    ) -> Tuple[Optional[int], Optional[int], List[str]]:
         self.team_seen[msg["id"]] = (self.tick, msg["level"])
         if msg["verb"] == "CALL" and msg["level"] == self.level:
             best_id, best_dir = msg["id"], direction
@@ -213,21 +203,20 @@ class HeuristicAI:
         elif msg["level"] == self.level:
             self.peers[msg["id"]] = self.tick
 
-        return best_id, best_dir, best_missing, sos_dir
+        return best_id, best_dir, best_missing
 
     def _scan_broadcasts(
         self,
-    ) -> Tuple[Optional[int], Optional[int], List[str], Optional[int]]:
+    ) -> Tuple[Optional[int], Optional[int], List[str]]:
         best_id, best_dir, best_missing = None, None, []
-        sos_dir: Optional[int] = None
         for direction, text in self.c.broadcasts:
             msg = self._decode(text)
             if not msg or msg["team"] != self.c.team or msg["id"] == self.id:
                 continue
-            best_id, best_dir, best_missing, sos_dir = self._process_broadcast_msg(
-                direction, msg, best_id, best_dir, best_missing, sos_dir
+            best_id, best_dir, best_missing = self._process_broadcast_msg(
+                direction, msg, best_id, best_dir, best_missing
             )
-        return best_id, best_dir, best_missing, sos_dir
+        return best_id, best_dir, best_missing
 
     def _update_call_state(
         self, best_id: Optional[int], best_dir: Optional[int], best_missing: List[str]
@@ -242,17 +231,8 @@ class HeuristicAI:
             self.call_id = self.call_dir = None
             self.call_missing = []
 
-    def _update_sos_state(self, sos_dir: Optional[int]) -> None:
-        if sos_dir is not None:
-            self.sos_dir = sos_dir
-            self.sos_ttl = SOS_MEMORY
-        elif self.sos_ttl > 0:
-            self.sos_ttl -= 1
-        else:
-            self.sos_dir = None
-
     def handle_messages(self) -> None:
-        best_id, best_dir, best_missing, sos_dir = self._scan_broadcasts()
+        best_id, best_dir, best_missing = self._scan_broadcasts()
         self.c.broadcasts.clear()
         self.peers = {
             p: t for p, t in self.peers.items() if self.tick - t <= PEER_WINDOW
@@ -265,7 +245,6 @@ class HeuristicAI:
             if self.tick - t <= PEER_WINDOW
         }
         self._update_call_state(best_id, best_dir, best_missing)
-        self._update_sos_state(sos_dir)
 
     def reset_rally(self) -> None:
         self.call_id = self.call_dir = None
@@ -404,14 +383,6 @@ class HeuristicAI:
     def farm_food(self) -> None:
         if self.food < FOOD_CAP and self.maybe_eat():
             return
-        if self.sos_dir is not None and self.food > 2:
-            if self.sos_dir == 0:
-                if self.c.set_down("food"):
-                    self.inv["food"] -= 1
-                    self.refresh_look()
-                return
-            self.sos_dir = self.go_to_sound(self.sos_dir)
-            return
         self.forage()
 
     def solo_elevate(self) -> None:
@@ -525,18 +496,6 @@ class HeuristicAI:
                         self.inv[stone] = self.inv.get(stone, 0) + 1
                     return
         self.move_for_direction(self.call_dir)
-
-    def deliver_food(self) -> bool:
-        if self.sos_dir is None:
-            return False
-        if self.sos_dir == 0:
-            if self.food > DONOR_KEEP and self.c.set_down("food"):
-                self.inv["food"] -= 1
-                self.refresh_look()
-                return True
-            return False
-        self.sos_dir = self.go_to_sound(self.sos_dir)
-        return True
 
     def go_get(self, names: List[str]) -> bool:
         for stone in names:
