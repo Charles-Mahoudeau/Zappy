@@ -523,15 +523,30 @@ std::uint32_t World::computeBroadcastDirection(const math::Vector2u emitterPos, 
     //   2 1 8
     //   3 P 7
     //   4 5 6
-    const double h = std::numbers::pi / 8.0;                        // half-sector = π/8
-    if (localAngle >= -h && localAngle < h) return 1;               // front
-    if (localAngle >= -3.0 * h && localAngle < -h) return 2;        // front-left  (CCW)
-    if (localAngle >= -5.0 * h && localAngle < -3.0 * h) return 3;  // left
-    if (localAngle >= -7.0 * h && localAngle < -5.0 * h) return 4;  // back-left
-    if (localAngle < -7.0 * h || localAngle >= 7.0 * h) return 5;   // behind
-    if (localAngle >= 5.0 * h && localAngle < 7.0 * h) return 6;    // back-right  (CW)
-    if (localAngle >= 3.0 * h && localAngle < 5.0 * h) return 7;    // right
-    return 8;                                                       // [h, 3h) = front-right
+    constexpr double h = std::numbers::pi / 8.0;  // half-sector = π/8
+
+    if (localAngle >= -h && localAngle < h) {
+        return 1;  // front
+    }
+    if (localAngle >= -3.0 * h && localAngle < -h) {
+        return 2;  // front-left  (CCW)
+    }
+    if (localAngle >= -5.0 * h && localAngle < -3.0 * h) {
+        return 3;  // left
+    }
+    if (localAngle >= -7.0 * h && localAngle < -5.0 * h) {
+        return 4;  // back-left
+    }
+    if (localAngle < -7.0 * h || localAngle >= 7.0 * h) {
+        return 5;  // behind
+    }
+    if (localAngle >= 5.0 * h && localAngle < 7.0 * h) {
+        return 6;  // back-right  (CW)
+    }
+    if (localAngle >= 3.0 * h && localAngle < 5.0 * h) {
+        return 7;  // right
+    }
+    return 8;  // [h, 3h) = front-right
 }
 
 std::vector<std::reference_wrapper<Tile>> World::playerView(const entity::Player* player) {
