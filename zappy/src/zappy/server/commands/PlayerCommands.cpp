@@ -24,9 +24,10 @@
 #include "zappy/server/commands/ACommandGroup.hpp"
 #include "zappy/server/commands/ICommandGroup.hpp"
 #include "zappy/server/commands/player/MoveCommand.hpp"
-#include "zappy/server/commands/player/ObjectCommand.hpp"
 #include "zappy/server/commands/player/PlayerData.hpp"
+#include "zappy/server/commands/player/WorldInterationCommand.hpp"
 #include "zappy/server/game/Event.hpp"
+#include "zappy/server/game/Tile.hpp"
 #include "zappy/server/game/World.hpp"
 #include "zappy/server/game/entity/Egg.hpp"
 #include "zappy/server/game/entity/Player.hpp"
@@ -44,9 +45,9 @@ PlayerCommands::PlayerCommands(CommandCtx context)
           {"Broadcast", [](auto& ctx) { return PlayerCommands::broadcast(ctx); }},
           {"Connect_nbr", [](auto& ctx) { return PlayerCommands::connectNb(ctx); }},
           {"Fork", [](auto& ctx) { return PlayerCommands::fork(ctx); }},
-          {"Eject", [](auto& ctx) { return PlayerCommands::ignore(ctx); }},
-          {"Take", [](auto& ctx) { return player::ObjectCommand::take(ctx); }},
-          {"Set", [](auto& ctx) { return player::ObjectCommand::drop(ctx); }},
+          {"Eject", [](auto& ctx) { return player::WorldInterationCommand::eject(ctx); }},
+          {"Take", [](auto& ctx) { return player::WorldInterationCommand::take(ctx); }},
+          {"Set", [](auto& ctx) { return player::WorldInterationCommand::drop(ctx); }},
           {"Incantation", [](const CommandCtx& ctx) { return incantation(ctx); }},
       }) {}
 
@@ -60,11 +61,6 @@ void PlayerCommands::execute(Client* client, [[maybe_unused]] const std::string_
     } else {
         client->sendError();
     }
-}
-
-bool PlayerCommands::ignore(const CommandCtx& ctx) {
-    (void)ctx;
-    return false;
 }
 
 bool PlayerCommands::inventory(CommandCtx& ctx) {
@@ -162,6 +158,7 @@ bool PlayerCommands::look(CommandCtx& ctx) {
     });
     return true;
 }
+
 bool PlayerCommands::connectNb(CommandCtx& ctx) {
     auto* client = ctx.client;
     const client::Team* team = ctx.teamRegistry.get().team(client->address());
