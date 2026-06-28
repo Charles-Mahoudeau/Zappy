@@ -8,6 +8,7 @@
 #include "AssetStore.hpp"
 
 #include <cstddef>
+#include <functional>
 #include <initializer_list>
 #include <map>
 #include <memory>
@@ -173,9 +174,9 @@ Model AssetStore::createModel(std::string_view path, std::string_view animationP
     return model;
 }
 
-const std::map<std::string, ParticleEmitter>& AssetStore::vfxs() const { return _vfxHandler.vfxs(); }
+const std::map<std::string, ParticleEmitter, std::less<>>& AssetStore::vfxs() const { return _vfxHandler.vfxs(); }
 
-std::map<std::string, ParticleEmitter>& AssetStore::vfxs() { return _vfxHandler.vfxs(); }
+std::map<std::string, ParticleEmitter, std::less<>>& AssetStore::vfxs() { return _vfxHandler.vfxs(); }
 
 void AssetStore::emit(std::string_view path, Vector3 pos) { _vfxHandler.emit(path, pos); }
 

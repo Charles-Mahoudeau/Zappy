@@ -55,8 +55,8 @@ class AssetStore {
     [[nodiscard]] Model& playerModel(std::size_t index);
     [[nodiscard]] std::size_t playerModelCount() const;
     [[nodiscard]] const std::map<game::ResourceType, Model>& resourceModels() const;
-    [[nodiscard]] const std::map<std::string, ParticleEmitter>& vfxs() const;
-    [[nodiscard]] std::map<std::string, ParticleEmitter>& vfxs();
+    [[nodiscard]] const std::map<std::string, ParticleEmitter, std::less<>>& vfxs() const;
+    [[nodiscard]] std::map<std::string, ParticleEmitter, std::less<>>& vfxs();
     [[nodiscard]] const Model& eggModel() const { return *_eggModel; }
     [[nodiscard]] const Model& islandModel() const { return *_islandModel; }
     [[nodiscard]] const Model& bridgeModel() const { return *_bridgeModel; }

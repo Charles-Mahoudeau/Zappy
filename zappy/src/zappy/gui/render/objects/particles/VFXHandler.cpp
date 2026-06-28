@@ -7,6 +7,7 @@
 
 #include "VFXHandler.hpp"
 
+#include <functional>
 #include <map>
 #include <string>
 #include <utility>
