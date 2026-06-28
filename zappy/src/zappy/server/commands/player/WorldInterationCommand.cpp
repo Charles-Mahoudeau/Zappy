@@ -7,6 +7,7 @@
 
 #include "zappy/server/commands/player/WorldInterationCommand.hpp"
 
+#include <array>
 #include <cstdint>
 #include <functional>
 #include <utility>
