@@ -12,7 +12,7 @@
 #include <string_view>
 #include <vector>
 
-#include "Vector3.hpp"
+#include "zappy/gui/render/utils/Vector3.hpp"
 
 namespace zappy::gui::game {
 
@@ -20,12 +20,12 @@ enum class EventType : std::uint8_t { None, Broadcast, Incantation, Death, EggHa
 
 struct Event {
     EventType type{EventType::None};
-    Vector3 position{0.0F, 0.0F, 0.0F};
+    render::Vector3 position{0.0F, 0.0F, 0.0F};
 };
 
 struct EventResponse {
     std::vector<std::string_view>& emitters;
-    Vector3 position{0.0F, 0.0F, 0.0F};
+    render::Vector3 position{0.0F, 0.0F, 0.0F};
 };
 
 class EventHandler {

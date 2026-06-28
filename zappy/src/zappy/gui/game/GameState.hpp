@@ -16,6 +16,7 @@
 #include <vector>
 
 #include "EventHandler.hpp"
+#include "zappy/gui/render/utils/Vector3.hpp"
 
 namespace zappy::gui::game {
 
@@ -101,7 +102,7 @@ class GameState {
     [[nodiscard]] bool isReady() const;
     [[nodiscard]] const std::deque<std::string>& broadcasts() const;
 
-    void broadcastEvent(EventType type, Vector3 position = {0.0F, 0.0F, 0.0F});
+    void broadcastEvent(EventType type, render::Vector3 position = {0.0F, 0.0F, 0.0F});
     [[nodiscard]] Event& getEvent();
 
   private:

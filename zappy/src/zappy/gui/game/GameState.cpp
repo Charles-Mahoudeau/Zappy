@@ -17,6 +17,7 @@
 #include <utility>
 #include <vector>
 
+#include "zappy/gui/render/utils/Vector3.hpp"
 #include "zappy/shared/exception/InvalidArgument.hpp"
 
 namespace zappy::gui::game {
@@ -143,7 +144,7 @@ bool GameState::isReady() const { return _width > 0 && _height > 0 && _tilesRece
 
 const std::deque<std::string>& GameState::broadcasts() const { return _broadcasts; }
 
-void GameState::broadcastEvent(EventType type, Vector3 position) {
+void GameState::broadcastEvent(EventType type, render::Vector3 position) {
     _event.type = type;
     _event.position = position;
 }
