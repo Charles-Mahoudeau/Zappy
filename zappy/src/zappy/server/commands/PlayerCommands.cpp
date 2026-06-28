@@ -102,9 +102,11 @@ bool PlayerCommands::broadcast(CommandCtx& ctx) {
                 continue;
             }
             if (const game::entity::Player* receiver = world.get().player(client->playerID()); receiver != nullptr) {
-                std::ignore = client->sendMessage(
-                    "message {}, {}\n", world.get().computeDistFromPositions(emitter->position(), receiver->position()),
-                    text);
+                std::ignore =
+                    client->sendMessage("message {}, {}\n",
+                                        world.get().computeBroadcastDirection(emitter->position(), receiver->position(),
+                                                                              receiver->orientation()),
+                                        text);
             }
         }
         data.client()->sendSuccess();
