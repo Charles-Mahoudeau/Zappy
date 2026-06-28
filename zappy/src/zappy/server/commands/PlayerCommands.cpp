@@ -200,8 +200,8 @@ bool PlayerCommands::incantation(const CommandCtx& ctx) {
         }
     };
 
-    ctx.timer.get().scheduleLater(kIncantationTimeLimit, [&world = ctx.world.get(), &logger = ctx.logger.get(),
-                                                          snapshot = *snapshot, broadcastMessage] {
+    ctx.client->setTimeout(kIncantationTimeLimit, [&world = ctx.world.get(), &logger = ctx.logger.get(),
+                                                   snapshot = *snapshot, broadcastMessage] {
         if (!world.endIncantation(snapshot)) {
             broadcastMessage(snapshot, "ko\n");
             return;
@@ -209,7 +209,6 @@ bool PlayerCommands::incantation(const CommandCtx& ctx) {
         broadcastMessage(snapshot, std::format("Current level: {}\n", snapshot.level + 1));
         logger.info("Incantation started by player #{} has reached level {}.", snapshot.playerId, snapshot.level + 1);
     });
-    ctx.client->setTimeout(kIncantationTimeLimit);
     broadcastMessage(*snapshot, "Elevation underway\n");
     return true;
 }
