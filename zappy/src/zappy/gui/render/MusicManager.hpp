@@ -51,7 +51,6 @@ class MusicManager {
     [[nodiscard]] unsigned int currentMusicIndex() const { return _currentMusicIndex; }
     [[nodiscard]] bool isPlaying() const;
 
-  protected:
   private:
     std::optional<std::reference_wrapper<Music>> _currentMusic;
     std::deque<Music> _musics;
@@ -61,6 +60,6 @@ class MusicManager {
 
 class MusicManagerException : public zappy::exception::Exception {
   public:
-    explicit MusicManagerException(std::string message) : zappy::exception::Exception{std::move(message)} {}
+    explicit MusicManagerException(std::string_view message) : zappy::exception::Exception{message} {}
 };
 };  // namespace zappy::gui::render

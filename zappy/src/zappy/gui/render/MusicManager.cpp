@@ -93,13 +93,14 @@ bool MusicManager::isPlaying() const { return _playing; }
 
 void MusicManager::setCurrentMusicIndex(unsigned int index) {
     const auto musicSize = static_cast<unsigned int>(_musics.size());
-    if (index >= 0 && index < musicSize) {
+    if (index < musicSize) {
         stop();
         _currentMusicIndex = index;
         _currentMusic = std::ref(_musics.at(_currentMusicIndex));
         _currentMusic.value().get().play();
     } else {
-        throw MusicManagerException{"Invalid music index: " + std::to_string(index)};
+        throw MusicManagerException{
+            std::format("Invalid music index: {}. Must be between 0 and {}", index, musicSize - 1)};
     }
 }
 void MusicManager::nextMusic() {
