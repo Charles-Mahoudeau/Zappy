@@ -18,6 +18,7 @@
 
 #include "../game/GameState.hpp"
 #include "AssetLoaderRegistry.hpp"
+#include "Grid.hpp"
 #include "objects/Model.hpp"
 #include "objects/Texture.hpp"
 #include "objects/particles/ParticleEmitter.hpp"
@@ -180,7 +181,8 @@ void AssetStore::emit(std::string_view path, Vector3 pos) { _vfxHandler.emit(pat
 
 void AssetStore::playVFX(std::vector<std::string_view>& emitters, Vector3 pos) {
     for (const auto& emitterName : emitters) {
-        emit(emitterName, pos);
+        Vector3 worldPos = Grid::tileToWorld(pos.x(), pos.z(), pos.y());
+        emit(emitterName, worldPos);
     }
 }
 }  // namespace zappy::gui::render

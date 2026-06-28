@@ -37,9 +37,9 @@ class EnwHandler {
         if (!ss.eof()) {
             throw exception::ParseException{"enw: unexpected trailing tokens"};
         }
+        auto eggId = parseId(eggToken);
+        _state.get().eggEvent(eggId, game::EventType::EggHatch);
         _state.get().addEgg(parseId(eggToken), parseId(playerToken), x, y);
-        _state.get().broadcastEvent(game::EventType::EggHatch,
-                                    render::Vector3{static_cast<float>(x), 0.0F, static_cast<float>(y)});
     }
 
   private:
