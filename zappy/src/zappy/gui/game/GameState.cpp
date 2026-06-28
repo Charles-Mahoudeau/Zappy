@@ -143,7 +143,7 @@ bool GameState::isReady() const { return _width > 0 && _height > 0 && _tilesRece
 
 const std::deque<std::string>& GameState::broadcasts() const { return _broadcasts; }
 
-void GameState::broadcastEvent(EventType type, Vector3 position = {0.0F, 0.0F, 0.0F}) {
+void GameState::broadcastEvent(EventType type, Vector3 position) {
     _event.type = type;
     _event.position = position;
 }

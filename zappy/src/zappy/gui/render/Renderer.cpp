@@ -42,19 +42,6 @@ void Renderer::update(Camera& camera, game::GameState& state, AssetStore& assets
     game::EventResponse eventRes = _eventHandler.handleEvent(state.getEvent());
     assets.playVFX(eventRes.emitters, eventRes.position);
 
-    static float timeIncrement = 0.0F;
-    timeIncrement += GetFrameTime() * static_cast<float>(state.timeUnit());
-    if (timeIncrement >= 75.0F) {
-        timeIncrement = 0.0F;
-        assets.emit("impact", Vector3{0.0F, 0.0F, 0.0F});
-        assets.emit("signal", Vector3{3.0F, 0.0F, 0.0F});
-        assets.emit("eggCrack", Vector3{6.0F, 0.0F, 0.0F});
-        assets.emit("sparkles", Vector3{9.0F, 0.0F, 0.0F});
-        assets.emit("smoke", Vector3{0.0F, 0.0F, 4.0F});
-        assets.emit("skull", Vector3{5.0F, 0.0F, 5.0F});
-        assets.emit("slash", Vector3{9.0F, 0.0F, 9.0F});
-        assets.emit("foodDebris", Vector3{0.0F, 0.0F, 9.0F});
-    }
     _grid.resize(state.width(), state.height());
     display::Window::BeginMode3D(camera);
     _grid.draw(assets);
