@@ -12,9 +12,11 @@
 #include <optional>
 #include <sstream>
 #include <string>
+#include <utility>
 
 #include "Tile.hpp"
 #include "entity/Egg.hpp"
+#include "entity/Player.hpp"
 
 namespace zappy::server::game {
 std::string WireHelper::tileToCommands(const Tile& tile) {
