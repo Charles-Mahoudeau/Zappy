@@ -126,12 +126,23 @@ const Resources& GameState::tile(std::size_t x, std::size_t y) const {
 
 const std::unordered_map<std::uint32_t, Player>& GameState::players() const { return _players; }
 
-std::optional<Player> GameState::getPlayer(std::uint32_t id) const {
+std::optional<Player> GameState::getPlayer(std::int32_t id) const {
     auto it = _players.find(id);
     if (it == _players.end()) {
         return std::nullopt;
     }
     return it->second;
+}
+
+void GameState::playerEvent(std::int32_t playerId, EventType type) {
+    auto plr = getPlayer(playerId);
+    render::Vector3 pos;
+
+    if (plr.has_value()) {
+        pos = render::Vector3{static_cast<float>(plr->x), 0.0F, static_cast<float>(plr->y)};
+        broadcastEvent(type, pos);
+    }
+    _players.erase(playerId);
 }
 
 const std::vector<std::string>& GameState::teams() const { return _teams; }
@@ -143,7 +154,7 @@ std::size_t GameState::playersAtMaxLevel(const std::string& team) const {
 
 const std::unordered_map<std::uint32_t, Egg>& GameState::eggs() const { return _eggs; }
 
-std::optional<Egg> GameState::getEgg(std::uint32_t eggId) const {
+std::optional<Egg> GameState::getEgg(std::int32_t eggId) const {
     auto it = _eggs.find(eggId);
     if (it != _eggs.end()) {
         return it->second;
@@ -151,6 +162,15 @@ std::optional<Egg> GameState::getEgg(std::uint32_t eggId) const {
     return std::nullopt;
 }
 
+void GameState::eggEvent(std::int16_t eggId, EventType type) {
+    auto egg = getEgg(eggId);
+    render::Vector3 pos;
+
+    if (egg.has_value()) {
+        pos = render::Vector3{static_cast<float>(egg->x), 0.0F, static_cast<float>(egg->y)};
+        broadcastEvent(type, pos);
+    }
+}
 std::uint32_t GameState::timeUnit() const { return _timeUnit; }
 
 bool GameState::isGameOver() const { return _winner.has_value(); }

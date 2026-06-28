@@ -35,14 +35,8 @@ class EdiHandler {
         }
 
         auto eggId = parseId(eggToken);
-        auto egg = _state.get().getEgg(eggId);
-        render::Vector3 pos;
-
-        if (egg.has_value()) {
-            pos = render::Vector3{static_cast<float>(egg->x), 0.0F, static_cast<float>(egg->y)};
-            _state.get().removeEgg(eggId);
-            _state.get().broadcastEvent(game::EventType::EggDeath, pos);
-        }
+        _state.get().eggEvent(eggId, game::EventType::EggDeath);
+        _state.get().removeEgg(eggId);
     }
 
   private:

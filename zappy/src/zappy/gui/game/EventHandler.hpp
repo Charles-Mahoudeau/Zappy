@@ -41,11 +41,9 @@ class EventHandler {
     EventResponse handleEvent(Event& event) {
         const auto position = event.position;
         const auto it = _eventHandlers.find(event.type);
-        EventResponse response{.emitters = std::ref(it->second), .position = position};
-
         event = Event{};
         if (it != _eventHandlers.end()) {
-            return response;
+            return EventResponse{.emitters = std::ref(it->second), .position = position};
         }
         static std::vector<std::string_view> emptyVector;
         return EventResponse{.emitters = std::ref(emptyVector), .position = position};
