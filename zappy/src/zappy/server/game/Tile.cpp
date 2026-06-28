@@ -10,8 +10,13 @@
 #include <algorithm>
 #include <cstdint>
 #include <span>
+#include <string>
+#include <vector>
 
 #include "Inventory.hpp"
+#include "zappy/server/game/EntityDatabase.hpp"
+#include "zappy/server/game/entity/Egg.hpp"
+#include "zappy/server/game/entity/Player.hpp"
 #include "zappy/shared/math/Vector2.hpp"
 
 namespace zappy::server::game {
@@ -39,4 +44,19 @@ bool Tile::removeEntity(const std::uint64_t entityId) {
 const Inventory& Tile::inventory() const { return _inventory; }
 
 Inventory& Tile::inventory() { return _inventory; }
+
+std::string Tile::string(const EntityDatabase& db) {
+    std::string str;
+
+    for (const auto& entityId : this->_entities) {
+        if (db.is<entity::Player>(entityId)) {
+            str += " player";
+        } else if (db.is<entity::Egg>(entityId)) {
+            str += " egg";
+        }
+    }
+    str += this->_inventory.list();
+    return str;
+}
+
 }  // namespace zappy::server::game
