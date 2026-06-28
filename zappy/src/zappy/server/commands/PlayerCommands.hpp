@@ -32,7 +32,6 @@ class PlayerCommands : public ACommandGroup {
   private:
     static constexpr std::uint16_t kIncantationTimeLimit{300};
 
-    static bool ignore(const CommandCtx& ctx);
     static bool inventory(CommandCtx& ctx);
     static bool broadcast(CommandCtx& ctx);
     static bool fork(CommandCtx& ctx);

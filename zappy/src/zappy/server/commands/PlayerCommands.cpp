@@ -63,11 +63,6 @@ void PlayerCommands::execute(Client* client, [[maybe_unused]] const std::string_
     }
 }
 
-bool PlayerCommands::ignore(const CommandCtx& ctx) {
-    (void)ctx;
-    return false;
-}
-
 bool PlayerCommands::inventory(CommandCtx& ctx) {
     auto clients = ctx.clientRegistry;
     auto world = ctx.world;
