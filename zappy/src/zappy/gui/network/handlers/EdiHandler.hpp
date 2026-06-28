@@ -35,7 +35,7 @@ class EdiHandler {
 
         auto eggId = parseId(eggToken);
         auto egg = _state.get().getEgg(eggId);
-        render::Vector3 pos{0.0F, 0.0F, 0.0F};
+        render::Vector3 pos;
 
         if (egg.has_value()) {
             pos = render::Vector3{static_cast<float>(egg->x), 0.0F, static_cast<float>(egg->y)};

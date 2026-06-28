@@ -11,6 +11,7 @@
 #include <sstream>
 #include <string>
 
+#include "zappy/gui/game/EventHandler.hpp"
 #include "zappy/gui/game/GameState.hpp"
 #include "zappy/gui/network/handlers/ParseHelpers.hpp"
 #include "zappy/shared/exception/ParseException.hpp"
@@ -26,7 +27,16 @@ class PdiHandler {
         if (!(ss >> idToken)) {
             throw exception::ParseException{"pdi: missing player id"};
         }
-        _state.get().removePlayer(parseId(idToken));
+
+        auto playerId = parseId(idToken);
+        auto plr = _state.get().getPlayer(playerId);
+        render::Vector3 pos;
+
+        if (plr.has_value()) {
+            pos = render::Vector3{static_cast<float>(plr->x), 0.0F, static_cast<float>(plr->y)};
+        }
+        _state.get().removePlayer(playerId);
+        _state.get().broadcastEvent(game::EventType::Death, pos);
     }
 
   private:

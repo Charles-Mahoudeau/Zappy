@@ -125,6 +125,14 @@ const Resources& GameState::tile(std::size_t x, std::size_t y) const {
 
 const std::unordered_map<std::uint32_t, Player>& GameState::players() const { return _players; }
 
+const std::optional<Player> GameState::getPlayer(std::uint32_t id) const {
+    auto it = _players.find(id);
+    if (it == _players.end()) {
+        return std::nullopt;
+    }
+    return it->second;
+}
+
 const std::vector<std::string>& GameState::teams() const { return _teams; }
 
 std::size_t GameState::playersAtMaxLevel(const std::string& team) const {
