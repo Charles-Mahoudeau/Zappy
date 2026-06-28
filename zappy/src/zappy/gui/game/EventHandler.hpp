@@ -8,6 +8,7 @@
 #pragma once
 
 #include <cstdint>
+#include <functional>
 #include <map>
 #include <string_view>
 #include <vector>
@@ -24,24 +25,29 @@ struct Event {
 };
 
 struct EventResponse {
-    std::vector<std::string_view>& emitters;
+    std::reference_wrapper<std::vector<std::string_view>> emitters;
     render::Vector3 position{0.0F, 0.0F, 0.0F};
 };
 
 class EventHandler {
   public:
     EventHandler() = default;
+    EventHandler(const EventHandler&) = default;
+    EventHandler& operator=(const EventHandler&) = default;
+    EventHandler(EventHandler&&) = default;
+    EventHandler& operator=(EventHandler&&) = default;
     ~EventHandler() = default;
 
     EventResponse handleEvent(Event& event) {
-        auto it = _eventHandlers.find(event.type);
+        const auto position = event.position;
+        const auto it = _eventHandlers.find(event.type);
 
         event = Event{};
         if (it != _eventHandlers.end()) {
-            return {it->second, event.position};
+            return EventResponse{.emitters = std::ref(it->second), .position = position};
         }
         static std::vector<std::string_view> emptyVector;
-        return {emptyVector, event.position};
+        return EventResponse{.emitters = std::ref(emptyVector), .position = position};
     }
 
   private:

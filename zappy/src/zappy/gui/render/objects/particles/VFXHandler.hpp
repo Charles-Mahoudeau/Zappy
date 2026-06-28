@@ -9,8 +9,10 @@
 
 #include <map>
 #include <string>
+#include <string_view>
 #include <vector>
 
+#include "../../utils/Vector3.hpp"
 #include "ParticleEmitter.hpp"
 
 namespace zappy::gui::render {
@@ -18,6 +20,10 @@ namespace zappy::gui::render {
 class VFXHandler {
   public:
     VFXHandler() = default;
+    VFXHandler(const VFXHandler&) = default;
+    VFXHandler& operator=(const VFXHandler&) = default;
+    VFXHandler(VFXHandler&&) = default;
+    VFXHandler& operator=(VFXHandler&&) = default;
     ~VFXHandler() = default;
 
     void createVFXs();

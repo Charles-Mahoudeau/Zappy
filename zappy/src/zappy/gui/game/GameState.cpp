@@ -125,7 +125,7 @@ const Resources& GameState::tile(std::size_t x, std::size_t y) const {
 
 const std::unordered_map<std::uint32_t, Player>& GameState::players() const { return _players; }
 
-const std::optional<Player> GameState::getPlayer(std::uint32_t id) const {
+std::optional<Player> GameState::getPlayer(std::uint32_t id) const {
     auto it = _players.find(id);
     if (it == _players.end()) {
         return std::nullopt;
@@ -142,7 +142,7 @@ std::size_t GameState::playersAtMaxLevel(const std::string& team) const {
 
 const std::unordered_map<std::uint32_t, Egg>& GameState::eggs() const { return _eggs; }
 
-std::optional<zappy::gui::game::Egg> GameState::getEgg(std::uint32_t eggId) const {
+std::optional<Egg> GameState::getEgg(std::uint32_t eggId) const {
     auto it = _eggs.find(eggId);
     if (it != _eggs.end()) {
         return it->second;

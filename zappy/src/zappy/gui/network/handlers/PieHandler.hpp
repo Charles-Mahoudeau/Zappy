@@ -13,6 +13,7 @@
 
 #include "zappy/gui/game/EventHandler.hpp"
 #include "zappy/gui/game/GameState.hpp"
+#include "zappy/gui/render/utils/Vector3.hpp"
 #include "zappy/shared/exception/ParseException.hpp"
 
 namespace zappy::gui::network::handlers {
