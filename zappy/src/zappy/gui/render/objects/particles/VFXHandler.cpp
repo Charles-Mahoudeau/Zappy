@@ -69,12 +69,12 @@ void VFXHandler::createVFXs() {
     _vfxs.insert({"skull", std::move(skull)});
 
     ParticleEmitter slash("assets/particles/Slash.png");
-    slash.setStatic(Vector3{}, Vector3{2.0F, 4.0F, 2.0F}, Vector3{0.0F, 0.0001F, 0.0F}, 180.0F, 14);
-    slash.setInitParticles(Vector2{0.1F, 1.0F}, 0.0F, ColorF{150.0F, 255.0F, 220.0F, 50.0F}, 130.0F, 0.0001F);
+    slash.setStatic(Vector3{}, Vector3{2.0F, 4.0F, 2.0F}, Vector3{0.0F, 0.0002F, 0.0F}, 0.0F, 12);
+    slash.setInitParticles(Vector2{0.1F, 1.0F}, 0.0F, ColorF{150.0F, 255.0F, 220.0F, 50.0F}, 100.0F, 0.0001F);
     slash.setInitEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.0F, .rotation = 0.0F, .tint = 20.0F}, 0.1F,
-                          0.03F);
-    slash.setIncrementParticles(Vector2{0.007F, 0.001F}, 0.0F, ColorF{-2.0F, -2.0F, -2.0F, -2.5F});
-    slash.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.005F, .rotation = 0.002F, .tint = 0.25F});
+                          0.00005F);
+    slash.setIncrementParticles(Vector2{0.007F, 0.001F}, 0.0F, ColorF{-3.5F, -3.5F, -3.5F, -4.0F});
+    slash.setIncrementEnvelope(ParticleEmitter::ParticleEnvelope{.size = 0.005F, .rotation = 0.0F, .tint = 0.25F});
     _vfxs.insert({"slash", std::move(slash)});
 }
 
