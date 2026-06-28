@@ -17,8 +17,12 @@ namespace zappy::gui::render {
 Texture::Texture(std::string_view path, bool flipVertical, bool premultiplyAlpha) {
     const std::string pathStr{path};
     Image img = LoadImage(pathStr.c_str());
-    if (flipVertical) ImageFlipVertical(&img);
-    if (premultiplyAlpha) ImageAlphaPremultiply(&img);
+    if (flipVertical) {
+        ImageFlipVertical(&img);
+    }
+    if (premultiplyAlpha) {
+        ImageAlphaPremultiply(&img);
+    }
     _texture = LoadTextureFromImage(img);
     UnloadImage(img);
     if (!isValid()) {

@@ -32,14 +32,8 @@ class PlvHandler {
         }
 
         auto playerId = parseId(idToken);
-        auto plr = _state.get().getPlayer(playerId);
-        render::Vector3 pos;
-
-        if (plr.has_value()) {
-            pos = render::Vector3{static_cast<float>(plr->x), 0.0F, static_cast<float>(plr->y)};
-        }
+        _state.get().playerEvent(playerId, game::EventType::LevelUp);
         _state.get().setPlayerLevel(playerId, level);
-        _state.get().broadcastEvent(game::EventType::LevelUp, pos);
     }
 
   private:
