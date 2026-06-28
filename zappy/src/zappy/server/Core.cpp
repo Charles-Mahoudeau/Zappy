@@ -36,10 +36,14 @@
 
 namespace zappy::server {
 void Core::init(const std::span<std::string_view> argv) {
-    _logger.info("Initialization begin.");
-
     CliParser parser{argv};
     const CliParser::CliParameters& parameters = parser.parameters();
+
+    if (parameters.verbose) {
+        _logger.setLevel(io::Level::kDebug);
+        _logger.info("Using debug logging.");
+    }
+    _logger.info("Initialization begin.");
     _logger.info("Parameters parsed and validated.");
 
     // ReSharper disable CppDFAConstantConditions
@@ -89,8 +93,6 @@ void Core::processCommandGroup() {
 }
 
 void Core::processWorldEvents() {
-    const io::Logger logger = _logger.derive("WorldSync");
-
     while (_world->hasEvents()) {
         const game::Event event = _world->popEvent();
 
@@ -110,7 +112,7 @@ void Core::processWorldEvents() {
         const std::string eventStr = game::EventHelper::toWire(event);
 
         std::ignore = _clientRegistry.broadcast(Client::Type::kGui, eventStr);
-        logger.debug("Forwarding: {}", eventStr.substr(0, eventStr.size() - 1));
+        _logger.debug("[WorldSync] Forwarding: {}", eventStr.substr(0, eventStr.size() - 1));
         if (std::holds_alternative<game::GameEndEvent>(event)) {
             _logger.info("Game ended, server will go in zombie state.");
         }
