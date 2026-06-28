@@ -84,7 +84,7 @@ std::uint16_t Inventory::removeResource(const ResourceType type, const std::uint
 void Inventory::clear() { _resources.clear(); }
 
 bool Inventory::canAfford(const Inventory& other) const {
-    return std::ranges::all_of(other._resources, [&](const auto& resource) {
+    return std::ranges::all_of(other._resources, [this](const auto& resource) {
         const auto& [type, required] = resource;
 
         return required == 0 || resourceCount(type) >= required;
