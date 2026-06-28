@@ -74,7 +74,7 @@ bool PlayerCommands::inventory(CommandCtx& ctx) {
         if (!data.valid()) {
             return;
         }
-        std::ignore = data.client()->sendMessage("[ {} ]\n", data.player()->inventory().detailedString());
+        std::ignore = data.client()->sendMessage("[{}]\n", data.player()->inventory().detailedString());
     });
     return true;
 }
@@ -142,7 +142,7 @@ bool PlayerCommands::look(CommandCtx& ctx) {
     auto world = ctx.world;
     auto id = ctx.client->playerID();
 
-    ctx.client->setTimeout(42, [clients, world, id]() {
+    ctx.client->setTimeout(7, [clients, world, id]() {
         const player::PlayerData data(clients, world, id);
 
         if (!data.valid()) {
