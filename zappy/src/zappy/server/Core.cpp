@@ -20,6 +20,7 @@
 
 #include "game/Event.hpp"
 #include "game/EventHelper.hpp"
+#include "zappy/gui/game/GameState.hpp"
 #include "zappy/server/CliParser.hpp"
 #include "zappy/server/client/Client.hpp"
 #include "zappy/server/commands/GuiCommands.hpp"
@@ -116,7 +117,16 @@ void Core::nextTick() {
         timeout = this->_timer.timeoutUntilNextTick();
     }
     this->_timer.update();
-    this->_clientRegistry.update();
+    for (const std::vector<std::uint64_t> disconnectedPlayerIds = _clientRegistry.update();
+         std::uint64_t playerId : disconnectedPlayerIds) {
+        game::entity::Player* player = _world->player(playerId);
+
+        if (player == nullptr) {
+            continue;
+        }
+        player->kill();
+        _logger.info("Killed player #{}, client disconnected.", playerId);
+    }
 }
 
 bool Core::initTeams(const std::span<const std::string_view> names) {
